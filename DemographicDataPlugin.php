@@ -4,6 +4,7 @@ namespace APP\plugins\generic\demographicData;
 
 use PKP\plugins\GenericPlugin;
 use APP\core\Application;
+use Illuminate\Database\Migrations\Migration;
 
 class DemographicDataPlugin extends GenericPlugin
 {
@@ -21,6 +22,11 @@ class DemographicDataPlugin extends GenericPlugin
     public function getDescription()
     {
         return __('plugins.generic.demographicData.description');
+    }
+
+    public function getInstallMigration(): Migration
+    {
+        return new DemographicQuestionsSchemaMigration();
     }
 
     public function getCanEnable()
