@@ -1,0 +1,5 @@
+msgid "plugins.generic.demographicData.displayName"
+msgstr "Dados Demográficos"
+
+msgid "plugins.generic.demographicData.description"
+msgstr "Adiciona perguntas personalizadas para Dados Demográficos."
