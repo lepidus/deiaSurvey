@@ -1,0 +1,1 @@
+<li><a name="identity" href="{url router=\PKP\core\PKPApplication::ROUTE_COMPONENT component="tab.user.ProfileTabHandler" op="identity"}">Dados Demográficos</a></li>
