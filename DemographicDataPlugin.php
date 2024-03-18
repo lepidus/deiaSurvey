@@ -29,12 +29,12 @@ class DemographicDataPlugin extends GenericPlugin
 
     public function demographicDataTabFilter($output, $templateMgr)
     {
-        if (preg_match('/<div[^>]+id="profileTabs"[^>]*>.*?<ul[^>]*>(.*?<\/li>)/s', $output, $matches, PREG_OFFSET_CAPTURE)) {
+        $regexListItemTabPosition = '/<div[^>]+id="profileTabs"[^>]*>.*?<ul[^>]*>((?:(?!<\/ul>).)*?<li>\s*<a[^>]*?name="(?:apiSettings)"[^>]*?>.*?<\/li>)/s';
+        if (preg_match($regexListItemTabPosition, $output, $matches, PREG_OFFSET_CAPTURE)) {
             $match = $matches[0][0];
             $offset = $matches[0][1];
             $newOutput = substr($output, 0, $offset + strlen($match));
-            error_log($newOutput);
-            $newOutput .= $templateMgr->fetch($this->getTemplateResource('tab.tpl'));
+            $newOutput .= $templateMgr->fetch($this->getTemplateResource('demographicDataTab.tpl'));
             $newOutput .= substr($output, $offset + strlen($match));
             $output = $newOutput;
             $templateMgr->unregisterFilter('output', [$this, 'demographicDataTabFilter']);
