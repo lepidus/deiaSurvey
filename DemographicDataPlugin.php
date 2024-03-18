@@ -19,10 +19,20 @@ class DemographicDataPlugin extends GenericPlugin
         return $success;
     }
 
+    public function getDisplayName()
+    {
+        return __('plugins.generic.demographicData.displayName');
+    }
+
+    public function getDescription()
+    {
+        return __('plugins.generic.demographicData.description');
+    }
+
     public function setupHandler($hookName, $params)
     {
         $component = & $params[0];
-        if ($component == 'plugins.generic.demographicData.DemographicDataHandler') {
+        if ($component == 'plugins.generic.demographicData.demographicData.TabHandler') {
             return true;
         }
         return false;
@@ -50,16 +60,6 @@ class DemographicDataPlugin extends GenericPlugin
             $templateMgr->unregisterFilter('output', [$this, 'demographicDataTabFilter']);
         }
         return $output;
-    }
-
-    public function getDisplayName()
-    {
-        return __('plugins.generic.demographicData.displayName');
-    }
-
-    public function getDescription()
-    {
-        return __('plugins.generic.demographicData.description');
     }
 
     public function getInstallMigration(): Migration

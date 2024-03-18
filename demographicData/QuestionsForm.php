@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\demographicData;
+namespace APP\plugins\generic\demographicData\demographicData;
 
 use APP\core\Application;
 use APP\template\TemplateManager;
@@ -8,7 +8,7 @@ use PKP\user\User;
 use PKP\form\Form;
 use PKP\plugins\PluginRegistry;
 
-class DemographicDataForm extends Form
+class QuestionsForm extends Form
 {
     public function __construct()
     {
@@ -39,5 +39,5 @@ class DemographicDataForm extends Form
 }
 
 if (!PKP_STRICT_MODE) {
-    class_alias('\APP\plugins\generic\demographicData\DemographicDataForm', '\DemographicDataForm');
+    class_alias('\APP\plugins\generic\demographicData\demographicData\QuestionsForm', '\QuestionsForm');
 }
