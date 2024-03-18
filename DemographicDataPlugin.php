@@ -6,6 +6,7 @@ use PKP\plugins\GenericPlugin;
 use APP\core\Application;
 use Illuminate\Database\Migrations\Migration;
 use PKP\plugins\Hook;
+use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 
 class DemographicDataPlugin extends GenericPlugin
 {
@@ -32,7 +33,7 @@ class DemographicDataPlugin extends GenericPlugin
     public function setupHandler($hookName, $params)
     {
         $component = & $params[0];
-        if ($component == 'plugins.generic.demographicData.demographicData.TabHandler') {
+        if ($component == 'plugins.generic.demographicData.classes.controllers.TabHandler') {
             return true;
         }
         return false;
@@ -64,7 +65,7 @@ class DemographicDataPlugin extends GenericPlugin
 
     public function getInstallMigration(): Migration
     {
-        return new DemographicQuestionsSchemaMigration();
+        return new SchemaMigration();
     }
 
     public function getCanEnable()

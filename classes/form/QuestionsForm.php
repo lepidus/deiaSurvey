@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\demographicData;
+namespace APP\plugins\generic\demographicData\classes\form;
 
 use APP\core\Application;
 use APP\template\TemplateManager;
@@ -13,7 +13,7 @@ class QuestionsForm extends Form
     public function __construct()
     {
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
-        parent::__construct($plugin->getTemplateResource('demographicData.tpl'));
+        parent::__construct($plugin->getTemplateResource('questions.tpl'));
     }
 
     public function fetch($request, $template = null, $display = false)
@@ -39,5 +39,5 @@ class QuestionsForm extends Form
 }
 
 if (!PKP_STRICT_MODE) {
-    class_alias('\APP\plugins\generic\demographicData\demographicData\QuestionsForm', '\QuestionsForm');
+    class_alias('\APP\plugins\generic\demographicData\classes\form\QuestionsForm', '\QuestionsForm');
 }
