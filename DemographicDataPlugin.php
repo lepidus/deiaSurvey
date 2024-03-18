@@ -14,8 +14,18 @@ class DemographicDataPlugin extends GenericPlugin
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
             Hook::add('TemplateManager::display', [$this, 'addDemographicDataTab']);
+            Hook::add('LoadComponentHandler', [$this, 'setupHandler']);
         }
         return $success;
+    }
+
+    public function setupHandler($hookName, $params)
+    {
+        $component = & $params[0];
+        if ($component == 'plugins.generic.demographicData.DemographicDataHandler') {
+            return true;
+        }
+        return false;
     }
 
     public function addDemographicDataTab(string $hookName, array $args)
