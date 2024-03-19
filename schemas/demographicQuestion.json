@@ -1,0 +1,17 @@
+{
+    "title": "Demographic Question",
+    "description": "A Question regarding the user's demographic information",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "readOnly": true
+      },
+      "contextId": {
+        "type": "integer"
+      },
+      "questionText": {
+        "type": "string",
+			  "multilingual": true
+      }
+    }
+}
