@@ -12,6 +12,8 @@ class RepositoryTest extends DatabaseTestCase
     use TestHelperTrait;
 
     private $contextId;
+    private $locale;
+    private array $params;
 
     protected function getAffectedTables(): array
     {
@@ -26,6 +28,16 @@ class RepositoryTest extends DatabaseTestCase
     {
         parent::setUp();
         $this->contextId = $this->createJournalMock();
+        $this->locale = "en";
+        $this->params = [
+            'contextId' => $this->contextId,
+            'title' => [
+                $this->locale => 'Test title'
+            ],
+            'description' => [
+                $this->locale => 'Test description'
+            ]
+        ];
         $this->addSchemaFile('demographicQuestion');
     }
 
@@ -34,18 +46,7 @@ class RepositoryTest extends DatabaseTestCase
         $repository = app(Repository::class);
         $demographicQuestion = $repository->newDataObject();
         self::assertInstanceOf(DemographicQuestion::class, $demographicQuestion);
-
-        $params = [
-            'id' => 123,
-            'contextId' => $this->contextId,
-            'title' => [
-                'en' => 'Test title'
-            ],
-            'description' => [
-                'en' => 'Test description'
-            ]
-        ];
-        $demographicQuestion = $repository->newDataObject($params);
-        self::assertEquals($params, $demographicQuestion->_data);
+        $demographicQuestion = $repository->newDataObject($this->params);
+        self::assertEquals($this->params, $demographicQuestion->_data);
     }
 }
