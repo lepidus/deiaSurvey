@@ -39,4 +39,9 @@ class DAO extends EntityDAO
     {
         return parent::_delete($demographicQuestion);
     }
+
+    public function update(DemographicQuestion $demographicQuestion)
+    {
+        return parent::_update($demographicQuestion);
+    }
 }

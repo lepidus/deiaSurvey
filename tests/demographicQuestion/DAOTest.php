@@ -73,6 +73,29 @@ class DAOTest extends DatabaseTestCase
         self::assertFalse($this->demographicQuestionDAO->exists($insertedDemographicQuestionId, $this->contextId));
     }
 
+    public function testEditDemographicQuestion(): void
+    {
+        $locale = 'en';
+
+        $demographicQuestion = $this->createDemographicQuestionObject($locale);
+        $insertedDemographicQuestionId = $this->demographicQuestionDAO->insert($demographicQuestion);
+
+        $fetchedDemographicQuestion = $this->demographicQuestionDAO->get(
+            $insertedDemographicQuestionId,
+            $this->contextId
+        );
+        $fetchedDemographicQuestion->setQuestionText('Updated title', $locale);
+
+        $this->demographicQuestionDAO->update($fetchedDemographicQuestion);
+
+        $fetchedDemographicQuestionEdited = $this->demographicQuestionDAO->get(
+            $insertedDemographicQuestionId,
+            $this->contextId
+        );
+
+        self::assertEquals($fetchedDemographicQuestionEdited->getLocalizedQuestionText()[$locale], "Updated title");
+    }
+
     private function createDemographicQuestionObject($locale)
     {
         $demographicQuestion = $this->demographicQuestionDAO->newDataObject();
