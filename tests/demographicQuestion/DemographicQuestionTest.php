@@ -29,4 +29,18 @@ class DemographicQuestionTest extends PKPTestCase
         $questionText = $this->demographicQuestion->getLocalizedQuestionText()['en'];
         $this->assertEquals($questionText, $expectedQuestionText);
     }
+
+    public function testGetQuestionDescription(): void
+    {
+        $expectedQuestionDescription = "Ethnicity refers to a group of people who share
+            common cultural, historical, linguistic, or ancestral characteristics.
+            These characteristics may include geographic origin, language, religion, customs,
+            traditions, and shared history. Ethnicity is often associated with cultural identity
+            and can play a significant role in shaping the individual and collective identity
+            of a group of people.";
+
+        $this->demographicQuestion->setQuestionDescription($expectedQuestionDescription, 'en');
+        $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription()['en'];
+        $this->assertEquals($questionDescription, $expectedQuestionDescription);
+    }
 }

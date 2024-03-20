@@ -23,4 +23,14 @@ class DemographicQuestion extends \PKP\core\DataObject
     {
         $this->setData('questionText', $title, $locale);
     }
+
+    public function getLocalizedQuestionDescription()
+    {
+        return $this->getData('questionDescription');
+    }
+
+    public function setQuestionDescription($descriptionText, $locale)
+    {
+        $this->setData('questionDescription', $descriptionText, $locale);
+    }
 }
