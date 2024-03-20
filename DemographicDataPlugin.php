@@ -16,6 +16,7 @@ class DemographicDataPlugin extends GenericPlugin
         if ($success && $this->getEnabled()) {
             Hook::add('TemplateManager::display', [$this, 'addDemographicDataTab']);
             Hook::add('LoadComponentHandler', [$this, 'setupHandler']);
+            Hook::add('Schema::get::demographicQuestion', [$this, 'addDemographicQuestionSchema']);
         }
         return $success;
     }
@@ -29,6 +30,35 @@ class DemographicDataPlugin extends GenericPlugin
     {
         return __('plugins.generic.demographicData.description');
     }
+
+    public function addDemographicQuestionSchema(string $hookName, array $params): bool
+    {
+        $schema = &$params[0];
+        $schema = $this->getJsonSchema('demographicQuestion');
+        return true;
+    }
+
+    private function getJsonSchema(string $schemaName): ?\stdClass
+    {
+        $schemaFile = sprintf(
+            '%s/plugins/generic/demographicData/schemas/%s.json',
+            BASE_SYS_DIR,
+            $schemaName
+        );
+        if (file_exists($schemaFile)) {
+            $schema = json_decode(file_get_contents($schemaFile));
+            if (!$schema) {
+                throw new \Exception(
+                    'Schema failed to decode. This usually means it is invalid JSON. Requested: '
+                    . $schemaFile
+                    . '. Last JSON error: '
+                    . json_last_error()
+                );
+            }
+        }
+        return $schema;
+    }
+
 
     public function setupHandler($hookName, $params)
     {
