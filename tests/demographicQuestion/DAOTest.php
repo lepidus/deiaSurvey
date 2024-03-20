@@ -52,7 +52,7 @@ class DAOTest extends DatabaseTestCase
         self::assertEquals([
             'id' => $insertedDemographicQuestionId,
             'contextId' => $this->contextId,
-            'questionText' => [$locale => 'Test title'],
+            'questionText' => [$locale => 'Test text'],
             'questionDescription' => [$locale => 'Test description'],
         ], $fetchedDemographicQuestion->_data);
     }
@@ -84,7 +84,7 @@ class DAOTest extends DatabaseTestCase
             $insertedDemographicQuestionId,
             $this->contextId
         );
-        $fetchedDemographicQuestion->setQuestionText('Updated title', $locale);
+        $fetchedDemographicQuestion->setQuestionText('Updated text', $locale);
 
         $this->demographicQuestionDAO->update($fetchedDemographicQuestion);
 
@@ -93,14 +93,14 @@ class DAOTest extends DatabaseTestCase
             $this->contextId
         );
 
-        self::assertEquals($fetchedDemographicQuestionEdited->getLocalizedQuestionText()[$locale], "Updated title");
+        self::assertEquals($fetchedDemographicQuestionEdited->getLocalizedQuestionText()[$locale], "Updated text");
     }
 
     private function createDemographicQuestionObject($locale)
     {
         $demographicQuestion = $this->demographicQuestionDAO->newDataObject();
         $demographicQuestion->setContextId($this->contextId);
-        $demographicQuestion->setQuestionText('Test title', $locale);
+        $demographicQuestion->setQuestionText('Test text', $locale);
         $demographicQuestion->setQuestionDescription('Test description', $locale);
 
         return $demographicQuestion;
