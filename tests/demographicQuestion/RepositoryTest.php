@@ -31,10 +31,10 @@ class RepositoryTest extends DatabaseTestCase
         $this->locale = "en";
         $this->params = [
             'contextId' => $this->contextId,
-            'title' => [
-                $this->locale => 'Test title'
+            'questionText' => [
+                $this->locale => 'Test text'
             ],
-            'description' => [
+            'questionDescription' => [
                 $this->locale => 'Test description'
             ]
         ];
@@ -48,5 +48,26 @@ class RepositoryTest extends DatabaseTestCase
         self::assertInstanceOf(DemographicQuestion::class, $demographicQuestion);
         $demographicQuestion = $repository->newDataObject($this->params);
         self::assertEquals($this->params, $demographicQuestion->_data);
+    }
+
+    public function testCrud(): void
+    {
+        $repository = app(Repository::class);
+        $demographicQuestion = $repository->newDataObject($this->params);
+        $insertedDemographicQuestionId = $repository->add($demographicQuestion);
+        $this->params['id'] = $insertedDemographicQuestionId;
+
+        $fetchedDemographicQuestion = $repository->get($insertedDemographicQuestionId, $this->contextId);
+        self::assertEquals($this->params, $fetchedDemographicQuestion->_data);
+
+        $this->params['questionText']['en'] = 'Updated text';
+        $this->params['questionDescription']['en'] = 'Updated description';
+        $repository->edit($demographicQuestion, $this->params);
+
+        $fetchedDemographicQuestion = $repository->get($demographicQuestion->getId(), $this->contextId);
+        self::assertEquals($this->params, $fetchedDemographicQuestion->_data);
+
+        $repository->delete($demographicQuestion);
+        self::assertFalse($repository->exists($demographicQuestion->getId()));
     }
 }
