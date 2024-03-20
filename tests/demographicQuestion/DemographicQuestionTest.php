@@ -14,4 +14,13 @@ class DemographicQuestionTest extends PKPTestCase
         $demographicQuestion->setContextId($expectedContextId);
         $this->assertEquals($demographicQuestion->getContextId(), $expectedContextId);
     }
+
+    public function testGetQuestionText(): void
+    {
+        $expectedQuestionText = "What is your ethnicity?";
+        $demographicQuestion = new DemographicQuestion();
+        $demographicQuestion->setQuestionText($expectedQuestionText, 'en');
+        $questionText = $demographicQuestion->getLocalizedQuestionText()['en'];
+        $this->assertEquals($questionText, $expectedQuestionText);
+    }
 }
