@@ -44,4 +44,22 @@ class DAO extends EntityDAO
     {
         return parent::_update($demographicQuestion);
     }
+
+    public function getMany(Collector $query): LazyCollection
+    {
+        $rows = $query
+            ->getQueryBuilder()
+            ->get();
+
+        return LazyCollection::make(function () use ($rows) {
+            foreach ($rows as $row) {
+                yield $row->demographic_question_id => $this->fromRow($row);
+            }
+        });
+    }
+
+    public function fromRow(object $row): DemographicQuestion
+    {
+        return parent::fromRow($row);
+    }
 }
