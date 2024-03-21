@@ -93,7 +93,7 @@ class DAOTest extends DatabaseTestCase
             $this->contextId
         );
 
-        self::assertEquals($fetchedDemographicQuestionEdited->getLocalizedQuestionText()[$locale], "Updated text");
+        self::assertEquals($fetchedDemographicQuestionEdited->getLocalizedQuestionText(), "Updated text");
     }
 
     private function createDemographicQuestionObject($locale)

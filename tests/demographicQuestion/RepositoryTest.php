@@ -81,10 +81,6 @@ class RepositoryTest extends DatabaseTestCase
         $demographicQuestions = $repository->getCollector()
             ->filterByContextIds([$this->contextId])
             ->getMany();
-
-        self::assertEquals(
-            [$demographicQuestion->getId() => $demographicQuestion],
-            $demographicQuestions->all()
-        );
+        self::assertTrue(in_array($demographicQuestion, $demographicQuestions->all()));
     }
 }

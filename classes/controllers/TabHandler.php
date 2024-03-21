@@ -11,6 +11,7 @@ class TabHandler extends Handler
     public function demographicData($args, $request)
     {
         $form = new QuestionsForm();
+        $form->initData();
         return new JSONMessage(true, $form->fetch($request));
     }
 }

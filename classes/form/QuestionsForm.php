@@ -7,6 +7,8 @@ use APP\template\TemplateManager;
 use PKP\user\User;
 use PKP\form\Form;
 use PKP\plugins\PluginRegistry;
+use APP\plugins\generic\demographicData\classes\facades\Repo;
+use APP\plugins\generic\demographicData\classes\demographicQuestion\Collector;
 
 class QuestionsForm extends Form
 {
@@ -25,6 +27,15 @@ class QuestionsForm extends Form
 
     public function initData()
     {
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        $questions = Repo::demographicQuestion()
+            ->getCollector()
+            ->filterByContextIds([$context->getId()])
+            ->getMany();
+
+        $this->setData('questions', $questions);
+        parent::initData();
     }
 
     public function readInputData()

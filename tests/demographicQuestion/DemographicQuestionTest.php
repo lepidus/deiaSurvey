@@ -26,7 +26,7 @@ class DemographicQuestionTest extends PKPTestCase
     {
         $expectedQuestionText = "What is your ethnicity?";
         $this->demographicQuestion->setQuestionText($expectedQuestionText, 'en');
-        $questionText = $this->demographicQuestion->getLocalizedQuestionText()['en'];
+        $questionText = $this->demographicQuestion->getLocalizedQuestionText();
         $this->assertEquals($questionText, $expectedQuestionText);
     }
 
@@ -40,7 +40,7 @@ class DemographicQuestionTest extends PKPTestCase
             of a group of people.";
 
         $this->demographicQuestion->setQuestionDescription($expectedQuestionDescription, 'en');
-        $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription()['en'];
+        $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
         $this->assertEquals($questionDescription, $expectedQuestionDescription);
     }
 }
