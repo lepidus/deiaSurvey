@@ -6,6 +6,7 @@ use PKP\plugins\GenericPlugin;
 use APP\core\Application;
 use Illuminate\Database\Migrations\Migration;
 use PKP\plugins\Hook;
+use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 
 class DemographicDataPlugin extends GenericPlugin
 {
@@ -14,8 +15,58 @@ class DemographicDataPlugin extends GenericPlugin
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
             Hook::add('TemplateManager::display', [$this, 'addDemographicDataTab']);
+            Hook::add('LoadComponentHandler', [$this, 'setupHandler']);
+            Hook::add('Schema::get::demographicQuestion', [$this, 'addDemographicQuestionSchema']);
         }
         return $success;
+    }
+
+    public function getDisplayName()
+    {
+        return __('plugins.generic.demographicData.displayName');
+    }
+
+    public function getDescription()
+    {
+        return __('plugins.generic.demographicData.description');
+    }
+
+    public function addDemographicQuestionSchema(string $hookName, array $params): bool
+    {
+        $schema = &$params[0];
+        $schema = $this->getJsonSchema('demographicQuestion');
+        return true;
+    }
+
+    private function getJsonSchema(string $schemaName): ?\stdClass
+    {
+        $schemaFile = sprintf(
+            '%s/plugins/generic/demographicData/schemas/%s.json',
+            BASE_SYS_DIR,
+            $schemaName
+        );
+        if (file_exists($schemaFile)) {
+            $schema = json_decode(file_get_contents($schemaFile));
+            if (!$schema) {
+                throw new \Exception(
+                    'Schema failed to decode. This usually means it is invalid JSON. Requested: '
+                    . $schemaFile
+                    . '. Last JSON error: '
+                    . json_last_error()
+                );
+            }
+        }
+        return $schema;
+    }
+
+
+    public function setupHandler($hookName, $params)
+    {
+        $component = & $params[0];
+        if ($component == 'plugins.generic.demographicData.classes.controllers.TabHandler') {
+            return true;
+        }
+        return false;
     }
 
     public function addDemographicDataTab(string $hookName, array $args)
@@ -42,19 +93,9 @@ class DemographicDataPlugin extends GenericPlugin
         return $output;
     }
 
-    public function getDisplayName()
-    {
-        return __('plugins.generic.demographicData.displayName');
-    }
-
-    public function getDescription()
-    {
-        return __('plugins.generic.demographicData.description');
-    }
-
     public function getInstallMigration(): Migration
     {
-        return new DemographicQuestionsSchemaMigration();
+        return new SchemaMigration();
     }
 
     public function getCanEnable()
