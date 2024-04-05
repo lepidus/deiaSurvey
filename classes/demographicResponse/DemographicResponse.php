@@ -13,4 +13,14 @@ class DemographicResponse extends \PKP\core\DataObject
     {
         $this->setData('demographicQuestionId', $demographicQuestionId);
     }
+
+    public function getLocalizedText(): string
+    {
+        return $this->getLocalizedData('responseText');
+    }
+
+    public function setLocalizedText($responseText, $locale)
+    {
+        $this->setData('responseText', $responseText, $locale);
+    }
 }
