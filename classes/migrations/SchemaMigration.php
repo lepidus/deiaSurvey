@@ -36,5 +36,17 @@ class SchemaMigration extends Migration
             $table->index(['demographic_question_id'], 'demographic_question_settings_id');
             $table->unique(['demographic_question_id', 'locale', 'setting_name'], 'demographic_question_settings_pkey');
         });
+
+        Schema::create('demographic_question_responses', function (Blueprint $table) {
+            $table->bigIncrements('demographic_question_response_id');
+            $table->bigInteger('demographic_question_id');
+            $table->text('response_value')->nullable();
+
+            $table->foreign('demographic_question_id')
+                ->references('demographic_question_id')
+                ->on('demographic_questions')
+                ->onDelete('cascade');
+            $table->index(['demographic_question_id'], 'demographic_question_responses_demographic_question_id');
+        });
     }
 }
