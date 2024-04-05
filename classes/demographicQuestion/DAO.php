@@ -3,7 +3,6 @@
 namespace APP\plugins\generic\demographicData\classes\demographicQuestion;
 
 use PKP\core\EntityDAO;
-use PKP\services\PKPSchemaService;
 use Illuminate\Support\LazyCollection;
 use PKP\core\traits\EntityWithParent;
 
