@@ -17,6 +17,7 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('TemplateManager::display', [$this, 'addDemographicDataTab']);
             Hook::add('LoadComponentHandler', [$this, 'setupHandler']);
             Hook::add('Schema::get::demographicQuestion', [$this, 'addDemographicQuestionSchema']);
+            Hook::add('Schema::get::demographicResponse', [$this, 'addDemographicResponseSchema']);
         }
         return $success;
     }
@@ -35,6 +36,13 @@ class DemographicDataPlugin extends GenericPlugin
     {
         $schema = &$params[0];
         $schema = $this->getJsonSchema('demographicQuestion');
+        return true;
+    }
+
+    public function addDemographicResponseSchema(string $hookName, array $params): bool
+    {
+        $schema = &$params[0];
+        $schema = $this->getJsonSchema('demographicResponse');
         return true;
     }
 
@@ -58,7 +66,6 @@ class DemographicDataPlugin extends GenericPlugin
         }
         return $schema;
     }
-
 
     public function setupHandler($hookName, $params)
     {

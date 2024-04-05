@@ -1,0 +1,17 @@
+{
+    "title": "Demographic Response",
+    "description": "The response of demographic question",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "readOnly": true
+      },
+      "demographicQuestionId": {
+        "type": "integer"
+      },
+      "responseText": {
+        "type": "string",
+		    "multilingual": true
+      }
+    }
+}
