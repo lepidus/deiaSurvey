@@ -61,30 +61,31 @@ class DAOTest extends DatabaseTestCase
         self::assertInstanceOf(DemographicResponse::class, $demographicResponse);
     }
 
-    // public function testCreateDemographicResponse(): void
-    // {
-    //     $demographicResponse = $this->createDemographicResponseObject();
-    //     dump($demographicResponse);
-    //     $insertedDemographicResponseId = $this->demographicResponseDAO->insert($demographicResponse);
+    public function testCreateDemographicResponse(): void
+    {
+        $demographicResponse = $this->createDemographicResponseObject();
+        $insertedDemographicResponseId = $this->demographicResponseDAO->insert($demographicResponse);
 
-    //     $fetchedDemographicResponse = $this->demographicResponseDAO->get(
-    //         $insertedDemographicResponseId,
-    //         $this->demographicQuestionId
-    //     );
+        $fetchedDemographicResponse = $this->demographicResponseDAO->get(
+            $insertedDemographicResponseId,
+            $this->demographicQuestionId
+        );
 
-    //     self::assertEquals([
-    //         'id' => $insertedDemographicResponseId,
-    //         'demographicQuestionId' => $this->demographicQuestionId,
-    //         'responseText' => [self::DEFAULT_LOCALE => 'Test text']
-    //     ], $fetchedDemographicResponse->_data);
-    // }
+        self::assertEquals([
+            'id' => $insertedDemographicResponseId,
+            'demographicQuestionId' => $this->demographicQuestionId,
+            'responseText' => [self::DEFAULT_LOCALE => 'Test text'],
+            'userId' => 1
+        ], $fetchedDemographicResponse->_data);
+    }
 
-    // private function createDemographicResponseObject()
-    // {
-    //     $demographicResponse = $this->demographicResponseDAO->newDataObject();
-    //     $demographicResponse->setDemographicQuestionId($this->demographicQuestionId);
-    //     $demographicResponse->setText('Test text', self::DEFAULT_LOCALE);
+    private function createDemographicResponseObject()
+    {
+        $demographicResponse = $this->demographicResponseDAO->newDataObject();
+        $demographicResponse->setUserId(1);
+        $demographicResponse->setDemographicQuestionId($this->demographicQuestionId);
+        $demographicResponse->setText('Test text', self::DEFAULT_LOCALE);
 
-    //     return $demographicResponse;
-    // }
+        return $demographicResponse;
+    }
 }

@@ -12,11 +12,12 @@ class DAO extends EntityDAO
 
     public $schema = 'demographicResponse';
     public $table = 'demographic_responses';
-    public $primaryKeyColumn = 'demographic_question_response_id';
+    public $primaryKeyColumn = 'demographic_response_id';
     public $settingsTable = 'demographic_response_settings';
     public $primaryTableColumns = [
-        'id' => 'demographic_question_response_id',
+        'id' => 'demographic_response_id',
         'demographicQuestionId' => 'demographic_question_id',
+        'userId' => 'user_id',
     ];
 
     public function getParentColumn(): string
@@ -27,5 +28,10 @@ class DAO extends EntityDAO
     public function newDataObject(): DemographicResponse
     {
         return app(DemographicResponse::class);
+    }
+
+    public function insert(DemographicResponse $demographicResponse): int
+    {
+        return parent::_insert($demographicResponse);
     }
 }
