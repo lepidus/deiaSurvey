@@ -11,7 +11,7 @@ class DAO extends EntityDAO
     use EntityWithParent;
 
     public $schema = 'demographicResponse';
-    public $table = 'demographic_question_responses';
+    public $table = 'demographic_responses';
     public $primaryKeyColumn = 'demographic_question_response_id';
     public $settingsTable = 'demographic_response_settings';
     public $primaryTableColumns = [
