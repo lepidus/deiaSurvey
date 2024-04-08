@@ -5,9 +5,39 @@ namespace APP\plugins\generic\demographicData\tests\helpers;
 use APP\journal\Journal;
 use PKP\user\User;
 use PKP\plugins\Hook;
+use APP\plugins\generic\demographicData\classes\demographicQuestion\Repository as DemographicQuestionRepository;
 
 trait TestHelperTrait
 {
+    private const DEFAULT_LOCALE = "en";
+
+    private function createDemographicQuestion()
+    {
+        $params = [
+            'contextId' => $this->createJournalMock(),
+            'questionText' => [
+                self::DEFAULT_LOCALE => 'Test text'
+            ],
+            'questionDescription' => [
+                self::DEFAULT_LOCALE => 'Test description'
+            ]
+        ];
+
+        $repository = app(DemographicQuestionRepository::class);
+        $demographicQuestion = $repository->newDataObject($params);
+        return $repository->add($demographicQuestion);
+    }
+
+    private function createDemographicResponseObject()
+    {
+        $demographicResponse = $this->demographicResponseDAO->newDataObject();
+        $demographicResponse->setUserId($this->createUserMock());
+        $demographicResponse->setDemographicQuestionId($this->demographicQuestionId);
+        $demographicResponse->setText('Test text', self::DEFAULT_LOCALE);
+
+        return $demographicResponse;
+    }
+
     private function createJournalMock()
     {
         $journal = $this->getMockBuilder(Journal::class)
