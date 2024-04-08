@@ -9,6 +9,9 @@
       "demographicQuestionId": {
         "type": "integer"
       },
+      "userId": {
+        "type": "integer"
+      },
       "responseText": {
         "type": "string",
 		    "multilingual": true

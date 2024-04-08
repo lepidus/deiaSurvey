@@ -25,7 +25,7 @@ class DemographicResponseTest extends PKPTestCase
     public function testGetDemographicResponseText(): void
     {
         $expectedDemographicResponseText = "I'm from Parintins";
-        $this->demographicResponse->setLocalizedText($expectedDemographicResponseText, 'en');
+        $this->demographicResponse->setText($expectedDemographicResponseText, 'en');
         $this->assertEquals($this->demographicResponse->getLocalizedText(), $expectedDemographicResponseText);
     }
 }

@@ -37,9 +37,10 @@ class SchemaMigration extends Migration
             $table->unique(['demographic_question_id', 'locale', 'setting_name'], 'demographic_question_settings_pkey');
         });
 
-        Schema::create('demographic_question_responses', function (Blueprint $table) {
-            $table->bigIncrements('demographic_question_response_id');
+        Schema::create('demographic_responses', function (Blueprint $table) {
+            $table->bigIncrements('demographic_response_id');
             $table->bigInteger('demographic_question_id');
+            $table->bigInteger('user_id');
             $table->text('response_value')->nullable();
 
             $table->foreign('demographic_question_id')
@@ -47,6 +48,22 @@ class SchemaMigration extends Migration
                 ->on('demographic_questions')
                 ->onDelete('cascade');
             $table->index(['demographic_question_id'], 'demographic_question_responses_demographic_question_id');
+        });
+
+        Schema::create('demographic_response_settings', function (Blueprint $table) {
+            $table->bigIncrements('demographic_response_setting_id');
+            $table->bigInteger('demographic_response_id');
+            $table->string('locale', 14)->default('');
+            $table->string('setting_name', 255);
+            $table->longText('setting_value')->nullable();
+
+            $table->foreign('demographic_response_id')
+                ->references('demographic_response_id')
+                ->on('demographic_responses')
+                ->onDelete('cascade');
+
+            $table->index(['demographic_response_id'], 'demographic_response_setting_id');
+            $table->unique(['demographic_response_id', 'locale', 'setting_name'], 'demographic_response_settings_pkey');
         });
     }
 }

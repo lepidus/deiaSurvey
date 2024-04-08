@@ -13,6 +13,7 @@ class DAO extends EntityDAO
     public $schema = 'demographicResponse';
     public $table = 'demographic_question_responses';
     public $primaryKeyColumn = 'demographic_question_response_id';
+    public $settingsTable = 'demographic_response_settings';
     public $primaryTableColumns = [
         'id' => 'demographic_question_response_id',
         'demographicQuestionId' => 'demographic_question_id',
