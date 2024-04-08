@@ -95,6 +95,27 @@ class DAOTest extends DatabaseTestCase
         self::assertFalse($this->demographicResponseDAO->exists($insertedDemographicResponseId, $this->contextId));
     }
 
+    public function testEditDemographicResponse(): void
+    {
+        $demographicResponse = $this->createDemographicResponseObject();
+        $insertedDemographicResponseId = $this->demographicResponseDAO->insert($demographicResponse);
+
+        $fetchedDemographicResponse = $this->demographicResponseDAO->get(
+            $insertedDemographicResponseId,
+            $this->demographicQuestionId
+        );
+        $fetchedDemographicResponse->setText('Updated text', self::DEFAULT_LOCALE);
+
+        $this->demographicResponseDAO->update($fetchedDemographicResponse);
+
+        $fetchedDemographicResponseEdited = $this->demographicResponseDAO->get(
+            $insertedDemographicResponseId,
+            $this->demographicQuestionId
+        );
+
+        self::assertEquals($fetchedDemographicResponseEdited->getLocalizedText(), "Updated text");
+    }
+
     private function createDemographicResponseObject()
     {
         $demographicResponse = $this->demographicResponseDAO->newDataObject();
