@@ -58,7 +58,7 @@ class DAO extends EntityDAO
         });
     }
 
-    public function fromRow(object $row): DemographicQuestion
+    public function fromRow(object $row): DemographicResponse
     {
         return parent::fromRow($row);
     }
