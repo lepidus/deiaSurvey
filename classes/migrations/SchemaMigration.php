@@ -41,7 +41,6 @@ class SchemaMigration extends Migration
             $table->bigIncrements('demographic_response_id');
             $table->bigInteger('demographic_question_id');
             $table->bigInteger('user_id');
-            $table->text('response_value')->nullable();
 
             $table->foreign('demographic_question_id')
                 ->references('demographic_question_id')
