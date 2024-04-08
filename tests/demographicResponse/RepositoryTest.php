@@ -39,10 +39,15 @@ class RepositoryTest extends DatabaseTestCase
             ]
         ];
         $this->addSchemaFile('demographicQuestion');
+        $this->addSchemaFile('demographicResponse');
     }
 
-    public function testTwoEqualsTwo(): void
+    public function testGetNewCustomResponseObject(): void
     {
-        self::assertTrue(2 === 2);
+        $repository = app(Repository::class);
+        $demographicResponse = $repository->newDataObject();
+        self::assertInstanceOf(DemographicResponse::class, $demographicResponse);
+        $demographicResponse = $repository->newDataObject($this->params);
+        self::assertEquals($this->params, $demographicResponse->_data);
     }
 }
