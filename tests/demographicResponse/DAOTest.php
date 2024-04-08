@@ -16,6 +16,7 @@ class DAOTest extends DatabaseTestCase
     private $demographicQuestionId;
     private const DEFAULT_LOCALE = "en";
     private $contextId;
+    private $userId;
 
     protected function getAffectedTables(): array
     {
@@ -36,6 +37,7 @@ class DAOTest extends DatabaseTestCase
         $this->addSchemaFile('demographicResponse');
         $this->contextId = $this->createJournalMock();
         $this->demographicQuestionId = $this->createDemographicQuestion();
+        $this->userId = $this->createUserMock();
     }
 
     private function createDemographicQuestion()
@@ -75,14 +77,14 @@ class DAOTest extends DatabaseTestCase
             'id' => $insertedDemographicResponseId,
             'demographicQuestionId' => $this->demographicQuestionId,
             'responseText' => [self::DEFAULT_LOCALE => 'Test text'],
-            'userId' => 1
+            'userId' => $this->userId
         ], $fetchedDemographicResponse->_data);
     }
 
     private function createDemographicResponseObject()
     {
         $demographicResponse = $this->demographicResponseDAO->newDataObject();
-        $demographicResponse->setUserId(1);
+        $demographicResponse->setUserId($this->userId);
         $demographicResponse->setDemographicQuestionId($this->demographicQuestionId);
         $demographicResponse->setText('Test text', self::DEFAULT_LOCALE);
 

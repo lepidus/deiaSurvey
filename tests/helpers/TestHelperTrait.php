@@ -3,6 +3,7 @@
 namespace APP\plugins\generic\demographicData\tests\helpers;
 
 use APP\journal\Journal;
+use PKP\user\User;
 use PKP\plugins\Hook;
 
 trait TestHelperTrait
@@ -23,6 +24,18 @@ trait TestHelperTrait
         $journal->setId(1);
 
         return $journal->getId();
+    }
+    private function createUserMock()
+    {
+        $user = $this->getMockBuilder(User::class)
+            ->onlyMethods(['getId'])
+            ->getMock();
+
+        $user->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue(1));
+
+        return $user->getId();
     }
 
     private function addSchemaFile(string $schemaName): void
