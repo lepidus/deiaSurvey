@@ -34,4 +34,9 @@ class DAO extends EntityDAO
     {
         return parent::_insert($demographicResponse);
     }
+
+    public function delete(DemographicResponse $demographicResponse)
+    {
+        return parent::_delete($demographicResponse);
+    }
 }

@@ -81,6 +81,20 @@ class DAOTest extends DatabaseTestCase
         ], $fetchedDemographicResponse->_data);
     }
 
+    public function testDeleteDemographicResponse(): void
+    {
+        $demographicResponse = $this->createDemographicResponseObject();
+        $insertedDemographicResponseId = $this->demographicResponseDAO->insert($demographicResponse);
+
+        $fetchedDemographicResponse = $this->demographicResponseDAO->get(
+            $insertedDemographicResponseId,
+            $this->demographicQuestionId
+        );
+
+        $this->demographicResponseDAO->delete($fetchedDemographicResponse);
+        self::assertFalse($this->demographicResponseDAO->exists($insertedDemographicResponseId, $this->contextId));
+    }
+
     private function createDemographicResponseObject()
     {
         $demographicResponse = $this->demographicResponseDAO->newDataObject();
