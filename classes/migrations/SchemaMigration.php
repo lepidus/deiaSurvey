@@ -47,7 +47,12 @@ class SchemaMigration extends Migration
                 ->references('demographic_question_id')
                 ->on('demographic_questions')
                 ->onDelete('cascade');
-            $table->index(['demographic_question_id'], 'demographic_question_responses_demographic_question_id');
+
+            $table->foreign('user_id')
+                ->references('user_id')
+                ->on('users')
+                ->onDelete('cascade');
+            $table->index(['demographic_question_id'], 'demographic_responses_demographic_question_id');
         });
 
         Schema::create('demographic_response_settings', function (Blueprint $table) {

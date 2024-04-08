@@ -23,7 +23,8 @@ class DAOTest extends DatabaseTestCase
             ...parent::getAffectedTables(),
             'demographic_questions',
             'demographic_question_settings',
-            'demographic_question_responses'
+            'demographic_responses',
+            'demographic_response_settings'
         ];
     }
 
