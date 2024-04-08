@@ -41,7 +41,7 @@ class RepositoryTest extends DatabaseTestCase
         $this->addSchemaFile('demographicQuestion');
     }
 
-    public function testGetNewCustomQuestionObject(): void
+    public function testGetNewDemographicQuestionObject(): void
     {
         $repository = app(Repository::class);
         $demographicQuestion = $repository->newDataObject();

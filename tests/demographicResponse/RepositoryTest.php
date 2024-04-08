@@ -42,12 +42,32 @@ class RepositoryTest extends DatabaseTestCase
         $this->addSchemaFile('demographicResponse');
     }
 
-    public function testGetNewCustomResponseObject(): void
+    public function testGetNewDemographicResponseObject(): void
     {
         $repository = app(Repository::class);
         $demographicResponse = $repository->newDataObject();
         self::assertInstanceOf(DemographicResponse::class, $demographicResponse);
         $demographicResponse = $repository->newDataObject($this->params);
         self::assertEquals($this->params, $demographicResponse->_data);
+    }
+
+    public function testCrud(): void
+    {
+        $repository = app(Repository::class);
+        $demographicResponse = $repository->newDataObject($this->params);
+        $insertedDemographicResponseId = $repository->add($demographicResponse);
+        $this->params['id'] = $insertedDemographicResponseId;
+
+        $fetchedDemographicResponse = $repository->get($insertedDemographicResponseId, $this->demographicQuestionId);
+        self::assertEquals($this->params, $fetchedDemographicResponse->_data);
+
+        $this->params['responseText']['en'] = 'Updated text';
+        $repository->edit($demographicResponse, $this->params);
+
+        $fetchedDemographicResponse = $repository->get($demographicResponse->getId(), $this->demographicQuestionId);
+        self::assertEquals($this->params, $fetchedDemographicResponse->_data);
+
+        $repository->delete($demographicResponse);
+        self::assertFalse($repository->exists($demographicResponse->getId()));
     }
 }
