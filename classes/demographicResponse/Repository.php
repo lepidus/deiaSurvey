@@ -50,4 +50,9 @@ class Repository
     {
         return $this->dao->exists($id, $demographicQuestionId);
     }
+
+    public function getCollector(): Collector
+    {
+        return app(Collector::class);
+    }
 }

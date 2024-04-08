@@ -70,4 +70,18 @@ class RepositoryTest extends DatabaseTestCase
         $repository->delete($demographicResponse);
         self::assertFalse($repository->exists($demographicResponse->getId()));
     }
+
+    public function testCollectorFilterByDemographicResponseIdAndUserId(): void
+    {
+        $repository = app(Repository::class);
+        $demographicResponse = $repository->newDataObject($this->params);
+
+        $repository->add($demographicResponse);
+
+        $demographicResponses = $repository->getCollector()
+            ->filterByQuestionIds([$this->demographicQuestionId])
+            ->filterByUserIds([$this->userId])
+            ->getMany();
+        self::assertTrue(in_array($demographicResponse, $demographicResponses->all()));
+    }
 }
