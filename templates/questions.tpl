@@ -11,7 +11,10 @@
 
     {foreach $questions as $question}
         {fbvFormArea id="demographicQuestion"}
-            {fbvFormSection title=$question->getLocalizedQuestionText() translate=false required=true}
+            {fbvFormSection title=$question['title'] translate=false required=true}
+				{fbvFormSection for="demographicResponse" description=$question['description'] translate=false}
+					{fbvElement type="text" multilingual="true" name="response" id="response" value=$question['response'] size=$fbvStyles.size.LARGE}
+				{/fbvFormSection}
             {/fbvFormSection}
         {/fbvFormArea}
     {/foreach}

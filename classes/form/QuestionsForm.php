@@ -29,11 +29,28 @@ class QuestionsForm extends Form
     {
         $request = Application::get()->getRequest();
         $context = $request->getContext();
-        $questions = Repo::demographicQuestion()
+        $questions = array();
+        $demographicQuestions = Repo::demographicQuestion()
             ->getCollector()
             ->filterByContextIds([$context->getId()])
             ->getMany();
 
+        foreach ($demographicQuestions as $demographicQuestion) {
+            $user = $request->getUser();
+            $demographicResponse = Repo::demographicResponse()
+                ->getCollector()
+                ->filterByQuestionIds([$demographicQuestion->getId()])
+                ->filterByUserIds([$user->getId()])
+                ->getMany();
+            $responseResultInArray = $demographicResponse->toArray();
+            $firstResponse = array_shift($responseResultInArray);
+            $reponse = empty($demographicResponse->toArray()) ? null : $firstResponse->getText();
+            $questions[] = [
+                'title' => $demographicQuestion->getLocalizedQuestionText(),
+                'description' => $demographicQuestion->getLocalizedQuestionDescription(),
+                'response' => $reponse
+            ];
+        }
         $this->setData('questions', $questions);
         parent::initData();
     }

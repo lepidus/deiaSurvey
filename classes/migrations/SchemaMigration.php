@@ -28,11 +28,6 @@ class SchemaMigration extends Migration
             $table->string('setting_name', 255);
             $table->longText('setting_value')->nullable();
 
-            $table->foreign('demographic_question_id')
-                ->references('demographic_question_id')
-                ->on('demographic_questions')
-                ->onDelete('cascade');
-
             $table->index(['demographic_question_id'], 'demographic_question_settings_id');
             $table->unique(['demographic_question_id', 'locale', 'setting_name'], 'demographic_question_settings_pkey');
         });
@@ -46,12 +41,13 @@ class SchemaMigration extends Migration
                 ->references('demographic_question_id')
                 ->on('demographic_questions')
                 ->onDelete('cascade');
+            $table->index(['demographic_question_id'], 'demographic_responses_demographic_question_id');
 
             $table->foreign('user_id')
                 ->references('user_id')
                 ->on('users')
                 ->onDelete('cascade');
-            $table->index(['demographic_question_id'], 'demographic_responses_demographic_question_id');
+            $table->index(['user_id'], 'demographic_responses_user_id');
         });
 
         Schema::create('demographic_response_settings', function (Blueprint $table) {
@@ -60,11 +56,6 @@ class SchemaMigration extends Migration
             $table->string('locale', 14)->default('');
             $table->string('setting_name', 255);
             $table->longText('setting_value')->nullable();
-
-            $table->foreign('demographic_response_id')
-                ->references('demographic_response_id')
-                ->on('demographic_responses')
-                ->onDelete('cascade');
 
             $table->index(['demographic_response_id'], 'demographic_response_setting_id');
             $table->unique(['demographic_response_id', 'locale', 'setting_name'], 'demographic_response_settings_pkey');
