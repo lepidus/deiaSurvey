@@ -27,12 +27,19 @@ class QuestionsForm extends Form
 
     public function initData()
     {
+        $questions = $this->retrieveQuestions();
+        $this->setData('questions', $questions);
+        parent::initData();
+    }
+
+    private function retrieveQuestions()
+    {
         $request = Application::get()->getRequest();
-        $context = $request->getContext();
+        $contextId = $request->getContext()->getId();
         $questions = array();
         $demographicQuestions = Repo::demographicQuestion()
             ->getCollector()
-            ->filterByContextIds([$context->getId()])
+            ->filterByContextIds([$contextId])
             ->getMany();
 
         foreach ($demographicQuestions as $demographicQuestion) {
@@ -51,8 +58,8 @@ class QuestionsForm extends Form
                 'response' => $reponse
             ];
         }
-        $this->setData('questions', $questions);
-        parent::initData();
+
+        return $questions;
     }
 
     public function readInputData()
