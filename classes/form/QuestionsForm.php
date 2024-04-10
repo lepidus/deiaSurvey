@@ -12,10 +12,35 @@ use APP\plugins\generic\demographicData\classes\demographicQuestion\Collector;
 
 class QuestionsForm extends Form
 {
-    public function __construct()
+    private $request;
+    private $args;
+
+    public function __construct($request = null, $args = null)
     {
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        if ($request) {
+            $this->request = $request;
+        }
+
+        if ($args) {
+            $this->args = $this->getQuestionResponsesByForm($args);
+        }
+
         parent::__construct($plugin->getTemplateResource('questions.tpl'));
+
+        $this->addCheck(new \PKP\form\validation\FormValidatorPost($this));
+        $this->addCheck(new \PKP\form\validation\FormValidatorCSRF($this));
+    }
+
+    private function getQuestionResponsesByForm($args)
+    {
+        $responses = array();
+        foreach ($args as $key => $value) {
+            if (strpos($key, 'question-') === 0) {
+                $responses[$key] = $value;
+            }
+        }
+        return $responses;
     }
 
     public function fetch($request, $template = null, $display = false)
@@ -55,20 +80,44 @@ class QuestionsForm extends Form
             $questions[] = [
                 'title' => $demographicQuestion->getLocalizedQuestionText(),
                 'description' => $demographicQuestion->getLocalizedQuestionDescription(),
-                'response' => $reponse
+                'response' => $reponse,
+                'questionId' => $demographicQuestion->getId()
             ];
         }
-
         return $questions;
-    }
-
-    public function readInputData()
-    {
-        parent::readInputData();
     }
 
     public function execute(...$functionArgs)
     {
+        $userId = $this->request->getUser()->getId();
+        foreach ($this->args as $question => $response) {
+            $questionId = explode("-", $question)[1];
+            $demographicResponseCollector = Repo::demographicResponse()
+                    ->getCollector()
+                    ->filterByQuestionIds([$questionId])
+                    ->filterByUserIds([$userId])
+                    ->getMany();
+            $responseResultInArray = $demographicResponseCollector->toArray();
+            $demographicResponse = array_shift($responseResultInArray);
+            if (!empty($response)) {
+                $params = [
+                    'demographicQuestionId',
+                    'userId',
+                    'responseText' => $response
+                ];
+                Repo::demographicResponse()->edit($demographicResponse, $params);
+            } else {
+                foreach ($response as $locale => $responseText) {
+                    if (!is_null($responseText)) {
+                        $response = Repo::demographicResponse()->newDataObject();
+                        $response->setUserId($userId);
+                        $response->setDemographicQuestionId($questionId);
+                        $response->setText($responseText, $locale);
+                        Repo::demographicResponse()->add($response);
+                    }
+                }
+            }
+        }
         parent::execute(...$functionArgs);
     }
 }

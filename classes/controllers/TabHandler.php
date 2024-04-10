@@ -14,6 +14,15 @@ class TabHandler extends Handler
         $form->initData();
         return new JSONMessage(true, $form->fetch($request));
     }
+
+    public function saveDemographicData($args, $request)
+    {
+        $form = new QuestionsForm($request, $args);
+        if ($form->validate()) {
+            $form->execute();
+        }
+        return new JSONMessage(true);
+    }
 }
 
 if (!PKP_STRICT_MODE) {

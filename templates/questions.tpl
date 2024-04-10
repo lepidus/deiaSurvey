@@ -9,15 +9,18 @@
 
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="identityFormNotification"}
 
-    {foreach $questions as $question}
-        {fbvFormArea id="demographicQuestion"}
-            {fbvFormSection title=$question['title'] translate=false required=true}
-				{fbvFormSection for="demographicResponse" description=$question['description'] translate=false}
-					{fbvElement type="text" multilingual="true" name="response" id="response" value=$question['response'] size=$fbvStyles.size.LARGE}
+	{fbvFormArea id="demographicQuestion"}
+		<div id="Hello" name="questions">
+			{foreach $questions as $question}
+				{assign var="questionId" value="question-{$question['questionId']}"}
+				{fbvFormSection title=$question['title'] translate=false}
+					{fbvFormSection for="demographicResponse" description=$question['description'] translate=false}
+						{fbvElement type="text" multilingual="true" name=$questionId id="responses" value=$question['response'] size=$fbvStyles.size.LARGE required=true}
+					{/fbvFormSection}
 				{/fbvFormSection}
-            {/fbvFormSection}
-        {/fbvFormArea}
-    {/foreach}
+			{/foreach}
+		</div>
+    {/fbvFormArea}
 
 	<p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 
