@@ -5,6 +5,7 @@ namespace APP\plugins\generic\demographicData\classes\controllers;
 use APP\handler\Handler;
 use PKP\core\JSONMessage;
 use APP\plugins\generic\demographicData\classes\form\QuestionsForm;
+use APP\notification\NotificationManager;
 
 class TabHandler extends Handler
 {
@@ -13,6 +14,18 @@ class TabHandler extends Handler
         $form = new QuestionsForm();
         $form->initData();
         return new JSONMessage(true, $form->fetch($request));
+    }
+
+    public function saveDemographicData($args, $request)
+    {
+        $form = new QuestionsForm($request, $args);
+        if ($form->validate()) {
+            $form->execute();
+            $notificationMgr = new NotificationManager();
+            $user = $request->getUser();
+            $notificationMgr->createTrivialNotification($user->getId());
+        }
+        return new JSONMessage(true);
     }
 }
 

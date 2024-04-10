@@ -20,7 +20,9 @@ class RepositoryTest extends DatabaseTestCase
         return [
             ...parent::getAffectedTables(),
             'demographic_questions',
-            'demographic_question_settings'
+            'demographic_question_settings',
+            'demographic_responses',
+            'demographic_response_settings'
         ];
     }
 
@@ -41,7 +43,7 @@ class RepositoryTest extends DatabaseTestCase
         $this->addSchemaFile('demographicQuestion');
     }
 
-    public function testGetNewCustomQuestionObject(): void
+    public function testGetNewDemographicQuestionObject(): void
     {
         $repository = app(Repository::class);
         $demographicQuestion = $repository->newDataObject();
