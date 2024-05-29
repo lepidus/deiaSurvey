@@ -14,7 +14,7 @@
       },
       "responseText": {
         "type": "string",
-		    "multilingual": true
+        "multilingual": true
       }
     }
 }

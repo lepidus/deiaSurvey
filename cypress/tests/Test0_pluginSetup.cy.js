@@ -1,5 +1,5 @@
 describe('Plugin setup', function () {
-    it('Enables Demographic Data plugin"', function () {
+    it('Enables Demographic Data plugin', function () {
 		cy.login('dbarnes', null, 'publicknowledge');
 
 		cy.contains('a', 'Website').click();
