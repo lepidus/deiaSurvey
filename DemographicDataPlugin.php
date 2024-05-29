@@ -7,6 +7,7 @@ use APP\core\Application;
 use Illuminate\Database\Migrations\Migration;
 use PKP\plugins\Hook;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
+use APP\plugins\generic\demographicData\classes\facades\Repo;
 
 class DemographicDataPlugin extends GenericPlugin
 {
@@ -18,6 +19,8 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('LoadComponentHandler', [$this, 'setupHandler']);
             Hook::add('Schema::get::demographicQuestion', [$this, 'addDemographicQuestionSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addDemographicResponseSchema']);
+
+            $this->addDefaultQuestions();
         }
         return $success;
     }
@@ -103,6 +106,37 @@ class DemographicDataPlugin extends GenericPlugin
     public function getInstallMigration(): Migration
     {
         return new SchemaMigration();
+    }
+
+    /*
+     * The following questions are for test purposes, and should be
+     * replaced by the real default questions when they be ready.
+    */
+    private function addDefaultQuestions()
+    {
+        $request = Application::get()->getRequest();
+        $contextId = $request->getContext()->getId();
+
+        $demographicQuestionsCount = Repo::demographicQuestion()
+            ->getCollector()
+            ->filterByContextIds([$contextId])
+            ->getCount();
+
+        if ($demographicQuestionsCount == 0) {
+            $firstQuestion = Repo::demographicQuestion()->newDataObject([
+                'contextId' => $contextId,
+                'questionText' => ['en' => 'Gender'],
+                'questionDescription' => ['en' => 'With which gender do you most identify?']
+            ]);
+            $secondQuestion = Repo::demographicQuestion()->newDataObject([
+                'contextId' => $contextId,
+                'questionText' => ['en' => 'Ethnicity'],
+                'questionDescription' => ['en' => 'How would you identify yourself in terms of ethnicity?']
+            ]);
+
+            Repo::demographicQuestion()->add($firstQuestion);
+            Repo::demographicQuestion()->add($secondQuestion);
+        }
     }
 
     public function getCanEnable()
