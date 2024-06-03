@@ -39,5 +39,23 @@ describe('Questions displaying', function () {
         cy.contains('a', 'Demographic Data').click();
         cy.get('input[name="demographicDataConsent"][value=0]').should('be.checked');
     });
-    //User answer questions
+    it('User chooses to answer questions', function () {
+        cy.login('dsokoloff', null, 'publicknowledge');
+        cy.get('.app__headerActions button').eq(1).click();
+        cy.contains('a', 'Edit Profile').click();
+        cy.contains('a', 'Demographic Data').click();
+
+        cy.get('input[name="demographicDataConsent"][value=1]').click();
+        cy.get('input[id^="responses-en"]').eq(0).clear().type('Female');
+        cy.get('input[id^="responses-en"]').eq(1).clear().type('Slavic');
+
+        cy.get('#demographicDataForm .submitFormButton').click();
+        cy.wait(1000);
+        cy.reload();
+
+        cy.contains('a', 'Demographic Data').click();
+        cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
+        cy.get('input[id^="responses-en"]').eq(0).should('have.value', 'Female');
+        cy.get('input[id^="responses-en"]').eq(1).should('have.value', 'Slavic');
+    });
 });
