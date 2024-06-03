@@ -11,11 +11,11 @@
       },
       "questionText": {
         "type": "string",
-		    "multilingual": true
+        "multilingual": true
       }, 
       "questionDescription": {
         "type": "string",
-		    "multilingual": true
+        "multilingual": true
       }
     }
 }

@@ -5,39 +5,42 @@ namespace APP\plugins\generic\demographicData\classes\form;
 use APP\template\TemplateManager;
 use PKP\form\Form;
 use PKP\plugins\PluginRegistry;
+use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
+use APP\plugins\generic\demographicData\classes\facades\Repo;
 
 class QuestionsForm extends Form
 {
     private $request;
-    private $args;
 
     public function __construct($request = null, $args = null)
     {
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        parent::__construct($plugin->getTemplateResource('questions.tpl'));
+
         if ($request) {
             $this->request = $request;
         }
 
         if ($args) {
-            $this->args = $this->getQuestionResponsesByForm($args);
+            $this->setData('demographicDataConsent', $args['demographicDataConsent']);
+            $this->loadQuestionResponsesByForm($args);
         }
-
-        parent::__construct($plugin->getTemplateResource('questions.tpl'));
 
         $this->addCheck(new \PKP\form\validation\FormValidatorPost($this));
         $this->addCheck(new \PKP\form\validation\FormValidatorCSRF($this));
     }
 
-    private function getQuestionResponsesByForm($args)
+    private function loadQuestionResponsesByForm($args)
     {
-        $responses = array();
+        $responses = [];
         foreach ($args as $key => $value) {
             if (strpos($key, 'question-') === 0) {
                 $responses[$key] = $value;
             }
         }
-        return $responses;
+
+        $this->setData('responses', $responses);
     }
 
     public function fetch($request, $template = null, $display = false)
@@ -49,15 +52,47 @@ class QuestionsForm extends Form
 
     public function initData()
     {
+        $context = $this->request->getContext();
+        $user = $this->request->getUser();
+        $demographicDataDao = new DemographicDataDAO();
+        $userConsent = $demographicDataDao->userGaveDemographicConsent($context->getId(), $user->getId());
+        $this->setData('demographicDataConsent', $userConsent);
+
         $questions = DemographicDataService::retrieveQuestions();
         $this->setData('questions', $questions);
         parent::initData();
     }
 
+    public function validate($callHooks = true)
+    {
+        $consent = $this->getData('demographicDataConsent');
+
+        if ($consent) {
+            $locale = $this->defaultLocale;
+
+            foreach ($this->getData('responses') as $response) {
+                if (empty($response[$locale])) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public function execute(...$functionArgs)
     {
-        $userId = $this->request->getUser()->getId();
-        DemographicDataService::registerResponse($userId, $this->args);
+        $context = $this->request->getContext();
+        $user = $this->request->getUser();
+        $consent = $this->getData('demographicDataConsent');
+
+        $demographicDataDao = new DemographicDataDAO();
+        $demographicDataDao->updateDemographicConsent($context->getId(), $user->getId(), $consent);
+
+        if ($consent) {
+            DemographicDataService::registerResponse($user->getId(), $this->getData('responses'));
+        }
+
         parent::execute(...$functionArgs);
     }
 }

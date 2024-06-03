@@ -26,11 +26,11 @@ class DemographicDataService
                 ->getMany();
             $responseResultInArray = $demographicResponse->toArray();
             $firstResponse = array_shift($responseResultInArray);
-            $reponse = empty($demographicResponse->toArray()) ? null : $firstResponse->getText();
+            $response = empty($demographicResponse->toArray()) ? null : $firstResponse->getText();
             $questions[] = [
                 'title' => $demographicQuestion->getLocalizedQuestionText(),
                 'description' => $demographicQuestion->getLocalizedQuestionDescription(),
-                'response' => $reponse,
+                'response' => $response,
                 'questionId' => $demographicQuestion->getId()
             ];
         }
@@ -39,32 +39,22 @@ class DemographicDataService
 
     public static function registerResponse($userId, $args)
     {
-        foreach ($args as $question => $response) {
+        foreach ($args as $question => $responseInput) {
             $questionId = explode("-", $question)[1];
             $demographicResponseCollector = Repo::demographicResponse()
                     ->getCollector()
                     ->filterByQuestionIds([$questionId])
                     ->filterByUserIds([$userId])
                     ->getMany();
-            $responseResultInArray = $demographicResponseCollector->toArray();
-            $demographicResponse = array_shift($responseResultInArray);
-            if (!empty($response)) {
-                $params = [
-                    'demographicQuestionId',
-                    'userId',
-                    'responseText' => $response
-                ];
-                Repo::demographicResponse()->edit($demographicResponse, $params);
+            $demographicResponse = array_shift($demographicResponseCollector->toArray());
+            if ($demographicResponse) {
+                Repo::demographicResponse()->edit($demographicResponse, ['responseText' => $responseInput]);
             } else {
-                foreach ($response as $locale => $responseText) {
-                    if (!is_null($responseText)) {
-                        $response = Repo::demographicResponse()->newDataObject();
-                        $response->setUserId($userId);
-                        $response->setDemographicQuestionId($questionId);
-                        $response->setText($responseText, $locale);
-                        Repo::demographicResponse()->add($response);
-                    }
-                }
+                $response = Repo::demographicResponse()->newDataObject();
+                $response->setUserId($userId);
+                $response->setDemographicQuestionId($questionId);
+                $response->setData('responseText', $responseInput);
+                Repo::demographicResponse()->add($response);
             }
         }
     }

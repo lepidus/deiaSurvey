@@ -3,3 +3,12 @@ msgstr "Datos Demográficos"
 
 msgid "plugins.generic.demographicData.description"
 msgstr "Agrega preguntas personalizadas para Datos Demográficos."
+
+msgid "plugins.generic.demographicData.consent"
+msgstr "Autorización"
+
+msgid "plugins.generic.demographicData.consent.yes"
+msgstr "Autorizo el tratamiento de mis Datos Demográficos"
+
+msgid "plugins.generic.demographicData.consent.no"
+msgstr "No autorizo el tratamiento de mis Datos Demográficos"
