@@ -19,7 +19,6 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('LoadComponentHandler', [$this, 'setupHandler']);
             Hook::add('Schema::get::demographicQuestion', [$this, 'addDemographicQuestionSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addDemographicResponseSchema']);
-            Hook::add('Schema::get::user', [$this, 'addOurFieldsToUserSchema']);
 
             $this->addDefaultQuestions();
         }
@@ -34,18 +33,6 @@ class DemographicDataPlugin extends GenericPlugin
     public function getDescription()
     {
         return __('plugins.generic.demographicData.description');
-    }
-
-    public function addOurFieldsToUserSchema(string $hookName, array $params): bool
-    {
-        $schema = &$params[0];
-        $schema->properties->{'demographicDataConsent'} = (object) [
-            'type' => 'boolean',
-            'apiSummary' => true,
-            'validation' => ['nullable'],
-        ];
-
-        return true;
     }
 
     public function addDemographicQuestionSchema(string $hookName, array $params): bool

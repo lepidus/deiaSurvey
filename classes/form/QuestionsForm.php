@@ -5,6 +5,7 @@ namespace APP\plugins\generic\demographicData\classes\form;
 use APP\template\TemplateManager;
 use PKP\form\Form;
 use PKP\plugins\PluginRegistry;
+use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
 
@@ -51,8 +52,11 @@ class QuestionsForm extends Form
 
     public function initData()
     {
+        $context = $this->request->getContext();
         $user = $this->request->getUser();
-        $this->setData('demographicDataConsent', $user->getData('demographicDataConsent'));
+        $demographicDataDao = new DemographicDataDAO();
+        $userConsent = $demographicDataDao->userGaveDemographicConsent($context->getId(), $user->getId());
+        $this->setData('demographicDataConsent', $userConsent);
 
         $questions = DemographicDataService::retrieveQuestions();
         $this->setData('questions', $questions);
@@ -78,10 +82,12 @@ class QuestionsForm extends Form
 
     public function execute(...$functionArgs)
     {
+        $context = $this->request->getContext();
         $user = $this->request->getUser();
         $consent = $this->getData('demographicDataConsent');
 
-        Repo::user()->edit($user, ['demographicDataConsent' => $consent]);
+        $demographicDataDao = new DemographicDataDAO();
+        $demographicDataDao->updateDemographicConsent($context->getId(), $user->getId(), $consent);
 
         if ($consent) {
             DemographicDataService::registerResponse($user->getId(), $this->getData('responses'));
