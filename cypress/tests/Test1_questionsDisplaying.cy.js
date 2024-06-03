@@ -25,7 +25,7 @@ describe('Questions displaying', function () {
         cy.contains('a', 'Edit Profile').click();
         cy.contains('a', 'Demographic Data').click();
 
-        cy.contains('I agree to the processing of my Demographic Data');
+        cy.contains('I consent to the processing of my Demographic Data');
         cy.contains('I do not consent to the processing of my Demographic Data');
 
         cy.get('input[name="demographicDataConsent"][value=0]').should('not.be.checked');
