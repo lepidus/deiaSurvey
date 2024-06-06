@@ -7,6 +7,7 @@ use APP\core\Application;
 use Illuminate\Database\Migrations\Migration;
 use PKP\plugins\Hook;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
+use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
 
 class DemographicDataPlugin extends GenericPlugin
@@ -15,7 +16,7 @@ class DemographicDataPlugin extends GenericPlugin
     {
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
-            Hook::add('TemplateManager::display', [$this, 'addDemographicDataTab']);
+            Hook::add('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
             Hook::add('LoadComponentHandler', [$this, 'setupHandler']);
             Hook::add('Schema::get::demographicQuestion', [$this, 'addDemographicQuestionSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addDemographicResponseSchema']);
@@ -79,12 +80,22 @@ class DemographicDataPlugin extends GenericPlugin
         return false;
     }
 
-    public function addDemographicDataTab(string $hookName, array $args)
+    public function addChangesToUserProfilePage(string $hookName, array $args)
     {
         $templateMgr = $args[0];
         $template = $args[1];
         if ($template === 'user/profile.tpl') {
             $templateMgr->registerFilter('output', [$this, 'demographicDataTabFilter']);
+
+            $request = Application::get()->getRequest();
+            $contextId = $request->getContext()->getId();
+            $userId = $request->getUser()->getId();
+            $demographicDataDao = new DemographicDataDAO();
+            $consent = $demographicDataDao->getDemographicConsent($contextId, $userId);
+
+            if (!is_null($consent)) {
+                $templateMgr->registerFilter('output', [$this, 'requestMessageFilter']);
+            }
         }
     }
 
@@ -99,6 +110,22 @@ class DemographicDataPlugin extends GenericPlugin
             $newOutput .= substr($output, $offset + strlen($match));
             $output = $newOutput;
             $templateMgr->unregisterFilter('output', [$this, 'demographicDataTabFilter']);
+        }
+        return $output;
+    }
+
+    public function requestMessageFilter($output, $templateMgr)
+    {
+        $profileTabsPattern = '/<div[^>]+id="profileTabs"/';
+        if (preg_match($profileTabsPattern, $output, $matches, PREG_OFFSET_CAPTURE)) {
+            $offset = $matches[0][1];
+
+            $newOutput = substr($output, 0, $offset);
+            $newOutput .= $templateMgr->fetch($this->getTemplateResource('requestMessage.tpl'));
+            $newOutput .= substr($output, $offset);
+
+            $output = $newOutput;
+            $templateMgr->unregisterFilter('output', [$this, 'requestMessageFilter']);
         }
         return $output;
     }
