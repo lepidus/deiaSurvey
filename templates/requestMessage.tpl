@@ -1,4 +1,4 @@
-<div id="demographicRequestMessage" class="pkp_notification">
+<div id="demographicRequestMessage" class="pkp_notification" style="background-color: white;">
     {assign var="content" value="plugins.generic.demographicData.requestMessage"}
     {include
         file="controllers/notification/inPlaceNotificationContent.tpl"
