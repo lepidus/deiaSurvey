@@ -12,3 +12,6 @@ msgstr "I consent to the processing of my Demographic Data"
 
 msgid "plugins.generic.demographicData.consent.no"
 msgstr "I do not consent to the processing of my Demographic Data"
+
+msgid "plugins.generic.demographicData.requestMessage"
+msgstr "We request that you fill in the demographic data survey on the \"Demographic Data\" tab of your profile page."

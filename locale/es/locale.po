@@ -12,3 +12,6 @@ msgstr "Autorizo el tratamiento de mis Datos Demográficos"
 
 msgid "plugins.generic.demographicData.consent.no"
 msgstr "No autorizo el tratamiento de mis Datos Demográficos"
+
+msgid "plugins.generic.demographicData.requestMessage"
+msgstr "Le pedimos que rellene el cuestionario de datos demográficos en la pestaña \"Datos demográficos\" de su página de perfil."

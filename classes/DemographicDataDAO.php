@@ -7,37 +7,50 @@ use Illuminate\Support\Facades\DB;
 
 class DemographicDataDAO extends DAO
 {
-    public function userGaveDemographicConsent(int $contextId, int $userId): bool
+    private function getConsentSetting(int $contextId, int $userId): ?array
     {
-        $result = DB::table('user_settings')
+        $rows = DB::table('user_settings')
             ->where('user_id', '=', $userId)
             ->where('setting_name', '=', 'demographicDataConsent')
-            ->where('setting_value', '=', $contextId)
-            ->first();
+            ->get();
 
-        return !is_null($result);
+        foreach ($rows as $row) {
+            $row = get_object_vars($row);
+            $value = json_decode($row['setting_value'], true);
+            if ($value['contextId'] == $contextId) {
+                return ['id' => $row['user_setting_id'], 'consentOption' => $value['consentOption']];
+            }
+        }
+
+        return null;
+    }
+
+    public function getDemographicConsent(int $contextId, int $userId): ?bool
+    {
+        $setting = $this->getConsentSetting($contextId, $userId);
+
+        return $setting ? $setting['consentOption'] : null;
     }
 
     public function updateDemographicConsent(int $contextId, int $userId, bool $consentOption)
     {
-        $previousConsent = $this->userGaveDemographicConsent($contextId, $userId);
+        $consentSetting = $this->getConsentSetting($contextId, $userId);
+        $settingValue = json_encode(['contextId' => $contextId, 'consentOption' => $consentOption]);
 
-        if ($previousConsent == $consentOption) {
-            return;
-        }
-
-        if ($consentOption) {
+        if (is_null($consentSetting)) {
             DB::table('user_settings')->insert([
                 'user_id' => $userId,
                 'setting_name' => 'demographicDataConsent',
-                'setting_value' => $contextId
+                'setting_value' => $settingValue
             ]);
-        } else {
-            DB::table('user_settings')
-                ->where('user_id', '=', $userId)
-                ->where('setting_name', '=', 'demographicDataConsent')
-                ->where('setting_value', '=', $contextId)
-                ->delete();
+
+            return;
         }
+
+        DB::table('user_settings')
+            ->where('user_setting_id', $consentSetting['id'])
+            ->update([
+                'setting_value' => $settingValue
+            ]);
     }
 }

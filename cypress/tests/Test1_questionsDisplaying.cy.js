@@ -7,16 +7,18 @@ function assertDefaultQuestionsDisplay() {
 }
 
 describe('Questions displaying', function () {
-    it('Display of questions at users profile page', function () {
+    it('Display of questions and request message at users profile page', function () {
         cy.login('dbarnes', null, 'publicknowledge');
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('a', 'Edit Profile').click();
+        cy.contains('We request that you fill in the demographic data survey on the "Demographic Data" tab of your profile page');
         assertDefaultQuestionsDisplay();
         cy.logout();
 
         cy.login('dsokoloff', null, 'publicknowledge');
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('a', 'Edit Profile').click();
+        cy.contains('We request that you fill in the demographic data survey on the "Demographic Data" tab of your profile page');
         assertDefaultQuestionsDisplay();
     });
     it('User can choose not to answer questions', function () {
@@ -38,6 +40,12 @@ describe('Questions displaying', function () {
 
         cy.contains('a', 'Demographic Data').click();
         cy.get('input[name="demographicDataConsent"][value=0]').should('be.checked');
+    });
+    it('Request message is not shown anymore', function () {
+        cy.login('dsokoloff', null, 'publicknowledge');
+        cy.get('.app__headerActions button').eq(1).click();
+        cy.contains('a', 'Edit Profile').click();
+        cy.get('span:contains("We request that you fill in the demographic data survey")').should('not.exist');
     });
     it('User chooses to answer questions', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
