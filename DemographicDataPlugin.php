@@ -93,7 +93,7 @@ class DemographicDataPlugin extends GenericPlugin
             $demographicDataDao = new DemographicDataDAO();
             $consent = $demographicDataDao->getDemographicConsent($contextId, $userId);
 
-            if (!is_null($consent)) {
+            if (is_null($consent)) {
                 $templateMgr->registerFilter('output', [$this, 'requestMessageFilter']);
             }
         }
