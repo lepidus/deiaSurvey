@@ -1,4 +1,4 @@
-describe('Plugin setup', function () {
+describe('Demographic Data - Plugin setup', function () {
     it('Enables Demographic Data plugin', function () {
 		cy.login('dbarnes', null, 'publicknowledge');
 
