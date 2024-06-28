@@ -5,10 +5,14 @@ namespace APP\plugins\generic\demographicData;
 use PKP\plugins\GenericPlugin;
 use APP\core\Application;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Mail;
 use PKP\plugins\Hook;
+use APP\decision\Decision;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
+use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
+use APP\plugins\generic\demographicData\classes\mail\mailables\RequestCollectionContributorData;
 
 class DemographicDataPlugin extends GenericPlugin
 {
@@ -20,6 +24,7 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('LoadComponentHandler', [$this, 'setupHandler']);
             Hook::add('Schema::get::demographicQuestion', [$this, 'addDemographicQuestionSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addDemographicResponseSchema']);
+            Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
 
             $this->addDefaultQuestions();
         }
@@ -34,6 +39,23 @@ class DemographicDataPlugin extends GenericPlugin
     public function getDescription()
     {
         return __('plugins.generic.demographicData.description');
+    }
+
+    public function getInstallEmailTemplatesFile()
+    {
+        return $this->getPluginPath() . '/emailTemplates.xml';
+    }
+
+    public function getCanEnable()
+    {
+        $request = Application::get()->getRequest();
+        return $request->getContext() !== null;
+    }
+
+    public function getCanDisable()
+    {
+        $request = Application::get()->getRequest();
+        return $request->getContext() !== null;
     }
 
     public function addDemographicQuestionSchema(string $hookName, array $params): bool
@@ -80,10 +102,10 @@ class DemographicDataPlugin extends GenericPlugin
         return false;
     }
 
-    public function addChangesToUserProfilePage(string $hookName, array $args)
+    public function addChangesToUserProfilePage(string $hookName, array $params)
     {
-        $templateMgr = $args[0];
-        $template = $args[1];
+        $templateMgr = $params[0];
+        $template = $params[1];
         if ($template === 'user/profile.tpl') {
             $templateFilterDispatcher = new TemplateFilterDispatcher($this);
             $templateFilterDispatcher->dispatch($templateMgr);
@@ -126,15 +148,59 @@ class DemographicDataPlugin extends GenericPlugin
         }
     }
 
-    public function getCanEnable()
+    public function requestDataExternalContributors(string $hookName, array $params)
     {
-        $request = Application::get()->getRequest();
-        return $request->getContext() !== null;
+        $decision = $params[0];
+
+        if ($decision->getData('decision') != Decision::ACCEPT and $decision->getData('decision') != Decision::SKIP_EXTERNAL_REVIEW) {
+            return;
+        }
+
+        $submission = Repo::submission()->get($decision->getData('submissionId'));
+        $nonRegisteredAuthors = $this->getNonRegisteredAuthors($submission);
+
+        if (!empty($nonRegisteredAuthors)) {
+            foreach ($nonRegisteredAuthors as $author) {
+                $this->sendRequestDataCollectionEmail($submission, $author);
+            }
+        }
     }
 
-    public function getCanDisable()
+    private function getNonRegisteredAuthors($submission): array
+    {
+        $publication = $submission->getCurrentPublication();
+        $nonRegisteredAuthors = [];
+        $demographicDataDao = new DemographicDataDAO();
+
+        foreach ($publication->getData('authors') as $author) {
+            $authorEmail = $author->getData('email');
+
+            if (!$demographicDataDao->thereIsUserRegistered($authorEmail)) {
+                $nonRegisteredAuthors[] = $author;
+            }
+        }
+
+        return $nonRegisteredAuthors;
+    }
+
+    private function sendRequestDataCollectionEmail($submission, $author)
     {
         $request = Application::get()->getRequest();
-        return $request->getContext() !== null;
+        $context = $request->getContext();
+
+        $emailTemplate = Repo::emailTemplate()->getByKey(
+            $context->getId(),
+            'REQUEST_COLLECTION_CONTRIBUTOR_DATA'
+        );
+        $authorName = $author->getFullName();
+        $authorEmail = $author->getData('email');
+
+        $email = new RequestCollectionContributorData($context, $submission, []);
+        $email->from($context->getData('contactEmail'), $context->getData('contactName'));
+        $email->to([['name' => $authorName, 'email' => $authorEmail]]);
+        $email->subject($emailTemplate->getLocalizedData('subject'));
+        $email->body($emailTemplate->getLocalizedData('body'));
+
+        Mail::send($email);
     }
 }
