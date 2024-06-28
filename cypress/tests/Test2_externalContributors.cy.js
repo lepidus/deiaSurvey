@@ -94,7 +94,7 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.assignReviewer('Julie Janssen');
         
         cy.clickDecision('Accept Submission');
-        cy.recordDecisionAcceptSubmission(['Elinor Ostrom'], [], []);
+        cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
     });
     it('Checks email has been sent to external contributors', function () {
         cy.visit('localhost:8025');
