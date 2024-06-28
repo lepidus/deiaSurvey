@@ -99,8 +99,11 @@ describe('Demographic Data - External contributors data collecting', function() 
     it('Checks email has been sent to external contributors', function () {
         cy.visit('localhost:8025');
         
-        cy.contains('susy.almeida@outlook.com');
-        cy.contains('Request for demographic data collection');
-        cy.contains('ckwantes@mailinator.com').should('not.exist');
+        cy.get('b:contains("Request for demographic data collection")').should('have.length', 1);
+        cy.contains('b', 'Request for demographic data collection')
+            .parent().parent().parent()
+            .within(() => {
+                cy.contains('susy.almeida@outlook.com');
+            });
     });
 });
