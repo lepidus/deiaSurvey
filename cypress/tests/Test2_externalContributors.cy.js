@@ -96,14 +96,24 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.clickDecision('Accept Submission');
         cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
     });
-    it('Checks email has been sent to external contributors', function () {
+    it('Access email collect data from contributors without registration', function () {
         cy.visit('localhost:8025');
         
         cy.get('b:contains("Request for demographic data collection")').should('have.length', 1);
         cy.contains('b', 'Request for demographic data collection')
             .parent().parent().parent()
-            .within(() => {
+            .within((node) => {
                 cy.contains('susy.almeida@outlook.com');
             });
+        cy.get('b:contains("Request for demographic data collection")').click();
+
+        cy.contains('In order to improve our publication, we collect demographic data from the authors of our submissions through an online questionnaire');
+        cy.contains('If you do not wish to register, you can fill in the questionnaire by accessing the following address:');
+        cy.contains('a', 'Demographic questionnaire').click();
+
+        cy.contains('Gender');
+        cy.contains('With which gender do you most identify?');
+        cy.contains('Ethnicity');
+        cy.contains('How would you identify yourself in terms of ethnicity?');
     });
 });
