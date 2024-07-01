@@ -1,0 +1,28 @@
+.fields {
+    border: 0;
+}
+
+.question {
+    margin-bottom: 1.75rem;
+}
+
+.questionTitle {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.questionDescription {
+    display: block;
+    font-size: 1rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: rgba(0,0,0,0.54);
+}
+
+.questionInput {
+    width: 75%;
+    font-size: 1rem;
+    line-height: 2rem;
+    padding: 0.0.25rem;
+}
