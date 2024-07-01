@@ -22,6 +22,7 @@ class DemographicDataPlugin extends GenericPlugin
         if ($success && $this->getEnabled()) {
             Hook::add('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
             Hook::add('LoadComponentHandler', [$this, 'setupHandler']);
+            Hook::add('LoadHandler', [$this, 'addPageHandler']);
             Hook::add('Schema::get::demographicQuestion', [$this, 'addDemographicQuestionSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addDemographicResponseSchema']);
             Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
@@ -97,6 +98,16 @@ class DemographicDataPlugin extends GenericPlugin
     {
         $component = & $params[0];
         if ($component == 'plugins.generic.demographicData.classes.controllers.TabHandler') {
+            return true;
+        }
+        return false;
+    }
+
+    public function addPageHandler($hookName, $params)
+    {
+        $page = $params[0];
+        if ($page == 'demographicQuestionnaire') {
+            define('HANDLER_CLASS', 'APP\plugins\generic\demographicData\pages\demographic\QuestionnaireHandler');
             return true;
         }
         return false;

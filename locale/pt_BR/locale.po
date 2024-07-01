@@ -15,3 +15,6 @@ msgstr "Eu não concordo com o processamento dos meus Dados Demográficos"
 
 msgid "plugins.generic.demographicData.requestMessage"
 msgstr "Requisitamos que você preencha o questionário de dados demográficos presente na aba \"Dados Demográficos\" da sua página de perfil."
+
+msgid "plugins.generic.demographicData.demographicQuestionnaire"
+msgstr "Questionário Demográfico"
