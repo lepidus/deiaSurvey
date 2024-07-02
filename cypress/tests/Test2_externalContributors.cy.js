@@ -109,7 +109,7 @@ describe('Demographic Data - External contributors data collecting', function() 
 
         cy.contains('In order to improve our publication, we collect demographic data from the authors of our submissions through an online questionnaire');
         cy.contains('If you do not wish to register, you can fill in the questionnaire by accessing the following address:');
-        cy.contains('a', 'Demographic questionnaire').click();
+        cy.contains('a', 'Demographic Questionnaire').click();
 
         cy.contains('Gender');
         cy.contains('With which gender do you most identify?');
