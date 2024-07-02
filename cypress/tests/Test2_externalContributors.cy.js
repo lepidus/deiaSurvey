@@ -122,4 +122,9 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.contains('Ethnicity');
         cy.contains('How would you identify yourself in terms of ethnicity?');
     });
+    it('Only the author can access the questionnaire page', function () {
+        cy.visit('index.php/publicknowledge/demographicQuestionnaire');
+
+        cy.contains('Access denied');
+    });
 });
