@@ -23,8 +23,9 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
             Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
             Hook::add('LoadHandler', [$this, 'addPageHandler']);
-            Hook::add('Schema::get::demographicQuestion', [$this, 'addDemographicQuestionSchema']);
-            Hook::add('Schema::get::demographicResponse', [$this, 'addDemographicResponseSchema']);
+            Hook::add('Schema::get::author', [$this, 'editAuthorSchema']);
+            Hook::add('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
+            Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
 
             $this->addDefaultQuestions();
@@ -59,17 +60,25 @@ class DemographicDataPlugin extends GenericPlugin
         return $request->getContext() !== null;
     }
 
-    public function addDemographicQuestionSchema(string $hookName, array $params): bool
+    public function editAuthorSchema(string $hookName, array $params): bool
     {
         $schema = &$params[0];
-        $schema = $this->getJsonSchema('demographicQuestion');
-        return true;
+
+        $schema->properties->{'demographicToken'} = (object) [
+            'type' => 'string',
+            'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+
+        return false;
     }
 
-    public function addDemographicResponseSchema(string $hookName, array $params): bool
+    public function addCustomSchema(string $hookName, array $params): bool
     {
+        $schemaName = explode('::', $hookName)[2];
         $schema = &$params[0];
-        $schema = $this->getJsonSchema('demographicResponse');
+        $schema = $this->getJsonSchema($schemaName);
+
         return true;
     }
 
@@ -206,7 +215,7 @@ class DemographicDataPlugin extends GenericPlugin
         $authorName = $author->getFullName();
         $authorEmail = $author->getData('email');
 
-        $questionnaireUrl = $this->getQuestionnairePageUrl($request);
+        $questionnaireUrl = $this->getQuestionnairePageUrl($request, $author);
 
         $email = new RequestCollectionContributorData($context, $submission, ['questionnaireUrl' => $questionnaireUrl]);
         $email->from($context->getData('contactEmail'), $context->getData('contactName'));
@@ -217,13 +226,20 @@ class DemographicDataPlugin extends GenericPlugin
         Mail::send($email);
     }
 
-    private function getQuestionnairePageUrl($request): string
+    private function getQuestionnairePageUrl($request, $author): string
     {
+        $authorToken = md5(microtime() . $author->getData('email'));
+
+        Repo::author()->edit($author, ['demographicToken' => $authorToken]);
+
         return $request->getDispatcher()->url(
             $request,
             Application::ROUTE_PAGE,
             null,
-            'demographicQuestionnaire'
+            'demographicQuestionnaire',
+            null,
+            null,
+            ['authorId' => $author->getId(), 'authorToken' => $authorToken]
         );
     }
 }
