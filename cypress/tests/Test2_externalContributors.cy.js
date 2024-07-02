@@ -107,9 +107,15 @@ describe('Demographic Data - External contributors data collecting', function() 
             });
         cy.get('b:contains("Request for demographic data collection")').click();
 
+        cy.get('#nav-tab button:contains("Text")').click();
+
         cy.contains('In order to improve our publication, we collect demographic data from the authors of our submissions through an online questionnaire');
         cy.contains('If you do not wish to register, you can fill in the questionnaire by accessing the following address:');
-        cy.contains('a', 'Demographic Questionnaire').click();
+        cy.get('.text-view').within(() => {
+            cy.get('a').should('have.attr', 'href').then((href) => {
+                cy.visit(href);
+            });
+        });
 
         cy.contains('Gender');
         cy.contains('With which gender do you most identify?');

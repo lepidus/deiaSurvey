@@ -7,7 +7,7 @@ use APP\core\Application;
 
 class DemographicDataService
 {
-    public static function retrieveQuestions()
+    public static function retrieveQuestions($shouldRetrieveResponses = false)
     {
         $request = Application::get()->getRequest();
         $contextId = $request->getContext()->getId();
@@ -18,26 +18,41 @@ class DemographicDataService
             ->getMany();
 
         foreach ($demographicQuestions as $demographicQuestion) {
-            $user = $request->getUser();
-            $demographicResponse = Repo::demographicResponse()
-                ->getCollector()
-                ->filterByQuestionIds([$demographicQuestion->getId()])
-                ->filterByUserIds([$user->getId()])
-                ->getMany();
-            $responseResultInArray = $demographicResponse->toArray();
-            $firstResponse = array_shift($responseResultInArray);
-            $response = empty($demographicResponse->toArray()) ? null : $firstResponse->getText();
-            $questions[] = [
+            $questionData = [
                 'title' => $demographicQuestion->getLocalizedQuestionText(),
                 'description' => $demographicQuestion->getLocalizedQuestionDescription(),
-                'response' => $response,
                 'questionId' => $demographicQuestion->getId()
             ];
+
+            if ($shouldRetrieveResponses) {
+                $user = $request->getUser();
+                $response = $this->getUserResponse($user->getId(), $demographicQuestion->getId());
+                $questionData['response'] = $response;
+            }
+
+            $questions[] = $questionData;
         }
         return $questions;
     }
 
-    public static function registerResponse($userId, $args)
+    private function getUserResponse(int $userId, int $questionId)
+    {
+        $demographicResponses = Repo::demographicResponse()
+            ->getCollector()
+            ->filterByQuestionIds([$questionId])
+            ->filterByUserIds([$userId])
+            ->getMany()
+            ->toArray();
+
+        if (empty($demographicResponses)) {
+            return null;
+        }
+
+        $firstResponse = array_shift($demographicResponses);
+        return $firstResponse->getText();
+    }
+
+    public static function registerResponse(int $userId, array $args)
     {
         foreach ($args as $question => $responseInput) {
             $questionId = explode("-", $question)[1];
