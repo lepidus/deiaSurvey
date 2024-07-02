@@ -21,7 +21,7 @@ class DemographicDataPlugin extends GenericPlugin
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
             Hook::add('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
-            Hook::add('LoadComponentHandler', [$this, 'setupHandler']);
+            Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
             Hook::add('LoadHandler', [$this, 'addPageHandler']);
             Hook::add('Schema::get::demographicQuestion', [$this, 'addDemographicQuestionSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addDemographicResponseSchema']);
@@ -94,7 +94,7 @@ class DemographicDataPlugin extends GenericPlugin
         return $schema;
     }
 
-    public function setupHandler($hookName, $params)
+    public function setupTabHandler($hookName, $params)
     {
         $component = & $params[0];
         if ($component == 'plugins.generic.demographicData.classes.controllers.TabHandler') {
@@ -206,12 +206,24 @@ class DemographicDataPlugin extends GenericPlugin
         $authorName = $author->getFullName();
         $authorEmail = $author->getData('email');
 
-        $email = new RequestCollectionContributorData($context, $submission, []);
+        $questionnaireUrl = $this->getQuestionnairePageUrl($request);
+
+        $email = new RequestCollectionContributorData($context, $submission, ['questionnaireUrl' => $questionnaireUrl]);
         $email->from($context->getData('contactEmail'), $context->getData('contactName'));
         $email->to([['name' => $authorName, 'email' => $authorEmail]]);
         $email->subject($emailTemplate->getLocalizedData('subject'));
         $email->body($emailTemplate->getLocalizedData('body'));
 
         Mail::send($email);
+    }
+
+    private function getQuestionnairePageUrl($request): string
+    {
+        return $request->getDispatcher()->url(
+            $request,
+            Application::ROUTE_PAGE,
+            null,
+            'demographicQuestionnaire'
+        );
     }
 }
