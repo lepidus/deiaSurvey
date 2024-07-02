@@ -58,7 +58,8 @@ class QuestionsForm extends Form
         $userConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
         $this->setData('demographicDataConsent', $userConsent);
 
-        $questions = DemographicDataService::retrieveQuestions(true);
+        $demographicDataService  = new DemographicDataService();
+        $questions = $demographicDataService->retrieveQuestions(true);
         $this->setData('questions', $questions);
         parent::initData();
     }

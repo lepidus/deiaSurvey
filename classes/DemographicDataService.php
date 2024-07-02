@@ -7,7 +7,7 @@ use APP\core\Application;
 
 class DemographicDataService
 {
-    public static function retrieveQuestions($shouldRetrieveResponses = false)
+    public function retrieveQuestions($shouldRetrieveResponses = false)
     {
         $request = Application::get()->getRequest();
         $contextId = $request->getContext()->getId();

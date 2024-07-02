@@ -16,7 +16,8 @@ class QuestionnaireHandler extends Handler
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
         $templateMgr = TemplateManager::getManager($request);
 
-        $questions = DemographicDataService::retrieveQuestions();
+        $demographicDataService  = new DemographicDataService();
+        $questions = $demographicDataService->retrieveQuestions();
         $templateMgr->assign('questions', $questions);
 
         return $templateMgr->display($plugin->getTemplateResource('questionnairePage.tpl'));
