@@ -121,10 +121,10 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.contains('With which gender do you most identify?');
         cy.contains('Ethnicity');
         cy.contains('How would you identify yourself in terms of ethnicity?');
-    });
-    it('Only the author can access the questionnaire page', function () {
-        cy.visit('index.php/publicknowledge/demographicQuestionnaire');
 
-        cy.contains('Access denied');
+        cy.url().then(url => {
+            cy.visit(url + 'breakToken');
+        });
+        cy.contains('Demographic Questionnaire').should('not.exist');
     });
 });
