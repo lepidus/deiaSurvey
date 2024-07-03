@@ -96,7 +96,7 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.clickDecision('Accept Submission');
         cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
     });
-    it('Access email collect data from contributors without registration', function () {
+    it('Access email to collect data from contributors without registration', function () {
         cy.visit('localhost:8025');
         
         cy.get('b:contains("Request for demographic data collection")').should('have.length', 1);
@@ -126,5 +126,22 @@ describe('Demographic Data - External contributors data collecting', function() 
             cy.visit(url + 'breakToken');
         });
         cy.contains('Demographic Questionnaire').should('not.exist');
+    });
+    it('Contributor without registration answers demographic questionnaire', function () {
+        cy.visit('localhost:8025');
+        cy.get('b:contains("Request for demographic data collection")').click();
+
+        cy.get('#nav-tab button:contains("Text")').click();
+        cy.get('.text-view').within(() => {
+            cy.get('a').should('have.attr', 'href').then((href) => {
+                cy.visit(href);
+            });
+        });
+
+        cy.get('input[id^="responses-en"]').eq(0).type('Male');
+        cy.get('input[id^="responses-en"]').eq(1).type('Latin');
+        cy.contains('button', 'Save').click();
+
+        cy.contains('Thanks for answering our demographic questionnaire');
     });
 });

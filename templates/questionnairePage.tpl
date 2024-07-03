@@ -24,7 +24,7 @@
         </fieldset>
 
         <div class="buttons">
-            <button class="submit" type="submit">
+            <button id="submitDemographicQuestionnaire" class="submit" type="submit">
                 {translate key="common.save"}
             </button>
         </div>
