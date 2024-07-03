@@ -91,7 +91,8 @@ class QuestionsForm extends Form
         $demographicDataDao->updateDemographicConsent($context->getId(), $user->getId(), $consent);
 
         if ($consent) {
-            DemographicDataService::registerResponse($user->getId(), $this->getData('responses'));
+            $demographicDataService  = new DemographicDataService();
+            $demographicDataService->registerResponse($user->getId(), $this->getData('responses'));
         }
 
         parent::execute(...$functionArgs);

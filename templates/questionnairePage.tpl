@@ -8,7 +8,7 @@
 <div class="page">
     <h1>{$pageTitle|escape}</h1>
     
-    <form class="pkp_form" id="demographicDataForm" method="post" action="noneYet" enctype="multipart/form-data">
+    <form class="pkp_form" id="demographicDataForm" method="post" action="{url op="saveQuestionnaire" authorId=$authorId authorToken=$authorToken}" role="form">
         {csrf}
 
         <fieldset class="fields">

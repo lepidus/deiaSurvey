@@ -17,9 +17,17 @@ class QuestionnaireHandler extends Handler
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
         $templateMgr = TemplateManager::getManager($request);
 
+        $queryParams = $request->getQueryArray();
+        $authorId = $queryParams['authorId'];
+        $authorToken = $queryParams['authorToken'];
+
         $demographicDataService  = new DemographicDataService();
         $questions = $demographicDataService->retrieveQuestions();
-        $templateMgr->assign('questions', $questions);
+        $templateMgr->assign([
+            'questions' => $questions,
+            'authorId' => $authorId,
+            'authorToken' => $authorToken
+        ]);
 
         return $templateMgr->display($plugin->getTemplateResource('questionnairePage.tpl'));
     }
@@ -38,5 +46,26 @@ class QuestionnaireHandler extends Handler
         }
 
         return parent::authorize($request, $args, $roleAssignments);
+    }
+
+    public function saveQuestionnaire($args, $request)
+    {
+        $authorId = $request->getUserVar('authorId');
+
+        $responses = [];
+        foreach ($request->getUserVars() as $key => $value) {
+            if (strpos($key, 'question-') === 0) {
+                $responses[$key] = $value;
+            }
+        }
+
+        $demographicDataService  = new DemographicDataService();
+        //Modify data structure so it can accept an e-mail address
+        //$demographicDataService->registerResponse($authorEmail, $responses));
+
+        //Code bellow will be removed soon
+        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $templateMgr = TemplateManager::getManager($request);
+        $templateMgr->display($plugin->getTemplateResource('questionnairePage.tpl'));
     }
 }

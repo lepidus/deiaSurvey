@@ -52,7 +52,7 @@ class DemographicDataService
         return $firstResponse->getText();
     }
 
-    public static function registerResponse(int $userId, array $args)
+    public function registerResponse(int $userId, array $args)
     {
         foreach ($args as $question => $responseInput) {
             $questionId = explode("-", $question)[1];
