@@ -11,6 +11,7 @@ use APP\decision\Decision;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
+use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
 use APP\plugins\generic\demographicData\classes\mail\mailables\RequestCollectionContributorData;
 
@@ -180,8 +181,12 @@ class DemographicDataPlugin extends GenericPlugin
         $nonRegisteredAuthors = $this->getNonRegisteredAuthors($submission);
 
         if (!empty($nonRegisteredAuthors)) {
+            $demographicDataService  = new DemographicDataService();
+
             foreach ($nonRegisteredAuthors as $author) {
-                $this->sendRequestDataCollectionEmail($submission, $author);
+                if (!$demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
+                    $this->sendRequestDataCollectionEmail($submission, $author);
+                }
             }
         }
     }

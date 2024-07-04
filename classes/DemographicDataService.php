@@ -90,4 +90,17 @@ class DemographicDataService
             Repo::demographicResponse()->add($response);
         }
     }
+
+    public function authorAlreadyAnsweredQuestionnaire($author): bool
+    {
+        $email = $author->getData('email');
+
+        $countAuthorResponses = Repo::demographicResponse()
+            ->getCollector()
+            ->filterByExternalIds([$email])
+            ->filterByExternalTypes(['email'])
+            ->getCount();
+
+        return ($countAuthorResponses > 0);
+    }
 }

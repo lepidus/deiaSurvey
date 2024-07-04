@@ -22,11 +22,12 @@ class QuestionnaireHandler extends Handler
         $author = Repo::author()->get((int) $queryParams['authorId']);
         $authorToken = $queryParams['authorToken'];
 
-        if ($this->authorAlreadyAnsweredQuestionnaire($author)) {
+        $demographicDataService  = new DemographicDataService();
+
+        if ($demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/alreadyAnswered.tpl'));
         }
 
-        $demographicDataService  = new DemographicDataService();
         $questions = $demographicDataService->retrieveAllQuestions($context->getId());
         $templateMgr->assign([
             'questions' => $questions,
@@ -50,8 +51,9 @@ class QuestionnaireHandler extends Handler
             return false;
         }
 
+        $demographicDataService  = new DemographicDataService();
         if (
-            !$this->authorAlreadyAnsweredQuestionnaire($author)
+            !$demographicDataService->authorAlreadyAnsweredQuestionnaire($author)
             and $author->getData('demographicToken') != $queryParams['authorToken']
         ) {
             return false;
@@ -80,18 +82,5 @@ class QuestionnaireHandler extends Handler
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
         $templateMgr = TemplateManager::getManager($request);
         $templateMgr->display($plugin->getTemplateResource('questionnairePage/saveSuccess.tpl'));
-    }
-
-    private function authorAlreadyAnsweredQuestionnaire($author): bool
-    {
-        $email = $author->getData('email');
-
-        $countAuthorResponses = Repo::demographicResponse()
-            ->getCollector()
-            ->filterByExternalIds([$email])
-            ->filterByExternalTypes(['email'])
-            ->getCount();
-
-        return ($countAuthorResponses > 0);
     }
 }
