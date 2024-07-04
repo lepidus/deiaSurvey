@@ -58,8 +58,30 @@ class DAOTest extends DatabaseTestCase
             'id' => $insertedDemographicResponseId,
             'demographicQuestionId' => $this->demographicQuestionId,
             'responseText' => [self::DEFAULT_LOCALE => 'Test text'],
-            'userId' => $this->userId
-        ], $fetchedDemographicResponse->_data);
+            'userId' => $this->userId,
+            'externalId' => null,
+            'externalType' => null
+        ], $fetchedDemographicResponse->getAllData());
+    }
+
+    public function testCreateDemographicResponseForExternalAuthor(): void
+    {
+        $demographicResponse = $this->createDemographicResponseObject(true);
+        $insertedDemographicResponseId = $this->demographicResponseDAO->insert($demographicResponse);
+
+        $fetchedDemographicResponse = $this->demographicResponseDAO->get(
+            $insertedDemographicResponseId,
+            $this->demographicQuestionId
+        );
+
+        self::assertEquals([
+            'id' => $insertedDemographicResponseId,
+            'demographicQuestionId' => $this->demographicQuestionId,
+            'responseText' => [self::DEFAULT_LOCALE => 'Test text'],
+            'userId' => null,
+            'externalId' => 'external.author@lepidus.com.br',
+            'externalType' => 'email'
+        ], $fetchedDemographicResponse->getAllData());
     }
 
     public function testDeleteDemographicResponse(): void

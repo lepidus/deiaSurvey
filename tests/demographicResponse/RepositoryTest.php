@@ -36,7 +36,9 @@ class RepositoryTest extends DatabaseTestCase
             'userId' => $this->userId,
             'responseText' => [
                 self::DEFAULT_LOCALE => 'Test text'
-            ]
+            ],
+            'externalId' => null,
+            'externalType' => null
         ];
         $this->addSchemaFile('demographicQuestion');
         $this->addSchemaFile('demographicResponse');
@@ -59,19 +61,19 @@ class RepositoryTest extends DatabaseTestCase
         $this->params['id'] = $insertedDemographicResponseId;
 
         $fetchedDemographicResponse = $repository->get($insertedDemographicResponseId, $this->demographicQuestionId);
-        self::assertEquals($this->params, $fetchedDemographicResponse->_data);
+        self::assertEquals($this->params, $fetchedDemographicResponse->getAllData());
 
         $this->params['responseText']['en'] = 'Updated text';
         $repository->edit($demographicResponse, $this->params);
 
         $fetchedDemographicResponse = $repository->get($demographicResponse->getId(), $this->demographicQuestionId);
-        self::assertEquals($this->params, $fetchedDemographicResponse->_data);
+        self::assertEquals($this->params, $fetchedDemographicResponse->getAllData());
 
         $repository->delete($demographicResponse);
         self::assertFalse($repository->exists($demographicResponse->getId()));
     }
 
-    public function testCollectorFilterByDemographicResponseIdAndUserId(): void
+    public function testCollectorFilterByQuestionAndUser(): void
     {
         $repository = app(Repository::class);
         $demographicResponse = $repository->newDataObject($this->params);
@@ -81,6 +83,30 @@ class RepositoryTest extends DatabaseTestCase
         $demographicResponses = $repository->getCollector()
             ->filterByQuestionIds([$this->demographicQuestionId])
             ->filterByUserIds([$this->userId])
+            ->getMany();
+        self::assertTrue(in_array($demographicResponse, $demographicResponses->all()));
+    }
+
+    public function testCollectorFilterByExternalId(): void
+    {
+        $newParams = [
+            'demographicQuestionId' => $this->demographicQuestionId,
+            'userId' => null,
+            'responseText' => [
+                self::DEFAULT_LOCALE => 'Test text'
+            ],
+            'externalId' => 'external.author@lepidus.com.br',
+            'externalType' => 'email'
+        ];
+        $repository = app(Repository::class);
+        $demographicResponse = $repository->newDataObject($newParams);
+
+        $repository->add($demographicResponse);
+
+        $demographicResponses = $repository->getCollector()
+            ->filterByQuestionIds([$this->demographicQuestionId])
+            ->filterByExternalIds([$newParams['externalId']])
+            ->filterByExternalTypes([$newParams['externalType']])
             ->getMany();
         self::assertTrue(in_array($demographicResponse, $demographicResponses->all()));
     }

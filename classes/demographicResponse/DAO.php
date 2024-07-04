@@ -18,6 +18,8 @@ class DAO extends EntityDAO
         'id' => 'demographic_response_id',
         'demographicQuestionId' => 'demographic_question_id',
         'userId' => 'user_id',
+        'externalId' => 'external_id',
+        'externalType' => 'external_type'
     ];
 
     public function getParentColumn(): string
