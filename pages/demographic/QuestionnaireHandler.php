@@ -16,20 +16,21 @@ class QuestionnaireHandler extends Handler
     {
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
         $templateMgr = TemplateManager::getManager($request);
+        $context = $request->getContext();
 
         $queryParams = $request->getQueryArray();
         $authorId = $queryParams['authorId'];
         $authorToken = $queryParams['authorToken'];
 
         $demographicDataService  = new DemographicDataService();
-        $questions = $demographicDataService->retrieveQuestions();
+        $questions = $demographicDataService->retrieveAllQuestions($context->getId());
         $templateMgr->assign([
             'questions' => $questions,
             'authorId' => $authorId,
             'authorToken' => $authorToken
         ]);
 
-        return $templateMgr->display($plugin->getTemplateResource('questionnairePage.tpl'));
+        return $templateMgr->display($plugin->getTemplateResource('questionnairePage/index.tpl'));
     }
 
     public function authorize($request, &$args, $roleAssignments)
@@ -51,6 +52,7 @@ class QuestionnaireHandler extends Handler
     public function saveQuestionnaire($args, $request)
     {
         $authorId = $request->getUserVar('authorId');
+        $author = Repo::author()->get($authorId);
 
         $responses = [];
         foreach ($request->getUserVars() as $key => $value) {
@@ -60,12 +62,12 @@ class QuestionnaireHandler extends Handler
         }
 
         $demographicDataService  = new DemographicDataService();
-        //Modify data structure so it can accept an e-mail address
-        //$demographicDataService->registerResponse($authorEmail, $responses));
+        $demographicDataService->registerExternalAuthorResponses($author->getData('email'), 'email', $responses);
 
-        //Code bellow will be removed soon
+        Repo::author()->edit($author, ['demographicToken' => null]);
+
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
         $templateMgr = TemplateManager::getManager($request);
-        $templateMgr->display($plugin->getTemplateResource('questionnairePage.tpl'));
+        $templateMgr->display($plugin->getTemplateResource('questionnairePage/saveSuccess.tpl'));
     }
 }

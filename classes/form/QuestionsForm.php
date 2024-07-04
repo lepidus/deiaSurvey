@@ -59,7 +59,7 @@ class QuestionsForm extends Form
         $this->setData('demographicDataConsent', $userConsent);
 
         $demographicDataService  = new DemographicDataService();
-        $questions = $demographicDataService->retrieveQuestions(true);
+        $questions = $demographicDataService->retrieveAllQuestions($context->getId(), true);
         $this->setData('questions', $questions);
         parent::initData();
     }
@@ -92,7 +92,7 @@ class QuestionsForm extends Form
 
         if ($consent) {
             $demographicDataService  = new DemographicDataService();
-            $demographicDataService->registerResponse($user->getId(), $this->getData('responses'));
+            $demographicDataService->registerUserResponses($user->getId(), $this->getData('responses'));
         }
 
         parent::execute(...$functionArgs);

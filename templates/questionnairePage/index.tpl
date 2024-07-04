@@ -1,5 +1,5 @@
 {capture assign="pageTitle"}
-    {translate key="plugins.generic.demographicData.demographicQuestionnaire"}
+    {translate key="plugins.generic.demographicData.questionnairePage.index.title"}
 {/capture}
 
 <link rel="stylesheet" type="text/css" href="/plugins/generic/demographicData/styles/questionnairePage.css">
