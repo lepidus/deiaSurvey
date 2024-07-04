@@ -19,14 +19,18 @@ class QuestionnaireHandler extends Handler
         $context = $request->getContext();
 
         $queryParams = $request->getQueryArray();
-        $authorId = $queryParams['authorId'];
+        $author = Repo::author()->get((int) $queryParams['authorId']);
         $authorToken = $queryParams['authorToken'];
+
+        if ($this->authorAlreadyAnsweredQuestionnaire($author)) {
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/alreadyAnswered.tpl'));
+        }
 
         $demographicDataService  = new DemographicDataService();
         $questions = $demographicDataService->retrieveAllQuestions($context->getId());
         $templateMgr->assign([
             'questions' => $questions,
-            'authorId' => $authorId,
+            'authorId' => $author->getId(),
             'authorToken' => $authorToken
         ]);
 
@@ -42,7 +46,14 @@ class QuestionnaireHandler extends Handler
         }
 
         $author = Repo::author()->get((int) $queryParams['authorId']);
-        if (is_null($author) or $author->getData('demographicToken') != $queryParams['authorToken']) {
+        if (is_null($author)) {
+            return false;
+        }
+
+        if (
+            !$this->authorAlreadyAnsweredQuestionnaire($author)
+            and $author->getData('demographicToken') != $queryParams['authorToken']
+        ) {
             return false;
         }
 
@@ -69,5 +80,18 @@ class QuestionnaireHandler extends Handler
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
         $templateMgr = TemplateManager::getManager($request);
         $templateMgr->display($plugin->getTemplateResource('questionnairePage/saveSuccess.tpl'));
+    }
+
+    private function authorAlreadyAnsweredQuestionnaire($author): bool
+    {
+        $email = $author->getData('email');
+
+        $countAuthorResponses = Repo::demographicResponse()
+            ->getCollector()
+            ->filterByExternalIds([$email])
+            ->filterByExternalTypes(['email'])
+            ->getCount();
+
+        return ($countAuthorResponses > 0);
     }
 }

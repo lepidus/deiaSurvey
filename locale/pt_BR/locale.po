@@ -24,3 +24,6 @@ msgstr "Questionário salvo com sucesso"
 
 msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.message"
 msgstr "Obrigado por responder nosso questionário demográfico!"
+
+msgid "plugins.generic.demographicData.questionnairePage.alreadyAnswered"
+msgstr "Você já respondeu o questionário demográfico."

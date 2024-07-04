@@ -47,6 +47,13 @@ class DAO extends EntityDAO
         return parent::_update($demographicResponse);
     }
 
+    public function getCount(Collector $query): int
+    {
+        return $query
+            ->getQueryBuilder()
+            ->count();
+    }
+
     public function getMany(Collector $query): LazyCollection
     {
         $rows = $query
