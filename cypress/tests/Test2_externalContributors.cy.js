@@ -138,8 +138,8 @@ describe('Demographic Data - External contributors data collecting', function() 
             });
         });
 
-        cy.get('input[id^="responses-en"]').eq(0).type('Male');
-        cy.get('input[id^="responses-en"]').eq(1).type('Latin');
+        cy.get('input[id^="responses"]').eq(0).type('Male');
+        cy.get('input[id^="responses"]').eq(1).type('Latin');
         cy.contains('button', 'Save').click();
 
         cy.contains('Thanks for answering our demographic questionnaire');
