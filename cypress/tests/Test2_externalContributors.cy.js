@@ -57,7 +57,7 @@ describe('Demographic Data - External contributors data collecting', function() 
             ]
 		};
 
-        firstSubmissionData = {
+        secondSubmissionData = {
             title: "Advancements in tests of automobile vehicles",
 			abstract: 'New improvements on tests of cars, motorcycles and other vehicles',
 			keywords: ['plugin', 'testing'],
@@ -172,7 +172,7 @@ describe('Demographic Data - External contributors data collecting', function() 
 
         cy.contains('You already answered the demographic questionnaire');
     });
-    it('New submission is created and accepted with same contributor', function() {
+    it('New submission is created and accepted with same contributor', function () {
         cy.login('ckwantes', null, 'publicknowledge');
         
         cy.get('div#myQueue a:contains("New Submission")').click();
@@ -196,7 +196,6 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.waitJQuery();
         cy.contains('h1', 'Submission complete');
         cy.logout();
-
 
         cy.login('dbarnes', null, 'publicknowledge');
         cy.findSubmission('myQueue', secondSubmissionData.title);
