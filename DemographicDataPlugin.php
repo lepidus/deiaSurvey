@@ -5,11 +5,13 @@ namespace APP\plugins\generic\demographicData;
 use PKP\plugins\GenericPlugin;
 use APP\core\Application;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use PKP\plugins\Hook;
 use APP\decision\Decision;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
+use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateResponsesOnRegistration;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
@@ -28,6 +30,8 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
+
+            Event::subscribe(new MigrateResponsesOnRegistration());
 
             $this->addDefaultQuestions();
         }
