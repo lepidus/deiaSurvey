@@ -10,7 +10,22 @@
         "type": "integer"
       },
       "userId": {
-        "type": "integer"
+        "type": "integer",
+        "validation": [
+          "nullable"
+        ]
+      },
+      "externalId": {
+        "type": "string",
+        "validation": [
+          "nullable"
+        ]
+      },
+      "externalType": {
+        "type": "string",
+        "validation": [
+          "nullable"
+        ]
       },
       "responseText": {
         "type": "string",

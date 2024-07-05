@@ -6,7 +6,7 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('.description', 'How would you identify yourself in terms of ethnicity?');
 }
 
-describe('Questions displaying', function () {
+describe('Demographic Data - Questions displaying', function () {
     it('Display of questions and request message at users profile page', function () {
         cy.login('dbarnes', null, 'publicknowledge');
         cy.get('.app__headerActions button').eq(1).click();

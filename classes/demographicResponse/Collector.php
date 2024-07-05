@@ -12,6 +12,8 @@ class Collector implements CollectorInterface
     public DAO $dao;
     public ?array $questionIds = null;
     public ?array $userIds = null;
+    public ?array $externalIds = null;
+    public ?array $externalTypes = null;
 
     public function __construct(DAO $dao)
     {
@@ -30,6 +32,18 @@ class Collector implements CollectorInterface
         return $this;
     }
 
+    public function filterByExternalIds(?array $externalIds): Collector
+    {
+        $this->externalIds = $externalIds;
+        return $this;
+    }
+
+    public function filterByExternalTypes(?array $externalTypes): Collector
+    {
+        $this->externalTypes = $externalTypes;
+        return $this;
+    }
+
     public function getQueryBuilder(): Builder
     {
         $queryBuilder = DB::table($this->dao->table . ' as demographic_responses')
@@ -41,6 +55,14 @@ class Collector implements CollectorInterface
 
         if (isset($this->userIds)) {
             $queryBuilder->whereIn('demographic_responses.user_id', $this->userIds);
+        }
+
+        if (isset($this->externalIds)) {
+            $queryBuilder->whereIn('demographic_responses.external_id', $this->externalIds);
+        }
+
+        if (isset($this->externalTypes)) {
+            $queryBuilder->whereIn('demographic_responses.external_type', $this->externalTypes);
         }
 
         return $queryBuilder;

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE emails SYSTEM "../../../lib/pkp/dtd/emailTemplates.dtd">
+
+<emails>
+    <email
+        key="REQUEST_COLLECTION_CONTRIBUTOR_DATA"
+        name="emails.requestCollectionContributorData.name"
+        description="emails.requestCollectionContributorData.description"
+        subject="emails.requestCollectionContributorData.subject"
+        body="emails.requestCollectionContributorData.body"
+    />
+</emails>

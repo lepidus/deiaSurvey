@@ -35,7 +35,9 @@ class SchemaMigration extends Migration
         Schema::create('demographic_responses', function (Blueprint $table) {
             $table->bigIncrements('demographic_response_id');
             $table->bigInteger('demographic_question_id');
-            $table->bigInteger('user_id');
+            $table->bigInteger('user_id')->nullable();
+            $table->string('external_id', 255)->nullable();
+            $table->string('external_type', 10)->nullable();
 
             $table->foreign('demographic_question_id')
                 ->references('demographic_question_id')

@@ -28,12 +28,18 @@ trait TestHelperTrait
         return $repository->add($demographicQuestion);
     }
 
-    private function createDemographicResponseObject()
+    private function createDemographicResponseObject($externalAuthor = false)
     {
         $demographicResponse = $this->demographicResponseDAO->newDataObject();
-        $demographicResponse->setUserId($this->createUserMock());
         $demographicResponse->setDemographicQuestionId($this->demographicQuestionId);
         $demographicResponse->setText('Test text', self::DEFAULT_LOCALE);
+
+        if ($externalAuthor) {
+            $demographicResponse->setExternalId('external.author@lepidus.com.br');
+            $demographicResponse->setExternalType('email');
+        } else {
+            $demographicResponse->setUserId($this->createUserMock());
+        }
 
         return $demographicResponse;
     }

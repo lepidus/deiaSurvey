@@ -18,6 +18,8 @@ class DAO extends EntityDAO
         'id' => 'demographic_response_id',
         'demographicQuestionId' => 'demographic_question_id',
         'userId' => 'user_id',
+        'externalId' => 'external_id',
+        'externalType' => 'external_type'
     ];
 
     public function getParentColumn(): string
@@ -43,6 +45,13 @@ class DAO extends EntityDAO
     public function update(DemographicResponse $demographicResponse)
     {
         return parent::_update($demographicResponse);
+    }
+
+    public function getCount(Collector $query): int
+    {
+        return $query
+            ->getQueryBuilder()
+            ->count();
     }
 
     public function getMany(Collector $query): LazyCollection

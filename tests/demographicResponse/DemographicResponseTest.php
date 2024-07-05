@@ -29,6 +29,20 @@ class DemographicResponseTest extends PKPTestCase
         $this->assertEquals($this->demographicResponse->getUserId(), $expectedUserId);
     }
 
+    public function testGetDemographicExternalId(): void
+    {
+        $expectedExternalId = 'external.author@lepidus.com.br';
+        $this->demographicResponse->setExternalId($expectedExternalId);
+        $this->assertEquals($this->demographicResponse->getExternalId(), $expectedExternalId);
+    }
+
+    public function testGetDemographicExternalType(): void
+    {
+        $expectedExternalType = 'email';
+        $this->demographicResponse->setExternalType($expectedExternalType);
+        $this->assertEquals($this->demographicResponse->getExternalType(), $expectedExternalType);
+    }
+
     public function testGetLocalizedDemographicResponseText(): void
     {
         $expectedDemographicResponseText = "I'm from Parintins";

@@ -15,3 +15,15 @@ msgstr "No autorizo el tratamiento de mis Datos Demográficos"
 
 msgid "plugins.generic.demographicData.requestMessage"
 msgstr "Le pedimos que rellene el cuestionario de datos demográficos en la pestaña \"Datos demográficos\" de su página de perfil."
+
+msgid "plugins.generic.demographicData.questionnairePage.index.title"
+msgstr "Cuestionario Demográfico"
+
+msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.title"
+msgstr "Cuestionario guardado correctamente"
+
+msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.message"
+msgstr "¡Gracias por responder a nuestro cuestionario demográfico!"
+
+msgid "plugins.generic.demographicData.questionnairePage.alreadyAnswered"
+msgstr "Ya ha rellenado el cuestionario demográfico."

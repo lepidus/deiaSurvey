@@ -15,3 +15,15 @@ msgstr "I do not consent to the processing of my Demographic Data"
 
 msgid "plugins.generic.demographicData.requestMessage"
 msgstr "We request that you fill in the demographic data survey on the \"Demographic Data\" tab of your profile page."
+
+msgid "plugins.generic.demographicData.questionnairePage.index.title"
+msgstr "Demographic Questionnaire"
+
+msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.title"
+msgstr "Questionnaire saved successfully"
+
+msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.message"
+msgstr "Thanks for answering our demographic questionnaire!"
+
+msgid "plugins.generic.demographicData.questionnairePage.alreadyAnswered"
+msgstr "You already answered the demographic questionnaire."

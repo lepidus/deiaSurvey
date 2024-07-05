@@ -4,7 +4,7 @@ namespace APP\plugins\generic\demographicData\classes\demographicResponse;
 
 class DemographicResponse extends \PKP\core\DataObject
 {
-    public function getUserId(): int
+    public function getUserId(): ?int
     {
         return $this->getData('userId');
     }
@@ -22,6 +22,26 @@ class DemographicResponse extends \PKP\core\DataObject
     public function setDemographicQuestionId($demographicQuestionId)
     {
         $this->setData('demographicQuestionId', $demographicQuestionId);
+    }
+
+    public function getExternalId(): ?string
+    {
+        return $this->getData('externalId');
+    }
+
+    public function setExternalId($externalId)
+    {
+        $this->setData('externalId', $externalId);
+    }
+
+    public function getExternalType(): ?string
+    {
+        return $this->getData('externalType');
+    }
+
+    public function setExternalType($externalType)
+    {
+        $this->setData('externalType', $externalType);
     }
 
     public function getLocalizedText(): string
