@@ -153,7 +153,7 @@ describe('Demographic Data - External contributors data collecting', function() 
             });
         });
 
-        cy.get('input[id^="responses"]').eq(0).type('Male');
+        cy.get('input[id^="responses"]').eq(0).type('Female');
         cy.get('input[id^="responses"]').eq(1).type('Latin');
         cy.contains('button', 'Save').click();
 
@@ -214,5 +214,22 @@ describe('Demographic Data - External contributors data collecting', function() 
     it('E-mail for demographic data collection is not sent again', function () {
         cy.visit('localhost:8025');
         cy.get('b:contains("Request for demographic data collection")').should('have.length', 1);
+    });
+    it('Responses reference is migrated when author registers', function () {
+        cy.register({
+            'username': 'susyalmeida',
+            'givenName': 'Susanna',
+            'familyName': 'Almeida',
+            'email': 'susy.almeida@outlook.com',
+            'affiliation': 'Universidade Federal de Santa Catarina',
+            'country': 'Brazil'
+        });
+
+        cy.contains('a', 'Edit My Profile').click();
+        cy.contains('a', 'Demographic Data').click();
+
+        cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
+        cy.get('input[id^="responses-en"]').eq(0).should('have.value', 'Female');
+        cy.get('input[id^="responses-en"]').eq(1).should('have.value', 'Latin');
     });
 });
