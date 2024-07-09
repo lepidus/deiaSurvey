@@ -4,10 +4,14 @@ namespace APP\plugins\generic\demographicData;
 
 use PKP\plugins\GenericPlugin;
 use APP\core\Application;
+use PKP\plugins\Hook;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
-use PKP\plugins\Hook;
+use APP\template\TemplateManager;
+use PKP\linkAction\LinkAction;
+use PKP\linkAction\request\AjaxModal;
+use PKP\core\JSONMessage;
 use APP\decision\Decision;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
@@ -16,6 +20,8 @@ use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
 use APP\plugins\generic\demographicData\classes\mail\mailables\RequestCollectionContributorData;
+use APP\plugins\generic\demographicData\classes\OrcidClient;
+use APP\plugins\generic\demographicData\DemographicDataSettingsForm;
 
 class DemographicDataPlugin extends GenericPlugin
 {
@@ -171,6 +177,54 @@ class DemographicDataPlugin extends GenericPlugin
             Repo::demographicQuestion()->add($firstQuestion);
             Repo::demographicQuestion()->add($secondQuestion);
         }
+    }
+
+    public function getActions($request, $actionArgs)
+    {
+        $router = $request->getRouter();
+        return array_merge(
+            array(
+                new LinkAction(
+                    'settings',
+                    new AjaxModal($router->url($request, null, null, 'manage', null, array('verb' => 'settings', 'plugin' => $this->getName(), 'category' => 'generic')), $this->getDisplayName()),
+                    __('manager.plugins.settings'),
+                    null
+                ),
+            ),
+            parent::getActions($request, $actionArgs)
+        );
+    }
+
+    public function manage($args, $request)
+    {
+        $context = $request->getContext();
+        $contextId = ($context == null) ? 0 : $context->getId();
+
+        switch ($request->getUserVar('verb')) {
+            case 'settings':
+                $templateMgr = TemplateManager::getManager();
+                $templateMgr->registerPlugin('function', 'plugin_url', array($this, 'smartyPluginUrl'));
+                $apiOptions = [
+                    OrcidClient::ORCID_API_URL_PUBLIC => 'plugins.generic.demographicData.settings.orcidAPIPath.public',
+                    OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.demographicData.settings.orcidAPIPath.publicSandbox',
+                    OrcidClient::ORCID_API_URL_MEMBER => 'plugins.generic.demographicData.settings.orcidAPIPath.member',
+                    OrcidClient::ORCID_API_URL_MEMBER_SANDBOX => 'plugins.generic.demographicData.settings.orcidAPIPath.memberSandbox'
+                ];
+                $templateMgr->assign('orcidApiUrls', $apiOptions);
+
+                $form = new DemographicDataSettingsForm($this, $contextId);
+                if ($request->getUserVar('save')) {
+                    $form->readInputData();
+                    if ($form->validate()) {
+                        $form->execute();
+                        return new JSONMessage(true);
+                    }
+                } else {
+                    $form->initData();
+                }
+                return new JSONMessage(true, $form->fetch($request));
+        }
+        return parent::manage($args, $request);
     }
 
     public function requestDataExternalContributors(string $hookName, array $params)
