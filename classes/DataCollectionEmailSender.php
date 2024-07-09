@@ -4,6 +4,7 @@ namespace APP\plugins\generic\demographicData\classes;
 
 use APP\core\Application;
 use Illuminate\Support\Facades\Mail;
+use PKP\plugins\PluginRegistry;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
@@ -56,13 +57,9 @@ class DataCollectionEmailSender
         $authorName = $author->getFullName();
         $authorEmail = $author->getData('email');
 
-        $questionnaireUrl = $this->getQuestionnairePageUrl($request, $author);
-        $emailBodyParams = [
-            'orcidQuestionnaireUrl' => $questionnaireUrl,   //Will be changed in next commits
-            'questionnaireUrl' => $questionnaireUrl
-        ];
+        $emailQuestionnaireUrls = $this->getQuestionnaireUrls($request, $author);
 
-        $email = new RequestCollectionContributorData($context, $submission, $emailBodyParams);
+        $email = new RequestCollectionContributorData($context, $submission, $emailQuestionnaireUrls);
         $email->from($context->getData('contactEmail'), $context->getData('contactName'));
         $email->to([['name' => $authorName, 'email' => $authorEmail]]);
         $email->subject($emailTemplate->getLocalizedData('subject'));
@@ -71,13 +68,12 @@ class DataCollectionEmailSender
         Mail::send($email);
     }
 
-    private function getQuestionnairePageUrl($request, $author): string
+    private function getQuestionnaireUrls($request, $author): array
     {
         $authorToken = md5(microtime() . $author->getData('email'));
-
         Repo::author()->edit($author, ['demographicToken' => $authorToken]);
 
-        return $request->getDispatcher()->url(
+        $questionnaireUrl = $request->getDispatcher()->url(
             $request,
             Application::ROUTE_PAGE,
             null,
@@ -86,5 +82,16 @@ class DataCollectionEmailSender
             null,
             ['authorId' => $author->getId(), 'authorToken' => $authorToken]
         );
+
+        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $contextId = $request->getContext()->getId();
+        $orcidClient = new OrcidClient($plugin, $contextId);
+
+        $orcidQuestionnaireUrl = $orcidClient->buildOAuthUrl([
+            'authorId' => $author->getId(),
+            'authorToken' => $authorToken
+        ]);
+
+        return ['questionnaireUrl' => $questionnaireUrl, 'orcidQuestionnaireUrl' => $orcidQuestionnaireUrl];
     }
 }
