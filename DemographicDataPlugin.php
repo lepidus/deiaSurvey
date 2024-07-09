@@ -225,8 +225,12 @@ class DemographicDataPlugin extends GenericPlugin
         $authorEmail = $author->getData('email');
 
         $questionnaireUrl = $this->getQuestionnairePageUrl($request, $author);
+        $emailBodyParams = [
+            'orcidQuestionnaireUrl' => $questionnaireUrl,   //Will be changed in next commits
+            'questionnaireUrl' => $questionnaireUrl
+        ];
 
-        $email = new RequestCollectionContributorData($context, $submission, ['questionnaireUrl' => $questionnaireUrl]);
+        $email = new RequestCollectionContributorData($context, $submission, $emailBodyParams);
         $email->from($context->getData('contactEmail'), $context->getData('contactName'));
         $email->to([['name' => $authorName, 'email' => $authorEmail]]);
         $email->subject($emailTemplate->getLocalizedData('subject'));
