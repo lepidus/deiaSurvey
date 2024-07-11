@@ -24,6 +24,32 @@ class OrcidClient
         $this->contextId = $contextId;
     }
 
+    public function requestOrcid(string $code)
+    {
+        $httpClient = Application::get()->getHttpClient();
+
+        $tokenUrl = $this->plugin->getSetting($this->contextId, 'orcidAPIPath') . 'oauth/token';
+        $requestHeaders = ['Accept' => 'application/json'];
+        $requestData = [
+            'client_id' => $this->plugin->getSetting($this->contextId, 'orcidClientId'),
+            'client_secret' => $this->plugin->getSetting($this->contextId, 'orcidClientSecret'),
+            'grant_type' => 'authorization_code',
+            'code' => $code
+        ];
+
+        $response = $httpClient->request(
+            'POST',
+            $tokenUrl,
+            [
+                'headers' => $requestHeaders,
+                'form_params' => $requestData,
+            ]
+        );
+
+        $responseJson = json_decode($response->getBody(), true);
+        return $responseJson['orcid'];
+    }
+
     public function buildOAuthUrl($redirectParams)
     {
         $request = Application::get()->getRequest();

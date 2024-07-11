@@ -7,7 +7,7 @@
 <div class="page">
     <h1>{$pageTitle|escape}</h1>
 
-    <p>{translate key="plugins.generic.demographicData.questionnairePage.alreadyAnswered"}</p>
+    <p>{$messageToDisplay}</p>
 </div>
 
 {include file="frontend/components/footer.tpl"}

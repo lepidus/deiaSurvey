@@ -28,6 +28,12 @@ msgstr "Thanks for answering our demographic questionnaire!"
 msgid "plugins.generic.demographicData.questionnairePage.alreadyAnswered"
 msgstr "You already answered the demographic questionnaire."
 
+msgid "plugins.generic.demographicData.questionnairePage.orcidAccessDenied"
+msgstr "You denied access to your ORCID record"
+
+msgid "plugins.generic.demographicData.questionnairePage.orcidAuthError"
+msgstr "An error occurred during your ORCID requesting. The message returned was: {$orcidAPIError}"
+
 
 msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"
 msgstr "Please, inform which ORCID API should be used"
