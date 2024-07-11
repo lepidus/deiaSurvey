@@ -91,14 +91,20 @@ class DemographicDataService
         }
     }
 
-    public function authorAlreadyAnsweredQuestionnaire($author): bool
+    public function authorAlreadyAnsweredQuestionnaire($author, $authorOrcid = null): bool
     {
-        $email = $author->getData('email');
+        $externalId = $author->getData('email');
+        $externalType = 'email';
+
+        if (!is_null($authorOrcid)) {
+            $externalId = $authorOrcid;
+            $externalType = 'orcid';
+        }
 
         $countAuthorResponses = Repo::demographicResponse()
             ->getCollector()
-            ->filterByExternalIds([$email])
-            ->filterByExternalTypes(['email'])
+            ->filterByExternalIds([$externalId])
+            ->filterByExternalTypes([$externalType])
             ->getCount();
 
         return ($countAuthorResponses > 0);

@@ -19,6 +19,9 @@ msgstr "We request that you fill in the demographic data survey on the \"Demogra
 msgid "plugins.generic.demographicData.questionnairePage.index.title"
 msgstr "Demographic Questionnaire"
 
+msgid "plugins.generic.demographicData.questionnairePage.accessDenied"
+msgstr "Only the author can access this page"
+
 msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.title"
 msgstr "Questionnaire saved successfully"
 

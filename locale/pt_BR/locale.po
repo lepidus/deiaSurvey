@@ -19,6 +19,9 @@ msgstr "Requisitamos que você preencha o questionário de dados demográficos p
 msgid "plugins.generic.demographicData.questionnairePage.index.title"
 msgstr "Questionário Demográfico"
 
+msgid "plugins.generic.demographicData.questionnairePage.accessDenied"
+msgstr "Apenas o autor pode acessa esta página"
+
 msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.title"
 msgstr "Questionário salvo com sucesso"
 
