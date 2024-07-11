@@ -141,7 +141,8 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.url().then(url => {
             cy.visit(url + 'breakToken');
         });
-        cy.contains('Demographic Questionnaire').should('not.exist');
+        cy.contains('Demographic Questionnaire');
+        cy.contains('Only the author can access this page');
     });
     it('Contributor without registration answers demographic questionnaire', function () {
         cy.visit('localhost:8025');
