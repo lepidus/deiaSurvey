@@ -19,6 +19,9 @@ msgstr "Le pedimos que rellene el cuestionario de datos demográficos en la pest
 msgid "plugins.generic.demographicData.questionnairePage.index.title"
 msgstr "Cuestionario Demográfico"
 
+msgid "plugins.generic.demographicData.questionnairePage.accessDenied"
+msgstr "Sólo el autor puede acceder a esta página"
+
 msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.title"
 msgstr "Cuestionario guardado correctamente"
 
@@ -27,3 +30,55 @@ msgstr "¡Gracias por responder a nuestro cuestionario demográfico!"
 
 msgid "plugins.generic.demographicData.questionnairePage.alreadyAnswered"
 msgstr "Ya ha rellenado el cuestionario demográfico."
+
+msgid "plugins.generic.demographicData.questionnairePage.orcidAccessDenied"
+msgstr "Ha denegado el acceso a su registro ORCID"
+
+msgid "plugins.generic.demographicData.questionnairePage.orcidAuthError"
+msgstr "Se ha producido un error al solicitar su ORCID. El mensaje devuelto fue: {$orcidAPIError}"
+
+msgid "plugins.generic.demographicData.questionnairePage.userWithOrcidExists"
+msgstr "Hay un usuario registrado con este ORCID en nuestro sistema. Por favor, rellene el cuestionario demográfico utilizando este usuario."
+
+
+msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"
+msgstr "Indique qué API de ORCID se debe utilizar"
+
+msgid "plugins.generic.demographicData.settings.orcidClientIdError"
+msgstr "ID de cliente no válido"
+
+msgid "plugins.generic.demographicData.settings.orcidClientSecretError"
+msgstr "Secreto de Cliente no válido"
+
+msgid "plugins.generic.demographicData.settings.title"
+msgstr "Configuración de la API de ORCID"
+
+msgid "plugins.generic.demographicData.settings.description"
+msgstr "Por favor configure el acceso a la API de ORCID para extraer información del perfil de ORCID."
+
+msgid "plugins.generic.demographicData.settings.globallyconfigured"
+msgstr "El host configuró globalmente la API de ORCID. Se han guardado las siguientes credenciales."
+
+msgid "plugins.generic.demographicData.settings.orcidAPIPath"
+msgstr "ORCID API"
+
+msgid "plugins.generic.demographicData.settings.orcidClientId"
+msgstr "ID del Cliente"
+
+msgid "plugins.generic.demographicData.settings.orcidClientSecret"
+msgstr "Secreto del Cliente"
+
+msgid "plugins.generic.demographicData.settings.hidden"
+msgstr "oculto"
+
+msgid "plugins.generic.demographicData.settings.orcidAPIPath.public"
+msgstr "Público"
+
+msgid "plugins.generic.demographicData.settings.orcidAPIPath.publicSandbox"
+msgstr "Sandbox Pública"
+
+msgid "plugins.generic.demographicData.settings.orcidAPIPath.member"
+msgstr "Miembro"
+
+msgid "plugins.generic.demographicData.settings.orcidAPIPath.memberSandbox"
+msgstr "Miembro Sandbox"

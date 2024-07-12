@@ -125,9 +125,10 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.get('#nav-tab button:contains("Text")').click();
 
         cy.contains('In order to improve our publication, we collect demographic data from the authors of our submissions through an online questionnaire');
-        cy.contains('If you do not wish to register, you can fill in the questionnaire by accessing the following address:');
+        cy.contains('If you do not wish to register, we recommend that you access the following address:');
+        cy.contains("If you don't have an ORCID record, you can fill in the questionnaire at the following address:");
         cy.get('.text-view').within(() => {
-            cy.get('a').should('have.attr', 'href').then((href) => {
+            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
                 cy.visit(href);
             });
         });
@@ -140,7 +141,8 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.url().then(url => {
             cy.visit(url + 'breakToken');
         });
-        cy.contains('Demographic Questionnaire').should('not.exist');
+        cy.contains('Demographic Questionnaire');
+        cy.contains('Only the author can access this page');
     });
     it('Contributor without registration answers demographic questionnaire', function () {
         cy.visit('localhost:8025');
@@ -148,7 +150,7 @@ describe('Demographic Data - External contributors data collecting', function() 
 
         cy.get('#nav-tab button:contains("Text")').click();
         cy.get('.text-view').within(() => {
-            cy.get('a').should('have.attr', 'href').then((href) => {
+            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
                 cy.visit(href);
             });
         });
@@ -165,7 +167,7 @@ describe('Demographic Data - External contributors data collecting', function() 
 
         cy.get('#nav-tab button:contains("Text")').click();
         cy.get('.text-view').within(() => {
-            cy.get('a').should('have.attr', 'href').then((href) => {
+            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
                 cy.visit(href);
             });
         });

@@ -4,18 +4,22 @@ namespace APP\plugins\generic\demographicData;
 
 use PKP\plugins\GenericPlugin;
 use APP\core\Application;
+use PKP\plugins\Hook;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Mail;
-use PKP\plugins\Hook;
+use APP\template\TemplateManager;
+use PKP\linkAction\LinkAction;
+use PKP\linkAction\request\AjaxModal;
+use PKP\core\JSONMessage;
 use APP\decision\Decision;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateResponsesOnRegistration;
-use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
-use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
-use APP\plugins\generic\demographicData\classes\mail\mailables\RequestCollectionContributorData;
+use APP\plugins\generic\demographicData\classes\OrcidClient;
+use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
+use APP\plugins\generic\demographicData\classes\DemographicDataService;
+use APP\plugins\generic\demographicData\DemographicDataSettingsForm;
 
 class DemographicDataPlugin extends GenericPlugin
 {
@@ -30,6 +34,7 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
+            Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
 
             Event::subscribe(new MigrateResponsesOnRegistration());
 
@@ -70,6 +75,11 @@ class DemographicDataPlugin extends GenericPlugin
         $schema = &$params[0];
 
         $schema->properties->{'demographicToken'} = (object) [
+            'type' => 'string',
+            'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+        $schema->properties->{'demographicOrcid'} = (object) [
             'type' => 'string',
             'apiSummary' => true,
             'validation' => ['nullable'],
@@ -173,6 +183,54 @@ class DemographicDataPlugin extends GenericPlugin
         }
     }
 
+    public function getActions($request, $actionArgs)
+    {
+        $router = $request->getRouter();
+        return array_merge(
+            array(
+                new LinkAction(
+                    'settings',
+                    new AjaxModal($router->url($request, null, null, 'manage', null, array('verb' => 'settings', 'plugin' => $this->getName(), 'category' => 'generic')), $this->getDisplayName()),
+                    __('manager.plugins.settings'),
+                    null
+                ),
+            ),
+            parent::getActions($request, $actionArgs)
+        );
+    }
+
+    public function manage($args, $request)
+    {
+        $context = $request->getContext();
+        $contextId = ($context == null) ? 0 : $context->getId();
+
+        switch ($request->getUserVar('verb')) {
+            case 'settings':
+                $templateMgr = TemplateManager::getManager();
+                $templateMgr->registerPlugin('function', 'plugin_url', array($this, 'smartyPluginUrl'));
+                $apiOptions = [
+                    OrcidClient::ORCID_API_URL_PUBLIC => 'plugins.generic.demographicData.settings.orcidAPIPath.public',
+                    OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.demographicData.settings.orcidAPIPath.publicSandbox',
+                    OrcidClient::ORCID_API_URL_MEMBER => 'plugins.generic.demographicData.settings.orcidAPIPath.member',
+                    OrcidClient::ORCID_API_URL_MEMBER_SANDBOX => 'plugins.generic.demographicData.settings.orcidAPIPath.memberSandbox'
+                ];
+                $templateMgr->assign('orcidApiUrls', $apiOptions);
+
+                $form = new DemographicDataSettingsForm($this, $contextId);
+                if ($request->getUserVar('save')) {
+                    $form->readInputData();
+                    if ($form->validate()) {
+                        $form->execute();
+                        return new JSONMessage(true);
+                    }
+                } else {
+                    $form->initData();
+                }
+                return new JSONMessage(true, $form->fetch($request));
+        }
+        return parent::manage($args, $request);
+    }
+
     public function requestDataExternalContributors(string $hookName, array $params)
     {
         $decision = $params[0];
@@ -181,74 +239,21 @@ class DemographicDataPlugin extends GenericPlugin
             return;
         }
 
-        $submission = Repo::submission()->get($decision->getData('submissionId'));
-        $nonRegisteredAuthors = $this->getNonRegisteredAuthors($submission);
+        $submissionId = $decision->getData('submissionId');
 
-        if (!empty($nonRegisteredAuthors)) {
-            $demographicDataService  = new DemographicDataService();
+        $dataCollectionEmailSender = new DataCollectionEmailSender();
+        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submissionId);
+    }
 
-            foreach ($nonRegisteredAuthors as $author) {
-                if (!$demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
-                    $this->sendRequestDataCollectionEmail($submission, $author);
-                }
-            }
+    public function checkMigrateResponsesOrcid(string $hookName, array $params)
+    {
+        $user = $params[0];
+        $userOrcid = $user->getOrcid();
+
+        if ($userOrcid) {
+            $context = Application::get()->getRequest()->getContext();
+            $demographicDataService = new DemographicDataService();
+            $demographicDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
         }
-    }
-
-    private function getNonRegisteredAuthors($submission): array
-    {
-        $publication = $submission->getCurrentPublication();
-        $nonRegisteredAuthors = [];
-        $demographicDataDao = new DemographicDataDAO();
-
-        foreach ($publication->getData('authors') as $author) {
-            $authorEmail = $author->getData('email');
-
-            if (!$demographicDataDao->thereIsUserRegistered($authorEmail)) {
-                $nonRegisteredAuthors[] = $author;
-            }
-        }
-
-        return $nonRegisteredAuthors;
-    }
-
-    private function sendRequestDataCollectionEmail($submission, $author)
-    {
-        $request = Application::get()->getRequest();
-        $context = $request->getContext();
-
-        $emailTemplate = Repo::emailTemplate()->getByKey(
-            $context->getId(),
-            'REQUEST_COLLECTION_CONTRIBUTOR_DATA'
-        );
-        $authorName = $author->getFullName();
-        $authorEmail = $author->getData('email');
-
-        $questionnaireUrl = $this->getQuestionnairePageUrl($request, $author);
-
-        $email = new RequestCollectionContributorData($context, $submission, ['questionnaireUrl' => $questionnaireUrl]);
-        $email->from($context->getData('contactEmail'), $context->getData('contactName'));
-        $email->to([['name' => $authorName, 'email' => $authorEmail]]);
-        $email->subject($emailTemplate->getLocalizedData('subject'));
-        $email->body($emailTemplate->getLocalizedData('body'));
-
-        Mail::send($email);
-    }
-
-    private function getQuestionnairePageUrl($request, $author): string
-    {
-        $authorToken = md5(microtime() . $author->getData('email'));
-
-        Repo::author()->edit($author, ['demographicToken' => $authorToken]);
-
-        return $request->getDispatcher()->url(
-            $request,
-            Application::ROUTE_PAGE,
-            null,
-            'demographicQuestionnaire',
-            null,
-            null,
-            ['authorId' => $author->getId(), 'authorToken' => $authorToken]
-        );
     }
 }
