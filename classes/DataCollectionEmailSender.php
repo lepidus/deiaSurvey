@@ -37,7 +37,7 @@ class DataCollectionEmailSender
         foreach ($publication->getData('authors') as $author) {
             $authorEmail = $author->getData('email');
 
-            if (!$demographicDataDao->thereIsUserRegistered($authorEmail)) {
+            if (!$demographicDataDao->thereIsUserWithSetting($authorEmail, 'email')) {
                 $nonRegisteredAuthors[] = $author;
             }
         }

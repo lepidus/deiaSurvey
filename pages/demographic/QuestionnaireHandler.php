@@ -8,6 +8,7 @@ use APP\template\TemplateManager;
 use PKP\plugins\PluginRegistry;
 use PKP\config\Config;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
+use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
 
@@ -99,7 +100,7 @@ class QuestionnaireHandler extends Handler
 
         Repo::author()->edit($author, ['demographicToken' => null, 'demographicOrcid' => null]);
 
-        $templateMgr->display($plugin->getTemplateResource('questionnairePage/saveSuccess.tpl'));
+        return $templateMgr->display($plugin->getTemplateResource('questionnairePage/saveSuccess.tpl'));
     }
 
     public function orcidVerify($args, $request)
@@ -110,8 +111,7 @@ class QuestionnaireHandler extends Handler
         $contextId = $request->getContext()->getId();
 
         if ($request->getUserVar('error') == 'access_denied') {
-            $message = __('plugins.generic.demographicData.questionnairePage.orcidAccessDenied');
-            $templateMgr->assign('messageToDisplay', $message);
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.orcidAccessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
@@ -120,8 +120,7 @@ class QuestionnaireHandler extends Handler
             $orcidClient = new OrcidClient($plugin, $contextId);
             $authorOrcid = $orcidClient->requestOrcid($code);
         } catch (\GuzzleHttp\Exception\RequestException $exception) {
-            $message = __('plugins.generic.demographicData.questionnairePage.orcidAuthError');
-            $templateMgr->assign('messageToDisplay', $message);
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.orcidAuthError'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
@@ -133,10 +132,15 @@ class QuestionnaireHandler extends Handler
             $plugin->getSetting($contextId, 'orcidAPIPath') == OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX;
         $authorOrcidUri = ($isSandBox ? OrcidClient::ORCID_URL_SANDBOX : OrcidClient::ORCID_URL) . $authorOrcid;
 
+        $demographicDataDao = new DemographicDataDAO();
+        if ($demographicDataDao->thereIsUserWithSetting($authorOrcidUri, 'orcid')) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.userWithOrcidExists'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
         $demographicDataService  = new DemographicDataService();
         if ($demographicDataService->authorAlreadyAnsweredQuestionnaire($author, $authorOrcidUri)) {
-            $message = __('plugins.generic.demographicData.questionnairePage.alreadyAnswered');
-            $templateMgr->assign('messageToDisplay', $message);
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.alreadyAnswered'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 

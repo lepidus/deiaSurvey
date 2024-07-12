@@ -37,6 +37,9 @@ msgstr "Ha denegado el acceso a su registro ORCID"
 msgid "plugins.generic.demographicData.questionnairePage.orcidAuthError"
 msgstr "Se ha producido un error al solicitar su ORCID. El mensaje devuelto fue: {$orcidAPIError}"
 
+msgid "plugins.generic.demographicData.questionnairePage.userWithOrcidExists"
+msgstr "Hay un usuario registrado con este ORCID en nuestro sistema. Por favor, rellene el cuestionario demográfico utilizando este usuario."
+
 
 msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"
 msgstr "Indique qué API de ORCID se debe utilizar"

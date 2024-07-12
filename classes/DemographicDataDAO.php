@@ -54,11 +54,18 @@ class DemographicDataDAO extends DAO
             ]);
     }
 
-    public function thereIsUserRegistered(string $email): bool
+    public function thereIsUserWithSetting(string $value, string $type): bool
     {
-        $countUsers = DB::table('users')
-            ->where('email', '=', $email)
-            ->count();
+        if ($type == 'email') {
+            $countUsers = DB::table('users')
+                ->where('email', '=', $value)
+                ->count();
+        } elseif ($type == 'orcid') {
+            $countUsers = DB::table('user_settings')
+                ->where('setting_name', 'orcid')
+                ->where('setting_value', $value)
+                ->count();
+        }
 
         return $countUsers > 0;
     }

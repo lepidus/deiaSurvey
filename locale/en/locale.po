@@ -37,6 +37,9 @@ msgstr "You denied access to your ORCID record"
 msgid "plugins.generic.demographicData.questionnairePage.orcidAuthError"
 msgstr "An error occurred during your ORCID requesting. The message returned was: {$orcidAPIError}"
 
+msgid "plugins.generic.demographicData.questionnairePage.userWithOrcidExists"
+msgstr "There is a user registered with this ORCID in our system. Please fill in the demographic questionnaire using this user."
+
 
 msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"
 msgstr "Please, inform which ORCID API should be used"
