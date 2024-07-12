@@ -4,6 +4,7 @@ namespace APP\plugins\generic\demographicData\classes;
 
 use APP\core\Application;
 use PKP\facades\Locale;
+use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
 
 class DemographicDataService
@@ -108,5 +109,41 @@ class DemographicDataService
             ->getCount();
 
         return ($countAuthorResponses > 0);
+    }
+
+    public function migrateResponsesByUserIdentifier($context, $user, $idName)
+    {
+        $contextQuestions = Repo::demographicQuestion()->getCollector()
+            ->filterByContextIds([$context->getId()])
+            ->getMany()
+            ->toArray();
+
+        if (empty($contextQuestions)) {
+            return;
+        }
+
+        $questionsIds = array_map(function ($question) {
+            return $question->getId();
+        }, $contextQuestions);
+
+        $userResponses = Repo::demographicResponse()->getCollector()
+            ->filterByExternalIds([$user->getData($idName)])
+            ->filterByExternalTypes([$idName])
+            ->filterByQuestionIds($questionsIds)
+            ->getMany()
+            ->toArray();
+
+        if (!empty($userResponses)) {
+            foreach ($userResponses as $response) {
+                Repo::demographicResponse()->edit($response, [
+                    'userId' => $user->getId(),
+                    'externalId' => null,
+                    'externalType' => null
+                ]);
+            }
+
+            $demographicDataDao = new DemographicDataDAO();
+            $demographicDataDao->updateDemographicConsent($context->getId(), $user->getId(), true);
+        }
     }
 }

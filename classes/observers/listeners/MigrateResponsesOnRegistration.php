@@ -5,7 +5,7 @@ namespace APP\plugins\generic\demographicData\classes\observers\listeners;
 use Illuminate\Events\Dispatcher;
 use PKP\observers\events\UserRegisteredContext;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
-use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
+use APP\plugins\generic\demographicData\classes\DemographicDataService;
 
 class MigrateResponsesOnRegistration
 {
@@ -22,34 +22,7 @@ class MigrateResponsesOnRegistration
         $user = $event->recipient;
         $context = $event->context;
 
-        $contextQuestions = Repo::demographicQuestion()->getCollector()
-            ->filterByContextIds([$context->getId()])
-            ->getMany()
-            ->toArray();
-
-        if (empty($contextQuestions)) {
-            return;
-        }
-
-        $questionsIds = array_map(function ($question) {
-            return $question->getId();
-        }, $contextQuestions);
-
-        $userResponses = Repo::demographicResponse()->getCollector()
-            ->filterByExternalIds([$user->getEmail()])
-            ->filterByExternalTypes(['email'])
-            ->filterByQuestionIds($questionsIds)
-            ->getMany();
-
-        foreach ($userResponses as $response) {
-            Repo::demographicResponse()->edit($response, [
-                'userId' => $user->getId(),
-                'externalId' => null,
-                'externalType' => null
-            ]);
-        }
-
-        $demographicDataDao = new DemographicDataDAO();
-        $demographicDataDao->updateDemographicConsent($context->getId(), $user->getId(), true);
+        $demographicDataService = new DemographicDataService();
+        $demographicDataService->migrateResponsesByUserIdentifier($context, $user, 'email');
     }
 }

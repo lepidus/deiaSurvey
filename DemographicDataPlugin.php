@@ -18,6 +18,7 @@ use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateRespo
 use APP\plugins\generic\demographicData\classes\facades\Repo;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
+use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\DemographicDataSettingsForm;
 
 class DemographicDataPlugin extends GenericPlugin
@@ -33,6 +34,7 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
+            Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
 
             Event::subscribe(new MigrateResponsesOnRegistration());
 
@@ -241,5 +243,17 @@ class DemographicDataPlugin extends GenericPlugin
 
         $dataCollectionEmailSender = new DataCollectionEmailSender();
         $dataCollectionEmailSender->sendRequestDataCollectionEmails($submissionId);
+    }
+
+    public function checkMigrateResponsesOrcid(string $hookName, array $params)
+    {
+        $user = $params[0];
+        $userOrcid = $user->getOrcid();
+
+        if ($userOrcid) {
+            $context = Application::get()->getRequest()->getContext();
+            $demographicDataService = new DemographicDataService();
+            $demographicDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
+        }
     }
 }
