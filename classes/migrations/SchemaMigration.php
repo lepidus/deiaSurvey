@@ -13,6 +13,7 @@ class SchemaMigration extends Migration
         Schema::create('demographic_questions', function (Blueprint $table) {
             $table->bigInteger('demographic_question_id')->autoIncrement();
             $table->bigInteger('context_id');
+            $table->bigInteger('question_type');
 
             $table->foreign('context_id')
                 ->references('journal_id')
