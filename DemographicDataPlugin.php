@@ -15,6 +15,7 @@ use APP\decision\Decision;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateResponsesOnRegistration;
+use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
@@ -169,11 +170,13 @@ class DemographicDataPlugin extends GenericPlugin
         if ($demographicQuestionsCount == 0) {
             $firstQuestion = Repo::demographicQuestion()->newDataObject([
                 'contextId' => $contextId,
+                'questionType' => DemographicQuestion::TYPE_TEXT_FIELD,
                 'questionText' => ['en' => 'Gender'],
                 'questionDescription' => ['en' => 'With which gender do you most identify?']
             ]);
             $secondQuestion = Repo::demographicQuestion()->newDataObject([
                 'contextId' => $contextId,
+                'questionType' => DemographicQuestion::TYPE_TEXT_FIELD,
                 'questionText' => ['en' => 'Ethnicity'],
                 'questionDescription' => ['en' => 'How would you identify yourself in terms of ethnicity?']
             ]);
