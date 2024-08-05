@@ -37,7 +37,7 @@ class DefaultTestQuestionsCreator
         return [
             [
                 'contextId' => $contextId,
-                'questionType' => DemographicQuestion::TYPE_TEXT_FIELD,
+                'questionType' => DemographicQuestion::TYPE_SMALL_TEXT_FIELD,
                 'questionText' => ['en' => 'Gender'],
                 'questionDescription' => ['en' => 'With which gender do you most identify?']
             ],
@@ -46,6 +46,44 @@ class DefaultTestQuestionsCreator
                 'questionType' => DemographicQuestion::TYPE_TEXT_FIELD,
                 'questionText' => ['en' => 'Ethnicity'],
                 'questionDescription' => ['en' => 'How would you identify yourself in terms of ethnicity?']
+            ],
+            [
+                'contextId' => $contextId,
+                'questionType' => DemographicQuestion::TYPE_TEXTAREA,
+                'questionText' => ['en' => 'Academic background'],
+                'questionDescription' => ['en' => 'Please tell us which academic institutions you have been involved with']
+            ],
+            [
+                'contextId' => $contextId,
+                'questionType' => DemographicQuestion::TYPE_CHECKBOXES,
+                'questionText' => ['en' => 'Languages'],
+                'questionDescription' => ['en' => 'Which of these languages do you speak?'],
+                'possibleResponses' => [
+                    'en' => ['English', 'French', 'Hindi', 'Mandarin', 'Portuguese', 'Spanish']
+                ]
+            ],
+            [
+                'contextId' => $contextId,
+                'questionType' => DemographicQuestion::TYPE_RADIO_BUTTONS,
+                'questionText' => ['en' => 'Nacionality'],
+                'questionDescription' => ['en' => 'Which continent are you from?'],
+                'possibleResponses' => [
+                    'en' => ['Africa', 'America', 'Asia', 'Europe', 'Oceania']
+                ]
+            ],
+            [
+                'contextId' => $contextId,
+                'questionType' => DemographicQuestion::TYPE_DROP_DOWN_BOX,
+                'questionText' => ['en' => 'Salary'],
+                'questionDescription' => ['en' => 'What range is your current salary in?'],
+                'possibleResponses' => [
+                    'en' => [
+                        'Less than a minimum wage',
+                        'One to three minimum wages',
+                        'Three to five minimum wages',
+                        'More than five minimum wages'
+                    ]
+                ]
             ]
         ];
     }
