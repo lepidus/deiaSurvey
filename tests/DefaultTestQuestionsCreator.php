@@ -23,16 +23,16 @@ class DefaultTestQuestionsCreator
             ->getCount();
 
         if ($demographicQuestionsCount == 0) {
-            $defaultTestQuestions = $this->getDefaultTestQuestionsData();
+            $defaultTestQuestions = $this->getDefaultTestQuestionsData($contextId);
 
             foreach ($defaultTestQuestions as $questionData) {
                 $questionObject = Repo::demographicQuestion()->newDataObject($questionData);
-                $questionObject->add($questionObject);
+                Repo::demographicQuestion()->add($questionObject);
             }
         }
     }
 
-    private function getDefaultTestQuestionsData(): array
+    private function getDefaultTestQuestionsData(int $contextId): array
     {
         return [
             [
