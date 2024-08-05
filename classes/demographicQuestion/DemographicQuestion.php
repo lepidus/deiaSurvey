@@ -4,7 +4,14 @@ namespace APP\plugins\generic\demographicData\classes\demographicQuestion;
 
 class DemographicQuestion extends \PKP\core\DataObject
 {
-    public function getContextId(): int
+    public const TYPE_SMALL_TEXT_FIELD = 1;
+    public const TYPE_TEXT_FIELD = 2;
+    public const TYPE_TEXTAREA = 3;
+    public const TYPE_CHECKBOXES = 4;
+    public const TYPE_RADIO_BUTTONS = 5;
+    public const TYPE_DROP_DOWN_BOX = 6;
+
+    public function getContextId()
     {
         return $this->getData('contextId');
     }
@@ -12,6 +19,16 @@ class DemographicQuestion extends \PKP\core\DataObject
     public function setContextId($contextId)
     {
         $this->setData('contextId', $contextId);
+    }
+
+    public function getQuestionType()
+    {
+        return $this->getData('questionType');
+    }
+
+    public function setQuestionType($questionType)
+    {
+        $this->setData('questionType', $questionType);
     }
 
     public function getLocalizedQuestionText()
@@ -32,5 +49,15 @@ class DemographicQuestion extends \PKP\core\DataObject
     public function setQuestionDescription($descriptionText, $locale)
     {
         $this->setData('questionDescription', $descriptionText, $locale);
+    }
+
+    public function getPossibleResponses($locale)
+    {
+        return $this->getData('possibleResponses', $locale);
+    }
+
+    public function setPossibleResponses($possibleResponses, $locale)
+    {
+        $this->setData('possibleResponses', $possibleResponses, $locale);
     }
 }
