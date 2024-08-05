@@ -33,11 +33,15 @@ class RepositoryTest extends DatabaseTestCase
         $this->locale = "en";
         $this->params = [
             'contextId' => $this->contextId,
+            'questionType' => DemographicQuestion::TYPE_TEXTAREA,
             'questionText' => [
                 $this->locale => 'Test text'
             ],
             'questionDescription' => [
                 $this->locale => 'Test description'
+            ],
+            'possibleResponses' => [
+                $this->locale => ['First possible response', 'Second possible response']
             ]
         ];
         $this->addSchemaFile('demographicQuestion');
@@ -62,8 +66,9 @@ class RepositoryTest extends DatabaseTestCase
         $fetchedDemographicQuestion = $repository->get($insertedDemographicQuestionId, $this->contextId);
         self::assertEquals($this->params, $fetchedDemographicQuestion->_data);
 
-        $this->params['questionText']['en'] = 'Updated text';
-        $this->params['questionDescription']['en'] = 'Updated description';
+        $this->params['questionText'][$this->locale] = 'Updated text';
+        $this->params['questionDescription'][$this->locale] = 'Updated description';
+        $this->params['possibleResponses'][$this->locale] = ['New first possible response', 'New second possible response'];
         $repository->edit($demographicQuestion, $this->params);
 
         $fetchedDemographicQuestion = $repository->get($demographicQuestion->getId(), $this->contextId);
