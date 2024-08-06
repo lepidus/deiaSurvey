@@ -1,7 +1,6 @@
 import '../support/commands.js';
 
 function assertDefaultQuestionsDisplay() {
-    cy.contains('a', 'Demographic Data').click();
     cy.contains('label', 'Gender');
     cy.contains('With which gender do you most identify?');
 
