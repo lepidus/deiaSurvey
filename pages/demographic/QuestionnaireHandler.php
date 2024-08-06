@@ -11,6 +11,7 @@ use APP\plugins\generic\demographicData\classes\facades\Repo;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
+use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 
 class QuestionnaireHandler extends Handler
 {
@@ -40,7 +41,8 @@ class QuestionnaireHandler extends Handler
         $templateMgr->assign([
             'questions' => $questions,
             'authorId' => $author->getId(),
-            'authorToken' => $authorToken
+            'authorToken' => $authorToken,
+            'questionTypeConsts' => DemographicQuestion::getQuestionTypeConstants()
         ]);
 
         return $templateMgr->display($plugin->getTemplateResource('questionnairePage/index.tpl'));
