@@ -11,6 +11,18 @@ class DemographicQuestion extends \PKP\core\DataObject
     public const TYPE_RADIO_BUTTONS = 5;
     public const TYPE_DROP_DOWN_BOX = 6;
 
+    public static function getQuestionTypeConstants(): array
+    {
+        return [
+            'TYPE_SMALL_TEXT_FIELD' => self::TYPE_SMALL_TEXT_FIELD,
+            'TYPE_TEXT_FIELD' => self::TYPE_TEXT_FIELD,
+            'TYPE_TEXTAREA' => self::TYPE_TEXTAREA,
+            'TYPE_CHECKBOXES' => self::TYPE_CHECKBOXES,
+            'TYPE_RADIO_BUTTONS' => self::TYPE_RADIO_BUTTONS,
+            'TYPE_DROP_DOWN_BOX' => self::TYPE_DROP_DOWN_BOX
+        ];
+    }
+
     public function getContextId()
     {
         return $this->getData('contextId');
@@ -59,5 +71,10 @@ class DemographicQuestion extends \PKP\core\DataObject
     public function setPossibleResponses($possibleResponses, $locale)
     {
         $this->setData('possibleResponses', $possibleResponses, $locale);
+    }
+
+    public function getLocalizedPossibleResponses()
+    {
+        return $this->getLocalizedData('possibleResponses');
     }
 }

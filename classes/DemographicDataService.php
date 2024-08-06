@@ -20,9 +20,11 @@ class DemographicDataService
 
         foreach ($demographicQuestions as $demographicQuestion) {
             $questionData = [
+                'questionId' => $demographicQuestion->getId(),
+                'type' => $demographicQuestion->getQuestionType(),
                 'title' => $demographicQuestion->getLocalizedQuestionText(),
                 'description' => $demographicQuestion->getLocalizedQuestionDescription(),
-                'questionId' => $demographicQuestion->getId()
+                'possibleResponses' => $demographicQuestion->getLocalizedPossibleResponses()
             ];
 
             if ($shouldRetrieveResponses) {

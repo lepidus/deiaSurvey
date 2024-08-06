@@ -15,12 +15,7 @@
 	{fbvFormArea id="demographicQuestion"}
 		<div id="Hello" name="questions">
 			{foreach $questions as $question}
-				{assign var="questionId" value="question-{$question['questionId']}"}
-				{fbvFormSection title=$question['title'] translate=false}
-					{fbvFormSection for="demographicResponse" description=$question['description'] translate=false}
-						{fbvElement type="text" multilingual="true" name=$questionId id="responses" value=$question['response'] size=$fbvStyles.size.LARGE}
-					{/fbvFormSection}
-				{/fbvFormSection}
+				{include file="../../../plugins/generic/demographicData/templates/question.tpl" question=$question}
 			{/foreach}
 		</div>
     {/fbvFormArea}
