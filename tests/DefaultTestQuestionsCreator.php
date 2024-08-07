@@ -59,7 +59,8 @@ class DefaultTestQuestionsCreator
                 'questionText' => ['en' => 'Languages'],
                 'questionDescription' => ['en' => 'Which of these languages do you speak?'],
                 'possibleResponses' => [
-                    'en' => ['English', 'French', 'Hindi', 'Mandarin', 'Portuguese', 'Spanish']
+                    'en' => ['English', 'French', 'Hindi', 'Mandarin', 'Portuguese', 'Spanish'],
+                    'fr_CA' => ['Anglais', 'Français', 'Hindi', 'Mandarin', 'Portugais', 'Espagnol']
                 ]
             ],
             [
@@ -68,7 +69,8 @@ class DefaultTestQuestionsCreator
                 'questionText' => ['en' => 'Nacionality'],
                 'questionDescription' => ['en' => 'Which continent are you from?'],
                 'possibleResponses' => [
-                    'en' => ['Africa', 'America', 'Asia', 'Europe', 'Oceania']
+                    'en' => ['Africa', 'America', 'Asia', 'Europe', 'Oceania'],
+                    'fr_CA' => ['Afrique', 'Amérique', 'Asie', 'Europe', 'Océanie']
                 ]
             ],
             [
@@ -82,6 +84,12 @@ class DefaultTestQuestionsCreator
                         'One to three minimum wages',
                         'Three to five minimum wages',
                         'More than five minimum wages'
+                    ],
+                    'fr_CA' => [
+                        "Moins qu'un salaire minimum",
+                        'Un à trois salaires minimums',
+                        'Trois à cinq salaires minimums',
+                        'Plus de cinq salaires minimums'
                     ]
                 ]
             ]

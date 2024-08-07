@@ -34,6 +34,61 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('option', 'More than five minimum wages');
 }
 
+function answerDefaultQuestions() {
+    cy.get('input[id^="responses-en"]').eq(0).clear().type('Female');
+    cy.get('input[id^="responses-en"]').eq(1).clear().type('Latin');
+    cy.get('textarea[id^="responses-en"]').clear().type('University of São Paulo');
+    cy.get('textarea[id^="responses-en"]').type('{enter}');
+    cy.get('textarea[id^="responses-en"]').type('University of Minas Gerais');
+    cy.contains('label', 'Academic background').click();
+    cy.contains('label', 'English').within(() => {
+        cy.get('input').check();
+    });
+    cy.contains('label', 'Spanish').within(() => {
+        cy.get('input').check();
+    });
+    cy.contains('label', 'America').within(() => {
+        cy.get('input').check();
+    });
+    cy.get('select[id^="responses"]').select('Three to five minimum wages');
+
+    cy.get('#demographicDataForm .submitFormButton').click();
+    cy.wait(1000);
+}
+
+function assertResponsesToDefaultQuestions() {
+    cy.contains('a', 'Demographic Data').click();
+    cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
+    
+    cy.get('input[id^="responses-en"]').eq(0).should('have.value', 'Female');
+    cy.get('input[id^="responses-en"]').eq(1).should('have.value', 'Latin');
+    cy.get('textarea[id^="responses-en"]').should('include', 'University of São Paulo');
+    cy.get('textarea[id^="responses-en"]').should('include', 'University of Minas Gerais');
+    cy.contains('label', 'English').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.contains('label', 'Spanish').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.contains('label', 'America').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.get('select[id^="responses"] option:selected').should('have.text', 'Three to five minimum wages');
+}
+
+function assertResponsesToQuestionsInFrench() {
+    cy.contains('label', 'Anglais').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.contains('label', 'Espagnol').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.contains('label', 'Amérique').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.get('select[id^="responses"] option:selected').should('have.text', 'Trois à cinq salaires minimums');
+}
+
 describe('Demographic Data - Questions displaying', function () {
     it('Display of questions and request message at users profile page', function () {
         cy.login('dbarnes', null, 'publicknowledge');
@@ -82,16 +137,13 @@ describe('Demographic Data - Questions displaying', function () {
         cy.contains('a', 'Demographic Data').click();
 
         cy.get('input[name="demographicDataConsent"][value=1]').click();
-        cy.get('input[id^="responses-en"]').eq(0).clear().type('Female');
-        cy.get('input[id^="responses-en"]').eq(1).clear().type('Slavic');
-
-        cy.get('#demographicDataForm .submitFormButton').click();
-        cy.wait(1000);
+        answerDefaultQuestions();
+        
         cy.reload();
-
-        cy.contains('a', 'Demographic Data').click();
-        cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
-        cy.get('input[id^="responses-en"]').eq(0).should('have.value', 'Female');
-        cy.get('input[id^="responses-en"]').eq(1).should('have.value', 'Slavic');
+        assertResponsesToDefaultQuestions();
+        
+        cy.get('.app__headerActions button').eq(1).click();
+        cy.contains('.pkpDropdown__action', 'Français').click();
+        assertResponsesToQuestionsInFrench();
     });
 });
