@@ -20,11 +20,37 @@
     color: rgba(0,0,0,0.54);
 }
 
-.questionInput {
+.questionSmallText {
+    width: 25%;
+    font-size: 1rem;
+    line-height: 2rem;
+    padding: 0 0.25rem;
+}
+
+.questionText, .questionTextArea {
     width: 75%;
     font-size: 1rem;
     line-height: 2rem;
-    padding: 0.0.25rem;
+    padding: 0 0.25rem;
+}
+
+.questionCheckbox, .questionRadio {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    padding: 0.25rem;
+}
+
+.questionCheckbox input, .questionRadio input {
+    margin-right: 0.5em;
+}
+
+.questionSelect {
+    width: 50%;
+    height: 2.15rem;
+    font-size: 1rem;
+    padding: 0.25rem;
+    background-color: #fff;
+    border: 1px solid #bbb;
 }
 
 .buttons {
