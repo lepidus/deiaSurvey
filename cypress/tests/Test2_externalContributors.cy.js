@@ -1,25 +1,25 @@
 import '../support/commands.js';
 
 function assertDefaultQuestionsDisplay() {
-    cy.contains('label', 'Gender');
+    cy.contains('.questionTitle', 'Gender');
     cy.contains('With which gender do you most identify?');
 
-    cy.contains('label', 'Ethnicity');
+    cy.contains('.questionTitle', 'Ethnicity');
     cy.contains('How would you identify yourself in terms of ethnicity?');
 
-    cy.contains('label', 'Academic background');
+    cy.contains('.questionTitle', 'Academic background');
     cy.contains('Please tell us which academic institutions you have been involved with');
 
-    cy.contains('label', 'Languages');
+    cy.contains('.questionTitle', 'Languages');
     cy.contains('Which of these languages do you speak?');
-    cy.contains('English');
+    cy.contains('label', 'English');
     cy.contains('French');
     cy.contains('Hindi');
     cy.contains('Mandarin');
     cy.contains('Portuguese');
     cy.contains('Spanish');
 
-    cy.contains('label', 'Nacionality');
+    cy.contains('.questionTitle', 'Nacionality');
     cy.contains('Which continent are you from?');
     cy.contains('Africa');
     cy.contains('America');
@@ -27,7 +27,7 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('Europe');
     cy.contains('Oceania');
 
-    cy.contains('label', 'Salary');
+    cy.contains('.questionTitle', 'Salary');
     cy.contains('What range is your current salary in?');
     cy.contains('option', 'Less than a minimum wage');
     cy.contains('option', 'One to three minimum wages');
