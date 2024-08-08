@@ -62,8 +62,8 @@ function assertResponsesToDefaultQuestions() {
     
     cy.get('input[id^="responses-en"]').eq(0).should('have.value', 'Female');
     cy.get('input[id^="responses-en"]').eq(1).should('have.value', 'Latin');
-    cy.get('textarea[id^="responses-en"]').should('include', 'University of São Paulo');
-    cy.get('textarea[id^="responses-en"]').should('include', 'University of Minas Gerais');
+    cy.get('textarea[id^="responses-en"]').invoke('val').should('include', 'University of São Paulo');
+    cy.get('textarea[id^="responses-en"]').invoke('val').should('include', 'University of Minas Gerais');
     cy.contains('label', 'English').within(() => {
         cy.get('input').should('be.checked');
     });
@@ -77,7 +77,7 @@ function assertResponsesToDefaultQuestions() {
 }
 
 function assertResponsesToQuestionsInFrench() {
-    cy.contains('label', 'Anglais').within(() => {
+    cy.get('li label:contains("Anglais")').within(() => {
         cy.get('input').should('be.checked');
     });
     cy.contains('label', 'Espagnol').within(() => {
@@ -138,12 +138,13 @@ describe('Demographic Data - Questions displaying', function () {
 
         cy.get('input[name="demographicDataConsent"][value=1]').click();
         answerDefaultQuestions();
-        
+
         cy.reload();
         assertResponsesToDefaultQuestions();
-        
+
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('.pkpDropdown__action', 'Français').click();
+        cy.get('a[name="demographicData"]').click();
         assertResponsesToQuestionsInFrench();
     });
 });

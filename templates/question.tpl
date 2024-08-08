@@ -38,7 +38,7 @@
                 }
             {/foreach}
         {elseif $question['type'] == $questionTypeConsts['TYPE_DROP_DOWN_BOX']}
-            {fbvElement type="select" name=$questionId id="responses" from=$question['possibleResponses'] checked=$question['response'] translate=false required=true size=$fbvStyles.size.LARGE}
+            {fbvElement type="select" name=$questionId id="responses" from=$question['possibleResponses'] selected=$question['response'] translate=false required=true size=$fbvStyles.size.LARGE}
         {/if}
     {/fbvFormSection}
 {/fbvFormSection}
