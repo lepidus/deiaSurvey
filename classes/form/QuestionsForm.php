@@ -74,8 +74,10 @@ class QuestionsForm extends Form
         if ($consent) {
             $locale = $this->defaultLocale;
 
-            foreach ($this->getData('responses') as $response) {
-                if (empty($response[$locale])) {
+            foreach ($this->getData('responses') as $questionId => $response) {
+                $inputType = explode('-', $questionId)[2];
+
+                if (($inputType == 'text' or $inputType == 'textarea') and empty($response[$locale])) {
                     return false;
                 }
             }

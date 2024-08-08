@@ -43,6 +43,20 @@ class DemographicQuestion extends \PKP\core\DataObject
         $this->setData('questionType', $questionType);
     }
 
+    public function getQuestionInputType(): string
+    {
+        $mapTypeInput = [
+            self::TYPE_SMALL_TEXT_FIELD => 'text',
+            self::TYPE_TEXT_FIELD => 'text',
+            self::TYPE_TEXTAREA => 'textarea',
+            self::TYPE_CHECKBOXES => 'checkbox',
+            self::TYPE_RADIO_BUTTONS => 'radio',
+            self::TYPE_DROP_DOWN_BOX => 'select'
+        ];
+
+        return $mapTypeInput[$this->getQuestionType()];
+    }
+
     public function getLocalizedQuestionText()
     {
         return $this->getLocalizedData('questionText');

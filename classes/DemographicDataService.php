@@ -6,6 +6,7 @@ use APP\core\Application;
 use PKP\facades\Locale;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
+use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 
 class DemographicDataService
 {
@@ -22,6 +23,7 @@ class DemographicDataService
             $questionData = [
                 'questionId' => $demographicQuestion->getId(),
                 'type' => $demographicQuestion->getQuestionType(),
+                'inputType' => $demographicQuestion->getQuestionInputType(),
                 'title' => $demographicQuestion->getLocalizedQuestionText(),
                 'description' => $demographicQuestion->getLocalizedQuestionDescription(),
                 'possibleResponses' => $demographicQuestion->getLocalizedPossibleResponses()
@@ -29,25 +31,34 @@ class DemographicDataService
 
             if ($shouldRetrieveResponses) {
                 $user = $request->getUser();
-                $response = $this->getUserResponse($user->getId(), $demographicQuestion->getId());
+                $response = $this->getUserResponse($demographicQuestion, $user->getId());
+
                 $questionData['response'] = $response;
             }
 
             $questions[] = $questionData;
         }
+
         return $questions;
     }
 
-    private function getUserResponse(int $userId, int $questionId)
+    private function getUserResponse(DemographicQuestion $question, int $userId)
     {
         $demographicResponses = Repo::demographicResponse()
             ->getCollector()
-            ->filterByQuestionIds([$questionId])
+            ->filterByQuestionIds([$question->getId()])
             ->filterByUserIds([$userId])
             ->getMany()
             ->toArray();
 
         if (empty($demographicResponses)) {
+            if (
+                $question->getQuestionType() == DemographicQuestion::TYPE_CHECKBOXES
+                || $question->getQuestionType() == DemographicQuestion::TYPE_RADIO_BUTTONS
+            ) {
+                return [];
+            }
+
             return null;
         }
 
@@ -59,12 +70,13 @@ class DemographicDataService
     {
         foreach ($responses as $question => $responseInput) {
             $questionId = explode("-", $question)[1];
-            $demographicResponseCollector = Repo::demographicResponse()
+            $demographicResponses = Repo::demographicResponse()
                 ->getCollector()
                 ->filterByQuestionIds([$questionId])
                 ->filterByUserIds([$userId])
-                ->getMany();
-            $demographicResponse = array_shift($demographicResponseCollector->toArray());
+                ->getMany()
+                ->toArray();
+            $demographicResponse = array_shift($demographicResponses);
             if ($demographicResponse) {
                 Repo::demographicResponse()->edit($demographicResponse, ['responseText' => $responseInput]);
             } else {
