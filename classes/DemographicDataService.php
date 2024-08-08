@@ -63,7 +63,7 @@ class DemographicDataService
         }
 
         $firstResponse = array_shift($demographicResponses);
-        return $firstResponse->getText();
+        return $firstResponse->getValue();
     }
 
     public function registerUserResponses(int $userId, array $responses)
@@ -78,12 +78,12 @@ class DemographicDataService
                 ->toArray();
             $demographicResponse = array_shift($demographicResponses);
             if ($demographicResponse) {
-                Repo::demographicResponse()->edit($demographicResponse, ['responseText' => $responseInput]);
+                Repo::demographicResponse()->edit($demographicResponse, ['responseValue' => $responseInput]);
             } else {
                 $response = Repo::demographicResponse()->newDataObject();
                 $response->setUserId($userId);
                 $response->setDemographicQuestionId($questionId);
-                $response->setData('responseText', $responseInput);
+                $response->setData('responseValue', $responseInput);
                 Repo::demographicResponse()->add($response);
             }
         }
@@ -98,7 +98,7 @@ class DemographicDataService
 
             $response = Repo::demographicResponse()->newDataObject();
             $response->setDemographicQuestionId($questionId);
-            $response->setData('responseText', $responseInput, $locale);
+            $response->setData('responseValue', $responseInput, $locale);
             $response->setExternalId($externalId);
             $response->setExternalType($externalType);
 

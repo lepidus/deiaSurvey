@@ -44,18 +44,13 @@ class DemographicResponse extends \PKP\core\DataObject
         $this->setData('externalType', $externalType);
     }
 
-    public function getLocalizedText(): string
+    public function getValue()
     {
-        return $this->getLocalizedData('responseText');
+        return $this->getData('responseValue');
     }
 
-    public function getText(string $locale = null)
+    public function setValue($responseValue)
     {
-        return $this->getData('responseText', $locale);
-    }
-
-    public function setText($responseText, $locale)
-    {
-        $this->setData('responseText', $responseText, $locale);
+        $this->setData('responseValue', $responseValue);
     }
 }

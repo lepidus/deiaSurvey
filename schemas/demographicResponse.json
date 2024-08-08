@@ -27,7 +27,7 @@
           "nullable"
         ]
       },
-      "responseText": {
+      "responseValue": {
         "type": "string",
         "validation": [
           "nullable"

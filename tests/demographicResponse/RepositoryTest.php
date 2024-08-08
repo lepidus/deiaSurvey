@@ -34,7 +34,7 @@ class RepositoryTest extends DatabaseTestCase
         $this->params = [
             'demographicQuestionId' => $this->demographicQuestionId,
             'userId' => $this->userId,
-            'responseText' => [
+            'responseValue' => [
                 self::DEFAULT_LOCALE => 'Test text'
             ],
             'externalId' => null,
@@ -63,7 +63,7 @@ class RepositoryTest extends DatabaseTestCase
         $fetchedDemographicResponse = $repository->get($insertedDemographicResponseId, $this->demographicQuestionId);
         self::assertEquals($this->params, $fetchedDemographicResponse->getAllData());
 
-        $this->params['responseText']['en'] = 'Updated text';
+        $this->params['responseValue']['en'] = 'Updated text';
         $repository->edit($demographicResponse, $this->params);
 
         $fetchedDemographicResponse = $repository->get($demographicResponse->getId(), $this->demographicQuestionId);
@@ -92,7 +92,7 @@ class RepositoryTest extends DatabaseTestCase
         $newParams = [
             'demographicQuestionId' => $this->demographicQuestionId,
             'userId' => null,
-            'responseText' => [
+            'responseValue' => [
                 self::DEFAULT_LOCALE => 'Test text'
             ],
             'externalId' => 'external.author@lepidus.com.br',

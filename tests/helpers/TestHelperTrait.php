@@ -37,7 +37,7 @@ trait TestHelperTrait
     {
         $demographicResponse = $this->demographicResponseDAO->newDataObject();
         $demographicResponse->setDemographicQuestionId($this->demographicQuestionId);
-        $demographicResponse->setText('Test text', self::DEFAULT_LOCALE);
+        $demographicResponse->setValue([self::DEFAULT_LOCALE => 'Test text']);
 
         if ($externalAuthor) {
             $demographicResponse->setExternalId('external.author@lepidus.com.br');
