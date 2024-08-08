@@ -94,13 +94,20 @@ class DemographicDataService
         $locale = Locale::getLocale();
 
         foreach ($responses as $question => $responseInput) {
-            $questionId = explode("-", $question)[1];
+            $questionParts = explode("-", $question);
+            $questionId = $questionParts[1];
+            $questionType = $questionParts[2];
 
             $response = Repo::demographicResponse()->newDataObject();
             $response->setDemographicQuestionId($questionId);
-            $response->setData('responseValue', $responseInput, $locale);
             $response->setExternalId($externalId);
             $response->setExternalType($externalType);
+
+            if ($questionType == 'text' or $questionType == 'textarea') {
+                $response->setData('responseValue', $responseInput, $locale);
+            } else {
+                $response->setData('responseValue', $responseInput);
+            }
 
             Repo::demographicResponse()->add($response);
         }
