@@ -35,6 +35,26 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('option', 'More than five minimum wages');
 }
 
+function answerDefaultQuestions() {
+    cy.get('input[id^="responses"]').eq(0).type('Female');
+    cy.get('input[id^="responses"]').eq(1).type('Latin');
+    cy.get('textarea[id^="responses"]').type('University of São Paulo');
+    cy.get('textarea[id^="responses"]').type('{enter}');
+    cy.get('textarea[id^="responses"]').type('University of Minas Gerais');
+    cy.contains('label', 'English').within(() => {
+        cy.get('input').check();
+    });
+    cy.contains('label', 'Spanish').within(() => {
+        cy.get('input').check();
+    });
+    cy.contains('label', 'America').within(() => {
+        cy.get('input').check();
+    });
+    cy.get('select[id^="responses"]').select('Three to five minimum wages');
+
+    cy.contains('button', 'Save').click();
+}
+
 function beginSubmission(submissionData) {
     cy.get('input[name="locale"][value="en"]').click();
     cy.setTinyMceContent('startSubmission-title-control', submissionData.title);
@@ -187,9 +207,7 @@ describe('Demographic Data - External contributors data collecting', function() 
             });
         });
 
-        cy.get('input[id^="responses"]').eq(0).type('Female');
-        cy.get('input[id^="responses"]').eq(1).type('Latin');
-        cy.contains('button', 'Save').click();
+        answerDefaultQuestions();
 
         cy.contains('Thanks for answering our demographic questionnaire');
     });
