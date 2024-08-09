@@ -86,7 +86,7 @@ function assertResponsesToQuestionsInFrench() {
     cy.contains('label', 'Amérique').within(() => {
         cy.get('input').should('be.checked');
     });
-    cy.get('select[id^="responses"] option:selected').should('have.text', 'Trois à cinq salaires minimums');
+    cy.get('select[id^="demographicResponses"] option:selected').should('have.text', 'Trois à cinq salaires minimums');
 }
 
 describe('Demographic Data - Questions displaying', function () {

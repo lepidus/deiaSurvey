@@ -36,11 +36,11 @@ function assertDefaultQuestionsDisplay() {
 }
 
 function answerDefaultQuestions() {
-    cy.get('input[id^="responses"]').eq(0).type('Female');
-    cy.get('input[id^="responses"]').eq(1).type('Latin');
-    cy.get('textarea[id^="responses"]').type('University of São Paulo');
-    cy.get('textarea[id^="responses"]').type('{enter}');
-    cy.get('textarea[id^="responses"]').type('University of Minas Gerais');
+    cy.get('input[id^="demographicResponses"]').eq(0).type('Female');
+    cy.get('input[id^="demographicResponses"]').eq(1).type('Latin');
+    cy.get('textarea[id^="demographicResponses"]').type('University of São Paulo');
+    cy.get('textarea[id^="demographicResponses"]').type('{enter}');
+    cy.get('textarea[id^="demographicResponses"]').type('University of Minas Gerais');
     cy.contains('label', 'English').within(() => {
         cy.get('input').check();
     });
@@ -50,7 +50,7 @@ function answerDefaultQuestions() {
     cy.contains('label', 'America').within(() => {
         cy.get('input').check();
     });
-    cy.get('select[id^="responses"]').select('Three to five minimum wages');
+    cy.get('select[id^="demographicResponses"]').select('Three to five minimum wages');
 
     cy.contains('button', 'Save').click();
 }
