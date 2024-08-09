@@ -13,13 +13,7 @@
 
         <fieldset class="fields">
             {foreach $questions as $question}
-                <div class="question">
-                    {assign var="questionId" value="question-{$question['questionId']}"}
-                    <span class="questionTitle">{$question['title']}</span>
-                    <span class="questionDescription">{$question['description']}</span>
-                    
-                    <input type="text" id="responses" class="questionInput" name="{$questionId}" value="" required aria-required="true">
-                </div>
+                {include file="../../../plugins/generic/demographicData/templates/questionnairePage/question.tpl" question=$question}
             {/foreach}
         </fieldset>
 

@@ -15,10 +15,10 @@ use APP\decision\Decision;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateResponsesOnRegistration;
-use APP\plugins\generic\demographicData\classes\facades\Repo;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
+use APP\plugins\generic\demographicData\tests\DefaultTestQuestionsCreator;
 use APP\plugins\generic\demographicData\DemographicDataSettingsForm;
 
 class DemographicDataPlugin extends GenericPlugin
@@ -38,7 +38,8 @@ class DemographicDataPlugin extends GenericPlugin
 
             Event::subscribe(new MigrateResponsesOnRegistration());
 
-            $this->addDefaultQuestions();
+            $defaultTestQuestionsCreator = new DefaultTestQuestionsCreator();
+            $defaultTestQuestionsCreator->createDefaultTestQuestions();
         }
         return $success;
     }
@@ -150,37 +151,6 @@ class DemographicDataPlugin extends GenericPlugin
     public function getInstallMigration(): Migration
     {
         return new SchemaMigration();
-    }
-
-    /*
-     * The following questions are for test purposes, and should be
-     * replaced by the real default questions when they be ready.
-    */
-    private function addDefaultQuestions()
-    {
-        $request = Application::get()->getRequest();
-        $contextId = $request->getContext()->getId();
-
-        $demographicQuestionsCount = Repo::demographicQuestion()
-            ->getCollector()
-            ->filterByContextIds([$contextId])
-            ->getCount();
-
-        if ($demographicQuestionsCount == 0) {
-            $firstQuestion = Repo::demographicQuestion()->newDataObject([
-                'contextId' => $contextId,
-                'questionText' => ['en' => 'Gender'],
-                'questionDescription' => ['en' => 'With which gender do you most identify?']
-            ]);
-            $secondQuestion = Repo::demographicQuestion()->newDataObject([
-                'contextId' => $contextId,
-                'questionText' => ['en' => 'Ethnicity'],
-                'questionDescription' => ['en' => 'How would you identify yourself in terms of ethnicity?']
-            ]);
-
-            Repo::demographicQuestion()->add($firstQuestion);
-            Repo::demographicQuestion()->add($secondQuestion);
-        }
     }
 
     public function getActions($request, $actionArgs)

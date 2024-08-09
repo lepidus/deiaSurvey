@@ -19,7 +19,35 @@ class DemographicQuestionTest extends PKPTestCase
     {
         $expectedContextId = 1;
         $this->demographicQuestion->setContextId($expectedContextId);
-        $this->assertEquals($this->demographicQuestion->getContextId(), $expectedContextId);
+        $this->assertEquals($expectedContextId, $this->demographicQuestion->getContextId());
+    }
+
+    public function testGetQuestionType(): void
+    {
+        $expectedQuestionType = DemographicQuestion::TYPE_SMALL_TEXT_FIELD;
+        $this->demographicQuestion->setQuestionType($expectedQuestionType);
+        $this->assertEquals($expectedQuestionType, $this->demographicQuestion->getQuestionType());
+    }
+
+    public function testGetQuestionInputType(): void
+    {
+        $this->demographicQuestion->setQuestionType(DemographicQuestion::TYPE_SMALL_TEXT_FIELD);
+        $this->assertEquals('text', $this->demographicQuestion->getQuestionInputType());
+
+        $this->demographicQuestion->setQuestionType(DemographicQuestion::TYPE_TEXT_FIELD);
+        $this->assertEquals('text', $this->demographicQuestion->getQuestionInputType());
+
+        $this->demographicQuestion->setQuestionType(DemographicQuestion::TYPE_TEXTAREA);
+        $this->assertEquals('textarea', $this->demographicQuestion->getQuestionInputType());
+
+        $this->demographicQuestion->setQuestionType(DemographicQuestion::TYPE_CHECKBOXES);
+        $this->assertEquals('checkbox', $this->demographicQuestion->getQuestionInputType());
+
+        $this->demographicQuestion->setQuestionType(DemographicQuestion::TYPE_RADIO_BUTTONS);
+        $this->assertEquals('radio', $this->demographicQuestion->getQuestionInputType());
+
+        $this->demographicQuestion->setQuestionType(DemographicQuestion::TYPE_DROP_DOWN_BOX);
+        $this->assertEquals('select', $this->demographicQuestion->getQuestionInputType());
     }
 
     public function testGetQuestionText(): void
@@ -27,7 +55,7 @@ class DemographicQuestionTest extends PKPTestCase
         $expectedQuestionText = "What is your ethnicity?";
         $this->demographicQuestion->setQuestionText($expectedQuestionText, 'en');
         $questionText = $this->demographicQuestion->getLocalizedQuestionText();
-        $this->assertEquals($questionText, $expectedQuestionText);
+        $this->assertEquals($expectedQuestionText, $questionText);
     }
 
     public function testGetQuestionDescription(): void
@@ -41,6 +69,20 @@ class DemographicQuestionTest extends PKPTestCase
 
         $this->demographicQuestion->setQuestionDescription($expectedQuestionDescription, 'en');
         $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
-        $this->assertEquals($questionDescription, $expectedQuestionDescription);
+        $this->assertEquals($expectedQuestionDescription, $questionDescription);
+    }
+
+    public function testGetQuestionPossibleResponses(): void
+    {
+        $expectedPossibleResponses = [
+            'en' => ['Black', 'Latin', 'Asian', 'Other'],
+            'pt_BR' => ['Negro(a)', 'Latino(a)', 'Asiático(a)', 'Outro(a)']
+        ];
+
+        $this->demographicQuestion->setPossibleResponses($expectedPossibleResponses['en'], 'en');
+        $this->demographicQuestion->setPossibleResponses($expectedPossibleResponses['pt_BR'], 'pt_BR');
+
+        $this->assertEquals($expectedPossibleResponses['en'], $this->demographicQuestion->getPossibleResponses('en'));
+        $this->assertEquals($expectedPossibleResponses['pt_BR'], $this->demographicQuestion->getPossibleResponses('pt_BR'));
     }
 }

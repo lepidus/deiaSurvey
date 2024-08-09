@@ -1,5 +1,80 @@
 import '../support/commands.js';
 
+function assertDefaultQuestionsDisplay() {
+    cy.contains('.questionTitle', 'Gender');
+    cy.contains('With which gender do you most identify?');
+
+    cy.contains('.questionTitle', 'Ethnicity');
+    cy.contains('How would you identify yourself in terms of ethnicity?');
+
+    cy.contains('.questionTitle', 'Academic background');
+    cy.contains('Please tell us which academic institutions you have been involved with');
+
+    cy.contains('.questionTitle', 'Languages');
+    cy.contains('Which of these languages do you speak?');
+    cy.contains('label', 'English');
+    cy.contains('French');
+    cy.contains('Hindi');
+    cy.contains('Mandarin');
+    cy.contains('Portuguese');
+    cy.contains('Spanish');
+
+    cy.contains('.questionTitle', 'Nacionality');
+    cy.contains('Which continent are you from?');
+    cy.contains('Africa');
+    cy.contains('America');
+    cy.contains('Asia');
+    cy.contains('Europe');
+    cy.contains('Oceania');
+
+    cy.contains('.questionTitle', 'Salary');
+    cy.contains('What range is your current salary in?');
+    cy.contains('option', 'Less than a minimum wage');
+    cy.contains('option', 'One to three minimum wages');
+    cy.contains('option', 'Three to five minimum wages');
+    cy.contains('option', 'More than five minimum wages');
+}
+
+function answerDefaultQuestions() {
+    cy.get('input[id^="demographicResponses"]').eq(0).type('Female');
+    cy.get('input[id^="demographicResponses"]').eq(1).type('Latin');
+    cy.get('textarea[id^="demographicResponses"]').type('University of São Paulo');
+    cy.get('textarea[id^="demographicResponses"]').type('{enter}');
+    cy.get('textarea[id^="demographicResponses"]').type('University of Minas Gerais');
+    cy.contains('label', 'English').within(() => {
+        cy.get('input').check();
+    });
+    cy.contains('label', 'Spanish').within(() => {
+        cy.get('input').check();
+    });
+    cy.contains('label', 'America').within(() => {
+        cy.get('input').check();
+    });
+    cy.get('select[id^="demographicResponses"]').select('Three to five minimum wages');
+
+    cy.contains('button', 'Save').click();
+}
+
+function assertResponsesToDefaultQuestions() {
+    cy.contains('a', 'Demographic Data').click();
+    cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
+    
+    cy.get('input[id^="demographicResponses-en"]').eq(0).should('have.value', 'Female');
+    cy.get('input[id^="demographicResponses-en"]').eq(1).should('have.value', 'Latin');
+    cy.get('textarea[id^="demographicResponses-en"]').invoke('val').should('include', 'University of São Paulo');
+    cy.get('textarea[id^="demographicResponses-en"]').invoke('val').should('include', 'University of Minas Gerais');
+    cy.contains('label', 'English').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.contains('label', 'Spanish').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.contains('label', 'America').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.get('select[id^="demographicResponses"] option:selected').should('have.text', 'Three to five minimum wages');
+}
+
 function beginSubmission(submissionData) {
     cy.get('input[name="locale"][value="en"]').click();
     cy.setTinyMceContent('startSubmission-title-control', submissionData.title);
@@ -133,10 +208,7 @@ describe('Demographic Data - External contributors data collecting', function() 
             });
         });
 
-        cy.contains('Gender');
-        cy.contains('With which gender do you most identify?');
-        cy.contains('Ethnicity');
-        cy.contains('How would you identify yourself in terms of ethnicity?');
+        assertDefaultQuestionsDisplay();
 
         cy.url().then(url => {
             cy.visit(url + 'breakToken');
@@ -155,9 +227,7 @@ describe('Demographic Data - External contributors data collecting', function() 
             });
         });
 
-        cy.get('input[id^="responses"]').eq(0).type('Female');
-        cy.get('input[id^="responses"]').eq(1).type('Latin');
-        cy.contains('button', 'Save').click();
+        answerDefaultQuestions();
 
         cy.contains('Thanks for answering our demographic questionnaire');
     });
@@ -230,8 +300,6 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.contains('a', 'Edit My Profile').click();
         cy.contains('a', 'Demographic Data').click();
 
-        cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
-        cy.get('input[id^="responses-en"]').eq(0).should('have.value', 'Female');
-        cy.get('input[id^="responses-en"]').eq(1).should('have.value', 'Latin');
+        assertResponsesToDefaultQuestions();
     });
 });

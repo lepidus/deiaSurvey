@@ -8,19 +8,14 @@
 	{csrf}
 
 	{fbvFormSection list="false" label='plugins.generic.demographicData.consent'}
-		{fbvElement type="radio" id="demographicDataConsentYes" name="demographicDataConsent" value=1 checked=$demographicDataConsent label="plugins.generic.demographicData.consent.yes"}
-		{fbvElement type="radio" id="demographicDataConsentNo" name="demographicDataConsent" value=0 checked=!$demographicDataConsent label="plugins.generic.demographicData.consent.no"}
+		{fbvElement type="radio" id="demographicDataConsentYes" name="demographicDataConsent" value=1 checked=$demographicDataConsent required=true label="plugins.generic.demographicData.consent.yes"}
+		{fbvElement type="radio" id="demographicDataConsentNo" name="demographicDataConsent" value=0 checked=!$demographicDataConsent required=true label="plugins.generic.demographicData.consent.no"}
 	{/fbvFormSection}
 
 	{fbvFormArea id="demographicQuestion"}
 		<div id="Hello" name="questions">
 			{foreach $questions as $question}
-				{assign var="questionId" value="question-{$question['questionId']}"}
-				{fbvFormSection title=$question['title'] translate=false}
-					{fbvFormSection for="demographicResponse" description=$question['description'] translate=false}
-						{fbvElement type="text" multilingual="true" name=$questionId id="responses" value=$question['response'] size=$fbvStyles.size.LARGE}
-					{/fbvFormSection}
-				{/fbvFormSection}
+				{include file="../../../plugins/generic/demographicData/templates/question.tpl" question=$question}
 			{/foreach}
 		</div>
     {/fbvFormArea}
@@ -32,7 +27,7 @@
 
 <script>
 	function setRequirementOnQuestions(required){ldelim}
-		let questions = document.querySelectorAll('[id^="responses-{$currentLocale}"]');
+		let questions = document.querySelectorAll('[id^="demographicResponses"]');
 
 		for(let question of questions) {ldelim}
 			question.required = required;
@@ -54,5 +49,9 @@
 				setRequirementOnQuestions(false);
 			{rdelim}
 		{rdelim});
+
+		if (demographicDataConsentNo.checked) {ldelim}
+			setRequirementOnQuestions(false);
+		{rdelim}
 	{rdelim});
 </script>

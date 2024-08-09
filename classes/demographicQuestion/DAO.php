@@ -17,6 +17,7 @@ class DAO extends EntityDAO
     public $primaryTableColumns = [
         'id' => 'demographic_question_id',
         'contextId' => 'context_id',
+        'questionType' => 'question_type'
     ];
 
     public function getParentColumn(): string

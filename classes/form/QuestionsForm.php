@@ -5,6 +5,7 @@ namespace APP\plugins\generic\demographicData\classes\form;
 use APP\template\TemplateManager;
 use PKP\form\Form;
 use PKP\plugins\PluginRegistry;
+use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
@@ -16,7 +17,7 @@ class QuestionsForm extends Form
     public function __construct($request = null, $args = null)
     {
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
-        parent::__construct($plugin->getTemplateResource('questions.tpl'));
+        parent::__construct($plugin->getTemplateResource('questionsInProfile.tpl'));
 
         if ($request) {
             $this->request = $request;
@@ -61,6 +62,8 @@ class QuestionsForm extends Form
         $demographicDataService  = new DemographicDataService();
         $questions = $demographicDataService->retrieveAllQuestions($context->getId(), true);
         $this->setData('questions', $questions);
+        $this->setData('questionTypeConsts', DemographicQuestion::getQuestionTypeConstants());
+
         parent::initData();
     }
 
@@ -71,8 +74,10 @@ class QuestionsForm extends Form
         if ($consent) {
             $locale = $this->defaultLocale;
 
-            foreach ($this->getData('responses') as $response) {
-                if (empty($response[$locale])) {
+            foreach ($this->getData('responses') as $questionId => $response) {
+                $inputType = explode('-', $questionId)[2];
+
+                if (($inputType == 'text' or $inputType == 'textarea') and empty($response[$locale])) {
                     return false;
                 }
             }

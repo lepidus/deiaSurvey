@@ -5,6 +5,7 @@ namespace APP\plugins\generic\demographicData\tests\helpers;
 use APP\journal\Journal;
 use PKP\user\User;
 use PKP\plugins\Hook;
+use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\demographicData\classes\demographicQuestion\Repository as DemographicQuestionRepository;
 
 trait TestHelperTrait
@@ -18,8 +19,12 @@ trait TestHelperTrait
             'questionText' => [
                 self::DEFAULT_LOCALE => 'Test text'
             ],
+            'questionType' => DemographicQuestion::TYPE_TEXTAREA,
             'questionDescription' => [
                 self::DEFAULT_LOCALE => 'Test description'
+            ],
+            'possibleResponses' => [
+                self::DEFAULT_LOCALE => ['First possible response', 'Second possible response']
             ]
         ];
 
@@ -32,7 +37,7 @@ trait TestHelperTrait
     {
         $demographicResponse = $this->demographicResponseDAO->newDataObject();
         $demographicResponse->setDemographicQuestionId($this->demographicQuestionId);
-        $demographicResponse->setText('Test text', self::DEFAULT_LOCALE);
+        $demographicResponse->setValue([self::DEFAULT_LOCALE => 'Test text']);
 
         if ($externalAuthor) {
             $demographicResponse->setExternalId('external.author@lepidus.com.br');

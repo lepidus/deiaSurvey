@@ -54,8 +54,12 @@ class DAOTest extends DatabaseTestCase
         self::assertEquals([
             'id' => $insertedDemographicQuestionId,
             'contextId' => $this->contextId,
+            'questionType' => DemographicQuestion::TYPE_RADIO_BUTTONS,
             'questionText' => [$locale => 'Test text'],
             'questionDescription' => [$locale => 'Test description'],
+            'possibleResponses' => [
+                $locale => ['First possible response', 'Second possible response']
+            ]
         ], $fetchedDemographicQuestion->_data);
     }
 
@@ -102,8 +106,10 @@ class DAOTest extends DatabaseTestCase
     {
         $demographicQuestion = $this->demographicQuestionDAO->newDataObject();
         $demographicQuestion->setContextId($this->contextId);
+        $demographicQuestion->setQuestionType(DemographicQuestion::TYPE_RADIO_BUTTONS);
         $demographicQuestion->setQuestionText('Test text', $locale);
         $demographicQuestion->setQuestionDescription('Test description', $locale);
+        $demographicQuestion->setPossibleResponses(['First possible response', 'Second possible response'], $locale);
 
         return $demographicQuestion;
     }

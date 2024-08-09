@@ -27,9 +27,11 @@
           "nullable"
         ]
       },
-      "responseText": {
+      "responseValue": {
         "type": "string",
-        "multilingual": true
+        "validation": [
+          "nullable"
+        ]
       }
     }
 }

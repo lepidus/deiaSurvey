@@ -6,6 +6,7 @@ use APP\core\Application;
 use PKP\facades\Locale;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
+use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 
 class DemographicDataService
 {
@@ -20,56 +21,69 @@ class DemographicDataService
 
         foreach ($demographicQuestions as $demographicQuestion) {
             $questionData = [
+                'questionId' => $demographicQuestion->getId(),
+                'type' => $demographicQuestion->getQuestionType(),
+                'inputType' => $demographicQuestion->getQuestionInputType(),
                 'title' => $demographicQuestion->getLocalizedQuestionText(),
                 'description' => $demographicQuestion->getLocalizedQuestionDescription(),
-                'questionId' => $demographicQuestion->getId()
+                'possibleResponses' => $demographicQuestion->getLocalizedPossibleResponses()
             ];
 
             if ($shouldRetrieveResponses) {
                 $user = $request->getUser();
-                $response = $this->getUserResponse($user->getId(), $demographicQuestion->getId());
+                $response = $this->getUserResponse($demographicQuestion, $user->getId());
+
                 $questionData['response'] = $response;
             }
 
             $questions[] = $questionData;
         }
+
         return $questions;
     }
 
-    private function getUserResponse(int $userId, int $questionId)
+    private function getUserResponse(DemographicQuestion $question, int $userId)
     {
         $demographicResponses = Repo::demographicResponse()
             ->getCollector()
-            ->filterByQuestionIds([$questionId])
+            ->filterByQuestionIds([$question->getId()])
             ->filterByUserIds([$userId])
             ->getMany()
             ->toArray();
 
         if (empty($demographicResponses)) {
+            if (
+                $question->getQuestionType() == DemographicQuestion::TYPE_CHECKBOXES
+                || $question->getQuestionType() == DemographicQuestion::TYPE_RADIO_BUTTONS
+            ) {
+                return [];
+            }
+
             return null;
         }
 
         $firstResponse = array_shift($demographicResponses);
-        return $firstResponse->getText();
+        return $firstResponse->getValue();
     }
 
     public function registerUserResponses(int $userId, array $responses)
     {
         foreach ($responses as $question => $responseInput) {
             $questionId = explode("-", $question)[1];
-            $demographicResponseCollector = Repo::demographicResponse()
+            $demographicResponses = Repo::demographicResponse()
                 ->getCollector()
                 ->filterByQuestionIds([$questionId])
                 ->filterByUserIds([$userId])
-                ->getMany();
-            $demographicResponse = array_shift($demographicResponseCollector->toArray());
+                ->getMany()
+                ->toArray();
+            $demographicResponse = array_shift($demographicResponses);
             if ($demographicResponse) {
-                Repo::demographicResponse()->edit($demographicResponse, ['responseText' => $responseInput]);
+                Repo::demographicResponse()->edit($demographicResponse, ['responseValue' => $responseInput]);
             } else {
                 $response = Repo::demographicResponse()->newDataObject();
                 $response->setUserId($userId);
                 $response->setDemographicQuestionId($questionId);
-                $response->setData('responseText', $responseInput);
+                $response->setData('responseValue', $responseInput);
                 Repo::demographicResponse()->add($response);
             }
         }
@@ -80,13 +94,20 @@ class DemographicDataService
         $locale = Locale::getLocale();
 
         foreach ($responses as $question => $responseInput) {
-            $questionId = explode("-", $question)[1];
+            $questionParts = explode("-", $question);
+            $questionId = $questionParts[1];
+            $questionType = $questionParts[2];
 
             $response = Repo::demographicResponse()->newDataObject();
             $response->setDemographicQuestionId($questionId);
-            $response->setData('responseText', $responseInput, $locale);
             $response->setExternalId($externalId);
             $response->setExternalType($externalType);
+
+            if ($questionType == 'text' or $questionType == 'textarea') {
+                $response->setData('responseValue', $responseInput, $locale);
+            } else {
+                $response->setData('responseValue', $responseInput);
+            }
 
             Repo::demographicResponse()->add($response);
         }

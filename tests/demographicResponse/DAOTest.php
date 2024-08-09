@@ -57,7 +57,7 @@ class DAOTest extends DatabaseTestCase
         self::assertEquals([
             'id' => $insertedDemographicResponseId,
             'demographicQuestionId' => $this->demographicQuestionId,
-            'responseText' => [self::DEFAULT_LOCALE => 'Test text'],
+            'responseValue' => [self::DEFAULT_LOCALE => 'Test text'],
             'userId' => $this->userId,
             'externalId' => null,
             'externalType' => null
@@ -77,7 +77,7 @@ class DAOTest extends DatabaseTestCase
         self::assertEquals([
             'id' => $insertedDemographicResponseId,
             'demographicQuestionId' => $this->demographicQuestionId,
-            'responseText' => [self::DEFAULT_LOCALE => 'Test text'],
+            'responseValue' => [self::DEFAULT_LOCALE => 'Test text'],
             'userId' => null,
             'externalId' => 'external.author@lepidus.com.br',
             'externalType' => 'email'
@@ -107,7 +107,7 @@ class DAOTest extends DatabaseTestCase
             $insertedDemographicResponseId,
             $this->demographicQuestionId
         );
-        $fetchedDemographicResponse->setText('Updated text', self::DEFAULT_LOCALE);
+        $fetchedDemographicResponse->setValue([self::DEFAULT_LOCALE => 'Updated text']);
 
         $this->demographicResponseDAO->update($fetchedDemographicResponse);
 
@@ -116,6 +116,6 @@ class DAOTest extends DatabaseTestCase
             $this->demographicQuestionId
         );
 
-        self::assertEquals($fetchedDemographicResponseEdited->getLocalizedText(), "Updated text");
+        self::assertEquals($fetchedDemographicResponseEdited->getValue(), [self::DEFAULT_LOCALE => 'Updated text']);
     }
 }
