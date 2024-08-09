@@ -55,6 +55,26 @@ function answerDefaultQuestions() {
     cy.contains('button', 'Save').click();
 }
 
+function assertResponsesToDefaultQuestions() {
+    cy.contains('a', 'Demographic Data').click();
+    cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
+    
+    cy.get('input[id^="demographicResponses-en"]').eq(0).should('have.value', 'Female');
+    cy.get('input[id^="demographicResponses-en"]').eq(1).should('have.value', 'Latin');
+    cy.get('textarea[id^="demographicResponses-en"]').invoke('val').should('include', 'University of São Paulo');
+    cy.get('textarea[id^="demographicResponses-en"]').invoke('val').should('include', 'University of Minas Gerais');
+    cy.contains('label', 'English').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.contains('label', 'Spanish').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.contains('label', 'America').within(() => {
+        cy.get('input').should('be.checked');
+    });
+    cy.get('select[id^="demographicResponses"] option:selected').should('have.text', 'Three to five minimum wages');
+}
+
 function beginSubmission(submissionData) {
     cy.get('input[name="locale"][value="en"]').click();
     cy.setTinyMceContent('startSubmission-title-control', submissionData.title);
@@ -280,8 +300,6 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.contains('a', 'Edit My Profile').click();
         cy.contains('a', 'Demographic Data').click();
 
-        cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
-        cy.get('input[id^="responses-en"]').eq(0).should('have.value', 'Female');
-        cy.get('input[id^="responses-en"]').eq(1).should('have.value', 'Latin');
+        assertResponsesToDefaultQuestions();
     });
 });

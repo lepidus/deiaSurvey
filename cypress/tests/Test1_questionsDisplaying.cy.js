@@ -35,11 +35,11 @@ function assertDefaultQuestionsDisplay() {
 }
 
 function answerDefaultQuestions() {
-    cy.get('input[id^="responses-en"]').eq(0).clear().type('Female');
-    cy.get('input[id^="responses-en"]').eq(1).clear().type('Latin');
-    cy.get('textarea[id^="responses-en"]').clear().type('University of São Paulo');
-    cy.get('textarea[id^="responses-en"]').type('{enter}');
-    cy.get('textarea[id^="responses-en"]').type('University of Minas Gerais');
+    cy.get('input[id^="demographicResponses-en"]').eq(0).clear().type('Female');
+    cy.get('input[id^="demographicResponses-en"]').eq(1).clear().type('Latin');
+    cy.get('textarea[id^="demographicResponses-en"]').clear().type('University of São Paulo');
+    cy.get('textarea[id^="demographicResponses-en"]').type('{enter}');
+    cy.get('textarea[id^="demographicResponses-en"]').type('University of Minas Gerais');
     cy.contains('label', 'Academic background').click();
     cy.contains('label', 'English').within(() => {
         cy.get('input').check();
@@ -50,7 +50,7 @@ function answerDefaultQuestions() {
     cy.contains('label', 'America').within(() => {
         cy.get('input').check();
     });
-    cy.get('select[id^="responses"]').select('Three to five minimum wages');
+    cy.get('select[id^="demographicResponses"]').select('Three to five minimum wages');
 
     cy.get('#demographicDataForm .submitFormButton').click();
     cy.wait(1000);
@@ -60,10 +60,10 @@ function assertResponsesToDefaultQuestions() {
     cy.contains('a', 'Demographic Data').click();
     cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
     
-    cy.get('input[id^="responses-en"]').eq(0).should('have.value', 'Female');
-    cy.get('input[id^="responses-en"]').eq(1).should('have.value', 'Latin');
-    cy.get('textarea[id^="responses-en"]').invoke('val').should('include', 'University of São Paulo');
-    cy.get('textarea[id^="responses-en"]').invoke('val').should('include', 'University of Minas Gerais');
+    cy.get('input[id^="demographicResponses-en"]').eq(0).should('have.value', 'Female');
+    cy.get('input[id^="demographicResponses-en"]').eq(1).should('have.value', 'Latin');
+    cy.get('textarea[id^="demographicResponses-en"]').invoke('val').should('include', 'University of São Paulo');
+    cy.get('textarea[id^="demographicResponses-en"]').invoke('val').should('include', 'University of Minas Gerais');
     cy.contains('label', 'English').within(() => {
         cy.get('input').should('be.checked');
     });
@@ -73,7 +73,7 @@ function assertResponsesToDefaultQuestions() {
     cy.contains('label', 'America').within(() => {
         cy.get('input').should('be.checked');
     });
-    cy.get('select[id^="responses"] option:selected').should('have.text', 'Three to five minimum wages');
+    cy.get('select[id^="demographicResponses"] option:selected').should('have.text', 'Three to five minimum wages');
 }
 
 function assertResponsesToQuestionsInFrench() {
