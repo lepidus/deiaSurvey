@@ -113,7 +113,7 @@ describe('Demographic Data - Questions displaying', function () {
         cy.contains('I consent to the processing of my Demographic Data');
         cy.contains('I do not consent to the processing of my Demographic Data');
 
-        cy.get('input[name="demographicDataConsent"][value=0]').should('be.checked');
+        cy.get('input[name="demographicDataConsent"][value=0]').should('not.be.checked');
         cy.get('input[name="demographicDataConsent"][value=1]').should('not.be.checked');
         
         cy.get('input[name="demographicDataConsent"][value=0]').click();
