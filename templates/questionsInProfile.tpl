@@ -7,9 +7,16 @@
 <form class="pkp_form" id="demographicDataForm" method="post" action="{url op="saveDemographicData"}" enctype="multipart/form-data">
 	{csrf}
 
-	{fbvFormSection list="false" label='plugins.generic.demographicData.consent'}
-		{fbvElement type="radio" id="demographicDataConsentYes" name="demographicDataConsent" value=1 checked=$demographicDataConsent required=true label="plugins.generic.demographicData.consent.yes"}
-		{fbvElement type="radio" id="demographicDataConsentNo" name="demographicDataConsent" value=0 checked=!$demographicDataConsent required=true label="plugins.generic.demographicData.consent.no"}
+	{fbvFormSection list="false" label='plugins.generic.demographicData.consent' required=true}
+		{if is_null($demographicDataConsent)}
+			{assign var=checkedConsentYes value=false}
+			{assign var=checkedConsentNo value=false}
+		{else}
+			{assign var=checkedConsentYes value=$demographicDataConsent}
+			{assign var=checkedConsentNo value=!$demographicDataConsent}
+		{/if}
+		{fbvElement type="radio" id="demographicDataConsentYes" name="demographicDataConsent" value=1 checked=$checkedConsentYes required=true label="plugins.generic.demographicData.consent.yes"}
+		{fbvElement type="radio" id="demographicDataConsentNo" name="demographicDataConsent" value=0 checked=$checkedConsentNo required=true label="plugins.generic.demographicData.consent.no"}
 	{/fbvFormSection}
 
 	{fbvFormArea id="demographicQuestion"}
