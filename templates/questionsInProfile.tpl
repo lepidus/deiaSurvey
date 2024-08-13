@@ -7,7 +7,7 @@
 <form class="pkp_form" id="demographicDataForm" method="post" action="{url op="saveDemographicData"}" enctype="multipart/form-data">
 	{csrf}
 
-	{fbvFormSection list="false" label='plugins.generic.demographicData.consent' required=true}
+	{fbvFormSection list="false" label='plugins.generic.demographicData.consent' description='plugins.generic.demographicData.consent.description' required=true}
 		{if is_null($demographicDataConsent)}
 			{assign var=checkedConsentYes value=false}
 			{assign var=checkedConsentNo value=false}

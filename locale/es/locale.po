@@ -7,6 +7,9 @@ msgstr "Agrega preguntas personalizadas para Datos Demográficos."
 msgid "plugins.generic.demographicData.consent"
 msgstr "Autorización"
 
+msgid "plugins.generic.demographicData.consent.description"
+msgstr "Puede cambiar su elección de consentimiento en cualquier momento. Si retira un consentimiento dado anteriormente, se eliminarán sus datos demográficos."
+
 msgid "plugins.generic.demographicData.consent.yes"
 msgstr "Autorizo el tratamiento de mis Datos Demográficos"
 
