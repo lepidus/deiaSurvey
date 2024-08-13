@@ -12,6 +12,7 @@ class Collector implements CollectorInterface
     public DAO $dao;
     public ?array $questionIds = null;
     public ?array $userIds = null;
+    public ?array $contextIds = null;
     public ?array $externalIds = null;
     public ?array $externalTypes = null;
 
@@ -29,6 +30,12 @@ class Collector implements CollectorInterface
     public function filterByUserIds(?array $userIds): Collector
     {
         $this->userIds = $userIds;
+        return $this;
+    }
+
+    public function filterByContextIds(?array $contextIds): Collector
+    {
+        $this->contextIds = $contextIds;
         return $this;
     }
 
@@ -55,6 +62,14 @@ class Collector implements CollectorInterface
 
         if (isset($this->userIds)) {
             $queryBuilder->whereIn('demographic_responses.user_id', $this->userIds);
+        }
+
+        if (isset($this->contextIds)) {
+            $queryBuilder->whereIn('demographic_responses.demographic_question_id', function ($q) {
+                $q->select('dq.demographic_question_id')
+                    ->from('demographic_questions', 'dq')
+                    ->whereIn('dq.context_id', $this->contextIds);
+            });
         }
 
         if (isset($this->externalIds)) {
