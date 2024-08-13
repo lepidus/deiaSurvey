@@ -112,6 +112,8 @@ describe('Demographic Data - Questions displaying', function () {
 
         cy.contains('I consent to the processing of my Demographic Data');
         cy.contains('I do not consent to the processing of my Demographic Data');
+        cy.contains('You can change your consent option at any time.');
+        cy.contains('If you withdraw a previously given consent, your demographic data will be deleted');
 
         cy.get('input[name="demographicDataConsent"][value=0]').should('not.be.checked');
         cy.get('input[name="demographicDataConsent"][value=1]').should('not.be.checked');
