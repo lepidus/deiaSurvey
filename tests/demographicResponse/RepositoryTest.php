@@ -95,8 +95,10 @@ class RepositoryTest extends DatabaseTestCase
             'demographicQuestionId' => $this->demographicQuestionId,
             'userId' => null,
             'responseValue' => [
-                self::DEFAULT_LOCALE => 'Test text'
-            ]
+                self::DEFAULT_LOCALE => 'Test text 2'
+            ],
+            'externalId' => null,
+            'externalType' => null
         ];
 
         $firstDemographicResponse = $repository->newDataObject($this->params);
