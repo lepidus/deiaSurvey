@@ -89,6 +89,19 @@ function assertResponsesToQuestionsInFrench() {
     cy.get('select[id^="demographicResponses"] option:selected').should('have.text', 'Trois à cinq salaires minimums');
 }
 
+function assertDisabledFields() {
+    cy.get('input[id^="demographicResponses-en"]').eq(0).should('be.disabled');
+    cy.get('input[id^="demographicResponses-en"]').eq(1).should('be.disabled');
+    cy.get('textarea[id^="demographicResponses-en"]').should('be.disabled');
+    cy.contains('label', 'English').within(() => {
+        cy.get('input').should('be.disabled');
+    });
+    cy.contains('label', 'America').within(() => {
+        cy.get('input').should('be.disabled');
+    });
+    cy.get('select[id^="demographicResponses"]').should('be.disabled');
+}
+
 describe('Demographic Data - Questions displaying', function () {
     it('Display of questions and request message at users profile page', function () {
         cy.login('dbarnes', null, 'publicknowledge');
@@ -112,8 +125,10 @@ describe('Demographic Data - Questions displaying', function () {
 
         cy.contains('I consent to the processing of my Demographic Data');
         cy.contains('I do not consent to the processing of my Demographic Data');
+        cy.contains('You can change your consent option at any time.');
+        cy.contains('If you withdraw a previously given consent, your demographic data will be deleted');
 
-        cy.get('input[name="demographicDataConsent"][value=0]').should('be.checked');
+        cy.get('input[name="demographicDataConsent"][value=0]').should('not.be.checked');
         cy.get('input[name="demographicDataConsent"][value=1]').should('not.be.checked');
         
         cy.get('input[name="demographicDataConsent"][value=0]').click();
@@ -123,6 +138,7 @@ describe('Demographic Data - Questions displaying', function () {
 
         cy.contains('a', 'Demographic Data').click();
         cy.get('input[name="demographicDataConsent"][value=0]').should('be.checked');
+        assertDisabledFields();
     });
     it('Request message is not shown anymore', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
@@ -146,5 +162,21 @@ describe('Demographic Data - Questions displaying', function () {
         cy.contains('.pkpDropdown__action', 'Français').click();
         cy.get('a[name="demographicData"]').click();
         assertResponsesToQuestionsInFrench();
+    });
+    it('User removes consent, leading to data deletion', function () {
+        cy.login('dsokoloff', null, 'publicknowledge');
+        cy.get('.app__headerActions button').eq(1).click();
+        cy.contains('a', 'Edit Profile').click();
+        cy.contains('a', 'Demographic Data').click();
+
+        cy.get('input[name="demographicDataConsent"][value=0]').click();
+        cy.get('#demographicDataForm .submitFormButton').click();
+        cy.wait(1000);
+        cy.reload();
+
+        cy.contains('a', 'Demographic Data').click();
+        cy.get('input[id^="demographicResponses-en"]').eq(0).should('have.value', '');
+        cy.get('input[id^="demographicResponses-en"]').eq(1).should('have.value', '');
+        cy.get('textarea[id^="demographicResponses-en"]').should('have.value', '');
     });
 });

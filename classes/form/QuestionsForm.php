@@ -88,16 +88,19 @@ class QuestionsForm extends Form
 
     public function execute(...$functionArgs)
     {
+        $demographicDataDao = new DemographicDataDAO();
+        $demographicDataService  = new DemographicDataService();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
-        $consent = $this->getData('demographicDataConsent');
+        $previousConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
+        $newConsent = $this->getData('demographicDataConsent');
 
-        $demographicDataDao = new DemographicDataDAO();
-        $demographicDataDao->updateDemographicConsent($context->getId(), $user->getId(), $consent);
+        $demographicDataDao->updateDemographicConsent($context->getId(), $user->getId(), $newConsent);
 
-        if ($consent) {
-            $demographicDataService  = new DemographicDataService();
+        if ($newConsent == '1') {
             $demographicDataService->registerUserResponses($user->getId(), $this->getData('responses'));
+        } elseif ($newConsent == '0' and $previousConsent) {
+            $demographicDataService->deleteUserResponses($user->getId(), $context->getId());
         }
 
         parent::execute(...$functionArgs);

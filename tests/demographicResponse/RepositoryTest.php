@@ -87,7 +87,37 @@ class RepositoryTest extends DatabaseTestCase
         self::assertTrue(in_array($demographicResponse, $demographicResponses->all()));
     }
 
-    public function testCollectorFilterByExternalId(): void
+    public function testCollectorFilterByContext(): void
+    {
+        $contextId = 1;
+        $repository = app(Repository::class);
+        $newParams = [
+            'demographicQuestionId' => $this->demographicQuestionId,
+            'userId' => null,
+            'responseValue' => [
+                self::DEFAULT_LOCALE => 'Test text 2'
+            ],
+            'externalId' => null,
+            'externalType' => null
+        ];
+
+        $firstDemographicResponse = $repository->newDataObject($this->params);
+        $secondDemographicResponse = $repository->newDataObject($newParams);
+
+        $repository->add($firstDemographicResponse);
+        $repository->add($secondDemographicResponse);
+
+        $demographicResponses = $repository->getCollector()
+            ->filterByContextIds([$contextId])
+            ->getMany()
+            ->toArray();
+
+        self::assertEquals(2, count($demographicResponses));
+        self::assertTrue(in_array($firstDemographicResponse, $demographicResponses));
+        self::assertTrue(in_array($secondDemographicResponse, $demographicResponses));
+    }
+
+    public function testCollectorFilterByExternalIdAndType(): void
     {
         $newParams = [
             'demographicQuestionId' => $this->demographicQuestionId,

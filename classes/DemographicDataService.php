@@ -113,6 +113,18 @@ class DemographicDataService
         }
     }
 
+    public function deleteUserResponses(int $userId, int $contextId)
+    {
+        $userResponses = Repo::demographicResponse()->getCollector()
+            ->filterByContextIds([$contextId])
+            ->filterByUserIds([$userId])
+            ->getMany();
+
+        foreach ($userResponses as $response) {
+            Repo::demographicResponse()->delete($response);
+        }
+    }
+
     public function authorAlreadyAnsweredQuestionnaire($author, $authorOrcid = null): bool
     {
         $externalId = $author->getData('email');
