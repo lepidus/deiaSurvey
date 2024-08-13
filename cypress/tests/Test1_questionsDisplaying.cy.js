@@ -149,4 +149,20 @@ describe('Demographic Data - Questions displaying', function () {
         cy.get('a[name="demographicData"]').click();
         assertResponsesToQuestionsInFrench();
     });
+    it('User removes consent, leading to data deletion', function () {
+        cy.login('dsokoloff', null, 'publicknowledge');
+        cy.get('.app__headerActions button').eq(1).click();
+        cy.contains('a', 'Edit Profile').click();
+        cy.contains('a', 'Demographic Data').click();
+
+        cy.get('input[name="demographicDataConsent"][value=0]').click();
+        cy.get('#demographicDataForm .submitFormButton').click();
+        cy.wait(1000);
+        cy.reload();
+
+        cy.contains('a', 'Demographic Data').click();
+        cy.get('input[id^="demographicResponses-en"]').eq(0).should('have.value', '');
+        cy.get('input[id^="demographicResponses-en"]').eq(1).should('have.value', '');
+        cy.get('textarea[id^="demographicResponses-en"]').should('have.value', '');
+    });
 });
