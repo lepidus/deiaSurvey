@@ -89,6 +89,19 @@ function assertResponsesToQuestionsInFrench() {
     cy.get('select[id^="demographicResponses"] option:selected').should('have.text', 'Trois à cinq salaires minimums');
 }
 
+function assertDisabledFields() {
+    cy.get('input[id^="demographicResponses-en"]').eq(0).should('be.disabled');
+    cy.get('input[id^="demographicResponses-en"]').eq(1).should('be.disabled');
+    cy.get('textarea[id^="demographicResponses-en"]').should('be.disabled');
+    cy.contains('label', 'English').within(() => {
+        cy.get('input').should('be.disabled');
+    });
+    cy.contains('label', 'America').within(() => {
+        cy.get('input').should('be.disabled');
+    });
+    cy.get('select[id^="demographicResponses"]').should('be.disabled');
+}
+
 describe('Demographic Data - Questions displaying', function () {
     it('Display of questions and request message at users profile page', function () {
         cy.login('dbarnes', null, 'publicknowledge');
@@ -125,6 +138,7 @@ describe('Demographic Data - Questions displaying', function () {
 
         cy.contains('a', 'Demographic Data').click();
         cy.get('input[name="demographicDataConsent"][value=0]').should('be.checked');
+        assertDisabledFields();
     });
     it('Request message is not shown anymore', function () {
         cy.login('dsokoloff', null, 'publicknowledge');

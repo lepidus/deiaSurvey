@@ -35,9 +35,24 @@
 <script>
 	function setRequirementOnQuestions(required){ldelim}
 		let questions = document.querySelectorAll('[id^="demographicResponses"]');
+		let reqSymbols = document.querySelectorAll('span.req');
+		let reqErrorMessages = document.querySelectorAll('label.error');
 
-		for(let question of questions) {ldelim}
+		for (let question of questions) {ldelim}
 			question.required = required;
+			question.disabled = !required;
+		{rdelim}
+
+		for (let reqSymbol of reqSymbols) {ldelim}
+			let reqSymbolParent = reqSymbol.parentNode;
+
+			if (!reqSymbolParent.textContent.includes('{translate key="plugins.generic.demographicData.consent"}')) {ldelim}
+				reqSymbol.style.display = (required ? 'inline' : 'none');
+			{rdelim}
+		{rdelim}
+
+		for (let reqErrorMessage of reqErrorMessages) {ldelim}
+			reqErrorMessage.style.display = 'none';
 		{rdelim}
 	{rdelim}
 	
