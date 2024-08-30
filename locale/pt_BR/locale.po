@@ -23,10 +23,10 @@ msgid "plugins.generic.demographicData.questionnairePage.index.title"
 msgstr "Questionário Demográfico"
 
 msgid "plugins.generic.demographicData.questionnairePage.externalId.email"
-msgstr "Os dados demográficos provenientes deste questionário ficarão associados ao endereço de e-mail: {$externalId}"
+msgstr "Os dados demográficos provenientes deste questionário ficarão associados ao endereço de e-mail: <strong>{$externalId}</strong>"
 
 msgid "plugins.generic.demographicData.questionnairePage.externalId.orcid"
-msgstr "Os dados demográficos provenientes deste questionário ficarão associados ao ORCID: {$externalId}"
+msgstr "Os dados demográficos provenientes deste questionário ficarão associados ao ORCID: <strong>{$externalId}</strong>"
 
 msgid "plugins.generic.demographicData.questionnairePage.accessDenied"
 msgstr "Apenas o autor pode acessa esta página"
