@@ -7,6 +7,10 @@
 
 <div class="page">
     <h1>{$pageTitle|escape}</h1>
+
+    <p>
+        {translate key="plugins.generic.demographicData.questionnairePage.externalId.{$externalType}" externalId=$externalId}
+    </p>
     
     <form class="pkp_form" id="demographicDataForm" method="post" action="{url op="saveQuestionnaire" authorId=$authorId authorToken=$authorToken}" role="form">
         {csrf}

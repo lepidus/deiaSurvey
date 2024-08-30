@@ -22,6 +22,12 @@ msgstr "We request that you fill in the demographic data survey on the \"Demogra
 msgid "plugins.generic.demographicData.questionnairePage.index.title"
 msgstr "Demographic Questionnaire"
 
+msgid "plugins.generic.demographicData.questionnairePage.externalId.email"
+msgstr "The demographic data from this questionnaire will be associated with the e-mail address: {$externalId}"
+
+msgid "plugins.generic.demographicData.questionnairePage.externalId.orcid"
+msgstr "The demographic data from this questionnaire will be associated with the ORCID: {$externalId}"
+
 msgid "plugins.generic.demographicData.questionnairePage.accessDenied"
 msgstr "Only the author can access this page"
 

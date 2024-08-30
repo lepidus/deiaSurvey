@@ -1,6 +1,8 @@
 import '../support/commands.js';
 
-function assertDefaultQuestionsDisplay() {
+function assertDefaultQuestionsDisplay(authorEmail) {
+    cy.contains('The demographic data from this questionnaire will be associated with the e-mail address: ' + authorEmail);
+    
     cy.contains('.questionTitle', 'Gender');
     cy.contains('With which gender do you most identify?');
 
@@ -208,7 +210,7 @@ describe('Demographic Data - External contributors data collecting', function() 
             });
         });
 
-        assertDefaultQuestionsDisplay();
+        assertDefaultQuestionsDisplay('susy.almeida@outlook.com');
 
         cy.url().then(url => {
             cy.visit(url + 'breakToken');

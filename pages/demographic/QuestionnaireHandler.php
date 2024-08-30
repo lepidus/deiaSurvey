@@ -37,11 +37,21 @@ class QuestionnaireHandler extends Handler
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
+        $authorExternalId = $author->getData('email');
+        $authorExternalType = 'email';
+
+        if (!is_null($author->getData('demographicOrcid'))) {
+            $authorExternalId = $author->getData('demographicOrcid');
+            $authorExternalType = 'orcid';
+        }
+
         $questions = $demographicDataService->retrieveAllQuestions($context->getId());
         $templateMgr->assign([
             'questions' => $questions,
             'authorId' => $author->getId(),
             'authorToken' => $authorToken,
+            'authorExternalId' => $authorExternalId,
+            'authorExternalType' => $authorExternalType,
             'questionTypeConsts' => DemographicQuestion::getQuestionTypeConstants()
         ]);
 
