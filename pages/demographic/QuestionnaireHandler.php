@@ -52,10 +52,24 @@ class QuestionnaireHandler extends Handler
             'authorToken' => $authorToken,
             'authorExternalId' => $authorExternalId,
             'authorExternalType' => $authorExternalType,
-            'questionTypeConsts' => DemographicQuestion::getQuestionTypeConstants()
+            'questionTypeConsts' => DemographicQuestion::getQuestionTypeConstants(),
+            'privacyUrl' => $this->getPrivacyUrl()
         ]);
 
         return $templateMgr->display($plugin->getTemplateResource('questionnairePage/index.tpl'));
+    }
+
+    private function getPrivacyUrl(): string
+    {
+        $request = Application::get()->getRequest();
+
+        return $request->getDispatcher()->url(
+            $request,
+            Application::ROUTE_PAGE,
+            null,
+            'about',
+            'privacy'
+        );
     }
 
     private function authorTokenIsValid($author, $token): bool

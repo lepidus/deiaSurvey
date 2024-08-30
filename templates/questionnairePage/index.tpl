@@ -21,6 +21,10 @@
             {/foreach}
         </fieldset>
 
+        <p class="privacyStatement">
+            {translate key="plugins.generic.demographicData.questionnairePage.privacyStatement"}
+        </p>
+
         <div class="buttons">
             <button id="submitDemographicQuestionnaire" class="submit" type="submit">
                 {translate key="common.save"}

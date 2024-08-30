@@ -49,6 +49,10 @@ msgstr "Se ha producido un error al solicitar su ORCID. El mensaje devuelto fue:
 msgid "plugins.generic.demographicData.questionnairePage.userWithOrcidExists"
 msgstr "Hay un usuario registrado con este ORCID en nuestro sistema. Por favor, rellene el cuestionario demográfico utilizando este usuario."
 
+msgid "plugins.generic.demographicData.questionnairePage.privacyStatement"
+msgstr ""
+"Los datos demográficos se recogen de acuerdo con la "
+"<a href=\"{$privacyUrl}\" target=\"_blank\">declaración de privacidad</a> de esta revista"
 
 msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"
 msgstr "Indique qué API de ORCID se debe utilizar"

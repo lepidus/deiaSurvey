@@ -35,6 +35,8 @@ function assertDefaultQuestionsDisplay(authorEmail) {
     cy.contains('option', 'One to three minimum wages');
     cy.contains('option', 'Three to five minimum wages');
     cy.contains('option', 'More than five minimum wages');
+
+    cy.contains('Demographic data is collected in accordance with this journal\'s privacy statement');
 }
 
 function answerDefaultQuestions() {
