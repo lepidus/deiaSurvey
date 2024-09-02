@@ -59,7 +59,22 @@ function answerDefaultQuestions() {
     cy.contains('button', 'Save').click();
 }
 
-function assertResponsesToDefaultQuestions() {
+function assertResponsesOfExternalAuthor() {
+    cy.contains('Showing demographic data associated with the e-mail address: ' + authorEmail);
+
+    cy.contains('Female');
+    cy.contains('Latin');
+    cy.contains('University of São Paulo');
+    cy.contains('University of Minas Gerais');
+    cy.contains('English, Spanish');
+    cy.contains('America');
+    cy.contains('Three to five minimum wages');
+
+    cy.contains('You can check you demographic data at any time by visiting this same address');
+    cy.contains('By creating a new account in the system with this same e-mail address, your demographic data will automatically be associated with the new account');
+}
+
+function assertResponsesOfRegisteredUser() {
     cy.contains('a', 'Demographic Data').click();
     cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
     
@@ -234,19 +249,10 @@ describe('Demographic Data - External contributors data collecting', function() 
         answerDefaultQuestions();
 
         cy.contains('Thanks for answering our demographic questionnaire');
-    });
-    it('Contributor access questionnaire again', function () {
-        cy.visit('localhost:8025');
-        cy.get('b:contains("Request for demographic data collection")').click();
+        cy.contains('You can check your answers by reloading this page');
+        cy.reload();
 
-        cy.get('#nav-tab button:contains("Text")').click();
-        cy.get('.text-view').within(() => {
-            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
-                cy.visit(href);
-            });
-        });
-
-        cy.contains('You already answered the demographic questionnaire');
+        assertResponsesOfExternalAuthor();
     });
     it('New submission is created and accepted with same contributor', function () {
         cy.login('ckwantes', null, 'publicknowledge');
@@ -304,6 +310,6 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.contains('a', 'Edit My Profile').click();
         cy.contains('a', 'Demographic Data').click();
 
-        assertResponsesToDefaultQuestions();
+        assertResponsesOfRegisteredUser();
     });
 });
