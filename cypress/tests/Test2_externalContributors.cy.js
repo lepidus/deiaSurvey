@@ -249,8 +249,7 @@ describe('Demographic Data - External contributors data collecting', function() 
         answerDefaultQuestions();
 
         cy.contains('Thanks for answering our demographic questionnaire');
-        cy.contains('You can check your answers by reloading this page');
-        cy.reload();
+        cy.contains('a', 'Check my answers').click();
 
         assertResponsesOfExternalAuthor();
     });

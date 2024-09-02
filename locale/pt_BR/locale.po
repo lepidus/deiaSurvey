@@ -37,8 +37,8 @@ msgstr "Questionário salvo com sucesso"
 msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.message"
 msgstr "Obrigado por responder nosso questionário demográfico!"
 
-msgid "plugins.generic.demographicData.questionnairePage.alreadyAnswered"
-msgstr "Você já respondeu o questionário demográfico."
+msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.checkAnswers"
+msgstr "Verificar minhas respostas"
 
 msgid "plugins.generic.demographicData.questionnairePage.orcidAccessDenied"
 msgstr "Você negou acesso ao seu registro ORCID"
@@ -53,6 +53,12 @@ msgid "plugins.generic.demographicData.questionnairePage.privacyStatement"
 msgstr ""
 "A coleta dos dados demográficos ocorre em acordo com a "
 "<a href=\"{$privacyUrl}\" target=\"_blank\">declaração de privacidade</a> desta revista"
+
+msgid "plugins.generic.demographicData.questionnairePage.responsesFor.email"
+msgstr "Mostrando dados demográficos associados ao endereço de e-mail: <strong>{$externalId}</strong>"
+
+msgid "plugins.generic.demographicData.questionnairePage.responsesFor.orcid"
+msgstr "Mostrando dados demográficos associados ao ORCID: <strong>{$externalId}</strong>"
 
 
 msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"

@@ -24,12 +24,7 @@ class QuestionnaireHandler extends Handler
         $queryParams = $request->getQueryArray();
         $author = Repo::author()->get((int) $queryParams['authorId']);
 
-        $demographicDataService  = new DemographicDataService();
-
-        if ($demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.alreadyAnswered'));
-            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
-        }
+        $demographicDataService = new DemographicDataService();
 
         $authorToken = $queryParams['authorToken'];
         if (!$this->authorTokenIsValid($author, $authorToken)) {
@@ -45,6 +40,7 @@ class QuestionnaireHandler extends Handler
             $authorExternalType = 'orcid';
         }
 
+        $templateToDisplay = 'questionnairePage/index.tpl';
         $questions = $demographicDataService->retrieveAllQuestions($context->getId());
         $templateMgr->assign([
             'questions' => $questions,
@@ -56,7 +52,13 @@ class QuestionnaireHandler extends Handler
             'privacyUrl' => $this->getPrivacyUrl()
         ]);
 
-        return $templateMgr->display($plugin->getTemplateResource('questionnairePage/index.tpl'));
+        if ($demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
+            $templateToDisplay = 'questionnairePage/responses.tpl';
+            $authorResponses = $demographicDataService->getExternalAuthorResponses($context->getId(), $authorExternalId, $authorExternalType);
+            $templateMgr->assign(['responses' => $responses]);
+        }
+
+        return $templateMgr->display($plugin->getTemplateResource($templateToDisplay));
     }
 
     private function getPrivacyUrl(): string
@@ -124,7 +126,10 @@ class QuestionnaireHandler extends Handler
         $demographicDataService  = new DemographicDataService();
         $demographicDataService->registerExternalAuthorResponses($responsesExternalId, $responsesExternalType, $responses);
 
-        Repo::author()->edit($author, ['demographicToken' => null, 'demographicOrcid' => null]);
+        $templateMgr->assign([
+            'authorId' => $author->getId(),
+            'authorToken' => $author->getData('demographicToken')
+        ]);
 
         return $templateMgr->display($plugin->getTemplateResource('questionnairePage/saveSuccess.tpl'));
     }

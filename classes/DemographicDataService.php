@@ -113,6 +113,22 @@ class DemographicDataService
         }
     }
 
+    public function getExternalAuthorResponses(int $contextId, string $externalId, string $externalType): array
+    {
+        $externalAuthorResponses = [];
+        $authorResponses = Repo::demographicResponse()->getCollector()
+            ->filterByContextIds([$contextId])
+            ->filterByExternalIds([$externalId])
+            ->filterByExternalTypes([$externalType])
+            ->getMany();
+
+        foreach ($authorResponses as $response) {
+            $externalAuthorResponses[$response->getDemographicQuestionId()] = $response;
+        }
+
+        return $externalAuthorResponses;
+    }
+
     public function deleteUserResponses(int $userId, int $contextId)
     {
         $userResponses = Repo::demographicResponse()->getCollector()

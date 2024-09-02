@@ -37,8 +37,8 @@ msgstr "Questionnaire saved successfully"
 msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.message"
 msgstr "Thanks for answering our demographic questionnaire!"
 
-msgid "plugins.generic.demographicData.questionnairePage.alreadyAnswered"
-msgstr "You already answered the demographic questionnaire."
+msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.checkAnswers"
+msgstr "Check my answers"
 
 msgid "plugins.generic.demographicData.questionnairePage.orcidAccessDenied"
 msgstr "You denied access to your ORCID record"
@@ -53,6 +53,13 @@ msgid "plugins.generic.demographicData.questionnairePage.privacyStatement"
 msgstr ""
 "Demographic data is collected in accordance with this journal's "
 "<a href=\"{$privacyUrl}\" target=\"_blank\">privacy statement</a>"
+
+msgid "plugins.generic.demographicData.questionnairePage.responsesFor.email"
+msgstr "Showing demographic data associated with the e-mail address: <strong>{$externalId}</strong>"
+
+msgid "plugins.generic.demographicData.questionnairePage.responsesFor.orcid"
+msgstr "Showing demographic data associated with the ORCID: <strong>{$externalId}</strong>"
+
 
 msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"
 msgstr "Please, inform which ORCID API should be used"
