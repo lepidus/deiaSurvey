@@ -55,7 +55,7 @@ class QuestionnaireHandler extends Handler
         if ($demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
             $templateToDisplay = 'questionnairePage/responses.tpl';
             $authorResponses = $demographicDataService->getExternalAuthorResponses($context->getId(), $authorExternalId, $authorExternalType);
-            $templateMgr->assign(['responses' => $responses]);
+            $templateMgr->assign(['responses' => $authorResponses]);
         }
 
         return $templateMgr->display($plugin->getTemplateResource($templateToDisplay));

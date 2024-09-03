@@ -11,7 +11,13 @@
     <p>
         {translate key="plugins.generic.demographicData.questionnairePage.responsesFor.{$authorExternalType}" externalId=$authorExternalId}
     </p>
-    
+
+    <fieldset class="fields">
+        {foreach $questions as $question}
+            <span class="questionTitle">{$question['title']}</span>
+            <span class="responseValue">{$responses[$question['questionId']]}</span>
+        {/foreach}
+    </fieldset>
 </div>
 
 {include file="frontend/components/footer.tpl"}

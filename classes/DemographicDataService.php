@@ -123,10 +123,45 @@ class DemographicDataService
             ->getMany();
 
         foreach ($authorResponses as $response) {
-            $externalAuthorResponses[$response->getDemographicQuestionId()] = $response;
+            $question = Repo::demographicQuestion()->get($response->getDemographicQuestionId());
+            $responseValueForDisplay = $this->getResponseValueForDisplay($question, $response);
+            $externalAuthorResponses[$question->getId()] = $responseValueForDisplay;
         }
 
         return $externalAuthorResponses;
+    }
+
+    private function getResponseValueForDisplay($question, $response): string
+    {
+        if (in_array(
+            $question->getQuestionType(),
+            [DemographicQuestion::TYPE_SMALL_TEXT_FIELD, DemographicQuestion::TYPE_TEXT_FIELD, DemographicQuestion::TYPE_TEXTAREA]
+        )) {
+            return $response->getLocalizedData('responseValue');
+        }
+
+        if (
+            $question->getQuestionType() == DemographicQuestion::TYPE_CHECKBOXES
+            || $question->getQuestionType() == DemographicQuestion::TYPE_RADIO_BUTTONS
+        ) {
+            $possibleResponses = $question->getLocalizedPossibleResponses();
+            $selectedResponsesValues = [];
+
+            foreach ($response->getValue() as $selectedResponse) {
+                $selectedResponsesValues[] = $possibleResponses[$selectedResponse];
+            }
+
+            return implode(', ', $selectedResponsesValues);
+        }
+
+        if ($question->getQuestionType() == DemographicQuestion::TYPE_DROP_DOWN_BOX) {
+            $possibleResponses = $question->getLocalizedPossibleResponses();
+            $selectedResponse = $response->getValue();
+
+            return $possibleResponses[$selectedResponse];
+        }
+
+        return '';
     }
 
     public function deleteUserResponses(int $userId, int $contextId)
