@@ -59,7 +59,7 @@ function answerDefaultQuestions() {
     cy.contains('button', 'Save').click();
 }
 
-function assertResponsesOfExternalAuthor() {
+function assertResponsesOfExternalAuthor(authorEmail) {
     cy.contains('Showing demographic data associated with the e-mail address: ' + authorEmail);
 
     cy.contains('Female');
@@ -251,7 +251,7 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.contains('Thanks for answering our demographic questionnaire');
         cy.contains('a', 'Check my answers').click();
 
-        assertResponsesOfExternalAuthor();
+        assertResponsesOfExternalAuthor('susy.almeida@outlook.com');
     });
     it('New submission is created and accepted with same contributor', function () {
         cy.login('ckwantes', null, 'publicknowledge');
