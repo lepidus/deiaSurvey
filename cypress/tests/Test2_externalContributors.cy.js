@@ -296,6 +296,52 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.visit('localhost:8025');
         cy.get('b:contains("Request for demographic data collection")').should('have.length', 1);
     });
+    it('Contributor without registration deletes his own demographic data', function () {
+        cy.visit('localhost:8025');
+        cy.get('b:contains("Request for demographic data collection")').click();
+
+        cy.get('#nav-tab button:contains("Text")').click();
+        cy.get('.text-view').within(() => {
+            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
+                cy.visit(href);
+            });
+        });
+
+        cy.contains('button', 'Delete my demographic data').click();
+
+        cy.contains('Demographic data deletion');
+        cy.contains('Are you sure you want to delete your demographic data? This action cannot be undone.');
+        cy.contains('Delete my demographic data').click();
+
+        cy.contains('Your demographic data has been deleted');
+    });
+    it('Editor goes back and accepts submission again', function () {
+        cy.login('dbarnes', null, 'publicknowledge');
+        cy.findSubmission('myQueue', secondSubmissionData.title);
+
+        cy.get('#workflow-button').click();
+        cy.clickDecision('Cancel Copyediting');
+        cy.contains('button', 'Skip this email').click();
+        cy.contains('button', 'Record Decision').click();
+        cy.get('a.pkpButton').contains('View Submission').click();
+
+        cy.clickDecision('Accept Submission');
+        cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
+    });
+    it('Contributor answers demographic questionnaire on new submission', function () {
+        cy.visit('localhost:8025');
+        cy.get('b:contains("Request for demographic data collection")').eq(0).click();
+
+        cy.get('#nav-tab button:contains("Text")').click();
+        cy.get('.text-view').within(() => {
+            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
+                cy.visit(href);
+            });
+        });
+
+        answerDefaultQuestions();
+        cy.contains('Thanks for answering our demographic questionnaire');
+    });
     it('Responses reference is migrated when author registers', function () {
         cy.register({
             'username': 'susyalmeida',
