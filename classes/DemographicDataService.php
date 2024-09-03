@@ -176,6 +176,19 @@ class DemographicDataService
         }
     }
 
+    public function deleteAuthorResponses(int $contextId, string $externalId, string $externalType)
+    {
+        $authorResponses = Repo::demographicResponse()->getCollector()
+            ->filterByContextIds([$contextId])
+            ->filterByExternalIds([$externalId])
+            ->filterByExternalTypes([$externalType])
+            ->getMany();
+
+        foreach ($authorResponses as $response) {
+            Repo::demographicResponse()->delete($response);
+        }
+    }
+
     public function authorAlreadyAnsweredQuestionnaire($author, $authorOrcid = null): bool
     {
         $externalId = $author->getData('email');
@@ -183,6 +196,9 @@ class DemographicDataService
 
         if (!is_null($authorOrcid)) {
             $externalId = $authorOrcid;
+            $externalType = 'orcid';
+        } elseif (!is_null($author->getData('demographicOrcid'))) {
+            $externalId = $author->getData('demographicOrcid');
             $externalType = 'orcid';
         }
 

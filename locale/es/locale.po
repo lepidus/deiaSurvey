@@ -54,6 +54,9 @@ msgstr ""
 "Los datos demográficos se recogen de acuerdo con la "
 "<a href=\"{$privacyUrl}\" target=\"_blank\">declaración de privacidad</a> de esta revista"
 
+msgid "plugins.generic.demographicData.questionnairePage.responses.title"
+msgstr "Datos Demográficos"
+
 msgid "plugins.generic.demographicData.questionnairePage.responsesFor.email"
 msgstr "Mostrando datos demográficos asociados a la dirección de correo electrónico: <strong>{$externalId}</strong>"
 
@@ -70,6 +73,21 @@ msgstr "Cuando cree una nueva cuenta en el sistema con esa misma dirección de c
 msgid "plugins.generic.demographicData.questionnairePage.dataMigration.orcid"
 msgstr "Cuando cree una nueva cuenta en el sistema y añada ese mismo ORCID, "
 "sus datos demográficos se asociarán automáticamente a la nueva cuenta."
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteData.title"
+msgstr "Eliminación de datos demográficos"
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteData.message"
+msgstr "¿Está seguro de que desea eliminar sus datos demográficos? Esta acción no se puede deshacer."
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteMyData"
+msgstr "Eliminar mis datos demográficos"
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteSuccess"
+msgstr "Tus datos demográficos han sido eliminados."
+
+msgid "plugins.generic.demographicData.questionnairePage.onlyWhoAnsweredCanDelete"
+msgstr "Sólo los autores que ya hayan respondido el cuestionario demográfico pueden eliminar datos demográficos."
 
 
 msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"

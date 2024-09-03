@@ -1,5 +1,5 @@
 {capture assign="pageTitle"}
-    {translate key="plugins.generic.demographicData.questionnairePage.index.title"}
+    {translate key="plugins.generic.demographicData.questionnairePage.responses.title"}
 {/capture}
 
 <link rel="stylesheet" type="text/css" href="/plugins/generic/demographicData/styles/questionnairePage.css">
@@ -25,6 +25,10 @@
     <p>
         {translate key="plugins.generic.demographicData.questionnairePage.dataMigration.{$authorExternalType}" externalId=$authorExternalId}
     </p>
+
+    <a id="deleteDemographicData" href="{url op="deleteData" authorId=$authorId authorToken=$authorToken}">
+        {translate key="plugins.generic.demographicData.questionnairePage.deleteMyData"}
+    </a>
 </div>
 
 {include file="frontend/components/footer.tpl"}

@@ -134,6 +134,47 @@ class QuestionnaireHandler extends Handler
         return $templateMgr->display($plugin->getTemplateResource('questionnairePage/saveSuccess.tpl'));
     }
 
+    public function deleteData($args, $request)
+    {
+        $authorId = $request->getUserVar('authorId');
+        $authorToken = $request->getUserVar('authorToken');
+        $author = Repo::author()->get($authorId);
+        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $templateMgr = TemplateManager::getManager($request);
+
+        if (!$this->authorTokenIsValid($author, $authorToken)) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.accessDenied'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
+        $demographicDataService  = new DemographicDataService();
+        if (!$demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.onlyWhoAnsweredCanDelete'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
+        if ($request->getUserVar('save')) {
+            $contextId = $request->getContext()->getId();
+            $authorExternalId = $author->getData('email');
+            $authorExternalType = 'email';
+
+            if (!is_null($author->getData('demographicOrcid'))) {
+                $authorExternalId = $author->getData('demographicOrcid');
+                $authorExternalType = 'orcid';
+            }
+
+            $demographicDataService->deleteAuthorResponses($contextId, $authorExternalId, $authorExternalType);
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/deleteSuccess.tpl'));
+        }
+
+        $templateMgr->assign([
+            'authorId' => $author->getId(),
+            'authorToken' => $author->getData('demographicToken')
+        ]);
+
+        return $templateMgr->display($plugin->getTemplateResource('questionnairePage/deleteData.tpl'));
+    }
+
     public function orcidVerify($args, $request)
     {
         $author = Repo::author()->get($request->getUserVar('authorId'));
