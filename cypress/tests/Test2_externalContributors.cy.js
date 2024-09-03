@@ -307,7 +307,7 @@ describe('Demographic Data - External contributors data collecting', function() 
             });
         });
 
-        cy.contains('button', 'Delete my demographic data').click();
+        cy.contains('a', 'Delete my demographic data').click();
 
         cy.contains('Demographic data deletion');
         cy.contains('Are you sure you want to delete your demographic data? This action cannot be undone.');
