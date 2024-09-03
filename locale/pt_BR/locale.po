@@ -60,6 +60,17 @@ msgstr "Mostrando dados demográficos associados ao endereço de e-mail: <strong
 msgid "plugins.generic.demographicData.questionnairePage.responsesFor.orcid"
 msgstr "Mostrando dados demográficos associados ao ORCID: <strong>{$externalId}</strong>"
 
+msgid "plugins.generic.demographicData.questionnairePage.checkAnswersAnytime"
+msgstr "Você pode verificar seus dados demográficos a qualquer momento acessando este mesmo endereço."
+
+msgid "plugins.generic.demographicData.questionnairePage.dataMigration.email"
+msgstr "Ao criar uma nova conta no sistema com esse mesmo endereço de e-mail, "
+"seus dados demográficos serão automaticamente associados à nova conta."
+
+msgid "plugins.generic.demographicData.questionnairePage.dataMigration.orcid"
+msgstr "Ao criar uma nova conta no sistema e adicionar esse mesmo ORCID, "
+"seus dados demográficos serão automaticamente associados à nova conta."
+
 
 msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"
 msgstr "Por favor, informe qual API ORCID deve ser utilizada"

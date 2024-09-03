@@ -14,10 +14,17 @@
 
     <fieldset class="fields">
         {foreach $questions as $question}
-            <span class="questionTitle">{$question['title']}</span>
-            <span class="responseValue">{$responses[$question['questionId']]}</span>
+            <div class="authorResponse">
+                <span class="questionTitle">{$question['title']}</span>
+                <span class="responseValue">{$responses[$question['questionId']]}</span>
+            </div>
         {/foreach}
     </fieldset>
+
+    <p>{translate key="plugins.generic.demographicData.questionnairePage.checkAnswersAnytime"}</p>
+    <p>
+        {translate key="plugins.generic.demographicData.questionnairePage.dataMigration.{$authorExternalType}" externalId=$authorExternalId}
+    </p>
 </div>
 
 {include file="frontend/components/footer.tpl"}

@@ -2,7 +2,7 @@
     border: 0;
 }
 
-.question {
+.question, .authorResponse {
     margin-bottom: 1.75rem;
 }
 
@@ -51,6 +51,10 @@
     padding: 0.25rem;
     background-color: #fff;
     border: 1px solid #bbb;
+}
+
+.responseValue {
+    margin-top: 0.5rem;
 }
 
 .buttons, .privacyStatement {
