@@ -1,6 +1,8 @@
 import '../support/commands.js';
 
-function assertDefaultQuestionsDisplay() {
+function assertDefaultQuestionsDisplay(authorEmail) {
+    cy.contains('The demographic data from this questionnaire will be associated with the e-mail address: ' + authorEmail);
+    
     cy.contains('.questionTitle', 'Gender');
     cy.contains('With which gender do you most identify?');
 
@@ -33,6 +35,8 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('option', 'One to three minimum wages');
     cy.contains('option', 'Three to five minimum wages');
     cy.contains('option', 'More than five minimum wages');
+
+    cy.contains('Demographic data is collected in accordance with this journal\'s privacy statement');
 }
 
 function answerDefaultQuestions() {
@@ -55,7 +59,22 @@ function answerDefaultQuestions() {
     cy.contains('button', 'Save').click();
 }
 
-function assertResponsesToDefaultQuestions() {
+function assertResponsesOfExternalAuthor(authorEmail) {
+    cy.contains('Showing demographic data associated with the e-mail address: ' + authorEmail);
+
+    cy.contains('Female');
+    cy.contains('Latin');
+    cy.contains('University of São Paulo');
+    cy.contains('University of Minas Gerais');
+    cy.contains('English, Spanish');
+    cy.contains('America');
+    cy.contains('Three to five minimum wages');
+
+    cy.contains('You can check you demographic data at any time by visiting this same address');
+    cy.contains('By creating a new account in the system with this same e-mail address, your demographic data will automatically be associated with the new account');
+}
+
+function assertResponsesOfRegisteredUser() {
     cy.contains('a', 'Demographic Data').click();
     cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
     
@@ -208,7 +227,7 @@ describe('Demographic Data - External contributors data collecting', function() 
             });
         });
 
-        assertDefaultQuestionsDisplay();
+        assertDefaultQuestionsDisplay('susy.almeida@outlook.com');
 
         cy.url().then(url => {
             cy.visit(url + 'breakToken');
@@ -230,19 +249,9 @@ describe('Demographic Data - External contributors data collecting', function() 
         answerDefaultQuestions();
 
         cy.contains('Thanks for answering our demographic questionnaire');
-    });
-    it('Contributor access questionnaire again', function () {
-        cy.visit('localhost:8025');
-        cy.get('b:contains("Request for demographic data collection")').click();
+        cy.contains('a', 'Check my answers').click();
 
-        cy.get('#nav-tab button:contains("Text")').click();
-        cy.get('.text-view').within(() => {
-            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
-                cy.visit(href);
-            });
-        });
-
-        cy.contains('You already answered the demographic questionnaire');
+        assertResponsesOfExternalAuthor('susy.almeida@outlook.com');
     });
     it('New submission is created and accepted with same contributor', function () {
         cy.login('ckwantes', null, 'publicknowledge');
@@ -287,6 +296,52 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.visit('localhost:8025');
         cy.get('b:contains("Request for demographic data collection")').should('have.length', 1);
     });
+    it('Contributor without registration deletes his own demographic data', function () {
+        cy.visit('localhost:8025');
+        cy.get('b:contains("Request for demographic data collection")').click();
+
+        cy.get('#nav-tab button:contains("Text")').click();
+        cy.get('.text-view').within(() => {
+            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
+                cy.visit(href);
+            });
+        });
+
+        cy.contains('a', 'Delete my demographic data').click();
+
+        cy.contains('Demographic data deletion');
+        cy.contains('Are you sure you want to delete your demographic data? This action cannot be undone.');
+        cy.contains('Delete my demographic data').click();
+
+        cy.contains('Your demographic data has been deleted');
+    });
+    it('Editor goes back and accepts submission again', function () {
+        cy.login('dbarnes', null, 'publicknowledge');
+        cy.findSubmission('myQueue', secondSubmissionData.title);
+
+        cy.get('#workflow-button').click();
+        cy.clickDecision('Cancel Copyediting');
+        cy.contains('button', 'Skip this email').click();
+        cy.contains('button', 'Record Decision').click();
+        cy.get('a.pkpButton').contains('View Submission').click();
+
+        cy.clickDecision('Accept Submission');
+        cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
+    });
+    it('Contributor answers demographic questionnaire on new submission', function () {
+        cy.visit('localhost:8025');
+        cy.get('b:contains("Request for demographic data collection")').eq(0).click();
+
+        cy.get('#nav-tab button:contains("Text")').click();
+        cy.get('.text-view').within(() => {
+            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
+                cy.visit(href);
+            });
+        });
+
+        answerDefaultQuestions();
+        cy.contains('Thanks for answering our demographic questionnaire');
+    });
     it('Responses reference is migrated when author registers', function () {
         cy.register({
             'username': 'susyalmeida',
@@ -300,6 +355,6 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.contains('a', 'Edit My Profile').click();
         cy.contains('a', 'Demographic Data').click();
 
-        assertResponsesToDefaultQuestions();
+        assertResponsesOfRegisteredUser();
     });
 });

@@ -22,6 +22,12 @@ msgstr "We request that you fill in the demographic data survey on the \"Demogra
 msgid "plugins.generic.demographicData.questionnairePage.index.title"
 msgstr "Demographic Questionnaire"
 
+msgid "plugins.generic.demographicData.questionnairePage.externalId.email"
+msgstr "The demographic data from this questionnaire will be associated with the e-mail address: <strong>{$externalId}</strong>"
+
+msgid "plugins.generic.demographicData.questionnairePage.externalId.orcid"
+msgstr "The demographic data from this questionnaire will be associated with the ORCID: <strong>{$externalId}</strong>"
+
 msgid "plugins.generic.demographicData.questionnairePage.accessDenied"
 msgstr "Only the author can access this page"
 
@@ -31,8 +37,8 @@ msgstr "Questionnaire saved successfully"
 msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.message"
 msgstr "Thanks for answering our demographic questionnaire!"
 
-msgid "plugins.generic.demographicData.questionnairePage.alreadyAnswered"
-msgstr "You already answered the demographic questionnaire."
+msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.checkAnswers"
+msgstr "Check my answers"
 
 msgid "plugins.generic.demographicData.questionnairePage.orcidAccessDenied"
 msgstr "You denied access to your ORCID record"
@@ -42,6 +48,46 @@ msgstr "An error occurred during your ORCID requesting. The message returned was
 
 msgid "plugins.generic.demographicData.questionnairePage.userWithOrcidExists"
 msgstr "There is a user registered with this ORCID in our system. Please fill in the demographic questionnaire using this user."
+
+msgid "plugins.generic.demographicData.questionnairePage.privacyStatement"
+msgstr ""
+"Demographic data is collected in accordance with this journal's "
+"<a href=\"{$privacyUrl}\" target=\"_blank\">privacy statement</a>"
+
+msgid "plugins.generic.demographicData.questionnairePage.responses.title"
+msgstr "Demographic Data"
+
+msgid "plugins.generic.demographicData.questionnairePage.responsesFor.email"
+msgstr "Showing demographic data associated with the e-mail address: <strong>{$externalId}</strong>"
+
+msgid "plugins.generic.demographicData.questionnairePage.responsesFor.orcid"
+msgstr "Showing demographic data associated with the ORCID: <strong>{$externalId}</strong>"
+
+msgid "plugins.generic.demographicData.questionnairePage.checkAnswersAnytime"
+msgstr "You can check you demographic data at any time by visiting this same address."
+
+msgid "plugins.generic.demographicData.questionnairePage.dataMigration.email"
+msgstr "By creating a new account in the system with this same e-mail address, "
+"your demographic data will automatically be associated with the new account."
+
+msgid "plugins.generic.demographicData.questionnairePage.dataMigration.orcid"
+msgstr "By creating a new account in the system and add the same ORCID, "
+"your demographic data will automatically be associated with the new account."
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteData.title"
+msgstr "Demographic data deletion"
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteData.message"
+msgstr "Are you sure you want to delete your demographic data? This action cannot be undone."
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteMyData"
+msgstr "Delete my demographic data"
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteSuccess"
+msgstr "Your demographic data has been deleted."
+
+msgid "plugins.generic.demographicData.questionnairePage.onlyWhoAnsweredCanDelete"
+msgstr "Only authors who have already completed the demographic questionnaire can delete demographic data."
 
 
 msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"

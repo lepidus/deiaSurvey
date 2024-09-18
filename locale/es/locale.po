@@ -22,6 +22,12 @@ msgstr "Le pedimos que rellene el cuestionario de datos demográficos en la pest
 msgid "plugins.generic.demographicData.questionnairePage.index.title"
 msgstr "Cuestionario Demográfico"
 
+msgid "plugins.generic.demographicData.questionnairePage.externalId.email"
+msgstr "Los datos demográficos de este cuestionario se vincularán a la dirección de correo electrónico: <strong>{$externalId}</strong>"
+
+msgid "plugins.generic.demographicData.questionnairePage.externalId.orcid"
+msgstr "Los datos demográficos de este cuestionario se vincularán a ORCID: <strong>{$externalId}</strong>"
+
 msgid "plugins.generic.demographicData.questionnairePage.accessDenied"
 msgstr "Sólo el autor puede acceder a esta página"
 
@@ -31,8 +37,8 @@ msgstr "Cuestionario guardado correctamente"
 msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.message"
 msgstr "¡Gracias por responder a nuestro cuestionario demográfico!"
 
-msgid "plugins.generic.demographicData.questionnairePage.alreadyAnswered"
-msgstr "Ya ha rellenado el cuestionario demográfico."
+msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.checkAnswers"
+msgstr "Revisa mis respuestas"
 
 msgid "plugins.generic.demographicData.questionnairePage.orcidAccessDenied"
 msgstr "Ha denegado el acceso a su registro ORCID"
@@ -42,6 +48,46 @@ msgstr "Se ha producido un error al solicitar su ORCID. El mensaje devuelto fue:
 
 msgid "plugins.generic.demographicData.questionnairePage.userWithOrcidExists"
 msgstr "Hay un usuario registrado con este ORCID en nuestro sistema. Por favor, rellene el cuestionario demográfico utilizando este usuario."
+
+msgid "plugins.generic.demographicData.questionnairePage.privacyStatement"
+msgstr ""
+"Los datos demográficos se recogen de acuerdo con la "
+"<a href=\"{$privacyUrl}\" target=\"_blank\">declaración de privacidad</a> de esta revista"
+
+msgid "plugins.generic.demographicData.questionnairePage.responses.title"
+msgstr "Datos Demográficos"
+
+msgid "plugins.generic.demographicData.questionnairePage.responsesFor.email"
+msgstr "Mostrando datos demográficos asociados a la dirección de correo electrónico: <strong>{$externalId}</strong>"
+
+msgid "plugins.generic.demographicData.questionnairePage.responsesFor.orcid"
+msgstr "Mostrando datos demográficos asociados a ORCID: <strong>{$externalId}</strong>"
+
+msgid "plugins.generic.demographicData.questionnairePage.checkAnswersAnytime"
+msgstr "Puede consultar sus datos demográficos en cualquier momento accediendo a esta misma dirección."
+
+msgid "plugins.generic.demographicData.questionnairePage.dataMigration.email"
+msgstr "Cuando cree una nueva cuenta en el sistema con esa misma dirección de correo electrónico, "
+"sus datos demográficos se asociarán automáticamente a la nueva cuenta."
+
+msgid "plugins.generic.demographicData.questionnairePage.dataMigration.orcid"
+msgstr "Cuando cree una nueva cuenta en el sistema y añada ese mismo ORCID, "
+"sus datos demográficos se asociarán automáticamente a la nueva cuenta."
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteData.title"
+msgstr "Eliminación de datos demográficos"
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteData.message"
+msgstr "¿Está seguro de que desea eliminar sus datos demográficos? Esta acción no se puede deshacer."
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteMyData"
+msgstr "Eliminar mis datos demográficos"
+
+msgid "plugins.generic.demographicData.questionnairePage.deleteSuccess"
+msgstr "Tus datos demográficos han sido eliminados."
+
+msgid "plugins.generic.demographicData.questionnairePage.onlyWhoAnsweredCanDelete"
+msgstr "Sólo los autores que ya hayan respondido el cuestionario demográfico pueden eliminar datos demográficos."
 
 
 msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"

@@ -24,12 +24,7 @@ class QuestionnaireHandler extends Handler
         $queryParams = $request->getQueryArray();
         $author = Repo::author()->get((int) $queryParams['authorId']);
 
-        $demographicDataService  = new DemographicDataService();
-
-        if ($demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.alreadyAnswered'));
-            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
-        }
+        $demographicDataService = new DemographicDataService();
 
         $authorToken = $queryParams['authorToken'];
         if (!$this->authorTokenIsValid($author, $authorToken)) {
@@ -37,15 +32,46 @@ class QuestionnaireHandler extends Handler
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
+        $authorExternalId = $author->getData('email');
+        $authorExternalType = 'email';
+
+        if (!is_null($author->getData('demographicOrcid'))) {
+            $authorExternalId = $author->getData('demographicOrcid');
+            $authorExternalType = 'orcid';
+        }
+
+        $templateToDisplay = 'questionnairePage/index.tpl';
         $questions = $demographicDataService->retrieveAllQuestions($context->getId());
         $templateMgr->assign([
             'questions' => $questions,
             'authorId' => $author->getId(),
             'authorToken' => $authorToken,
-            'questionTypeConsts' => DemographicQuestion::getQuestionTypeConstants()
+            'authorExternalId' => $authorExternalId,
+            'authorExternalType' => $authorExternalType,
+            'questionTypeConsts' => DemographicQuestion::getQuestionTypeConstants(),
+            'privacyUrl' => $this->getPrivacyUrl()
         ]);
 
-        return $templateMgr->display($plugin->getTemplateResource('questionnairePage/index.tpl'));
+        if ($demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
+            $templateToDisplay = 'questionnairePage/responses.tpl';
+            $authorResponses = $demographicDataService->getExternalAuthorResponses($context->getId(), $authorExternalId, $authorExternalType);
+            $templateMgr->assign(['responses' => $authorResponses]);
+        }
+
+        return $templateMgr->display($plugin->getTemplateResource($templateToDisplay));
+    }
+
+    private function getPrivacyUrl(): string
+    {
+        $request = Application::get()->getRequest();
+
+        return $request->getDispatcher()->url(
+            $request,
+            Application::ROUTE_PAGE,
+            null,
+            'about',
+            'privacy'
+        );
     }
 
     private function authorTokenIsValid($author, $token): bool
@@ -100,9 +126,53 @@ class QuestionnaireHandler extends Handler
         $demographicDataService  = new DemographicDataService();
         $demographicDataService->registerExternalAuthorResponses($responsesExternalId, $responsesExternalType, $responses);
 
-        Repo::author()->edit($author, ['demographicToken' => null, 'demographicOrcid' => null]);
+        $templateMgr->assign([
+            'authorId' => $author->getId(),
+            'authorToken' => $author->getData('demographicToken')
+        ]);
 
         return $templateMgr->display($plugin->getTemplateResource('questionnairePage/saveSuccess.tpl'));
+    }
+
+    public function deleteData($args, $request)
+    {
+        $authorId = $request->getUserVar('authorId');
+        $authorToken = $request->getUserVar('authorToken');
+        $author = Repo::author()->get($authorId);
+        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $templateMgr = TemplateManager::getManager($request);
+
+        if (!$this->authorTokenIsValid($author, $authorToken)) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.accessDenied'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
+        $demographicDataService  = new DemographicDataService();
+        if (!$demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.onlyWhoAnsweredCanDelete'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
+        if ($request->getUserVar('save')) {
+            $contextId = $request->getContext()->getId();
+            $authorExternalId = $author->getData('email');
+            $authorExternalType = 'email';
+
+            if (!is_null($author->getData('demographicOrcid'))) {
+                $authorExternalId = $author->getData('demographicOrcid');
+                $authorExternalType = 'orcid';
+            }
+
+            $demographicDataService->deleteAuthorResponses($contextId, $authorExternalId, $authorExternalType);
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/deleteSuccess.tpl'));
+        }
+
+        $templateMgr->assign([
+            'authorId' => $author->getId(),
+            'authorToken' => $author->getData('demographicToken')
+        ]);
+
+        return $templateMgr->display($plugin->getTemplateResource('questionnairePage/deleteData.tpl'));
     }
 
     public function orcidVerify($args, $request)

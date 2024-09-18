@@ -7,6 +7,10 @@
 
 <div class="page">
     <h1>{$pageTitle|escape}</h1>
+
+    <p>
+        {translate key="plugins.generic.demographicData.questionnairePage.externalId.{$authorExternalType}" externalId=$authorExternalId}
+    </p>
     
     <form class="pkp_form" id="demographicDataForm" method="post" action="{url op="saveQuestionnaire" authorId=$authorId authorToken=$authorToken}" role="form">
         {csrf}
@@ -16,6 +20,10 @@
                 {include file="../../../plugins/generic/demographicData/templates/questionnairePage/question.tpl" question=$question}
             {/foreach}
         </fieldset>
+
+        <p class="privacyStatement">
+            {translate key="plugins.generic.demographicData.questionnairePage.privacyStatement"}
+        </p>
 
         <div class="buttons">
             <button id="submitDemographicQuestionnaire" class="submit" type="submit">
