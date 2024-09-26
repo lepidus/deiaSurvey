@@ -18,7 +18,7 @@ use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateRespo
 use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
-use APP\plugins\generic\demographicData\tests\DefaultTestQuestionsCreator;
+use APP\plugins\generic\demographicData\classes\test\DefaultTestQuestionsCreator;
 use APP\plugins\generic\demographicData\DemographicDataSettingsForm;
 
 class DemographicDataPlugin extends GenericPlugin
