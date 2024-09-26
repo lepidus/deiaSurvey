@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests;
+namespace APP\plugins\generic\demographicData\classes\test;
 
 use APP\core\Application;
 use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
