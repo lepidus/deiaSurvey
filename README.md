@@ -30,6 +30,11 @@ The e-mail sent offers two ways of filling in the data. The first requires an OR
 
 Authors can view and delete their demographic data at any time. Subsequently, if they create an account in the system with the e-mail address or ORCID used, their data will be migrated to this new user.
 
+## Credits
+This plugin was sponsored by the Lepidus Tecnologia, Scientific Electronic Library Online (SciELO), Revista Encontros Bibli (UFSC) and others (we'll update soon).
+
+Developed by Lepidus Tecnologia.
+
 ## License
 
 __This plugin is licensed under the GNU General Public License v3.0__
