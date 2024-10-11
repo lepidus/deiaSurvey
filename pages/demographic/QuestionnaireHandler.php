@@ -24,6 +24,7 @@ class QuestionnaireHandler extends Handler
         $queryParams = $request->getQueryArray();
         $author = Repo::author()->get((int) $queryParams['authorId']);
 
+        $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
         $demographicDataService = new DemographicDataService();
 
         $authorToken = $queryParams['authorToken'];
@@ -103,6 +104,8 @@ class QuestionnaireHandler extends Handler
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
         $templateMgr = TemplateManager::getManager($request);
 
+        $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
+
         if (!$this->authorTokenIsValid($author, $authorToken)) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
@@ -141,6 +144,8 @@ class QuestionnaireHandler extends Handler
         $author = Repo::author()->get($authorId);
         $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
         $templateMgr = TemplateManager::getManager($request);
+
+        $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
 
         if (!$this->authorTokenIsValid($author, $authorToken)) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.accessDenied'));
@@ -182,6 +187,8 @@ class QuestionnaireHandler extends Handler
         $templateMgr = TemplateManager::getManager($request);
         $contextId = $request->getContext()->getId();
 
+        $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
+
         if ($request->getUserVar('error') == 'access_denied') {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.orcidAccessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
@@ -219,5 +226,18 @@ class QuestionnaireHandler extends Handler
         Repo::author()->edit($author, ['demographicOrcid' => $authorOrcidUri]);
 
         $request->redirect(null, null, 'index', null, ['authorId' => $author->getId(), 'authorToken' => $request->getUserVar('authorToken')]);
+    }
+
+    private function addQuestionnairePageStyleSheet($plugin, $request, $templateMgr)
+    {
+        $templateMgr->addStyleSheet(
+            'questionnairePageStyleSheet',
+            $request->getBaseUrl() . '/' . $plugin->getPluginPath() . '/styles/questionnairePage.css',
+            [
+                'priority' => TemplateManager::STYLE_SEQUENCE_LAST,
+                'contexts' => ['frontend'],
+                'inline' => false,
+            ]
+        );
     }
 }
