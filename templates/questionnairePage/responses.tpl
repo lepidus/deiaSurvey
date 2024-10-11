@@ -2,7 +2,6 @@
     {translate key="plugins.generic.demographicData.questionnairePage.responses.title"}
 {/capture}
 
-<link rel="stylesheet" type="text/css" href="/plugins/generic/demographicData/styles/questionnairePage.css">
 {include file="frontend/components/header.tpl" pageTitleTranslated=$pageTitle}
 
 <div class="page">
