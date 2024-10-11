@@ -61,4 +61,39 @@ class DAOTest extends DatabaseTestCase
             'hasInputField' => true,
         ], $fetchedDemographicResponseOption->getAllData());
     }
+
+    public function testEditDemographicResponseOption(): void
+    {
+        $demographicResponseOption = $this->createDemographicResponseOptionObject();
+        $insertedObjectId = $this->demographicResponseOptionDAO->insert($demographicResponseOption);
+
+        $fetchedDemographicResponseOption = $this->demographicResponseOptionDAO->get(
+            $insertedObjectId,
+            $this->demographicQuestionId
+        );
+        $fetchedDemographicResponseOption->setOptionText('Updated text', self::DEFAULT_LOCALE);
+
+        $this->demographicResponseOptionDAO->update($fetchedDemographicResponseOption);
+
+        $objectEdited = $this->demographicResponseOptionDAO->get(
+            $insertedObjectId,
+            $this->demographicQuestionId
+        );
+
+        self::assertEquals($objectEdited->getData('optionText'), [self::DEFAULT_LOCALE => 'Updated text']);
+    }
+
+    public function testDeleteDemographicResponseOption(): void
+    {
+        $demographicResponseOption = $this->createDemographicResponseOptionObject();
+        $insertedObjectId = $this->demographicResponseOptionDAO->insert($demographicResponseOption);
+
+        $fetchedDemographicResponseOption = $this->demographicResponseOptionDAO->get(
+            $insertedObjectId,
+            $this->demographicQuestionId
+        );
+
+        $this->demographicResponseOptionDAO->delete($fetchedDemographicResponseOption);
+        self::assertFalse($this->demographicResponseOptionDAO->exists($insertedObjectId, $this->contextId));
+    }
 }
