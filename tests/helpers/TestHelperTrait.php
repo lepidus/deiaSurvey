@@ -33,6 +33,16 @@ trait TestHelperTrait
         return $repository->add($demographicQuestion);
     }
 
+    private function createDemographicResponseOptionObject()
+    {
+        $demographicResponseOption = $this->demographicResponseOptionDAO->newDataObject();
+        $demographicResponseOption->setDemographicQuestionId($this->demographicQuestionId);
+        $demographicResponseOption->setOptionText('First response option, with input field', self::DEFAULT_LOCALE);
+        $demographicResponseOption->setHasInputField(true);
+
+        return $demographicResponseOption;
+    }
+
     private function createDemographicResponseObject($externalAuthor = false)
     {
         $demographicResponse = $this->demographicResponseDAO->newDataObject();
