@@ -25,8 +25,7 @@ class DemographicDataService
                 'type' => $demographicQuestion->getQuestionType(),
                 'inputType' => $demographicQuestion->getQuestionInputType(),
                 'title' => $demographicQuestion->getLocalizedQuestionText(),
-                'description' => $demographicQuestion->getLocalizedQuestionDescription(),
-                'possibleResponses' => $demographicQuestion->getLocalizedPossibleResponses()
+                'description' => $demographicQuestion->getLocalizedQuestionDescription()
             ];
 
             if ($shouldRetrieveResponses) {
@@ -144,21 +143,11 @@ class DemographicDataService
             $question->getQuestionType() == DemographicQuestion::TYPE_CHECKBOXES
             || $question->getQuestionType() == DemographicQuestion::TYPE_RADIO_BUTTONS
         ) {
-            $possibleResponses = $question->getLocalizedPossibleResponses();
-            $selectedResponsesValues = [];
-
-            foreach ($response->getValue() as $selectedResponse) {
-                $selectedResponsesValues[] = $possibleResponses[$selectedResponse];
-            }
-
-            return implode(', ', $selectedResponsesValues);
+            return '';
         }
 
         if ($question->getQuestionType() == DemographicQuestion::TYPE_DROP_DOWN_BOX) {
-            $possibleResponses = $question->getLocalizedPossibleResponses();
-            $selectedResponse = $response->getValue();
-
-            return $possibleResponses[$selectedResponse];
+            return '';
         }
 
         return '';

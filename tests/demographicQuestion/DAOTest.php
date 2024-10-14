@@ -56,10 +56,7 @@ class DAOTest extends DatabaseTestCase
             'contextId' => $this->contextId,
             'questionType' => DemographicQuestion::TYPE_RADIO_BUTTONS,
             'questionText' => [$locale => 'Test text'],
-            'questionDescription' => [$locale => 'Test description'],
-            'possibleResponses' => [
-                $locale => ['First possible response', 'Second possible response']
-            ]
+            'questionDescription' => [$locale => 'Test description']
         ], $fetchedDemographicQuestion->_data);
     }
 
@@ -109,7 +106,6 @@ class DAOTest extends DatabaseTestCase
         $demographicQuestion->setQuestionType(DemographicQuestion::TYPE_RADIO_BUTTONS);
         $demographicQuestion->setQuestionText('Test text', $locale);
         $demographicQuestion->setQuestionDescription('Test description', $locale);
-        $demographicQuestion->setPossibleResponses(['First possible response', 'Second possible response'], $locale);
 
         return $demographicQuestion;
     }

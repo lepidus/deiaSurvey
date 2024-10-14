@@ -57,41 +57,19 @@ class DefaultTestQuestionsCreator
                 'contextId' => $contextId,
                 'questionType' => DemographicQuestion::TYPE_CHECKBOXES,
                 'questionText' => ['en' => 'Languages'],
-                'questionDescription' => ['en' => 'Which of these languages do you speak?'],
-                'possibleResponses' => [
-                    'en' => ['English', 'French', 'Hindi', 'Mandarin', 'Portuguese', 'Spanish'],
-                    'fr_CA' => ['Anglais', 'Français', 'Hindi', 'Mandarin', 'Portugais', 'Espagnol']
-                ]
+                'questionDescription' => ['en' => 'Which of these languages do you speak?']
             ],
             [
                 'contextId' => $contextId,
                 'questionType' => DemographicQuestion::TYPE_RADIO_BUTTONS,
                 'questionText' => ['en' => 'Nacionality'],
-                'questionDescription' => ['en' => 'Which continent are you from?'],
-                'possibleResponses' => [
-                    'en' => ['Africa', 'America', 'Asia', 'Europe', 'Oceania'],
-                    'fr_CA' => ['Afrique', 'Amérique', 'Asie', 'Europe', 'Océanie']
-                ]
+                'questionDescription' => ['en' => 'Which continent are you from?']
             ],
             [
                 'contextId' => $contextId,
                 'questionType' => DemographicQuestion::TYPE_DROP_DOWN_BOX,
                 'questionText' => ['en' => 'Salary'],
-                'questionDescription' => ['en' => 'What range is your current salary in?'],
-                'possibleResponses' => [
-                    'en' => [
-                        'Less than a minimum wage',
-                        'One to three minimum wages',
-                        'Three to five minimum wages',
-                        'More than five minimum wages'
-                    ],
-                    'fr_CA' => [
-                        "Moins qu'un salaire minimum",
-                        'Un à trois salaires minimums',
-                        'Trois à cinq salaires minimums',
-                        'Plus de cinq salaires minimums'
-                    ]
-                ]
+                'questionDescription' => ['en' => 'What range is your current salary in?']
             ]
         ];
     }

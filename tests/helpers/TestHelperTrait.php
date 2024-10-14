@@ -22,9 +22,6 @@ trait TestHelperTrait
             'questionType' => DemographicQuestion::TYPE_TEXTAREA,
             'questionDescription' => [
                 self::DEFAULT_LOCALE => 'Test description'
-            ],
-            'possibleResponses' => [
-                self::DEFAULT_LOCALE => ['First possible response', 'Second possible response']
             ]
         ];
 

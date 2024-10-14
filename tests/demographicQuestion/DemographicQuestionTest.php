@@ -71,18 +71,4 @@ class DemographicQuestionTest extends PKPTestCase
         $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
         $this->assertEquals($expectedQuestionDescription, $questionDescription);
     }
-
-    public function testGetQuestionPossibleResponses(): void
-    {
-        $expectedPossibleResponses = [
-            'en' => ['Black', 'Latin', 'Asian', 'Other'],
-            'pt_BR' => ['Negro(a)', 'Latino(a)', 'Asiático(a)', 'Outro(a)']
-        ];
-
-        $this->demographicQuestion->setPossibleResponses($expectedPossibleResponses['en'], 'en');
-        $this->demographicQuestion->setPossibleResponses($expectedPossibleResponses['pt_BR'], 'pt_BR');
-
-        $this->assertEquals($expectedPossibleResponses['en'], $this->demographicQuestion->getPossibleResponses('en'));
-        $this->assertEquals($expectedPossibleResponses['pt_BR'], $this->demographicQuestion->getPossibleResponses('pt_BR'));
-    }
 }

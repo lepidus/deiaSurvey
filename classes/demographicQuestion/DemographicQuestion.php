@@ -76,19 +76,4 @@ class DemographicQuestion extends \PKP\core\DataObject
     {
         $this->setData('questionDescription', $descriptionText, $locale);
     }
-
-    public function getPossibleResponses($locale)
-    {
-        return $this->getData('possibleResponses', $locale);
-    }
-
-    public function setPossibleResponses($possibleResponses, $locale)
-    {
-        $this->setData('possibleResponses', $possibleResponses, $locale);
-    }
-
-    public function getLocalizedPossibleResponses()
-    {
-        return $this->getLocalizedData('possibleResponses');
-    }
 }
