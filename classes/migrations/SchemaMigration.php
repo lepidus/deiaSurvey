@@ -55,7 +55,11 @@ class SchemaMigration extends Migration
             $table->string('setting_name', 255);
             $table->longText('setting_value')->nullable();
 
-            $table->index(['demographic_response_option_id'], 'demographic_response_option_settings_id');
+            $table->foreign('demographic_response_option_id', 'demographic_response_option_settings_option_id')
+                ->references('demographic_response_option_id')
+                ->on('demographic_response_options')
+                ->onDelete('cascade');
+            $table->index(['demographic_response_option_id'], 'demographic_response_option_settings_option_id');
             $table->unique(['demographic_response_option_id', 'locale', 'setting_name'], 'demographic_response_option_settings_pkey');
         });
 

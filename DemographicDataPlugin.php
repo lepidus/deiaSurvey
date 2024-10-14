@@ -33,6 +33,7 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('Schema::get::author', [$this, 'editAuthorSchema']);
             Hook::add('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
+            Hook::add('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
             Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
             Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
 
