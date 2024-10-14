@@ -2,6 +2,8 @@
 
 namespace APP\plugins\generic\demographicData\classes\demographicQuestion;
 
+use APP\plugins\generic\demographicData\classes\facades\Repo;
+
 class DemographicQuestion extends \PKP\core\DataObject
 {
     public const TYPE_SMALL_TEXT_FIELD = 1;
@@ -75,5 +77,23 @@ class DemographicQuestion extends \PKP\core\DataObject
     public function setQuestionDescription($descriptionText, $locale)
     {
         $this->setData('questionDescription', $descriptionText, $locale);
+    }
+
+    public function getResponseOptions()
+    {
+        if (is_null($this->getData('responseOptions'))) {
+            $responseOptions = Repo::demographicResponseOption()->getCollector()
+                ->filterByQuestionIds([$this->getId()])
+                ->getMany();
+
+            $mappedResponseOptions = [];
+            foreach ($responseOptions as $responseOption) {
+                $mappedResponseOptions[$responseOption->getId()] = $responseOption;
+            }
+
+            $this->setData('responseOptions', $mappedResponseOptions);
+        }
+
+        return $this->getData('responseOptions');
     }
 }

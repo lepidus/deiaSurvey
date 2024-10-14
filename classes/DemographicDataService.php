@@ -25,8 +25,16 @@ class DemographicDataService
                 'type' => $demographicQuestion->getQuestionType(),
                 'inputType' => $demographicQuestion->getQuestionInputType(),
                 'title' => $demographicQuestion->getLocalizedQuestionText(),
-                'description' => $demographicQuestion->getLocalizedQuestionDescription()
+                'description' => $demographicQuestion->getLocalizedQuestionDescription(),
+                'responseOptions' => $demographicQuestion->getResponseOptions()
             ];
+
+            if ($demographicQuestion->getQuestionType() == DemographicQuestion::TYPE_DROP_DOWN_BOX) {
+                $questionData['responseOptions'] = [];
+                foreach ($demographicQuestion->getResponseOptions() as $responseOption) {
+                    $questionData['responseOptions'][$responseOption->getId()] = $responseOption->getLocalizedOptionText();
+                }
+            }
 
             if ($shouldRetrieveResponses) {
                 $user = $request->getUser();
