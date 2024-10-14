@@ -14,7 +14,6 @@ class DAOTest extends DatabaseTestCase
     private $demographicResponseOptionDAO;
     private $demographicQuestionId;
     private $contextId;
-    private $userId;
 
     protected function getAffectedTables(): array
     {
@@ -35,7 +34,6 @@ class DAOTest extends DatabaseTestCase
         $this->addSchemaFile('demographicResponseOption');
         $this->contextId = $this->createJournalMock();
         $this->demographicQuestionId = $this->createDemographicQuestion();
-        $this->userId = $this->createUserMock();
     }
 
     public function testNewDataObjectIsInstanceOfDemographicResponseOption(): void
