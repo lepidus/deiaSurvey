@@ -76,6 +76,11 @@ class DAO extends EntityDAO
             $demographicResponse->setValue(unserialize($serializedValue));
         }
 
+        if (@unserialize($demographicResponse->getOptionsInputValue())) {
+            $serializedValue = $demographicResponse->getOptionsInputValue();
+            $demographicResponse->setOptionsInputValue(unserialize($serializedValue));
+        }
+
         return $demographicResponse;
     }
 }

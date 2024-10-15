@@ -32,6 +32,12 @@
         "validation": [
           "nullable"
         ]
+      },
+      "optionsInputValue": {
+        "type": "string",
+        "validation": [
+          "nullable"
+        ]
       }
     }
 }

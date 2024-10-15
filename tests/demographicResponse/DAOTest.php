@@ -58,6 +58,7 @@ class DAOTest extends DatabaseTestCase
             'id' => $insertedDemographicResponseId,
             'demographicQuestionId' => $this->demographicQuestionId,
             'responseValue' => [self::DEFAULT_LOCALE => 'Test text'],
+            'optionsInputValue' => [45 => 'Aditional information for response option'],
             'userId' => $this->userId,
             'externalId' => null,
             'externalType' => null
@@ -78,6 +79,7 @@ class DAOTest extends DatabaseTestCase
             'id' => $insertedDemographicResponseId,
             'demographicQuestionId' => $this->demographicQuestionId,
             'responseValue' => [self::DEFAULT_LOCALE => 'Test text'],
+            'optionsInputValue' => [45 => 'Aditional information for response option'],
             'userId' => null,
             'externalId' => 'external.author@lepidus.com.br',
             'externalType' => 'email'
