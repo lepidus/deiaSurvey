@@ -151,11 +151,22 @@ class DemographicDataService
             $question->getQuestionType() == DemographicQuestion::TYPE_CHECKBOXES
             || $question->getQuestionType() == DemographicQuestion::TYPE_RADIO_BUTTONS
         ) {
-            return '';
+            $responseOptions = $question->getResponseOptions();
+            $selectedResponseOptionsTexts = [];
+
+            foreach ($response->getValue() as $selectedResponseOptionId) {
+                $selectedResponseOption = $responseOptions[$selectedResponseOptionId];
+                $selectedResponseOptionsTexts[] = $selectedResponseOption->getLocalizedOptionText();
+            }
+
+            return implode(', ', $selectedResponseOptionsTexts);
         }
 
         if ($question->getQuestionType() == DemographicQuestion::TYPE_DROP_DOWN_BOX) {
-            return '';
+            $responseOptions = $question->getResponseOptions();
+            $selectedResponseOption = $responseOptions[$response->getValue()];
+
+            return $selectedResponseOption->getLocalizedOptionText();
         }
 
         return '';
