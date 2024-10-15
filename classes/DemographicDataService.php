@@ -38,9 +38,7 @@ class DemographicDataService
 
             if ($shouldRetrieveResponses) {
                 $user = $request->getUser();
-                $response = $this->getUserResponse($demographicQuestion, $user->getId());
-
-                $questionData['response'] = $response;
+                $questionData['response'] = $this->getUserResponse($demographicQuestion, $user->getId());
             }
 
             $questions[] = $questionData;
@@ -63,17 +61,17 @@ class DemographicDataService
                 $question->getQuestionType() == DemographicQuestion::TYPE_CHECKBOXES
                 || $question->getQuestionType() == DemographicQuestion::TYPE_RADIO_BUTTONS
             ) {
-                return [];
+                return ['value' => [], 'optionsInputValue' => []];
             }
 
-            return null;
+            return ['value' => null];
         }
 
         $firstResponse = array_shift($demographicResponses);
-        return $firstResponse->getValue();
+        return ['value' => $firstResponse->getValue(), 'optionsInputValue' => $firstResponse->getOptionsInputValue()];
     }
 
-    public function registerUserResponses(int $userId, array $responses)
+    public function registerUserResponses(int $userId, array $responses, array $responseOptionsInputs)
     {
         foreach ($responses as $question => $responseInput) {
             $questionId = explode("-", $question)[1];
@@ -84,16 +82,44 @@ class DemographicDataService
                 ->getMany()
                 ->toArray();
             $demographicResponse = array_shift($demographicResponses);
+
+            $optionsInputValue = $this->getResponseOptionsInputValue($questionId, $responseOptionsInputs, $responseInput);
+
             if ($demographicResponse) {
-                Repo::demographicResponse()->edit($demographicResponse, ['responseValue' => $responseInput]);
+                Repo::demographicResponse()->edit($demographicResponse, [
+                    'responseValue' => $responseInput,
+                    'optionsInputValue' => $optionsInputValue
+                ]);
             } else {
                 $response = Repo::demographicResponse()->newDataObject();
                 $response->setUserId($userId);
                 $response->setDemographicQuestionId($questionId);
                 $response->setData('responseValue', $responseInput);
+                $response->setOptionsInputValue($optionsInputValue);
                 Repo::demographicResponse()->add($response);
             }
         }
+    }
+
+    private function getResponseOptionsInputValue($questionId, $responseOptionsInputs, $responseInput)
+    {
+        $demographicQuestion = Repo::demographicQuestion()->get($questionId);
+
+        if ($demographicQuestion->getQuestionType() == DemographicQuestion::TYPE_CHECKBOXES
+            || $demographicQuestion->getQuestionType() == DemographicQuestion::TYPE_RADIO_BUTTONS
+        ) {
+            $responseOptionsInputValue = [];
+            foreach ($responseInput as $responseOptionId) {
+                $responseOptionInputName = "responseOptionInput-$responseOptionId";
+                if (isset($responseOptionsInputs[$responseOptionInputName])) {
+                    $responseOptionsInputValue[$responseOptionId] = $responseOptionsInputs[$responseOptionInputName];
+                }
+            }
+
+            return $responseOptionsInputValue;
+        }
+
+        return null;
     }
 
     public function registerExternalAuthorResponses(string $externalId, string $externalType, array $responses)
