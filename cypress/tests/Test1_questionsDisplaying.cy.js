@@ -17,6 +17,7 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('Mandarin');
     cy.contains('Portuguese');
     cy.contains('Spanish');
+    cy.contains('Other:');
 
     cy.contains('label', 'Nacionality');
     cy.contains('.description', 'Which continent are you from?');
