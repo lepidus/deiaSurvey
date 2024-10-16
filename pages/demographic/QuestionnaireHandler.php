@@ -112,9 +112,12 @@ class QuestionnaireHandler extends Handler
         }
 
         $responses = [];
+        $responseOptionsInputs = [];
         foreach ($request->getUserVars() as $key => $value) {
             if (strpos($key, 'question-') === 0) {
                 $responses[$key] = $value;
+            } elseif (strpos($key, 'responseOptionInput-') === 0) {
+                $responseOptionsInputs[$key] = $value;
             }
         }
 
@@ -127,7 +130,7 @@ class QuestionnaireHandler extends Handler
         }
 
         $demographicDataService  = new DemographicDataService();
-        $demographicDataService->registerExternalAuthorResponses($responsesExternalId, $responsesExternalType, $responses);
+        $demographicDataService->registerExternalAuthorResponses($responsesExternalId, $responsesExternalType, $responses, $responseOptionsInputs);
 
         $templateMgr->assign([
             'authorId' => $author->getId(),

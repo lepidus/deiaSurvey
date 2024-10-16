@@ -122,7 +122,7 @@ class DemographicDataService
         return null;
     }
 
-    public function registerExternalAuthorResponses(string $externalId, string $externalType, array $responses)
+    public function registerExternalAuthorResponses(string $externalId, string $externalType, array $responses, array $responseOptionsInputs)
     {
         $locale = Locale::getLocale();
 
@@ -131,10 +131,13 @@ class DemographicDataService
             $questionId = $questionParts[1];
             $questionType = $questionParts[2];
 
+            $optionsInputValue = $this->getResponseOptionsInputValue($questionId, $responseOptionsInputs, $responseInput);
+
             $response = Repo::demographicResponse()->newDataObject();
             $response->setDemographicQuestionId($questionId);
             $response->setExternalId($externalId);
             $response->setExternalType($externalType);
+            $response->setOptionsInputValue($optionsInputValue);
 
             if ($questionType == 'text' or $questionType == 'textarea') {
                 $response->setData('responseValue', $responseInput, $locale);
@@ -182,7 +185,14 @@ class DemographicDataService
 
             foreach ($response->getValue() as $selectedResponseOptionId) {
                 $selectedResponseOption = $responseOptions[$selectedResponseOptionId];
-                $selectedResponseOptionsTexts[] = $selectedResponseOption->getLocalizedOptionText();
+                $selectedResponseOptionsText = $selectedResponseOption->getLocalizedOptionText();
+
+                if ($selectedResponseOption->hasInputField()) {
+                    $optionsInputValue = $response->getOptionsInputValue();
+                    $selectedResponseOptionsText .= ' "' . $optionsInputValue[$selectedResponseOptionId] . '"';
+                }
+
+                $selectedResponseOptionsTexts[] = $selectedResponseOptionsText;
             }
 
             return implode(', ', $selectedResponseOptionsTexts);
