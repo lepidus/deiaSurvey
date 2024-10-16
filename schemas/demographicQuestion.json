@@ -19,16 +19,6 @@
         "questionDescription": {
             "type": "string",
             "multilingual": true
-        },
-        "possibleResponses": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            },
-            "multilingual": true,
-            "validation": [
-                "nullable"
-            ]
         }
     }
 }

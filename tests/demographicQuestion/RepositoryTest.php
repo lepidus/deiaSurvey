@@ -39,9 +39,6 @@ class RepositoryTest extends DatabaseTestCase
             ],
             'questionDescription' => [
                 $this->locale => 'Test description'
-            ],
-            'possibleResponses' => [
-                $this->locale => ['First possible response', 'Second possible response']
             ]
         ];
         $this->addSchemaFile('demographicQuestion');
@@ -68,7 +65,6 @@ class RepositoryTest extends DatabaseTestCase
 
         $this->params['questionText'][$this->locale] = 'Updated text';
         $this->params['questionDescription'][$this->locale] = 'Updated description';
-        $this->params['possibleResponses'][$this->locale] = ['New first possible response', 'New second possible response'];
         $repository->edit($demographicQuestion, $this->params);
 
         $fetchedDemographicQuestion = $repository->get($demographicQuestion->getId(), $this->contextId);

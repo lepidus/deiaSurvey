@@ -35,13 +35,18 @@ class QuestionsForm extends Form
     private function loadQuestionResponsesByForm($args)
     {
         $responses = [];
+        $responseOptionsInputs = [];
+
         foreach ($args as $key => $value) {
             if (strpos($key, 'question-') === 0) {
                 $responses[$key] = $value;
+            } elseif (strpos($key, 'responseOptionInput-') === 0) {
+                $responseOptionsInputs[$key] = $value;
             }
         }
 
         $this->setData('responses', $responses);
+        $this->setData('responseOptionsInputs', $responseOptionsInputs);
     }
 
     public function fetch($request, $template = null, $display = false)
@@ -98,7 +103,7 @@ class QuestionsForm extends Form
         $demographicDataDao->updateDemographicConsent($context->getId(), $user->getId(), $newConsent);
 
         if ($newConsent == '1') {
-            $demographicDataService->registerUserResponses($user->getId(), $this->getData('responses'));
+            $demographicDataService->registerUserResponses($user->getId(), $this->getData('responses'), $this->getData('responseOptionsInputs'));
         } elseif ($newConsent == '0' and $previousConsent) {
             $demographicDataService->deleteUserResponses($user->getId(), $context->getId());
         }

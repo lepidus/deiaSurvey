@@ -49,4 +49,11 @@ class DemographicResponseTest extends PKPTestCase
         $this->demographicResponse->setValue(['en' => "I'm from Parintins"]);
         $this->assertEquals($this->demographicResponse->getValue(), $expectedDemographicResponseValue);
     }
+
+    public function testGetDemographicOptionsInputValue(): void
+    {
+        $expectedOptionsInputValue = [45 => 'Aditional information for response option'];
+        $this->demographicResponse->setOptionsInputValue([45 => 'Aditional information for response option']);
+        $this->assertEquals($this->demographicResponse->getOptionsInputValue(), $expectedOptionsInputValue);
+    }
 }

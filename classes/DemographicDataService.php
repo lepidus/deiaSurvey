@@ -26,14 +26,19 @@ class DemographicDataService
                 'inputType' => $demographicQuestion->getQuestionInputType(),
                 'title' => $demographicQuestion->getLocalizedQuestionText(),
                 'description' => $demographicQuestion->getLocalizedQuestionDescription(),
-                'possibleResponses' => $demographicQuestion->getLocalizedPossibleResponses()
+                'responseOptions' => $demographicQuestion->getResponseOptions()
             ];
+
+            if ($demographicQuestion->getQuestionType() == DemographicQuestion::TYPE_DROP_DOWN_BOX) {
+                $questionData['responseOptions'] = [];
+                foreach ($demographicQuestion->getResponseOptions() as $responseOption) {
+                    $questionData['responseOptions'][$responseOption->getId()] = $responseOption->getLocalizedOptionText();
+                }
+            }
 
             if ($shouldRetrieveResponses) {
                 $user = $request->getUser();
-                $response = $this->getUserResponse($demographicQuestion, $user->getId());
-
-                $questionData['response'] = $response;
+                $questionData['response'] = $this->getUserResponse($demographicQuestion, $user->getId());
             }
 
             $questions[] = $questionData;
@@ -56,17 +61,17 @@ class DemographicDataService
                 $question->getQuestionType() == DemographicQuestion::TYPE_CHECKBOXES
                 || $question->getQuestionType() == DemographicQuestion::TYPE_RADIO_BUTTONS
             ) {
-                return [];
+                return ['value' => [], 'optionsInputValue' => []];
             }
 
-            return null;
+            return ['value' => null];
         }
 
         $firstResponse = array_shift($demographicResponses);
-        return $firstResponse->getValue();
+        return ['value' => $firstResponse->getValue(), 'optionsInputValue' => $firstResponse->getOptionsInputValue()];
     }
 
-    public function registerUserResponses(int $userId, array $responses)
+    public function registerUserResponses(int $userId, array $responses, array $responseOptionsInputs)
     {
         foreach ($responses as $question => $responseInput) {
             $questionId = explode("-", $question)[1];
@@ -77,19 +82,47 @@ class DemographicDataService
                 ->getMany()
                 ->toArray();
             $demographicResponse = array_shift($demographicResponses);
+
+            $optionsInputValue = $this->getResponseOptionsInputValue($questionId, $responseOptionsInputs, $responseInput);
+
             if ($demographicResponse) {
-                Repo::demographicResponse()->edit($demographicResponse, ['responseValue' => $responseInput]);
+                Repo::demographicResponse()->edit($demographicResponse, [
+                    'responseValue' => $responseInput,
+                    'optionsInputValue' => $optionsInputValue
+                ]);
             } else {
                 $response = Repo::demographicResponse()->newDataObject();
                 $response->setUserId($userId);
                 $response->setDemographicQuestionId($questionId);
                 $response->setData('responseValue', $responseInput);
+                $response->setOptionsInputValue($optionsInputValue);
                 Repo::demographicResponse()->add($response);
             }
         }
     }
 
-    public function registerExternalAuthorResponses(string $externalId, string $externalType, array $responses)
+    private function getResponseOptionsInputValue($questionId, $responseOptionsInputs, $responseInput)
+    {
+        $demographicQuestion = Repo::demographicQuestion()->get($questionId);
+
+        if ($demographicQuestion->getQuestionType() == DemographicQuestion::TYPE_CHECKBOXES
+            || $demographicQuestion->getQuestionType() == DemographicQuestion::TYPE_RADIO_BUTTONS
+        ) {
+            $responseOptionsInputValue = [];
+            foreach ($responseInput as $responseOptionId) {
+                $responseOptionInputName = "responseOptionInput-$responseOptionId";
+                if (isset($responseOptionsInputs[$responseOptionInputName])) {
+                    $responseOptionsInputValue[$responseOptionId] = $responseOptionsInputs[$responseOptionInputName];
+                }
+            }
+
+            return $responseOptionsInputValue;
+        }
+
+        return null;
+    }
+
+    public function registerExternalAuthorResponses(string $externalId, string $externalType, array $responses, array $responseOptionsInputs)
     {
         $locale = Locale::getLocale();
 
@@ -98,10 +131,13 @@ class DemographicDataService
             $questionId = $questionParts[1];
             $questionType = $questionParts[2];
 
+            $optionsInputValue = $this->getResponseOptionsInputValue($questionId, $responseOptionsInputs, $responseInput);
+
             $response = Repo::demographicResponse()->newDataObject();
             $response->setDemographicQuestionId($questionId);
             $response->setExternalId($externalId);
             $response->setExternalType($externalType);
+            $response->setOptionsInputValue($optionsInputValue);
 
             if ($questionType == 'text' or $questionType == 'textarea') {
                 $response->setData('responseValue', $responseInput, $locale);
@@ -144,21 +180,29 @@ class DemographicDataService
             $question->getQuestionType() == DemographicQuestion::TYPE_CHECKBOXES
             || $question->getQuestionType() == DemographicQuestion::TYPE_RADIO_BUTTONS
         ) {
-            $possibleResponses = $question->getLocalizedPossibleResponses();
-            $selectedResponsesValues = [];
+            $responseOptions = $question->getResponseOptions();
+            $selectedResponseOptionsTexts = [];
 
-            foreach ($response->getValue() as $selectedResponse) {
-                $selectedResponsesValues[] = $possibleResponses[$selectedResponse];
+            foreach ($response->getValue() as $selectedResponseOptionId) {
+                $selectedResponseOption = $responseOptions[$selectedResponseOptionId];
+                $selectedResponseOptionsText = $selectedResponseOption->getLocalizedOptionText();
+
+                if ($selectedResponseOption->hasInputField()) {
+                    $optionsInputValue = $response->getOptionsInputValue();
+                    $selectedResponseOptionsText .= ' "' . $optionsInputValue[$selectedResponseOptionId] . '"';
+                }
+
+                $selectedResponseOptionsTexts[] = $selectedResponseOptionsText;
             }
 
-            return implode(', ', $selectedResponsesValues);
+            return implode(', ', $selectedResponseOptionsTexts);
         }
 
         if ($question->getQuestionType() == DemographicQuestion::TYPE_DROP_DOWN_BOX) {
-            $possibleResponses = $question->getLocalizedPossibleResponses();
-            $selectedResponse = $response->getValue();
+            $responseOptions = $question->getResponseOptions();
+            $selectedResponseOption = $responseOptions[$response->getValue()];
 
-            return $possibleResponses[$selectedResponse];
+            return $selectedResponseOption->getLocalizedOptionText();
         }
 
         return '';

@@ -1,0 +1,20 @@
+{
+    "title": "Demographic response option",
+    "description": "A response option for a given demographic question",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "demographicQuestionId": {
+            "type": "integer"
+        },
+        "optionText": {
+            "type": "string",
+            "multilingual": true
+        }, 
+        "hasInputField": {
+            "type": "boolean"
+        }
+    }
+}

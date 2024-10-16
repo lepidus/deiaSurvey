@@ -51,6 +51,10 @@ function answerDefaultQuestions() {
     cy.contains('label', 'Spanish').within(() => {
         cy.get('input').check();
     });
+    cy.contains('label', 'Other:').parent().within(() => {
+        cy.get('input[type="checkbox"]').check();
+        cy.get('input[type="text"]').clear().type('Japanese');
+    });
     cy.contains('label', 'America').within(() => {
         cy.get('input').check();
     });
@@ -66,7 +70,7 @@ function assertResponsesOfExternalAuthor(authorEmail) {
     cy.contains('Latin');
     cy.contains('University of São Paulo');
     cy.contains('University of Minas Gerais');
-    cy.contains('English, Spanish');
+    cy.contains('English, Spanish, Other: "Japanese"');
     cy.contains('America');
     cy.contains('Three to five minimum wages');
 
@@ -87,6 +91,10 @@ function assertResponsesOfRegisteredUser() {
     });
     cy.contains('label', 'Spanish').within(() => {
         cy.get('input').should('be.checked');
+    });
+    cy.contains('label', 'Other:').parent().parent().within(() => {
+        cy.get('input[type="checkbox"]').check();
+        cy.get('input[type="text"]').clear().type('Japanese');
     });
     cy.contains('label', 'America').within(() => {
         cy.get('input').should('be.checked');

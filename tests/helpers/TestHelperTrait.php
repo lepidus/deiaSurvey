@@ -22,9 +22,6 @@ trait TestHelperTrait
             'questionType' => DemographicQuestion::TYPE_TEXTAREA,
             'questionDescription' => [
                 self::DEFAULT_LOCALE => 'Test description'
-            ],
-            'possibleResponses' => [
-                self::DEFAULT_LOCALE => ['First possible response', 'Second possible response']
             ]
         ];
 
@@ -33,11 +30,22 @@ trait TestHelperTrait
         return $repository->add($demographicQuestion);
     }
 
+    private function createDemographicResponseOptionObject()
+    {
+        $demographicResponseOption = $this->demographicResponseOptionDAO->newDataObject();
+        $demographicResponseOption->setDemographicQuestionId($this->demographicQuestionId);
+        $demographicResponseOption->setOptionText('First response option, with input field', self::DEFAULT_LOCALE);
+        $demographicResponseOption->setHasInputField(true);
+
+        return $demographicResponseOption;
+    }
+
     private function createDemographicResponseObject($externalAuthor = false)
     {
         $demographicResponse = $this->demographicResponseDAO->newDataObject();
         $demographicResponse->setDemographicQuestionId($this->demographicQuestionId);
         $demographicResponse->setValue([self::DEFAULT_LOCALE => 'Test text']);
+        $demographicResponse->setOptionsInputValue([45 => 'Aditional information for response option']);
 
         if ($externalAuthor) {
             $demographicResponse->setExternalId('external.author@lepidus.com.br');

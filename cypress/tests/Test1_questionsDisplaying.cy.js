@@ -17,6 +17,7 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('Mandarin');
     cy.contains('Portuguese');
     cy.contains('Spanish');
+    cy.contains('Other:');
 
     cy.contains('label', 'Nacionality');
     cy.contains('.description', 'Which continent are you from?');
@@ -47,6 +48,10 @@ function answerDefaultQuestions() {
     cy.contains('label', 'Spanish').within(() => {
         cy.get('input').check();
     });
+    cy.contains('label', 'Other:').parent().parent().within(() => {
+        cy.get('input[type="checkbox"]').check();
+        cy.get('input[type="text"]').clear().type('Japanese');
+    });
     cy.contains('label', 'America').within(() => {
         cy.get('input').check();
     });
@@ -70,6 +75,10 @@ function assertResponsesToDefaultQuestions() {
     cy.contains('label', 'Spanish').within(() => {
         cy.get('input').should('be.checked');
     });
+    cy.contains('label', 'Other:').parent().parent().within(() => {
+        cy.get('input[type="checkbox"]').should('be.checked');
+        cy.get('input[type="text"]').should('have.value', 'Japanese');
+    });
     cy.contains('label', 'America').within(() => {
         cy.get('input').should('be.checked');
     });
@@ -82,6 +91,10 @@ function assertResponsesToQuestionsInFrench() {
     });
     cy.contains('label', 'Espagnol').within(() => {
         cy.get('input').should('be.checked');
+    });
+    cy.contains('label', 'Autre:').parent().parent().within(() => {
+        cy.get('input[type="checkbox"]').should('be.checked');
+        cy.get('input[type="text"]').should('have.value', 'Japanese');
     });
     cy.contains('label', 'Amérique').within(() => {
         cy.get('input').should('be.checked');

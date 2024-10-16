@@ -53,4 +53,14 @@ class DemographicResponse extends \PKP\core\DataObject
     {
         $this->setData('responseValue', $responseValue);
     }
+
+    public function getOptionsInputValue()
+    {
+        return $this->getData('optionsInputValue');
+    }
+
+    public function setOptionsInputValue($optionsInputValue)
+    {
+        $this->setData('optionsInputValue', $optionsInputValue);
+    }
 }
