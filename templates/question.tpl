@@ -1,3 +1,5 @@
+<link rel="stylesheet" type="text/css" href="/plugins/generic/demographicData/styles/questionsInProfile.css">
+
 {assign var="questionId" value="question-{$question['questionId']}-{$question['inputType']}"}
 {if $question['type'] == $questionTypeConsts['TYPE_CHECKBOXES'] or $question['type'] == $questionTypeConsts['TYPE_RADIO_BUTTONS']}
     {assign var="isListSection" value=true}
@@ -13,7 +15,7 @@
             {fbvElement type="textarea" multilingual="true" name=$questionId id="demographicResponses" value=$question['response']['value'] required=true rich=false size=$fbvStyles.size.LARGE}
         {elseif $question['type'] == $questionTypeConsts['TYPE_CHECKBOXES']}
             {foreach from=$question['responseOptions'] item="responseOption"}
-                <div id="responseOption-{$responseOption->getId()}">
+                <div class="responseOption">
                     {fbvElement
                         type="checkbox"
                         name="{$questionId}[]"
@@ -32,13 +34,13 @@
                             {assign var="optionInputValue" value=""}
                         {/if}
                         
-                        {fbvElement type="text" name=$optionInputName id="responseOptionsInputs" value=$optionInputValue size=$fbvStyles.size.SMALL}
+                        {fbvElement type="text" name=$optionInputName id="responseOptionsInputs" value=$optionInputValue size=$fbvStyles.size.MEDIUM}
                     {/if}
                 </div>
             {/foreach}
         {elseif $question['type'] == $questionTypeConsts['TYPE_RADIO_BUTTONS']}
             {foreach from=$question['responseOptions'] item="responseOption"}
-                <div id="responseOption-{$responseOption->getId()}">
+                <div class="responseOption">
                     {fbvElement
                         type="radio"
                         name="{$questionId}[]"
@@ -58,7 +60,7 @@
                             {assign var="optionInputValue" value=""}
                         {/if}
                         
-                        {fbvElement type="text" name=$optionInputName id="responseOptionsInputs" value=$optionInputValue size=$fbvStyles.size.SMALL}
+                        {fbvElement type="text" name=$optionInputName id="responseOptionsInputs" value=$optionInputValue size=$fbvStyles.size.MEDIUM}
                     {/if}
                 </div>
             {/foreach}
