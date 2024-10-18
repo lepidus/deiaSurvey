@@ -4,14 +4,14 @@ function assertDefaultQuestionsDisplay(authorEmail) {
     cy.contains('The demographic data from this questionnaire will be associated with the e-mail address: ' + authorEmail);
 
     cy.contains('.questionTitle', 'Gender');
-    cy.contains('.description', 'With which gender do you most identify? Please select one option:');
+    cy.contains('.questionDescription', 'With which gender do you most identify? Please select one option:');
     cy.contains('label', 'Woman');
     cy.contains('label', 'Man');
     cy.contains('label', 'Non-binary or gender diverse');
     cy.contains('label', 'Prefer not to disclose');
 
     cy.contains('.questionTitle', 'Race');
-    cy.contains('.description', 'How would you identify yourself in terms of race? Please select ALL the groups that apply to you:');
+    cy.contains('.questionDescription', 'How would you identify yourself in terms of race? Please select ALL the groups that apply to you:');
     cy.contains('label', 'Asian or Pacific Islander');
     cy.contains('label', 'Black');
     cy.contains('label', 'Hispanic or Latino/a/x');
@@ -22,7 +22,7 @@ function assertDefaultQuestionsDisplay(authorEmail) {
     cy.contains('label', 'Self describe');
 
     cy.contains('.questionTitle', 'Ethnicity');
-    cy.contains('.description', "What are your ethnic origins or ancestry? Please select ALL the geographic areas from which your family's ancestors first originated:");
+    cy.contains('.questionDescription', "What are your ethnic origins or ancestry? Please select ALL the geographic areas from which your family's ancestors first originated:");
     cy.contains('label', 'Western Europe');
     cy.contains('label', 'Eastern Europe');
     cy.contains('label', 'North Africa');
