@@ -2,63 +2,54 @@ import '../support/commands.js';
 
 function assertDefaultQuestionsDisplay(authorEmail) {
     cy.contains('The demographic data from this questionnaire will be associated with the e-mail address: ' + authorEmail);
-    
+
     cy.contains('.questionTitle', 'Gender');
-    cy.contains('With which gender do you most identify?');
+    cy.contains('.description', 'With which gender do you most identify? Please select one option:');
+    cy.contains('label', 'Woman');
+    cy.contains('label', 'Man');
+    cy.contains('label', 'Non-binary or gender diverse');
+    cy.contains('label', 'Prefer not to disclose');
+
+    cy.contains('.questionTitle', 'Race');
+    cy.contains('.description', 'How would you identify yourself in terms of race? Please select ALL the groups that apply to you:');
+    cy.contains('label', 'Asian or Pacific Islander');
+    cy.contains('label', 'Black');
+    cy.contains('label', 'Hispanic or Latino/a/x');
+    cy.contains('label', 'Indigenous (e.g. North American Indian Navajo, South American Indian Quechua, Aboriginal or Torres Strait Islander)');
+    cy.contains('label', 'Middle Eastern or North African');
+    cy.contains('label', 'White');
+    cy.contains('label', 'Prefer not to disclose');
+    cy.contains('label', 'Self describe');
 
     cy.contains('.questionTitle', 'Ethnicity');
-    cy.contains('How would you identify yourself in terms of ethnicity?');
-
-    cy.contains('.questionTitle', 'Academic background');
-    cy.contains('Please tell us which academic institutions you have been involved with');
-
-    cy.contains('.questionTitle', 'Languages');
-    cy.contains('Which of these languages do you speak?');
-    cy.contains('label', 'English');
-    cy.contains('French');
-    cy.contains('Hindi');
-    cy.contains('Mandarin');
-    cy.contains('Portuguese');
-    cy.contains('Spanish');
-
-    cy.contains('.questionTitle', 'Nacionality');
-    cy.contains('Which continent are you from?');
-    cy.contains('Africa');
-    cy.contains('America');
-    cy.contains('Asia');
-    cy.contains('Europe');
-    cy.contains('Oceania');
-
-    cy.contains('.questionTitle', 'Salary');
-    cy.contains('What range is your current salary in?');
-    cy.contains('option', 'Less than a minimum wage');
-    cy.contains('option', 'One to three minimum wages');
-    cy.contains('option', 'Three to five minimum wages');
-    cy.contains('option', 'More than five minimum wages');
+    cy.contains('.description', "What are your ethnic origins or ancestry? Please select ALL the geographic areas from which your family's ancestors first originated:");
+    cy.contains('label', 'Western Europe');
+    cy.contains('label', 'Eastern Europe');
+    cy.contains('label', 'North Africa');
+    cy.contains('label', 'Sub-Saharan Africa');
+    cy.contains('label', 'West Asia / Middle East');
+    cy.contains('label', 'South and Southeast Asia');
+    cy.contains('label', 'East and Central Asia');
+    cy.contains('label', 'Pacific / Oceania');
+    cy.contains('label', 'North America');
+    cy.contains('label', 'Central America and Caribbean');
+    cy.contains('label', 'South America');
+    cy.contains('label', 'Prefer not to disclose');
+    cy.contains('label', 'Self describe');
 
     cy.contains('Demographic data is collected in accordance with this journal\'s privacy statement');
 }
 
 function answerDefaultQuestions() {
-    cy.get('input[id^="demographicResponses"]').eq(0).type('Female');
-    cy.get('input[id^="demographicResponses"]').eq(1).type('Latin');
-    cy.get('textarea[id^="demographicResponses"]').type('University of São Paulo');
-    cy.get('textarea[id^="demographicResponses"]').type('{enter}');
-    cy.get('textarea[id^="demographicResponses"]').type('University of Minas Gerais');
-    cy.contains('label', 'English').within(() => {
+    cy.contains('label', 'Woman').within(() => {
         cy.get('input').check();
     });
-    cy.contains('label', 'Spanish').within(() => {
+    cy.contains('label', 'Black').within(() => {
         cy.get('input').check();
     });
-    cy.contains('label', 'Other:').parent().within(() => {
-        cy.get('input[type="checkbox"]').check();
-        cy.get('input[type="text"]').clear().type('Japanese');
-    });
-    cy.contains('label', 'America').within(() => {
+    cy.contains('label', 'South America').within(() => {
         cy.get('input').check();
     });
-    cy.get('select[id^="demographicResponses"]').select('Three to five minimum wages');
 
     cy.contains('button', 'Save').click();
 }
@@ -66,13 +57,9 @@ function answerDefaultQuestions() {
 function assertResponsesOfExternalAuthor(authorEmail) {
     cy.contains('Showing demographic data associated with the e-mail address: ' + authorEmail);
 
-    cy.contains('Female');
-    cy.contains('Latin');
-    cy.contains('University of São Paulo');
-    cy.contains('University of Minas Gerais');
-    cy.contains('English, Spanish, Other: "Japanese"');
-    cy.contains('America');
-    cy.contains('Three to five minimum wages');
+    cy.contains('Woman');
+    cy.contains('Black');
+    cy.contains('South America');
 
     cy.contains('You can check you demographic data at any time by visiting this same address');
     cy.contains('By creating a new account in the system with this same e-mail address, your demographic data will automatically be associated with the new account');
@@ -82,24 +69,15 @@ function assertResponsesOfRegisteredUser() {
     cy.contains('a', 'Demographic Data').click();
     cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
     
-    cy.get('input[id^="demographicResponses-en"]').eq(0).should('have.value', 'Female');
-    cy.get('input[id^="demographicResponses-en"]').eq(1).should('have.value', 'Latin');
-    cy.get('textarea[id^="demographicResponses-en"]').invoke('val').should('include', 'University of São Paulo');
-    cy.get('textarea[id^="demographicResponses-en"]').invoke('val').should('include', 'University of Minas Gerais');
-    cy.contains('label', 'English').within(() => {
+    cy.contains('label', 'Woman').within(() => {
         cy.get('input').should('be.checked');
     });
-    cy.contains('label', 'Spanish').within(() => {
+    cy.contains('label', 'Black').within(() => {
         cy.get('input').should('be.checked');
     });
-    cy.contains('label', 'Other:').parent().parent().within(() => {
-        cy.get('input[type="checkbox"]').check();
-        cy.get('input[type="text"]').clear().type('Japanese');
-    });
-    cy.contains('label', 'America').within(() => {
+    cy.contains('label', 'South America').within(() => {
         cy.get('input').should('be.checked');
     });
-    cy.get('select[id^="demographicResponses"] option:selected').should('have.text', 'Three to five minimum wages');
 }
 
 function beginSubmission(submissionData) {

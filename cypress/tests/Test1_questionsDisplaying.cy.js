@@ -78,7 +78,6 @@ function assertDisabledFields() {
     cy.contains('label', 'Eastern Europe').within(() => {
         cy.get('input').should('be.disabled');
     });
-    cy.get('select[id^="demographicResponses"]').should('be.disabled');
 }
 
 describe('Demographic Data - Questions displaying', function () {
