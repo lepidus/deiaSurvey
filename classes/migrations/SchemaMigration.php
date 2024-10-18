@@ -5,7 +5,6 @@ namespace APP\plugins\generic\demographicData\classes\migrations;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use APP\plugins\generic\demographicData\classes\migrations\DefaultQuestionsCreator;
 
 class SchemaMigration extends Migration
 {
