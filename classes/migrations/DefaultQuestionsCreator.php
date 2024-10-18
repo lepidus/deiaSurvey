@@ -105,7 +105,7 @@ class DefaultQuestionsCreator
                     ],
                     [
                         'optionText' => [
-                            'en' => "Indigenous (e.g. North American Indian Navajo, \
+                            'en' => "Indigenous (e.g. North American Indian Navajo,
                             South American Indian Quechua, Aboriginal or Torres Strait Islander)"
                         ],
                         'hasInputField' => false
@@ -143,7 +143,7 @@ class DefaultQuestionsCreator
                     'en' => 'Ethnicity'
                 ],
                 'questionDescription' => [
-                    'en' => "What are your ethnic origins or ancestry? \
+                    'en' => "What are your ethnic origins or ancestry?
                     Please select ALL the geographic areas from which your family's ancestors first originated:"
                 ],
                 'responseOptions' => [
@@ -180,6 +180,36 @@ class DefaultQuestionsCreator
                     [
                         'optionText' => [
                             'en' => 'South and Southeast Asia (e.g. India, Indonesia, Singapore)'
+                        ],
+                        'hasInputField' => false
+                    ],
+                    [
+                        'optionText' => [
+                            'en' => 'East and Central Asia (e.g. China, Japan, Uzbekistan)'
+                        ],
+                        'hasInputField' => false
+                    ],
+                    [
+                        'optionText' => [
+                            'en' => 'Pacific / Oceania (e.g. Australia, Papua New Guinea, Fiji)'
+                        ],
+                        'hasInputField' => false
+                    ],
+                    [
+                        'optionText' => [
+                            'en' => 'North America (Canada, United States)'
+                        ],
+                        'hasInputField' => false
+                    ],
+                    [
+                        'optionText' => [
+                            'en' => 'Central America and Caribbean (e.g. Jamaica, Mexico, Panama)'
+                        ],
+                        'hasInputField' => false
+                    ],
+                    [
+                        'optionText' => [
+                            'en' => 'South America (e.g. Brazil, Chile, Colombia)'
                         ],
                         'hasInputField' => false
                     ],

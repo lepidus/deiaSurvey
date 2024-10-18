@@ -5,6 +5,7 @@ namespace APP\plugins\generic\demographicData\classes\migrations;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use APP\plugins\generic\demographicData\classes\migrations\DefaultQuestionsCreator;
 
 class SchemaMigration extends Migration
 {
@@ -97,5 +98,8 @@ class SchemaMigration extends Migration
             $table->index(['demographic_response_id'], 'demographic_response_setting_id');
             $table->unique(['demographic_response_id', 'locale', 'setting_name'], 'demographic_response_settings_pkey');
         });
+
+        $defaultQuestionsCreator = new DefaultQuestionsCreator();
+        $defaultQuestionsCreator->createDefaultQuestions();
     }
 }
