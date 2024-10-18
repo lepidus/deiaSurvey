@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\migrations;
+namespace APP\plugins\generic\demographicData\classes;
 
 use APP\core\Application;
 use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;

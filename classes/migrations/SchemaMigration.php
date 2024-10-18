@@ -98,8 +98,5 @@ class SchemaMigration extends Migration
             $table->index(['demographic_response_id'], 'demographic_response_setting_id');
             $table->unique(['demographic_response_id', 'locale', 'setting_name'], 'demographic_response_settings_pkey');
         });
-
-        $defaultQuestionsCreator = new DefaultQuestionsCreator();
-        $defaultQuestionsCreator->createDefaultQuestions();
     }
 }
