@@ -84,14 +84,10 @@ class DemographicQuestion extends \PKP\core\DataObject
         if (is_null($this->getData('responseOptions'))) {
             $responseOptions = Repo::demographicResponseOption()->getCollector()
                 ->filterByQuestionIds([$this->getId()])
-                ->getMany();
+                ->getMany()
+                ->toArray();
 
-            $mappedResponseOptions = [];
-            foreach ($responseOptions as $responseOption) {
-                $mappedResponseOptions[$responseOption->getId()] = $responseOption;
-            }
-
-            $this->setData('responseOptions', $mappedResponseOptions);
+            $this->setData('responseOptions', $responseOptions);
         }
 
         return $this->getData('responseOptions');
