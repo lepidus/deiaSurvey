@@ -35,9 +35,7 @@ O e-mail enviado oferece duas maneiras de preencher os dados demográficos. A pr
 Os usuários podem ver e excluir seus dados demográficos a qualquer momento. Para os autores sem cadastro que preencheram o questionário, caso estes criem um usuário no sistema com o mesmo endereço de e-mail ou ORCID utilizado, seus dados serão migrados para este novo usuário.
 
 ## Créditos
-Este plugin foi patrocinado por Lepidus Tecnologia, 
-
-This plugin was sponsored by the Lepidus Tecnologia, Scientific Electronic Library Online (SciELO), Revista Encontros Bibli (UFSC) e outros (iremos atualizar em breve).
+Este plugin foi patrocinado por Lepidus Tecnologia, Scientific Electronic Library Online (SciELO), Revista Encontros Bibli (UFSC) e outros (iremos atualizar em breve).
 
 Desenvolvido por Lepidus Tecnologia.
 
