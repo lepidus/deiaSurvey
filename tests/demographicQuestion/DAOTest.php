@@ -2,35 +2,49 @@
 
 namespace APP\plugins\generic\demographicData\tests\demographicQuestion;
 
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
+require_once(dirname(__DIR__, 2) . '/autoload.php');
+
 use APP\plugins\generic\demographicData\classes\demographicQuestion\DAO;
-use PKP\tests\DatabaseTestCase;
+use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\demographicData\tests\helpers\TestHelperTrait;
 
-class DAOTest extends DatabaseTestCase
+import('lib.pkp.tests.DatabaseTestCase');
+
+class DAOTest extends \DatabaseTestCase
 {
     use TestHelperTrait;
 
     private $contextId;
     private $demographicQuestionDAO;
 
+    private const DEFAULT_LOCALE = "en_US";
+
     protected function getAffectedTables(): array
     {
-        return [
-            ...parent::getAffectedTables(),
-            'demographic_questions',
-            'demographic_question_settings',
-            'demographic_responses',
-            'demographic_response_settings'
-        ];
+        return $this->affectedTables;
     }
 
     protected function setUp(): void
     {
+        $this->setAffectedTables([
+            'demographic_question_settings',
+            'demographic_questions',
+            'demographic_response_settings',
+            'demographic_responses',
+        ]);
+
         parent::setUp();
         $this->demographicQuestionDAO = app(DAO::class);
         $this->contextId = $this->createJournalMock();
         $this->addSchemaFile('demographicQuestion');
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreTables($this->getAffectedTables());
+        $this->setAffectedTables([]);
+
+        parent::tearDown();
     }
 
     public function testNewDataObjectIsInstanceOfDemographicQuestion(): void

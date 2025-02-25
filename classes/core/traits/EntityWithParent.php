@@ -17,7 +17,6 @@
 
 namespace APP\plugins\generic\demographicData\classes\core\traits;
 
-use PKP\core\DataObject;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Query\Builder;
 
@@ -60,7 +59,7 @@ trait EntityWithParent
      *
      * @return ?T
      */
-    public function get(int $id, int $parentId = null): ?DataObject
+    public function get(int $id, int $parentId = null): ?\DataObject
     {
         $row = Capsule::table($this->table)
             ->where($this->primaryKeyColumn, $id)

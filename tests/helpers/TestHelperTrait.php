@@ -2,15 +2,35 @@
 
 namespace APP\plugins\generic\demographicData\tests\helpers;
 
-use APP\journal\Journal;
-use PKP\user\User;
-use PKP\plugins\Hook;
 use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\demographicData\classes\demographicQuestion\Repository as DemographicQuestionRepository;
+use PKP\user\User;
+
+import('classes.journal.Journal');
 
 trait TestHelperTrait
 {
-    private const DEFAULT_LOCALE = "en";
+    protected array $affectedTables;
+
+    protected function setAffectedTables($affectedTables)
+    {
+        $this->affectedTables = $affectedTables;
+    }
+
+    private function restoreTables($tables)
+    {
+        $dao = new \DAO();
+        foreach ($tables as $table) {
+            $sqls = [
+                "DELETE FROM {$table}",
+                "INSERT INTO {$table} SELECT * FROM backup_{$table}",
+                "DROP TABLE backup_{$table}"
+            ];
+            foreach ($sqls as $sql) {
+                $dao->update($sql, [], true, false);
+            }
+        }
+    }
 
     private function createDemographicQuestion()
     {
@@ -59,7 +79,7 @@ trait TestHelperTrait
 
     private function createJournalMock()
     {
-        $journal = $this->getMockBuilder(Journal::class)
+        $journal = $this->getMockBuilder(\Journal::class)
             ->onlyMethods(['getId'])
             ->getMock();
 
@@ -89,7 +109,7 @@ trait TestHelperTrait
 
     private function addSchemaFile(string $schemaName): void
     {
-        Hook::add(
+        \HookRegistry::register(
             'Schema::get::' . $schemaName,
             function (string $hookName, array $args) use ($schemaName) {
                 $schema = &$args[0];

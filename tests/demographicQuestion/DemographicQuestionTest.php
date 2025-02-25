@@ -2,10 +2,14 @@
 
 namespace APP\plugins\generic\demographicData\tests\demographicQuestion;
 
-use PKP\tests\PKPTestCase;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
+require_once(dirname(__DIR__, 2) . '/autoload.php');
 
-class DemographicQuestionTest extends PKPTestCase
+use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
+use PKP\tests\PKPTestCase;
+
+import('lib.pkp.tests.PKPTestCase');
+
+class DemographicQuestionTest extends \PKPTestCase
 {
     private DemographicQuestion $demographicQuestion;
 

@@ -2,8 +2,9 @@
 
 spl_autoload_register(function ($class) {
     $namespaceMap = [
-        'APP\plugins\generic\demographicData' => dirname(__DIR__, 3) . '/plugins/generic/demographicData',
+        'APP' => dirname(__DIR__, 3) . '/classes',
         'PKP' => dirname(__DIR__, 3) . '/lib/pkp/classes',
+        'APP\plugins\generic\demographicData' => dirname(__DIR__, 3) . '/plugins/generic/demographicData',
     ];
 
     $classPath = str_replace('\\', '/', $class);
