@@ -2,9 +2,9 @@
 
 namespace APP\plugins\generic\demographicData\classes\demographicQuestion;
 
+use APP\plugins\generic\demographicData\classes\core\interfaces\CollectorInterface;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\DB;
-use PKP\core\interfaces\CollectorInterface;
 use Illuminate\Support\LazyCollection;
 
 class Collector implements CollectorInterface
@@ -25,7 +25,7 @@ class Collector implements CollectorInterface
 
     public function getQueryBuilder(): Builder
     {
-        $queryBuilder = DB::table($this->dao->table . ' as demographic_questions')
+        $queryBuilder = Capsule::table($this->dao->table . ' as demographic_questions')
             ->select(['demographic_questions.*']);
 
         if (isset($this->contextIds)) {
