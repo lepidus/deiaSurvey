@@ -2,9 +2,9 @@
 
 namespace APP\plugins\generic\demographicData\classes\demographicResponseOption;
 
-use Illuminate\Database\Query\Builder;
+use APP\plugins\generic\demographicData\classes\core\interfaces\CollectorInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use PKP\core\interfaces\CollectorInterface;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\LazyCollection;
 
 class Collector implements CollectorInterface

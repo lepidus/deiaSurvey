@@ -2,31 +2,37 @@
 
 namespace APP\plugins\generic\demographicData\tests\demographicResponseOption;
 
-use PKP\tests\DatabaseTestCase;
+require_once(dirname(__DIR__, 2) . '/autoload.php');
+
 use APP\plugins\generic\demographicData\classes\demographicResponseOption\DemographicResponseOption;
 use APP\plugins\generic\demographicData\classes\demographicResponseOption\Repository;
 use APP\plugins\generic\demographicData\tests\helpers\TestHelperTrait;
 
-class RepositoryTest extends DatabaseTestCase
+import('lib.pkp.tests.DatabaseTestCase');
+
+class RepositoryTest extends \DatabaseTestCase
 {
     use TestHelperTrait;
 
     private $params;
     private $demographicQuestionId;
 
+    private const DEFAULT_LOCALE = "en_US";
+
     protected function getAffectedTables(): array
     {
-        return [
-            ...parent::getAffectedTables(),
-            'demographic_questions',
-            'demographic_question_settings',
-            'demographic_response_options',
-            'demographic_response_option_settings'
-        ];
+        return $this->affectedTables;
     }
 
     protected function setUp(): void
     {
+        $this->setAffectedTables([
+            'demographic_questions',
+            'demographic_question_settings',
+            'demographic_response_options',
+            'demographic_response_option_settings'
+        ]);
+
         parent::setUp();
         $this->addSchemaFile('demographicQuestion');
         $this->addSchemaFile('demographicResponseOption');
@@ -36,6 +42,14 @@ class RepositoryTest extends DatabaseTestCase
             'optionText' => [self::DEFAULT_LOCALE => 'First response option, with input field'],
             'hasInputField' => true,
         ];
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreTables($this->getAffectedTables());
+        $this->setAffectedTables([]);
+
+        parent::tearDown();
     }
 
     public function testGetNewDemographicResponseOptionObject(): void

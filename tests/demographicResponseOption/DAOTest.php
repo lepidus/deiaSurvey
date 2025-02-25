@@ -2,12 +2,15 @@
 
 namespace APP\plugins\generic\demographicData\tests\demographicResponseOption;
 
-use APP\plugins\generic\demographicData\classes\demographicResponseOption\DemographicResponseOption;
+require_once(dirname(__DIR__, 2) . '/autoload.php');
+
 use APP\plugins\generic\demographicData\classes\demographicResponseOption\DAO;
-use PKP\tests\DatabaseTestCase;
+use APP\plugins\generic\demographicData\classes\demographicResponseOption\DemographicResponseOption;
 use APP\plugins\generic\demographicData\tests\helpers\TestHelperTrait;
 
-class DAOTest extends DatabaseTestCase
+import('lib.pkp.tests.DatabaseTestCase');
+
+class DAOTest extends \DatabaseTestCase
 {
     use TestHelperTrait;
 
@@ -15,25 +18,36 @@ class DAOTest extends DatabaseTestCase
     private $demographicQuestionId;
     private $contextId;
 
+    private const DEFAULT_LOCALE = "en_US";
+
     protected function getAffectedTables(): array
     {
-        return [
-            ...parent::getAffectedTables(),
-            'demographic_questions',
-            'demographic_question_settings',
-            'demographic_response_options',
-            'demographic_response_option_settings'
-        ];
+        return $this->affectedTables;
     }
 
     protected function setUp(): void
     {
+        $this->setAffectedTables([
+            'demographic_questions',
+            'demographic_question_settings',
+            'demographic_response_options',
+            'demographic_response_option_settings'
+        ]);
+
         parent::setUp();
         $this->demographicResponseOptionDAO = app(DAO::class);
         $this->addSchemaFile('demographicQuestion');
         $this->addSchemaFile('demographicResponseOption');
         $this->contextId = $this->createJournalMock();
         $this->demographicQuestionId = $this->createDemographicQuestion();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreTables($this->getAffectedTables());
+        $this->setAffectedTables([]);
+
+        parent::tearDown();
     }
 
     public function testNewDataObjectIsInstanceOfDemographicResponseOption(): void
