@@ -6,7 +6,7 @@ use APP\plugins\generic\demographicData\classes\demographicQuestion\Repository a
 use APP\plugins\generic\demographicData\classes\demographicResponse\Repository as DemographicResponseRepository;
 use APP\plugins\generic\demographicData\classes\demographicResponseOption\Repository as DemographicResponseOptionRepository;
 
-class Repo extends \APP\facades\Repo
+class Repo
 {
     public static function demographicQuestion(): DemographicQuestionRepository
     {
