@@ -1,43 +1,36 @@
 <?php
 
-namespace APP\plugins\generic\demographicData;
+require_once('autoload.php');
 
-use PKP\plugins\GenericPlugin;
-use APP\core\Application;
-use PKP\plugins\Hook;
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\Event;
-use APP\template\TemplateManager;
-use PKP\linkAction\LinkAction;
-use PKP\linkAction\request\AjaxModal;
-use PKP\core\JSONMessage;
-use APP\decision\Decision;
+use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
+use APP\plugins\generic\demographicData\classes\DefaultQuestionsCreator;
+use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateResponsesOnRegistration;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
-use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
-use APP\plugins\generic\demographicData\classes\DemographicDataService;
-use APP\plugins\generic\demographicData\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\demographicData\DemographicDataSettingsForm;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Event;
+use PKP\plugins\GenericPlugin;
 
-class DemographicDataPlugin extends GenericPlugin
+class DemographicDataPlugin extends \GenericPlugin
 {
     public function register($category, $path, $mainContextId = null): bool
     {
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
-            Hook::add('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
-            Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
-            Hook::add('LoadHandler', [$this, 'addPageHandler']);
-            Hook::add('Schema::get::author', [$this, 'editAuthorSchema']);
-            Hook::add('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
-            Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
-            Hook::add('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
-            Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
-            Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
+            // Hook::add('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
+            // Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
+            // Hook::add('LoadHandler', [$this, 'addPageHandler']);
+            // Hook::add('Schema::get::author', [$this, 'editAuthorSchema']);
+            HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
+            // Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
+            // Hook::add('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
+            // Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
+            // Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
 
-            Event::subscribe(new MigrateResponsesOnRegistration());
+            // Event::subscribe(new MigrateResponsesOnRegistration());
 
             $defaultQuestionsCreator = new DefaultQuestionsCreator();
             $defaultQuestionsCreator->createDefaultQuestions();
@@ -62,13 +55,13 @@ class DemographicDataPlugin extends GenericPlugin
 
     public function getCanEnable()
     {
-        $request = Application::get()->getRequest();
+        $request = \Application::get()->getRequest();
         return $request->getContext() !== null;
     }
 
     public function getCanDisable()
     {
-        $request = Application::get()->getRequest();
+        $request = \Application::get()->getRequest();
         return $request->getContext() !== null;
     }
 
@@ -159,9 +152,9 @@ class DemographicDataPlugin extends GenericPlugin
         $router = $request->getRouter();
         return array_merge(
             array(
-                new LinkAction(
+                new \LinkAction(
                     'settings',
-                    new AjaxModal($router->url($request, null, null, 'manage', null, array('verb' => 'settings', 'plugin' => $this->getName(), 'category' => 'generic')), $this->getDisplayName()),
+                    new \AjaxModal($router->url($request, null, null, 'manage', null, array('verb' => 'settings', 'plugin' => $this->getName(), 'category' => 'generic')), $this->getDisplayName()),
                     __('manager.plugins.settings'),
                     null
                 ),
@@ -177,7 +170,7 @@ class DemographicDataPlugin extends GenericPlugin
 
         switch ($request->getUserVar('verb')) {
             case 'settings':
-                $templateMgr = TemplateManager::getManager();
+                $templateMgr = \TemplateManager::getManager();
                 $templateMgr->registerPlugin('function', 'plugin_url', array($this, 'smartyPluginUrl'));
                 $apiOptions = [
                     OrcidClient::ORCID_API_URL_PUBLIC => 'plugins.generic.demographicData.settings.orcidAPIPath.public',
@@ -192,12 +185,12 @@ class DemographicDataPlugin extends GenericPlugin
                     $form->readInputData();
                     if ($form->validate()) {
                         $form->execute();
-                        return new JSONMessage(true);
+                        return new \JSONMessage(true);
                     }
                 } else {
                     $form->initData();
                 }
-                return new JSONMessage(true, $form->fetch($request));
+                return new \JSONMessage(true, $form->fetch($request));
         }
         return parent::manage($args, $request);
     }
@@ -222,7 +215,7 @@ class DemographicDataPlugin extends GenericPlugin
         $userOrcid = $user->getOrcid();
 
         if ($userOrcid) {
-            $context = Application::get()->getRequest()->getContext();
+            $context = \Application::get()->getRequest()->getContext();
             $demographicDataService = new DemographicDataService();
             $demographicDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
         }
