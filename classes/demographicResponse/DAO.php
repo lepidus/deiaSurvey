@@ -2,9 +2,9 @@
 
 namespace APP\plugins\generic\demographicData\classes\demographicResponse;
 
-use PKP\core\EntityDAO;
+use APP\plugins\generic\demographicData\classes\core\EntityDAO;
+use APP\plugins\generic\demographicData\classes\core\traits\EntityWithParent;
 use Illuminate\Support\LazyCollection;
-use PKP\core\traits\EntityWithParent;
 
 class DAO extends EntityDAO
 {

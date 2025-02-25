@@ -5,7 +5,6 @@ namespace APP\plugins\generic\demographicData\tests\demographicQuestion;
 require_once(dirname(__DIR__, 2) . '/autoload.php');
 
 use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
-use PKP\tests\PKPTestCase;
 
 import('lib.pkp.tests.PKPTestCase');
 

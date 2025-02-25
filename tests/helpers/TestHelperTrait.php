@@ -4,9 +4,9 @@ namespace APP\plugins\generic\demographicData\tests\helpers;
 
 use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\demographicData\classes\demographicQuestion\Repository as DemographicQuestionRepository;
-use PKP\user\User;
 
 import('classes.journal.Journal');
+import('lib.pkp.classes.user.User');
 
 trait TestHelperTrait
 {
@@ -96,7 +96,7 @@ trait TestHelperTrait
     }
     private function createUserMock()
     {
-        $user = $this->getMockBuilder(User::class)
+        $user = $this->getMockBuilder(\User::class)
             ->onlyMethods(['getId'])
             ->getMock();
 

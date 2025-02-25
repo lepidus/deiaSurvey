@@ -2,12 +2,15 @@
 
 namespace APP\plugins\generic\demographicData\tests\demographicResponse;
 
-use APP\plugins\generic\demographicData\classes\demographicResponse\DemographicResponse;
+require_once(dirname(__DIR__, 2) . '/autoload.php');
+
 use APP\plugins\generic\demographicData\classes\demographicResponse\DAO;
-use PKP\tests\DatabaseTestCase;
+use APP\plugins\generic\demographicData\classes\demographicResponse\DemographicResponse;
 use APP\plugins\generic\demographicData\tests\helpers\TestHelperTrait;
 
-class DAOTest extends DatabaseTestCase
+import('lib.pkp.tests.DatabaseTestCase');
+
+class DAOTest extends \DatabaseTestCase
 {
     use TestHelperTrait;
 
@@ -16,19 +19,22 @@ class DAOTest extends DatabaseTestCase
     private $contextId;
     private $userId;
 
+    private const DEFAULT_LOCALE = "en_US";
+
     protected function getAffectedTables(): array
     {
-        return [
-            ...parent::getAffectedTables(),
-            'demographic_questions',
-            'demographic_question_settings',
-            'demographic_responses',
-            'demographic_response_settings'
-        ];
+        return $this->affectedTables;
     }
 
     protected function setUp(): void
     {
+        $this->setAffectedTables([
+            'demographic_questions',
+            'demographic_question_settings',
+            'demographic_responses',
+            'demographic_response_settings'
+        ]);
+
         parent::setUp();
         $this->demographicResponseDAO = app(DAO::class);
         $this->addSchemaFile('demographicQuestion');
@@ -36,6 +42,14 @@ class DAOTest extends DatabaseTestCase
         $this->contextId = $this->createJournalMock();
         $this->demographicQuestionId = $this->createDemographicQuestion();
         $this->userId = $this->createUserMock();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreTables($this->getAffectedTables());
+        $this->setAffectedTables([]);
+
+        parent::tearDown();
     }
 
     public function testNewDataObjectIsInstanceOfDemographicResponse(): void
@@ -59,9 +73,7 @@ class DAOTest extends DatabaseTestCase
             'demographicQuestionId' => $this->demographicQuestionId,
             'responseValue' => [self::DEFAULT_LOCALE => 'Test text'],
             'optionsInputValue' => [45 => 'Aditional information for response option'],
-            'userId' => $this->userId,
-            'externalId' => null,
-            'externalType' => null
+            'userId' => $this->userId
         ], $fetchedDemographicResponse->getAllData());
     }
 
