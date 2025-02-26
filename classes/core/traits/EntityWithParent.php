@@ -35,7 +35,7 @@ trait EntityWithParent
      *
      * @return T
      */
-    abstract public function fromRow(object $row): DataObject;
+    abstract public function fromRow(object $row): \DataObject;
 
     /**
      * Check if an object exists.
@@ -47,7 +47,12 @@ trait EntityWithParent
     {
         return Capsule::table($this->table)
             ->where($this->primaryKeyColumn, '=', $id)
-            ->when($parentId !== null, fn (Builder $query) => $query->where($this->getParentColumn(), $parentId))
+            ->when(
+                $parentId !== null,
+                function (Builder $query) use ($parentId) {
+                    return $query->where($this->getParentColumn(), $parentId);
+                }
+            )
             ->exists();
     }
 
@@ -63,7 +68,12 @@ trait EntityWithParent
     {
         $row = Capsule::table($this->table)
             ->where($this->primaryKeyColumn, $id)
-            ->when($parentId !== null, fn (Builder $query) => $query->where($this->getParentColumn(), $parentId))
+            ->when(
+                $parentId !== null,
+                function (Builder $query) use ($parentId) {
+                    return $query->where($this->getParentColumn(), $parentId);
+                }
+            )
             ->first();
         return $row ? $this->fromRow($row) : null;
     }

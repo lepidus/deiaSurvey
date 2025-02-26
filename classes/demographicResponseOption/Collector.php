@@ -9,8 +9,8 @@ use Illuminate\Support\LazyCollection;
 
 class Collector implements CollectorInterface
 {
-    public DAO $dao;
-    public ?array $questionIds = null;
+    public $dao;
+    public $questionIds = null;
 
     public function __construct(DAO $dao)
     {

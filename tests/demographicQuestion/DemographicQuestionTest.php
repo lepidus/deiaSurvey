@@ -10,7 +10,7 @@ import('lib.pkp.tests.PKPTestCase');
 
 class DemographicQuestionTest extends \PKPTestCase
 {
-    private DemographicQuestion $demographicQuestion;
+    private $demographicQuestion;
 
     protected function setUp(): void
     {

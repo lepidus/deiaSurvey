@@ -16,7 +16,7 @@ class RepositoryTest extends \DatabaseTestCase
 
     private $contextId;
     private $locale;
-    private array $params;
+    private $params;
 
     protected function getAffectedTables(): array
     {

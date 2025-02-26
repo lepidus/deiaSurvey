@@ -10,7 +10,7 @@ import('lib.pkp.tests.PKPTestCase');
 
 class DemographicResponseOptionTest extends \PKPTestCase
 {
-    private DemographicResponseOption $demographicResponseOption;
+    private $demographicResponseOption;
 
     protected function setUp(): void
     {

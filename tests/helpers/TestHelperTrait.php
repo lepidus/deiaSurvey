@@ -10,7 +10,7 @@ import('lib.pkp.classes.user.User');
 
 trait TestHelperTrait
 {
-    protected array $affectedTables;
+    protected $affectedTables;
 
     protected function setAffectedTables($affectedTables)
     {
