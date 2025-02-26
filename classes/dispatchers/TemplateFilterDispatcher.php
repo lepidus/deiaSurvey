@@ -2,7 +2,6 @@
 
 namespace APP\plugins\generic\demographicData\classes\dispatchers;
 
-use APP\core\Application;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 
 class TemplateFilterDispatcher
@@ -18,7 +17,7 @@ class TemplateFilterDispatcher
     {
         $templateMgr->registerFilter('output', [$this, 'demographicDataTabFilter']);
 
-        $request = Application::get()->getRequest();
+        $request = \Application::get()->getRequest();
         $contextId = $request->getContext()->getId();
         $userId = $request->getUser()->getId();
         $demographicDataDao = new DemographicDataDAO();

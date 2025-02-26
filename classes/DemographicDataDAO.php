@@ -2,10 +2,9 @@
 
 namespace APP\plugins\generic\demographicData\classes;
 
-use PKP\db\DAO;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
-class DemographicDataDAO extends DAO
+class DemographicDataDAO extends \DAO
 {
     private function getConsentSetting(int $contextId, int $userId): ?array
     {

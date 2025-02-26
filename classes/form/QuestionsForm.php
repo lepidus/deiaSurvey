@@ -2,21 +2,24 @@
 
 namespace APP\plugins\generic\demographicData\classes\form;
 
-use APP\template\TemplateManager;
-use PKP\form\Form;
-use PKP\plugins\PluginRegistry;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
+use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
+use APP\template\TemplateManager;
+use PKP\form\validation\FormValidatorCSRF;
+use PKP\form\validation\FormValidatorPost;
+use PKP\plugins\PluginRegistry;
 
-class QuestionsForm extends Form
+import('lib.pkp.classes.form.Form');
+
+class QuestionsForm extends \Form
 {
     private $request;
 
     public function __construct($request = null, $args = null)
     {
-        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
         parent::__construct($plugin->getTemplateResource('questionsInProfile.tpl'));
 
         if ($request) {
@@ -28,8 +31,8 @@ class QuestionsForm extends Form
             $this->loadQuestionResponsesByForm($args);
         }
 
-        $this->addCheck(new \PKP\form\validation\FormValidatorPost($this));
-        $this->addCheck(new \PKP\form\validation\FormValidatorCSRF($this));
+        $this->addCheck(new \FormValidatorPost($this));
+        $this->addCheck(new \FormValidatorCSRF($this));
     }
 
     private function loadQuestionResponsesByForm($args)
@@ -51,7 +54,7 @@ class QuestionsForm extends Form
 
     public function fetch($request, $template = null, $display = false)
     {
-        $templateMgr = TemplateManager::getManager($request);
+        $templateMgr = \TemplateManager::getManager($request);
 
         return parent::fetch($request, $template, $display);
     }
@@ -110,8 +113,4 @@ class QuestionsForm extends Form
 
         parent::execute(...$functionArgs);
     }
-}
-
-if (!PKP_STRICT_MODE) {
-    class_alias('\APP\plugins\generic\demographicData\classes\form\QuestionsForm', '\QuestionsForm');
 }

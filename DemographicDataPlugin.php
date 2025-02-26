@@ -20,15 +20,15 @@ class DemographicDataPlugin extends \GenericPlugin
     {
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
-            // Hook::add('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
-            // Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
-            // Hook::add('LoadHandler', [$this, 'addPageHandler']);
-            // Hook::add('Schema::get::author', [$this, 'editAuthorSchema']);
-            HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
-            // Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
-            // Hook::add('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
-            // Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
-            // Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
+            \HookRegistry::register('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
+            \HookRegistry::register('LoadComponentHandler', [$this, 'setupTabHandler']);
+            \HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
+            \HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
+            \HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
+            \HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
+            \HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
+            \HookRegistry::register('Decision::add', [$this, 'requestDataExternalContributors']);
+            \HookRegistry::register('User::edit', [$this, 'checkMigrateResponsesOrcid']);
 
             // Event::subscribe(new MigrateResponsesOnRegistration());
 
