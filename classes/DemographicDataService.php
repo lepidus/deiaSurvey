@@ -3,16 +3,16 @@
 namespace APP\plugins\generic\demographicData\classes;
 
 use APP\core\Application;
-use PKP\facades\Locale;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
-use APP\plugins\generic\demographicData\classes\facades\Repo;
 use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\demographicData\classes\facades\Repo;
+use PKP\facades\Locale;
 
 class DemographicDataService
 {
     public function retrieveAllQuestions(int $contextId, bool $shouldRetrieveResponses = false)
     {
-        $request = Application::get()->getRequest();
+        $request = \Application::get()->getRequest();
         $questions = array();
         $demographicQuestions = Repo::demographicQuestion()
             ->getCollector()
@@ -124,7 +124,7 @@ class DemographicDataService
 
     public function registerExternalAuthorResponses(string $externalId, string $externalType, array $responses, array $responseOptionsInputs)
     {
-        $locale = Locale::getLocale();
+        $locale = \Locale::getLocale();
 
         foreach ($responses as $question => $responseInput) {
             $questionParts = explode("-", $question);

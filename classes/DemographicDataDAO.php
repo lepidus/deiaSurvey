@@ -17,7 +17,7 @@ class DemographicDataDAO extends \DAO
             $row = get_object_vars($row);
             $value = json_decode($row['setting_value'], true);
             if ($value['contextId'] == $contextId) {
-                return ['id' => $row['user_setting_id'], 'consentOption' => $value['consentOption']];
+                return ['id' => $row['user_id'], 'consentOption' => $value['consentOption']];
             }
         }
 
@@ -40,14 +40,15 @@ class DemographicDataDAO extends \DAO
             Capsule::table('user_settings')->insert([
                 'user_id' => $userId,
                 'setting_name' => 'demographicDataConsent',
-                'setting_value' => $settingValue
+                'setting_value' => $settingValue,
+                'setting_type' => 'object'
             ]);
 
             return;
         }
 
         Capsule::table('user_settings')
-            ->where('user_setting_id', $consentSetting['id'])
+            ->where('user_id', $consentSetting['id'])
             ->update([
                 'setting_value' => $settingValue
             ]);
