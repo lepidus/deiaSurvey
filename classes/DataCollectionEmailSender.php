@@ -3,18 +3,18 @@
 namespace APP\plugins\generic\demographicData\classes;
 
 use APP\core\Application;
-use Illuminate\Support\Facades\Mail;
-use PKP\plugins\PluginRegistry;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
 use APP\plugins\generic\demographicData\classes\mail\mailables\RequestCollectionContributorData;
+use Illuminate\Support\Facades\Mail;
+use PKP\plugins\PluginRegistry;
 
 class DataCollectionEmailSender
 {
     public function sendRequestDataCollectionEmails(int $submissionId)
     {
-        $submission = Repo::submission()->get($submissionId);
+        $submission = \Services::get('submission')->get($submissionId);
         $nonRegisteredAuthors = $this->getNonRegisteredAuthors($submission);
 
         if (!empty($nonRegisteredAuthors)) {
@@ -47,35 +47,35 @@ class DataCollectionEmailSender
 
     private function sendEmailToAuthor($submission, $author)
     {
-        $request = Application::get()->getRequest();
+        $request = \Application::get()->getRequest();
         $context = $request->getContext();
+        $publication = \Services::get('publication')->get($author->getData('publicationId'));
 
-        $emailTemplate = Repo::emailTemplate()->getByKey(
-            $context->getId(),
-            'REQUEST_COLLECTION_CONTRIBUTOR_DATA'
-        );
+        import('lib.pkp.classes.mail.MailTemplate');
+        $emailTemplate = new \MailTemplate('REQUEST_COLLECTION_CONTRIBUTOR_DATA', null, $context, false);
+
         $authorName = $author->getFullName();
         $authorEmail = $author->getData('email');
 
         $emailQuestionnaireUrls = $this->getQuestionnaireUrls($request, $author);
 
-        $email = new RequestCollectionContributorData($context, $submission, $emailQuestionnaireUrls);
-        $email->from($context->getData('contactEmail'), $context->getData('contactName'));
-        $email->to([['name' => $authorName, 'email' => $authorEmail]]);
-        $email->subject($emailTemplate->getLocalizedData('subject'));
-        $email->body($emailTemplate->getLocalizedData('body'));
-
-        Mail::send($email);
+        $emailTemplate->setFrom($context->getData('contactEmail'), $context->getData('contactName'));
+        $emailTemplate->setRecipients([['name' => $authorName, 'email' => $authorEmail]]);
+        $emailTemplate->sendWithParams(array_merge($emailQuestionnaireUrls, [
+            'submissionTitle' => htmlspecialchars($publication->getLocalizedTitle()),
+            'contactName' => $context->getData('contactName')
+        ]));
     }
 
     private function getQuestionnaireUrls($request, $author): array
     {
         $authorToken = md5(microtime() . $author->getData('email'));
-        Repo::author()->edit($author, ['demographicToken' => $authorToken]);
+
+        $author = \Services::get('author')->edit($author, ['demographicToken' => $authorToken], $request);
 
         $questionnaireUrl = $request->getDispatcher()->url(
             $request,
-            Application::ROUTE_PAGE,
+            ROUTE_PAGE,
             null,
             'demographicQuestionnaire',
             null,
@@ -83,7 +83,7 @@ class DataCollectionEmailSender
             ['authorId' => $author->getId(), 'authorToken' => $authorToken]
         );
 
-        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
         $contextId = $request->getContext()->getId();
         $orcidClient = new OrcidClient($plugin, $contextId);
 

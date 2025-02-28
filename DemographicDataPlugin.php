@@ -27,7 +27,7 @@ class DemographicDataPlugin extends \GenericPlugin
             \HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
             \HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             \HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
-            \HookRegistry::register('Decision::add', [$this, 'requestDataExternalContributors']);
+            \HookRegistry::register('EditorAction::recordDecision', [$this, 'requestDataExternalContributors']);
             \HookRegistry::register('User::edit', [$this, 'checkMigrateResponsesOrcid']);
 
             // Event::subscribe(new MigrateResponsesOnRegistration());
@@ -154,7 +154,21 @@ class DemographicDataPlugin extends \GenericPlugin
             array(
                 new \LinkAction(
                     'settings',
-                    new \AjaxModal($router->url($request, null, null, 'manage', null, array('verb' => 'settings', 'plugin' => $this->getName(), 'category' => 'generic')), $this->getDisplayName()),
+                    new \AjaxModal(
+                        $router->url(
+                            $request,
+                            null,
+                            null,
+                            'manage',
+                            null,
+                            array(
+                                'verb' => 'settings',
+                                'plugin' => $this->getName(),
+                                'category' => 'generic'
+                            )
+                        ),
+                        $this->getDisplayName()
+                    ),
                     __('manager.plugins.settings'),
                     null
                 ),
@@ -197,16 +211,15 @@ class DemographicDataPlugin extends \GenericPlugin
 
     public function requestDataExternalContributors(string $hookName, array $params)
     {
-        $decision = $params[0];
+        $submission = $params[0];
+        $decision = $params[1];
 
-        if ($decision->getData('decision') != Decision::ACCEPT and $decision->getData('decision') != Decision::SKIP_EXTERNAL_REVIEW) {
+        if ($decision['decision'] != SUBMISSION_EDITOR_DECISION_ACCEPT) {
             return;
         }
 
-        $submissionId = $decision->getData('submissionId');
-
         $dataCollectionEmailSender = new DataCollectionEmailSender();
-        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submissionId);
+        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submission->getId());
     }
 
     public function checkMigrateResponsesOrcid(string $hookName, array $params)
