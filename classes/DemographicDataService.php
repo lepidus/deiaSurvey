@@ -124,7 +124,7 @@ class DemographicDataService
 
     public function registerExternalAuthorResponses(string $externalId, string $externalType, array $responses, array $responseOptionsInputs)
     {
-        $locale = \Locale::getLocale();
+        $locale = \AppLocale::getLocale();
 
         foreach ($responses as $question => $responseInput) {
             $questionParts = explode("-", $question);

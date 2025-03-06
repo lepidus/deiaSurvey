@@ -2,32 +2,32 @@
 
 namespace APP\plugins\generic\demographicData\pages\demographic;
 
-use APP\handler\Handler;
 use APP\core\Application;
-use APP\template\TemplateManager;
-use PKP\plugins\PluginRegistry;
-use PKP\config\Config;
-use APP\plugins\generic\demographicData\classes\facades\Repo;
+use APP\handler\Handler;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
-use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\demographicData\classes\OrcidClient;
+use APP\template\TemplateManager;
+use PKP\config\Config;
+use PKP\plugins\PluginRegistry;
 
-class QuestionnaireHandler extends Handler
+class QuestionnaireHandler extends \Handler
 {
     public function index($args, $request)
     {
-        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
-        $templateMgr = TemplateManager::getManager($request);
+        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $templateMgr = \TemplateManager::getManager($request);
         $context = $request->getContext();
 
-        $queryParams = $request->getQueryArray();
-        $author = Repo::author()->get((int) $queryParams['authorId']);
+        $authorId = $request->getUserVar('authorId');
+        $authorToken = $request->getUserVar('authorToken');
+
+        $author = \Services::get('author')->get((int) $authorId);
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
         $demographicDataService = new DemographicDataService();
 
-        $authorToken = $queryParams['authorToken'];
         if (!$this->authorTokenIsValid($author, $authorToken)) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
@@ -64,11 +64,11 @@ class QuestionnaireHandler extends Handler
 
     private function getPrivacyUrl(): string
     {
-        $request = Application::get()->getRequest();
+        $request = \Application::get()->getRequest();
 
         return $request->getDispatcher()->url(
             $request,
-            Application::ROUTE_PAGE,
+            ROUTE_PAGE,
             null,
             'about',
             'privacy'
@@ -82,13 +82,14 @@ class QuestionnaireHandler extends Handler
 
     public function authorize($request, &$args, $roleAssignments)
     {
-        $queryParams = $request->getQueryArray();
+        $authorId = $request->getUserVar('authorId');
+        $authorToken = $request->getUserVar('authorToken');
 
-        if (empty($queryParams) or !isset($queryParams['authorId']) or !isset($queryParams['authorToken'])) {
+        if (!$authorId || !$authorToken) {
             return false;
         }
 
-        $author = Repo::author()->get((int) $queryParams['authorId']);
+        $author = \Services::get('author')->get((int) $authorId);
         if (is_null($author)) {
             return false;
         }
@@ -100,9 +101,9 @@ class QuestionnaireHandler extends Handler
     {
         $authorId = $request->getUserVar('authorId');
         $authorToken = $request->getUserVar('authorToken');
-        $author = Repo::author()->get($authorId);
-        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
-        $templateMgr = TemplateManager::getManager($request);
+        $author = \Services::get('author')->get($authorId);
+        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $templateMgr = \TemplateManager::getManager($request);
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
 
@@ -144,9 +145,9 @@ class QuestionnaireHandler extends Handler
     {
         $authorId = $request->getUserVar('authorId');
         $authorToken = $request->getUserVar('authorToken');
-        $author = Repo::author()->get($authorId);
-        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
-        $templateMgr = TemplateManager::getManager($request);
+        $author = \Services::get('author')->get($authorId);
+        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $templateMgr = \TemplateManager::getManager($request);
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
 
@@ -185,9 +186,9 @@ class QuestionnaireHandler extends Handler
 
     public function orcidVerify($args, $request)
     {
-        $author = Repo::author()->get($request->getUserVar('authorId'));
-        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
-        $templateMgr = TemplateManager::getManager($request);
+        $author = \Services::get('author')->get($request->getUserVar('authorId'));
+        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $templateMgr = \TemplateManager::getManager($request);
         $contextId = $request->getContext()->getId();
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
@@ -226,7 +227,7 @@ class QuestionnaireHandler extends Handler
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
-        Repo::author()->edit($author, ['demographicOrcid' => $authorOrcidUri]);
+        \Services::get('author')->edit($author, ['demographicOrcid' => $authorOrcidUri], $request);
 
         $request->redirect(null, null, 'index', null, ['authorId' => $author->getId(), 'authorToken' => $request->getUserVar('authorToken')]);
     }
@@ -237,7 +238,7 @@ class QuestionnaireHandler extends Handler
             'questionnairePageStyleSheet',
             $request->getBaseUrl() . '/' . $plugin->getPluginPath() . '/styles/questionnairePage.css',
             [
-                'priority' => TemplateManager::STYLE_SEQUENCE_LAST,
+                'priority' => STYLE_SEQUENCE_LAST,
                 'contexts' => ['frontend'],
                 'inline' => false,
             ]
