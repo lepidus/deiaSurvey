@@ -150,6 +150,8 @@ class DemographicDataPlugin extends \GenericPlugin
     public function getActions($request, $actionArgs)
     {
         $router = $request->getRouter();
+
+        import('lib.pkp.classes.linkAction.request.AjaxModal');
         return array_merge(
             array(
                 new \LinkAction(
