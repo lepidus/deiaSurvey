@@ -6,12 +6,12 @@ use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
 use APP\plugins\generic\demographicData\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
+use APP\plugins\generic\demographicData\classes\form\CustomRegistrationForm;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateResponsesOnRegistration;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\plugins\generic\demographicData\DemographicDataSettingsForm;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\Event;
 use PKP\plugins\GenericPlugin;
 
 class DemographicDataPlugin extends \GenericPlugin
@@ -28,9 +28,7 @@ class DemographicDataPlugin extends \GenericPlugin
             \HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             \HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
             \HookRegistry::register('EditorAction::recordDecision', [$this, 'requestDataExternalContributors']);
-            \HookRegistry::register('User::edit', [$this, 'checkMigrateResponsesOrcid']);
-
-            // Event::subscribe(new MigrateResponsesOnRegistration());
+            \HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
 
             $defaultQuestionsCreator = new DefaultQuestionsCreator();
             $defaultQuestionsCreator->createDefaultQuestions();
@@ -125,8 +123,15 @@ class DemographicDataPlugin extends \GenericPlugin
     public function addPageHandler($hookName, $params)
     {
         $page = $params[0];
+        $op = $params[1];
+
         if ($page == 'demographicQuestionnaire') {
             define('HANDLER_CLASS', 'APP\plugins\generic\demographicData\pages\demographic\QuestionnaireHandler');
+            return true;
+        }
+
+        if ($page === 'user' && $op === 'register') {
+            define('HANDLER_CLASS', 'APP\plugins\generic\demographicData\pages\user\CustomRegistrationHandler');
             return true;
         }
         return false;
@@ -226,7 +231,13 @@ class DemographicDataPlugin extends \GenericPlugin
 
     public function checkMigrateResponsesOrcid(string $hookName, array $params)
     {
-        $user = $params[0];
+        $form = $params[0];
+        $user = $form->user;
+
+        if (!$user) {
+            return;
+        }
+
         $userOrcid = $user->getOrcid();
 
         if ($userOrcid) {

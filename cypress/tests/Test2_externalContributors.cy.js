@@ -68,7 +68,7 @@ function assertResponsesOfExternalAuthor(authorEmail) {
 function assertResponsesOfRegisteredUser() {
     cy.contains('a', 'Demographic Data').click();
     cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
-    
+
     cy.contains('label', 'Woman').within(() => {
         cy.get('input').should('be.checked');
     });
@@ -80,71 +80,126 @@ function assertResponsesOfRegisteredUser() {
     });
 }
 
-function beginSubmission(submissionData) {
-    cy.get('input[name="locale"][value="en"]').click();
-    cy.setTinyMceContent('startSubmission-title-control', submissionData.title);
-    
-    if (Cypress.env('contextTitles').en !== 'Public Knowledge Preprint Server') {
-        cy.get('input[name="sectionId"][value="1"]').click();
+function newSubmission(data) {
+	if (!('files' in data)) data.files = [{
+		'file': 'dummy.pdf',
+		'fileName': data.title + '.pdf',
+		'fileTitle': data.title,
+		'genre': Cypress.env('defaultGenre')
+	}];
+	if (!('keywords' in data)) data.keywords = [];
+	if (!('additionalAuthors' in data)) data.additionalAuthors = [];
+	if ('additionalFiles' in data) {
+		data.files = data.files.concat(data.additionalFiles);
+	}
+
+	cy.get('a:contains("Make a New Submission"), div#myQueue a:contains("New Submission")').click();
+
+    // === Submission Step 1 ===
+	if ('section' in data) cy.get('select[id="sectionId"],select[id="seriesId"]').select(data.section);
+	cy.get('input[id^="checklist-"]').click({multiple: true});
+	cy.get('input[id=privacyConsent]').click();
+	if ('submitterRole' in data) {
+		cy.get('input[name=userGroupId]').parent().contains(data.submitterRole).click();
+	}
+	cy.get('button.submitFormButton').click();
+
+	// === Submission Step 2 ===
+    cy.get('button:contains("Add File")');
+
+    const allowException = function(error, runnable) {
+        return false;
     }
-    
-    cy.get('input[name="submissionRequirements"]').check();
-    cy.get('input[name="privacyConsent"]').check();
-    cy.contains('button', 'Begin Submission').click();
-}
+    cy.on('uncaught:exception', allowException);
 
-function detailsStep(submissionData) {
-    cy.setTinyMceContent('titleAbstract-abstract-control-en', submissionData.abstract);
-    submissionData.keywords.forEach(keyword => {
-        cy.get('#titleAbstract-keywords-control-en').type(keyword, {delay: 0});
-        cy.wait(500);
-        cy.get('#titleAbstract-keywords-control-en').type('{enter}', {delay: 0});
-    });
-    cy.contains('button', 'Continue').click();
-}
-
-function contributorsStep(submissionData) {
-    submissionData.contributors.forEach(authorData => {
-        cy.contains('button', 'Add Contributor').click();
-        cy.get('input[name="givenName-en"]').type(authorData.given, {delay: 0});
-        cy.get('input[name="familyName-en"]').type(authorData.family, {delay: 0});
-        cy.get('input[name="email"]').type(authorData.email, {delay: 0});
-        cy.get('select[name="country"]').select(authorData.country);
-        
-        cy.get('.modal__panel:contains("Add Contributor")').find('button').contains('Save').click();
-        cy.waitJQuery();
+    const primaryFileGenres = ['Article Text', 'Book Manuscript', 'Chapter Manuscript'];
+    data.files.forEach(file => {
+        cy.fixture(file.file, 'base64').then(fileContent => {
+            cy.get('input[type=file]').upload(
+                {fileContent, 'fileName': file.fileName, 'mimeType': 'application/pdf', 'encoding': 'base64'}
+            );
+            var $row = cy.get('a:contains("' + file.fileName + '")').parents('.listPanel__item');
+            if (primaryFileGenres.includes(file.genre)) {
+                $row.get('button:contains("' + file.genre + '")').last().click();
+                $row.get('span:contains("' + file.genre + '")');
+            } else {
+                $row.get('button:contains("Other")').last().click();
+                cy.get('#submission-files-container .modal label:contains("' + file.genre + '")').click();
+                cy.get('#submission-files-container .modal button:contains("Save")').click();
+            }
+            $row.get('button:contains("What kind of file is this?")').should('not.exist');
+        });
     });
 
-    cy.contains('button', 'Continue').click();
+	cy.location('search')
+		.then(search => {
+			data.id = parseInt(search.split('=')[1], 10);
+		});
+
+	cy.get('button').contains('Save and continue').click();
+
+	// === Submission Step 3 ===
+	cy.get('input[id^="title-en_US-"').type(data.title, {delay: 0});
+	cy.get('label').contains('Title').click(); // Close multilingual popover
+	cy.get('textarea[id^="abstract-en_US"]').then(node => {
+		cy.setTinyMceContent(node.attr('id'), data.abstract);
+	});
+	cy.get('ul[id^="en_US-keywords-"]').then(node => {
+		data.keywords.forEach(keyword => {
+			node.tagit('createTag', keyword);
+		});
+	});
+	data.additionalAuthors.forEach(author => {
+		if (!('role' in author)) author.role = 'Author';
+		cy.get('a[id^="component-grid-users-author-authorgrid-addAuthor-button-"]').click();
+		cy.wait(250);
+		cy.get('input[id^="givenName-en_US-"]').type(author.givenName, {delay: 0});
+		cy.get('input[id^="familyName-en_US-"]').type(author.familyName, {delay: 0});
+		cy.get('select[id=country]').select(author.country);
+		cy.get('input[id^="email"]').type(author.email, {delay: 0});
+		if ('affiliation' in author) cy.get('input[id^="affiliation-en_US-"]').type(author.affiliation, {delay: 0});
+		cy.get('label').contains(author.role).click();
+		cy.get('form#editAuthor').find('button:contains("Save")').click();
+		cy.get('div[id^="component-grid-users-author-authorgrid-"] span.label:contains("' + Cypress.$.escapeSelector(author.givenName + ' ' + author.familyName) + '")');
+	});
+	cy.waitJQuery();
+	cy.get('form[id=submitStep3Form]').find('button').contains('Save and continue').click();
+
+	// === Submission Step 4 ===
+	cy.waitJQuery();
+	cy.get('form[id=submitStep4Form]').find('button').contains('Finish Submission').click();
+	cy.get('button.pkpModalConfirmButton').click();
+	cy.waitJQuery();
+	cy.get('h2:contains("Submission complete")');
 }
 
 describe('Demographic Data - External contributors data collecting', function() {
     let firstSubmissionData;
     let secondSubmissionData;
-    
     before(function() {
         firstSubmissionData = {
+            section: 'Articles',
             title: "Test scenarios to automobile vehicles",
 			abstract: 'Description of test scenarios for cars, motorcycles and other vehicles',
 			keywords: ['plugin', 'testing'],
-            contributors: [
+            additionalAuthors: [
                 {
-                    'given': 'Susanna',
-                    'family': 'Almeida',
+                    'givenName': 'Susanna',
+                    'familyName': 'Almeida',
                     'email': 'susy.almeida@outlook.com',
                     'country': 'Brazil'
                 }
             ]
 		};
-
         secondSubmissionData = {
+            section: 'Articles',
             title: "Advancements in tests of automobile vehicles",
 			abstract: 'New improvements on tests of cars, motorcycles and other vehicles',
 			keywords: ['plugin', 'testing'],
             contributors: [
                 {
-                    'given': 'Susanna',
-                    'family': 'Almeida',
+                    'givenName': 'Susanna',
+                    'familyName': 'Almeida',
                     'email': 'susy.almeida@outlook.com',
                     'country': 'Brazil'
                 }
@@ -152,48 +207,21 @@ describe('Demographic Data - External contributors data collecting', function() 
 		};
     });
 
-    it('Creation of new submission', function() {
+    it('Create and accept new submission', function() {
         cy.login('ckwantes', null, 'publicknowledge');
-        
-        cy.get('div#myQueue a:contains("New Submission")').click();
-        beginSubmission(firstSubmissionData);
-        detailsStep(firstSubmissionData);
-        cy.uploadSubmissionFiles([{
-			'file': 'dummy.pdf',
-			'fileName': 'dummy.pdf',
-			'mimeType': 'application/pdf',
-			'genre': 'Article Text'
-		}]);
-        cy.contains('button', 'Continue').click();
-        contributorsStep(firstSubmissionData);
-        cy.contains('button', 'Continue').click();
-        cy.wait(1000);
 
-        cy.contains('button', 'Submit').click();
-        cy.get('.modal__panel:visible').within(() => {
-            cy.contains('button', 'Submit').click();
-        });
-        cy.waitJQuery();
-        cy.contains('h1', 'Submission complete');
-    });
-    it('Editor accepts submission', function () {
-        cy.login('dbarnes', null, 'publicknowledge');
-        cy.findSubmission('myQueue', firstSubmissionData.title);
+        newSubmission(firstSubmissionData);
 
-        cy.get('#workflow-button').click();
-            
-        cy.clickDecision('Send for Review');
-        cy.contains('button', 'Skip this email').click();
-        cy.contains('button', 'Record Decision').click();
-        cy.get('a.pkpButton').contains('View Submission').click();
-        cy.assignReviewer('Julie Janssen');
-        
-        cy.clickDecision('Accept Submission');
-        cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
+        cy.logout();
+		cy.findSubmissionAsEditor('dbarnes', null, 'Kwantes');
+        cy.sendToReview();
+		cy.assignReviewer('Julie Janssen');
+        cy.recordEditorialDecision('Accept Submission');
     });
-    it('Access email to collect data from contributors without registration', function () {
+
+    it('Email was sent to contributors without registration', function () {
         cy.visit('localhost:8025');
-        
+
         cy.get('b:contains("Request for demographic data collection")').should('have.length', 1);
         cy.contains('b', 'Request for demographic data collection')
             .parent().parent().parent()
@@ -207,10 +235,25 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.contains('In order to improve our publication, we collect demographic data from the authors of our submissions through an online questionnaire');
         cy.contains('If you do not wish to register, we recommend that you access the following address:');
         cy.contains("If you don't have an ORCID record, you can fill in the questionnaire at the following address:");
-        cy.get('.text-view').within(() => {
-            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
-                cy.visit(href);
-            });
+
+        cy.get('#nav-html-tab').click();
+        cy.get('#preview-html').then($iframe => {
+            let iframeDocument = $iframe.contents().find('body');
+
+            cy.wrap(iframeDocument)
+                .find('a')
+                .eq(1)
+                .contains('Demographic Questionnaire')
+                .invoke('attr', 'target', '_self')
+                .invoke('attr', 'href').then(href => {
+                    cy.writeFile('cypress/fixtures/data.json', { url: href })
+                });
+          });
+    });
+
+    it('Acess questionnaire from contributors without registration', function () {
+        cy.readFile('cypress/fixtures/data.json').then((data) => {
+            cy.visit(data.url);
         });
 
         assertDefaultQuestionsDisplay('susy.almeida@outlook.com');
@@ -221,15 +264,10 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.contains('Demographic Questionnaire');
         cy.contains('Only the author can access this page');
     });
-    it('Contributor without registration answers demographic questionnaire', function () {
-        cy.visit('localhost:8025');
-        cy.get('b:contains("Request for demographic data collection")').click();
 
-        cy.get('#nav-tab button:contains("Text")').click();
-        cy.get('.text-view').within(() => {
-            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
-                cy.visit(href);
-            });
+    it('Contributor without registration answers demographic questionnaire', function () {
+        cy.readFile('cypress/fixtures/data.json').then((data) => {
+            cy.visit(data.url);
         });
 
         answerDefaultQuestions();
@@ -239,58 +277,27 @@ describe('Demographic Data - External contributors data collecting', function() 
 
         assertResponsesOfExternalAuthor('susy.almeida@outlook.com');
     });
+
     it('New submission is created and accepted with same contributor', function () {
         cy.login('ckwantes', null, 'publicknowledge');
-        
-        cy.get('div#myQueue a:contains("New Submission")').click();
-        beginSubmission(secondSubmissionData);
-        detailsStep(secondSubmissionData);
-        cy.uploadSubmissionFiles([{
-			'file': 'dummy.pdf',
-			'fileName': 'dummy.pdf',
-			'mimeType': 'application/pdf',
-			'genre': 'Article Text'
-		}]);
-        cy.contains('button', 'Continue').click();
-        contributorsStep(secondSubmissionData);
-        cy.contains('button', 'Continue').click();
-        cy.wait(1000);
 
-        cy.contains('button', 'Submit').click();
-        cy.get('.modal__panel:visible').within(() => {
-            cy.contains('button', 'Submit').click();
-        });
-        cy.waitJQuery();
-        cy.contains('h1', 'Submission complete');
+        newSubmission(secondSubmissionData);
+
         cy.logout();
-
-        cy.login('dbarnes', null, 'publicknowledge');
-        cy.findSubmission('myQueue', secondSubmissionData.title);
-
-        cy.get('#workflow-button').click();
-
-        cy.clickDecision('Send for Review');
-        cy.contains('button', 'Skip this email').click();
-        cy.contains('button', 'Record Decision').click();
-        cy.get('a.pkpButton').contains('View Submission').click();
-        cy.assignReviewer('Julie Janssen');
-        
-        cy.clickDecision('Accept Submission');
-        cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
+		cy.findSubmissionAsEditor('dbarnes', null, 'Kwantes');
+        cy.sendToReview();
+		cy.assignReviewer('Julie Janssen');
+        cy.recordEditorialDecision('Accept Submission');
     });
+
     it('E-mail for demographic data collection is not sent again', function () {
         cy.visit('localhost:8025');
         cy.get('b:contains("Request for demographic data collection")').should('have.length', 1);
     });
-    it('Contributor without registration deletes his own demographic data', function () {
-        cy.visit('localhost:8025');
-        cy.get('b:contains("Request for demographic data collection")').click();
 
-        cy.get('#nav-tab button:contains("Text")').click();
-        cy.get('.text-view').within(() => {
-            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
-                cy.visit(href);
-            });
+    it('Contributor without registration deletes his own demographic data', function () {
+        cy.readFile('cypress/fixtures/data.json').then((data) => {
+            cy.visit(data.url);
         });
 
         cy.contains('a', 'Delete my demographic data').click();
@@ -301,33 +308,43 @@ describe('Demographic Data - External contributors data collecting', function() 
 
         cy.contains('Your demographic data has been deleted');
     });
+
     it('Editor goes back and accepts submission again', function () {
-        cy.login('dbarnes', null, 'publicknowledge');
-        cy.findSubmission('myQueue', secondSubmissionData.title);
+        cy.findSubmissionAsEditor('dbarnes', null, 'Kwantes');
 
-        cy.get('#workflow-button').click();
-        cy.clickDecision('Cancel Copyediting');
-        cy.contains('button', 'Skip this email').click();
-        cy.contains('button', 'Record Decision').click();
-        cy.get('a.pkpButton').contains('View Submission').click();
-
-        cy.clickDecision('Accept Submission');
-        cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
+        cy.get('.ui-tabs-anchor:contains("Review")').click();
+        cy.get('.pkp_workflow_change_decision').click();
+        cy.recordEditorialDecision('Accept Submission');
     });
-    it('Contributor answers demographic questionnaire on new submission', function () {
+
+    it('Email was sent on new submission', function() {
         cy.visit('localhost:8025');
         cy.get('b:contains("Request for demographic data collection")').eq(0).click();
 
-        cy.get('#nav-tab button:contains("Text")').click();
-        cy.get('.text-view').within(() => {
-            cy.get('a').eq(1).should('have.attr', 'href').then((href) => {
-                cy.visit(href);
-            });
+        cy.get('#nav-html-tab').click();
+        cy.get('#preview-html').then($iframe => {
+            let iframeDocument = $iframe.contents().find('body');
+
+            cy.wrap(iframeDocument)
+                .find('a')
+                .eq(1)
+                .contains('Demographic Questionnaire')
+                .invoke('attr', 'target', '_self')
+                .invoke('attr', 'href').then(href => {
+                    cy.writeFile('cypress/fixtures/data.json', { url: href })
+                });
+        });
+    });
+
+    it('Contributor answers demographic questionnaire on new submission', function () {
+        cy.readFile('cypress/fixtures/data.json').then((data) => {
+            cy.visit(data.url);
         });
 
         answerDefaultQuestions();
         cy.contains('Thanks for answering our demographic questionnaire');
     });
+
     it('Responses reference is migrated when author registers', function () {
         cy.register({
             'username': 'susyalmeida',
