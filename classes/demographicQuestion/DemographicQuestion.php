@@ -4,7 +4,7 @@ namespace APP\plugins\generic\demographicData\classes\demographicQuestion;
 
 use APP\plugins\generic\demographicData\classes\facades\Repo;
 
-class DemographicQuestion extends \PKP\core\DataObject
+class DemographicQuestion extends \DataObject
 {
     public const TYPE_SMALL_TEXT_FIELD = 1;
     public const TYPE_TEXT_FIELD = 2;

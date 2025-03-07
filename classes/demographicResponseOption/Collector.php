@@ -2,15 +2,15 @@
 
 namespace APP\plugins\generic\demographicData\classes\demographicResponseOption;
 
+use APP\plugins\generic\demographicData\classes\core\interfaces\CollectorInterface;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\DB;
-use PKP\core\interfaces\CollectorInterface;
 use Illuminate\Support\LazyCollection;
 
 class Collector implements CollectorInterface
 {
-    public DAO $dao;
-    public ?array $questionIds = null;
+    public $dao;
+    public $questionIds = null;
 
     public function __construct(DAO $dao)
     {
@@ -25,7 +25,7 @@ class Collector implements CollectorInterface
 
     public function getQueryBuilder(): Builder
     {
-        $queryBuilder = DB::table($this->dao->table . ' AS dro')
+        $queryBuilder = Capsule::table($this->dao->table . ' AS dro')
             ->select(['dro.*']);
 
         if (isset($this->questionIds)) {

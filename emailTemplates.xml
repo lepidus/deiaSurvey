@@ -3,10 +3,10 @@
 
 <emails>
     <email
-        key="REQUEST_COLLECTION_CONTRIBUTOR_DATA"
-        name="emails.requestCollectionContributorData.name"
-        description="emails.requestCollectionContributorData.description"
-        subject="emails.requestCollectionContributorData.subject"
-        body="emails.requestCollectionContributorData.body"
-    />
+    key="REQUEST_COLLECTION_CONTRIBUTOR_DATA"
+    can_edit="1"
+    can_disable="0"
+    subject="emails.requestCollectionContributorData.subject"
+    description="emails.requestCollectionContributorData.description"
+    body="emails.requestCollectionContributorData.body"/>
 </emails>

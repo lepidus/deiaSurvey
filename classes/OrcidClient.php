@@ -2,8 +2,6 @@
 
 namespace APP\plugins\generic\demographicData\classes;
 
-use APP\core\Application;
-
 class OrcidClient
 {
     public const ORCID_URL = 'https://orcid.org/';
@@ -26,7 +24,7 @@ class OrcidClient
 
     public function requestOrcid(string $code)
     {
-        $httpClient = Application::get()->getHttpClient();
+        $httpClient = \Application::get()->getHttpClient();
 
         $tokenUrl = $this->plugin->getSetting($this->contextId, 'orcidAPIPath') . 'oauth/token';
         $requestHeaders = ['Accept' => 'application/json'];
@@ -52,7 +50,7 @@ class OrcidClient
 
     public function buildOAuthUrl($redirectParams)
     {
-        $request = Application::get()->getRequest();
+        $request = \Application::get()->getRequest();
 
         if ($this->isMemberApiEnabled($this->contextId)) {
             $scope = self::ORCID_API_SCOPE_MEMBER;
@@ -62,7 +60,7 @@ class OrcidClient
 
         $redirectUrl = $request->getDispatcher()->url(
             $request,
-            Application::ROUTE_PAGE,
+            ROUTE_PAGE,
             null,
             'demographicQuestionnaire',
             'orcidVerify',

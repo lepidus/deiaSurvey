@@ -2,15 +2,15 @@
 
 namespace APP\plugins\generic\demographicData\classes\migrations;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 class SchemaMigration extends Migration
 {
     public function up(): void
     {
-        Schema::create('demographic_questions', function (Blueprint $table) {
+        Capsule::schema()->create('demographic_questions', function (Blueprint $table) {
             $table->bigInteger('demographic_question_id')->autoIncrement();
             $table->bigInteger('context_id');
             $table->bigInteger('question_type');
@@ -22,7 +22,7 @@ class SchemaMigration extends Migration
             $table->index(['context_id'], 'demographic_questions_context_id');
         });
 
-        Schema::create('demographic_question_settings', function (Blueprint $table) {
+        Capsule::schema()->create('demographic_question_settings', function (Blueprint $table) {
             $table->bigIncrements('demographic_question_setting_id');
             $table->bigInteger('demographic_question_id');
             $table->string('locale', 14)->default('');
@@ -37,7 +37,7 @@ class SchemaMigration extends Migration
             $table->unique(['demographic_question_id', 'locale', 'setting_name'], 'demographic_question_settings_pkey');
         });
 
-        Schema::create('demographic_response_options', function (Blueprint $table) {
+        Capsule::schema()->create('demographic_response_options', function (Blueprint $table) {
             $table->bigInteger('demographic_response_option_id')->autoIncrement();
             $table->bigInteger('demographic_question_id');
 
@@ -48,7 +48,7 @@ class SchemaMigration extends Migration
             $table->index(['demographic_question_id'], 'demographic_response_options_demographic_question_id');
         });
 
-        Schema::create('demographic_response_option_settings', function (Blueprint $table) {
+        Capsule::schema()->create('demographic_response_option_settings', function (Blueprint $table) {
             $table->bigIncrements('demographic_response_option_setting_id');
             $table->bigInteger('demographic_response_option_id');
             $table->string('locale', 14)->default('');
@@ -63,7 +63,7 @@ class SchemaMigration extends Migration
             $table->unique(['demographic_response_option_id', 'locale', 'setting_name'], 'demographic_response_option_settings_pkey');
         });
 
-        Schema::create('demographic_responses', function (Blueprint $table) {
+        Capsule::schema()->create('demographic_responses', function (Blueprint $table) {
             $table->bigInteger('demographic_response_id')->autoIncrement();
             $table->bigInteger('demographic_question_id');
             $table->bigInteger('user_id')->nullable();
@@ -83,7 +83,7 @@ class SchemaMigration extends Migration
             $table->index(['user_id'], 'demographic_responses_user_id');
         });
 
-        Schema::create('demographic_response_settings', function (Blueprint $table) {
+        Capsule::schema()->create('demographic_response_settings', function (Blueprint $table) {
             $table->bigIncrements('demographic_response_setting_id');
             $table->bigInteger('demographic_response_id');
             $table->string('locale', 14)->default('');

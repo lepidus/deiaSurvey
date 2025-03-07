@@ -2,15 +2,14 @@
 
 namespace APP\plugins\generic\demographicData\classes;
 
-use APP\core\Application;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\demographicData\classes\facades\Repo;
+use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 
 class DefaultQuestionsCreator
 {
     public function createDefaultQuestions()
     {
-        $request = Application::get()->getRequest();
+        $request = \Application::get()->getRequest();
         $contextId = $request->getContext()->getId();
 
         $demographicQuestionsCount = Repo::demographicQuestion()

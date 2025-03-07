@@ -2,7 +2,7 @@
 
 namespace APP\plugins\generic\demographicData\classes\demographicResponseOption;
 
-class DemographicResponseOption extends \PKP\core\DataObject
+class DemographicResponseOption extends \DataObject
 {
     public function getDemographicQuestionId(): int
     {

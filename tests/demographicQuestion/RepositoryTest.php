@@ -2,32 +2,36 @@
 
 namespace APP\plugins\generic\demographicData\tests\demographicQuestion;
 
+require_once(dirname(__DIR__, 2) . '/autoload.php');
+
 use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\demographicData\classes\demographicQuestion\Repository;
-use PKP\tests\DatabaseTestCase;
 use APP\plugins\generic\demographicData\tests\helpers\TestHelperTrait;
 
-class RepositoryTest extends DatabaseTestCase
+import('lib.pkp.tests.DatabaseTestCase');
+
+class RepositoryTest extends \DatabaseTestCase
 {
     use TestHelperTrait;
 
     private $contextId;
     private $locale;
-    private array $params;
+    private $params;
 
     protected function getAffectedTables(): array
     {
-        return [
-            ...parent::getAffectedTables(),
-            'demographic_questions',
-            'demographic_question_settings',
-            'demographic_responses',
-            'demographic_response_settings'
-        ];
+        return $this->affectedTables;
     }
 
     protected function setUp(): void
     {
+        $this->setAffectedTables([
+            'demographic_question_settings',
+            'demographic_questions',
+            'demographic_response_settings',
+            'demographic_responses',
+        ]);
+
         parent::setUp();
         $this->contextId = $this->createJournalMock();
         $this->locale = "en";
@@ -42,6 +46,14 @@ class RepositoryTest extends DatabaseTestCase
             ]
         ];
         $this->addSchemaFile('demographicQuestion');
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreTables($this->getAffectedTables());
+        $this->setAffectedTables([]);
+
+        parent::tearDown();
     }
 
     public function testGetNewDemographicQuestionObject(): void

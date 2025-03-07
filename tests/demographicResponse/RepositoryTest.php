@@ -2,12 +2,15 @@
 
 namespace APP\plugins\generic\demographicData\tests\demographicResponse;
 
+require_once(dirname(__DIR__, 2) . '/autoload.php');
+
 use APP\plugins\generic\demographicData\classes\demographicResponse\DemographicResponse;
 use APP\plugins\generic\demographicData\classes\demographicResponse\Repository;
-use PKP\tests\DatabaseTestCase;
 use APP\plugins\generic\demographicData\tests\helpers\TestHelperTrait;
 
-class RepositoryTest extends DatabaseTestCase
+import('lib.pkp.tests.DatabaseTestCase');
+
+class RepositoryTest extends \DatabaseTestCase
 {
     use TestHelperTrait;
 
@@ -15,19 +18,22 @@ class RepositoryTest extends DatabaseTestCase
     private $demographicQuestionId;
     private $userId;
 
+    private const DEFAULT_LOCALE = "en_US";
+
     protected function getAffectedTables(): array
     {
-        return [
-            ...parent::getAffectedTables(),
-            'demographic_questions',
-            'demographic_question_settings',
-            'demographic_responses',
-            'demographic_response_settings'
-        ];
+        return $this->affectedTables;
     }
 
     protected function setUp(): void
     {
+        $this->setAffectedTables([
+            'demographic_questions',
+            'demographic_question_settings',
+            'demographic_responses',
+            'demographic_response_settings'
+        ]);
+
         parent::setUp();
         $this->demographicQuestionId = $this->createDemographicQuestion();
         $this->userId = $this->createUserMock();
@@ -36,12 +42,18 @@ class RepositoryTest extends DatabaseTestCase
             'userId' => $this->userId,
             'responseValue' => [
                 self::DEFAULT_LOCALE => 'Test text'
-            ],
-            'externalId' => null,
-            'externalType' => null
+            ]
         ];
         $this->addSchemaFile('demographicQuestion');
         $this->addSchemaFile('demographicResponse');
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreTables($this->getAffectedTables());
+        $this->setAffectedTables([]);
+
+        parent::tearDown();
     }
 
     public function testGetNewDemographicResponseObject(): void
@@ -90,15 +102,14 @@ class RepositoryTest extends DatabaseTestCase
     public function testCollectorFilterByContext(): void
     {
         $contextId = 1;
+        $userId = 1;
         $repository = app(Repository::class);
         $newParams = [
             'demographicQuestionId' => $this->demographicQuestionId,
-            'userId' => null,
+            'userId' => $userId,
             'responseValue' => [
                 self::DEFAULT_LOCALE => 'Test text 2'
             ],
-            'externalId' => null,
-            'externalType' => null
         ];
 
         $firstDemographicResponse = $repository->newDataObject($this->params);
@@ -119,9 +130,10 @@ class RepositoryTest extends DatabaseTestCase
 
     public function testCollectorFilterByExternalIdAndType(): void
     {
+        $userId = 1;
         $newParams = [
             'demographicQuestionId' => $this->demographicQuestionId,
-            'userId' => null,
+            'userId' => $userId,
             'responseValue' => [
                 self::DEFAULT_LOCALE => 'Test text'
             ],

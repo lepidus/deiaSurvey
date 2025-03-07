@@ -23,7 +23,7 @@ use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorCustom;
 use APP\plugins\generic\demographicData\classes\OrcidCredentialsValidator;
 
-class DemographicDataSettingsForm extends Form
+class DemographicDataSettingsForm extends \Form
 {
     public $contextId;
     public $plugin;
@@ -37,22 +37,44 @@ class DemographicDataSettingsForm extends Form
 
     public function __construct($plugin, $contextId)
     {
+        parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
+
         $this->contextId = $contextId;
         $this->plugin = $plugin;
-        $orcidValidator = new OrcidCredentialsValidator($plugin);
-        $this->validator = $orcidValidator;
-        parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
-        $this->addCheck(new FormValidatorPost($this));
-        $this->addCheck(new FormValidatorCSRF($this));
+        $this->validator = new OrcidCredentialsValidator($plugin);
+
+        $this->addCheck(new \FormValidatorPost($this));
+        $this->addCheck(new \FormValidatorCSRF($this));
 
         if (!$this->orcidIsGloballyConfigured()) {
-            $this->addCheck(new FormValidator($this, 'orcidAPIPath', 'required', 'plugins.generic.demographicData.settings.orcidAPIPathRequired'));
-            $this->addCheck(new FormValidatorCustom($this, 'orcidClientId', 'required', 'plugins.generic.demographicData.settings.orcidClientIdError', function ($clientId) {
-                return $this->validator->validateClientId($clientId);
-            }));
-            $this->addCheck(new FormValidatorCustom($this, 'orcidClientSecret', 'required', 'plugins.generic.demographicData.settings.orcidClientSecretError', function ($clientSecret) {
-                return $this->validator->validateClientSecret($clientSecret);
-            }));
+            $this->addCheck(new \FormValidator(
+                $this,
+                'orcidAPIPath',
+                'required',
+                'plugins.generic.demographicData.settings.orcidAPIPathRequired'
+            ));
+            $this->addCheck(
+                new \FormValidatorCustom(
+                    $this,
+                    'orcidClientId',
+                    'required',
+                    'plugins.generic.demographicData.settings.orcidClientIdError',
+                    function ($clientId) {
+                        return $this->validator->validateClientId($clientId);
+                    }
+                )
+            );
+            $this->addCheck(
+                new \FormValidatorCustom(
+                    $this,
+                    'orcidClientSecret',
+                    'required',
+                    'plugins.generic.demographicData.settings.orcidClientSecretError',
+                    function ($clientSecret) {
+                        return $this->validator->validateClientSecret($clientSecret);
+                    }
+                )
+            );
         }
     }
 
@@ -73,10 +95,10 @@ class DemographicDataSettingsForm extends Form
 
     public function fetch($request, $template = null, $display = false)
     {
-        $templateMgr = TemplateManager::getManager($request);
+        $templateMgr = \TemplateManager::getManager($request);
         $templateMgr->assign('globallyConfigured', $this->orcidIsGloballyConfigured());
         $templateMgr->assign('pluginName', $this->plugin->getName());
-        $templateMgr->assign('applicationName', Application::get()->getName());
+        $templateMgr->assign('applicationName', \Application::get()->getName());
         return parent::fetch($request, $template, $display);
     }
 
@@ -115,10 +137,15 @@ class DemographicDataSettingsForm extends Form
 
     public function orcidIsGloballyConfigured(): bool
     {
-        $apiUrl = Config::getVar('orcid', 'api_url');
-        $clientId = Config::getVar('orcid', 'client_id');
-        $clientSecret = Config::getVar('orcid', 'client_secret');
-        return isset($apiUrl) && trim($apiUrl) && isset($clientId) && trim($clientId) &&
-            isset($clientSecret) && trim($clientSecret);
+        $apiUrl = \Config::getVar('orcid', 'api_url');
+        $clientId = \Config::getVar('orcid', 'client_id');
+        $clientSecret = \Config::getVar('orcid', 'client_secret');
+
+        return isset($apiUrl)
+            && trim($apiUrl)
+            && isset($clientId)
+            && trim($clientId)
+            && isset($clientSecret)
+            && trim($clientSecret);
     }
 }
