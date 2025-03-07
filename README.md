@@ -8,9 +8,9 @@ This plugin allows the collection of demographic data from users via a questionn
 
 The latest release of this plugin is compatible with the following PKP applications:
 
-* OJS 3.4.0
+* OJS 3.3.0 (Releases 0.x.x.x)
 
-Using PHP 8.1 or later.
+Using PHP 7.3 or later.
 
 ## Plugin Download
 
@@ -42,4 +42,4 @@ Developed by Lepidus Tecnologia.
 
 __This plugin is licensed under the GNU General Public License v3.0__
 
-__Copyright (c) 2024 Lepidus Tecnologia__
+__Copyright (c) 2024-2025 Lepidus Tecnologia__
