@@ -14,14 +14,14 @@ Utilizando PHP 8.1 ou uma versão superior.
 
 ## Download do plugin 
 
-Para fazer download do plugin, vá até a [Página de Versões](https://github.com/lepidus/demographicData/releases) e faça download do pacote tar.gz da última versão compatível com o seu website.
+Para fazer download do plugin, vá até a [Página de Versões](https://github.com/lepidus/demographicData/releases) e faça download do pacote tar.gz da última versão compatível com o seu OJS.
 
 ## Instalação
 
 1. Entre na área administrativa do seu site OJS através do __Painel de Controle__.
 2. Navegue até `Configurações`> `Website`> `Plugins`> `Carregar um novo plugin`.
 3. Em __Carregar arquivo__, selecione o arquivo __demographicData.tar.gz__.
-4. Clique em __Salvar__ e o plugin será instalado no seu site.
+4. Clique em __Salvar__ e o plugin será instalado no seu OJS.
 
 ## Instruções de uso
 Assim que o plugin for ativado, o questionário demográfico será exibido na página de perfil do usuário. Ao acessar essa página, o usuário encontrará uma nova aba, chamada "Dados Demográficos", onde poderá consentir em responder o questionário ou não.
