@@ -20,15 +20,16 @@ class DemographicDataPlugin extends \GenericPlugin
     {
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
-            \HookRegistry::register('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
-            \HookRegistry::register('LoadComponentHandler', [$this, 'setupTabHandler']);
-            \HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
-            \HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
-            \HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
-            \HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
-            \HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
-            \HookRegistry::register('EditorAction::recordDecision', [$this, 'requestDataExternalContributors']);
-            \HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
+            HookRegistry::register('Request::redirect', [$this, 'redirectAuthorAfterLogin']);
+            HookRegistry::register('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
+            HookRegistry::register('LoadComponentHandler', [$this, 'setupTabHandler']);
+            HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
+            HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
+            HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
+            HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
+            HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
+            HookRegistry::register('EditorAction::recordDecision', [$this, 'requestDataExternalContributors']);
+            HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
 
             $defaultQuestionsCreator = new DefaultQuestionsCreator();
             $defaultQuestionsCreator->createDefaultQuestions();
@@ -135,6 +136,21 @@ class DemographicDataPlugin extends \GenericPlugin
             return true;
         }
         return false;
+    }
+
+    public function redirectAuthorAfterLogin(string $hookName, array $params)
+    {
+        $request = Application::get()->getRequest();
+        $user = $request->getUser();
+        $url = &$params[0];
+
+        if ($user && strpos($url, '/submissions') !== false) {
+            $userIsAuthor = false; //implement real method
+
+            if ($userIsAuthor) {
+                $url = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'user', 'profile');
+            }
+        }
     }
 
     public function addChangesToUserProfilePage(string $hookName, array $params)
