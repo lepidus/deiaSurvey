@@ -155,6 +155,12 @@ describe('Demographic Data - External contributors data collecting', function() 
     it('Creation of new submission', function() {
         cy.login('ckwantes', null, 'publicknowledge');
         
+        cy.contains('a', 'Demographic Data').click();
+        cy.get('input[name="demographicDataConsent"][value=0]').click();
+        cy.get('#demographicDataForm .submitFormButton').click();
+        cy.wait(1000);
+        cy.contains('Back to Submissions').click();
+
         cy.get('div#myQueue a:contains("New Submission")').click();
         beginSubmission(firstSubmissionData);
         detailsStep(firstSubmissionData);
