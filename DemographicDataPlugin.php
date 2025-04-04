@@ -12,8 +12,10 @@ use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
 use PKP\core\JSONMessage;
 use APP\decision\Decision;
+use PKP\security\Role;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
+use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateResponsesOnRegistration;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
@@ -27,7 +29,8 @@ class DemographicDataPlugin extends GenericPlugin
     {
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
-            Hook::add('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
+            Hook::add('Request::redirect', [$this, 'redirectAuthorAfterLogin']);
+            Hook::add('TemplateManager::display', [$this, 'addChangesOnTemplateDisplaying']);
             Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
             Hook::add('LoadHandler', [$this, 'addPageHandler']);
             Hook::add('Schema::get::author', [$this, 'editAuthorSchema']);
@@ -139,14 +142,57 @@ class DemographicDataPlugin extends GenericPlugin
         return false;
     }
 
-    public function addChangesToUserProfilePage(string $hookName, array $params)
+    public function redirectAuthorAfterLogin(string $hookName, array $params)
+    {
+        $url = &$params[0];
+        if (strpos($url, '/submissions') === false) {
+            return;
+        }
+
+        $request = Application::get()->getRequest();
+        if ($this->userShouldBeRedirected($request)) {
+            $url = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'user', 'profile');
+        }
+    }
+
+    public function addChangesOnTemplateDisplaying(string $hookName, array $params)
     {
         $templateMgr = $params[0];
         $template = $params[1];
+
         if ($template === 'user/profile.tpl') {
             $templateFilterDispatcher = new TemplateFilterDispatcher($this);
             $templateFilterDispatcher->dispatch($templateMgr);
         }
+
+        if ($template === 'dashboard/index.tpl') {
+            $request = Application::get()->getRequest();
+            if ($this->userShouldBeRedirected($request)) {
+                $request->redirect(null, 'user', 'profile');
+            }
+        }
+    }
+
+    private function userShouldBeRedirected($request)
+    {
+        $context = $request->getContext();
+        $user = $request->getUser();
+
+        $demographicDataDao = new DemographicDataDAO();
+        $userConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
+
+        return is_null($userConsent) && $this->userIsAuthor($user, $context);
+    }
+
+    private function userIsAuthor($user, $context)
+    {
+        $userRoles = $user->getRoles($context->getId());
+        $userRoles = array_map(function ($role) {
+            return $role->getRoleId();
+        }, $userRoles);
+        $authorRoles = [Role::ROLE_ID_AUTHOR, Role::ROLE_ID_READER];
+
+        return !empty(array_intersect($userRoles, $authorRoles)) && empty(array_diff($userRoles, $authorRoles));
     }
 
     public function getInstallMigration(): Migration
