@@ -22,7 +22,7 @@ class DemographicDataPlugin extends \GenericPlugin
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
             HookRegistry::register('Request::redirect', [$this, 'redirectAuthorAfterLogin']);
-            HookRegistry::register('TemplateManager::display', [$this, 'addChangesToUserProfilePage']);
+            HookRegistry::register('TemplateManager::display', [$this, 'addChangesOnTemplateDisplaying']);
             HookRegistry::register('LoadComponentHandler', [$this, 'setupTabHandler']);
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
             HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
@@ -147,15 +147,38 @@ class DemographicDataPlugin extends \GenericPlugin
         }
 
         $request = Application::get()->getRequest();
+        if ($this->userShouldBeRedirected($request)) {
+            $url = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'user', 'profile');
+        }
+    }
+
+    public function addChangesOnTemplateDisplaying(string $hookName, array $params)
+    {
+        $templateMgr = $params[0];
+        $template = $params[1];
+        
+        if ($template === 'user/profile.tpl') {
+            $templateFilterDispatcher = new TemplateFilterDispatcher($this);
+            $templateFilterDispatcher->dispatch($templateMgr);
+        }
+
+        if ($template === 'dashboard/index.tpl') {
+            $request = Application::get()->getRequest();
+            if ($this->userShouldBeRedirected($request)) {
+                $request->redirect(null, 'user', 'profile');
+            }
+        }
+    }
+
+    private function userShouldBeRedirected($request)
+    {
         $context = $request->getContext();
         $user = $request->getUser();
 
         $demographicDataDao = new DemographicDataDAO();
         $userConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
 
-        if (is_null($userConsent) && $this->userIsAuthor($user, $context)) {
-            $url = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'user', 'profile');
-        }
+        return is_null($userConsent) && $this->userIsAuthor($user, $context);
     }
 
     private function userIsAuthor($user, $context)
@@ -167,16 +190,6 @@ class DemographicDataPlugin extends \GenericPlugin
         $authorRoles = [ROLE_ID_AUTHOR, ROLE_ID_READER];
 
         return !empty(array_intersect($userRoles, $authorRoles)) && empty(array_diff($userRoles, $authorRoles));
-    }
-
-    public function addChangesToUserProfilePage(string $hookName, array $params)
-    {
-        $templateMgr = $params[0];
-        $template = $params[1];
-        if ($template === 'user/profile.tpl') {
-            $templateFilterDispatcher = new TemplateFilterDispatcher($this);
-            $templateFilterDispatcher->dispatch($templateMgr);
-        }
     }
 
     public function getInstallMigration(): Migration
