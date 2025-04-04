@@ -8,6 +8,7 @@ use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\form\CustomRegistrationForm;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
+use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateResponsesOnRegistration;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\plugins\generic\demographicData\DemographicDataSettingsForm;
@@ -140,17 +141,32 @@ class DemographicDataPlugin extends \GenericPlugin
 
     public function redirectAuthorAfterLogin(string $hookName, array $params)
     {
-        $request = Application::get()->getRequest();
-        $user = $request->getUser();
         $url = &$params[0];
-
-        if ($user && strpos($url, '/submissions') !== false) {
-            $userIsAuthor = false; //implement real method
-
-            if ($userIsAuthor) {
-                $url = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'user', 'profile');
-            }
+        if (strpos($url, '/submissions') === false) {
+            return;
         }
+
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        $user = $request->getUser();
+
+        $demographicDataDao = new DemographicDataDAO();
+        $userConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
+
+        if (is_null($userConsent) && $this->userIsAuthor($user, $context)) {
+            $url = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'user', 'profile');
+        }
+    }
+
+    private function userIsAuthor($user, $context)
+    {
+        $userRoles = $user->getRoles($context->getId());
+        $userRoles = array_map(function ($role) {
+            return $role->getRoleId();
+        }, $userRoles);
+        $authorRoles = [ROLE_ID_AUTHOR, ROLE_ID_READER];
+
+        return !empty(array_intersect($userRoles, $authorRoles)) && empty(array_diff($userRoles, $authorRoles));
     }
 
     public function addChangesToUserProfilePage(string $hookName, array $params)
