@@ -156,7 +156,7 @@ class DemographicDataPlugin extends \GenericPlugin
     {
         $templateMgr = $params[0];
         $template = $params[1];
-        
+
         if ($template === 'user/profile.tpl') {
             $templateFilterDispatcher = new TemplateFilterDispatcher($this);
             $templateFilterDispatcher->dispatch($templateMgr);
