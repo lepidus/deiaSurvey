@@ -81,24 +81,26 @@ function assertDisabledFields() {
 }
 
 describe('Demographic Data - Questions displaying', function () {
-    it('Display of questions and request message at users profile page', function () {
+    it('Display of questions for editors at profile page', function () {
         cy.login('dbarnes', null, 'publicknowledge');
+        cy.contains('h1', 'Submissions');
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('a', 'Edit Profile').click();
-        cy.contains('We request that you fill in the demographic data survey on the "Demographic Data" tab of your profile page');
-        assertDefaultQuestionsDisplay();
-        cy.logout();
 
-        cy.login('dsokoloff', null, 'publicknowledge');
-        cy.get('.app__headerActions button').eq(1).click();
-        cy.contains('a', 'Edit Profile').click();
         cy.contains('We request that you fill in the demographic data survey on the "Demographic Data" tab of your profile page');
         assertDefaultQuestionsDisplay();
     });
+    it('Display of questions for authors just after login. Fullfilling is mandatory.', function () {
+        cy.login('dsokoloff', null, 'publicknowledge');
+        cy.contains('h1', 'Profile');
+        cy.contains('We request that you fill in the demographic data survey on the "Demographic Data" tab of your profile page');
+        assertDefaultQuestionsDisplay();
+
+        cy.contains('a', 'Back to Submissions').click();
+        cy.contains('h1', 'Profile');
+    });
     it('User can choose not to answer questions', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
-        cy.get('.app__headerActions button').eq(1).click();
-        cy.contains('a', 'Edit Profile').click();
         cy.contains('a', 'Demographic Data').click();
 
         cy.contains('I consent to the processing of my Demographic Data');
@@ -118,7 +120,7 @@ describe('Demographic Data - Questions displaying', function () {
         cy.get('input[name="demographicDataConsent"][value=0]').should('be.checked');
         assertDisabledFields();
     });
-    it('Request message is not shown anymore', function () {
+    it('Request message is not shown anymore. Author can now access other parts of the application.', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('a', 'Edit Profile').click();
