@@ -100,6 +100,10 @@ describe('Demographic Data - Questions displaying', function () {
 
             if (['manager', 'editor'].includes(userRole)) {
                 cy.contains('.app__navItem', 'Submissions').click();
+                cy.contains('h1', 'Profile');
+                cy.contains('.app__navItem', 'Issues').click();
+                cy.contains('h1', 'Profile');
+                cy.contains('.app__navItem', 'Website').click();
             } else {
                 cy.contains('a', 'Back to Submissions').click();
             }
