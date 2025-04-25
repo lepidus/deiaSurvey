@@ -1,6 +1,7 @@
 describe('Demographic Data - Plugin setup', function () {
     it('Editor does not give consent, in order to use the application', function () {
 		cy.login('dbarnes', null, 'publicknowledge');
+		cy.contains('a', 'Website').click();
 
 		cy.contains('h1', 'Profile');
 		cy.contains('a', 'Demographic Data').click();
