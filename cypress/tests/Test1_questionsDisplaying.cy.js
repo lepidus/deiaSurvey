@@ -81,23 +81,48 @@ function assertDisabledFields() {
 }
 
 describe('Demographic Data - Questions displaying', function () {
-    it('Display of questions for editors at profile page', function () {
-        cy.login('dbarnes', null, 'publicknowledge');
+    it('Display of questions for users just after login. Fullfilling is mandatory.', function () {
+        let usersWithMandatoryFilling = {
+            'rvaca': 'manager',
+            'sberardo': 'editor',
+            'agallego': 'reviewer',
+            'dsokoloff': 'author'
+        };
+
+        for (let username in usersWithMandatoryFilling) {
+            let userRole = usersWithMandatoryFilling[username];
+            cy.login(username, null, 'publicknowledge');
+            cy.log('User ' + username);
+
+            cy.contains('h1', 'Profile');
+            cy.contains('We request that you fill in the demographic data survey on the "Demographic Data" tab of your profile page');
+            assertDefaultQuestionsDisplay();
+
+            if (userRole == 'manager') {
+                cy.contains('.app__navItem', 'Submissions').click();
+                cy.contains('h1', 'Profile');
+                cy.contains('.app__navItem', 'Issues').click();
+                cy.contains('h1', 'Profile');
+                cy.contains('.app__navItem', 'Website').click();
+            } else if (userRole == 'editor') {
+                cy.contains('.app__navItem', 'Submissions').click();
+                cy.contains('h1', 'Profile');
+                cy.contains('.app__navItem', 'Editorial Activity').click();
+            } else {
+                cy.contains('a', 'Back to Submissions').click();
+            }
+            cy.contains('h1', 'Profile');
+            cy.logout();
+        }
+    });
+    it('Answering of questions is not mandatory for the site admin', function () {
+        cy.login('admin', 'admin', 'publicknowledge');
         cy.contains('h1', 'Submissions');
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('a', 'Edit Profile').click();
         
         cy.contains('We request that you fill in the demographic data survey on the "Demographic Data" tab of your profile page');
         assertDefaultQuestionsDisplay();
-    });
-    it('Display of questions for authors just after login. Fullfilling is mandatory.', function () {
-        cy.login('dsokoloff', null, 'publicknowledge');
-        cy.contains('h1', 'Profile');
-        cy.contains('We request that you fill in the demographic data survey on the "Demographic Data" tab of your profile page');
-        assertDefaultQuestionsDisplay();
-
-        cy.contains('a', 'Back to Submissions').click();
-        cy.contains('h1', 'Profile');
     });
     it('User can choose not to answer questions', function () {
         cy.login('dsokoloff', null, 'publicknowledge');

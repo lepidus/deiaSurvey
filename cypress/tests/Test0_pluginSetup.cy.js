@@ -1,5 +1,5 @@
 describe('Demographic Data - Plugin setup', function () {
-    it('Enables Demographic Data plugin', function () {
+	it('Enables Demographic Data plugin', function () {
 		cy.login('dbarnes', null, 'publicknowledge');
 
 		cy.contains('a', 'Website').click();
@@ -10,6 +10,15 @@ describe('Demographic Data - Plugin setup', function () {
 		cy.get('input[id^=select-cell-demographicdataplugin]').check();
 		cy.get('input[id^=select-cell-demographicdataplugin]').should('be.checked');
     });
+	it('Editor does not give consent, in order to use the application', function () {
+		cy.login('dbarnes', null, 'publicknowledge');
+
+		cy.contains('h1', 'Profile');
+		cy.contains('a', 'Demographic Data').click();
+		cy.get('input[name="demographicDataConsent"][value=0]').click();
+        cy.get('#demographicDataForm .submitFormButton').click();
+        cy.wait(1000);
+	});
 	it('Configures plugin', function() {
 		const pluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-demographicdataplugin';
 

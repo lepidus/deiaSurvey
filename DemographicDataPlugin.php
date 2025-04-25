@@ -21,7 +21,7 @@ class DemographicDataPlugin extends \GenericPlugin
     {
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
-            HookRegistry::register('Request::redirect', [$this, 'redirectAuthorAfterLogin']);
+            HookRegistry::register('Request::redirect', [$this, 'redirectUserAfterLogin']);
             HookRegistry::register('TemplateManager::display', [$this, 'addChangesOnTemplateDisplaying']);
             HookRegistry::register('LoadComponentHandler', [$this, 'setupTabHandler']);
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
@@ -139,7 +139,7 @@ class DemographicDataPlugin extends \GenericPlugin
         return false;
     }
 
-    public function redirectAuthorAfterLogin(string $hookName, array $params)
+    public function redirectUserAfterLogin(string $hookName, array $params)
     {
         $url = &$params[0];
         if (strpos($url, '/submissions') === false) {
@@ -160,9 +160,11 @@ class DemographicDataPlugin extends \GenericPlugin
         if ($template === 'user/profile.tpl') {
             $templateFilterDispatcher = new TemplateFilterDispatcher($this);
             $templateFilterDispatcher->dispatch($templateMgr);
+            return;
         }
 
-        if ($template === 'dashboard/index.tpl') {
+        $backendMenuState = $templateMgr->getState('menu');
+        if (!is_null($backendMenuState)) {
             $request = Application::get()->getRequest();
             if ($this->userShouldBeRedirected($request)) {
                 $request->redirect(null, 'user', 'profile');
@@ -178,18 +180,17 @@ class DemographicDataPlugin extends \GenericPlugin
         $demographicDataDao = new DemographicDataDAO();
         $userConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
 
-        return is_null($userConsent) && $this->userIsAuthor($user, $context);
+        return is_null($userConsent) && $this->userHasMandatoryFilling($user, $context);
     }
 
-    private function userIsAuthor($user, $context)
+    private function userHasMandatoryFilling($user, $context)
     {
-        $userRoles = $user->getRoles($context->getId());
+        $userRoles = $user->getRoles(CONTEXT_SITE);
         $userRoles = array_map(function ($role) {
             return $role->getRoleId();
         }, $userRoles);
-        $authorRoles = [ROLE_ID_AUTHOR, ROLE_ID_READER];
 
-        return !empty(array_intersect($userRoles, $authorRoles)) && empty(array_diff($userRoles, $authorRoles));
+        return !in_array(ROLE_ID_SITE_ADMIN, $userRoles);
     }
 
     public function getInstallMigration(): Migration
