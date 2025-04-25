@@ -185,7 +185,7 @@ class DemographicDataPlugin extends \GenericPlugin
 
     private function userHasMandatoryFilling($user, $context)
     {
-        $userRoles = $user->getRoles($context->getId());
+        $userRoles = $user->getRoles(CONTEXT_SITE);
         $userRoles = array_map(function ($role) {
             return $role->getRoleId();
         }, $userRoles);
