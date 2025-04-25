@@ -84,7 +84,7 @@ describe('Demographic Data - Questions displaying', function () {
     it('Display of questions for users just after login. Fullfilling is mandatory.', function () {
         let usersWithMandatoryFilling = {
             'rvaca': 'manager',
-            'dbarnes': 'editor',
+            'sberardo': 'editor',
             'agallego': 'reviewer',
             'dsokoloff': 'author'
         };
@@ -98,12 +98,16 @@ describe('Demographic Data - Questions displaying', function () {
             cy.contains('We request that you fill in the demographic data survey on the "Demographic Data" tab of your profile page');
             assertDefaultQuestionsDisplay();
 
-            if (['manager', 'editor'].includes(userRole)) {
+            if (userRole == 'manager') {
                 cy.contains('.app__navItem', 'Submissions').click();
                 cy.contains('h1', 'Profile');
                 cy.contains('.app__navItem', 'Issues').click();
                 cy.contains('h1', 'Profile');
                 cy.contains('.app__navItem', 'Website').click();
+            } else if (userRole == 'editor') {
+                cy.contains('.app__navItem', 'Submissions').click();
+                cy.contains('h1', 'Profile');
+                cy.contains('.app__navItem', 'Editorial Activity').click();
             } else {
                 cy.contains('a', 'Back to Submissions').click();
             }
