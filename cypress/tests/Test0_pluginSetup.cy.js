@@ -1,5 +1,5 @@
 describe('Demographic Data - Plugin setup', function () {
-	it('Enables Demographic Data plugin', function () {
+	it('Enables Demographic Data plugin. Editor does not give consent', function () {
 		cy.login('dbarnes', null, 'publicknowledge');
 
 		cy.contains('a', 'Website').click();
@@ -9,9 +9,7 @@ describe('Demographic Data - Plugin setup', function () {
 
 		cy.get('input[id^=select-cell-demographicdataplugin]').check();
 		cy.get('input[id^=select-cell-demographicdataplugin]').should('be.checked');
-    });
-	it('Editor does not give consent, in order to use the application', function () {
-		cy.login('dbarnes', null, 'publicknowledge');
+		cy.reload();
 
 		cy.contains('h1', 'Profile');
 		cy.contains('a', 'Demographic Data').click();
