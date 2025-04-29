@@ -31,7 +31,7 @@ describe('Demographic Data - Plugin setup', function () {
 		cy.get('tr#' + orcidPluginRowId + ' a.show_extras').click();
 		cy.get('a[id^=' + orcidPluginRowId + '-settings-button]').click();
 
-		cy.get('#orcidAPIPath').select('Public Sandbox');
+		cy.get('#orcidProfileAPIPath').select('Public Sandbox');
 		cy.get('input[name="orcidClientId"]').clear().type(Cypress.env('orcidClientId'), {delay: 0});
 		cy.get('input[name="orcidClientSecret"]').clear().type(Cypress.env('orcidClientSecret'), {delay: 0});
 		cy.get('#orcidProfileSettingsForm button:contains("OK")').click();
@@ -59,7 +59,6 @@ describe('Demographic Data - Plugin setup', function () {
 		cy.get('#demographicDataSettingsForm button:contains("OK")').click();
 		cy.wait(1000);
 
-		cy.get('tr#' + pluginRowId + ' a.show_extras').click();
 		cy.get('a[id^=' + pluginRowId + '-settings-button]').click();
 		cy.contains("This plugin is using the credentials below");
 	});
