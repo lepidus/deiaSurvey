@@ -62,6 +62,7 @@ class OrcidConfigurationTest extends \PKPTestCase
         $orcidConfiguration = $this->orcidConfiguration->getOrcidConfiguration($this->contextId);
 
         $expectedConfiguration = [
+            'pluginName' => 'orcidprofileplugin',
             'apiPath' => $this->orcidAPIPath,
             'clientId' => $this->orcidClientId,
             'clientSecret' => $this->orcidClientSecret
@@ -81,6 +82,7 @@ class OrcidConfigurationTest extends \PKPTestCase
         $orcidConfiguration = $this->orcidConfiguration->getOrcidConfiguration($this->contextId);
 
         $expectedConfiguration = [
+            'pluginName' => 'demographicdataplugin',
             'apiPath' => $this->demographicAPIPath,
             'clientId' => $this->demographicClientId,
             'clientSecret' => $this->demographicClientSecret

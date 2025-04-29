@@ -34,6 +34,7 @@ class OrcidConfiguration
             $clientSecret = $pluginSettingsDao->getSetting($contextId, $pluginName, $settingsNames[2]);
 
             return [
+                'pluginName' => $pluginName,
                 'apiPath' => $apiPath,
                 'clientId' => $clientId,
                 'clientSecret' => $clientSecret
