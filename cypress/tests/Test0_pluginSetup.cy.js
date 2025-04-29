@@ -1,6 +1,6 @@
 describe('Demographic Data - Plugin setup', function () {
 	const pluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-demographicdataplugin';
-	const orcidPluginRowId = 'dsfsdfad';
+	const orcidPluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin';
 	
 	it('Enables Demographic Data plugin. Editor does not give consent', function () {
 		cy.login('dbarnes', null, 'publicknowledge');
