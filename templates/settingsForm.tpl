@@ -16,6 +16,16 @@
 
 <form class="pkp_form" id="demographicDataSettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
     <div id="demographicDataSettings">
+        {if $orcidConfiguration}
+            <p class="pkpNotification pkpNotification--success">
+                {if $orcidConfiguration['pluginName'] == 'orcidprofileplugin'}
+                    {translate key="plugins.generic.demographicData.settings.credentialsUsed.orcidProfile"}
+                {else}
+                    {translate key="plugins.generic.demographicData.settings.credentialsUsed.own"}
+                {/if}
+            </p>
+        {/if}
+        
         <p id="description">
             {translate key="plugins.generic.demographicData.settings.description" }
         </p>

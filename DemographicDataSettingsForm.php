@@ -22,6 +22,7 @@ use PKP\form\validation\FormValidatorPost;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorCustom;
 use APP\plugins\generic\demographicData\classes\OrcidCredentialsValidator;
+use APP\plugins\generic\demographicData\classes\OrcidConfiguration;
 
 class DemographicDataSettingsForm extends \Form
 {
@@ -99,6 +100,11 @@ class DemographicDataSettingsForm extends \Form
         $templateMgr->assign('globallyConfigured', $this->orcidIsGloballyConfigured());
         $templateMgr->assign('pluginName', $this->plugin->getName());
         $templateMgr->assign('applicationName', \Application::get()->getName());
+
+        $orcidConfiguration = new OrcidConfiguration();
+        $currentOrcidConfiguration = $orcidConfiguration->getOrcidConfiguration($this->contextId);
+        $templateMgr->assign('orcidConfiguration', $currentOrcidConfiguration);
+
         return parent::fetch($request, $template, $display);
     }
 
