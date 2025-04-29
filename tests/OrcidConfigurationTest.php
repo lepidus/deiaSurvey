@@ -2,13 +2,13 @@
 
 namespace APP\plugins\generic\demographicData\tests;
 
-require_once(dirname(__DIR__, 2) . '/autoload.php');
+require_once(dirname(__DIR__, 1) . '/autoload.php');
 
 use APP\plugins\generic\demographicData\classes\OrcidConfiguration;
 
-import('lib.pkp.tests.DatabaseTestCase');
+import('lib.pkp.tests.PKPTestCase');
 
-class OrcidConfigurationTest extends \DatabaseTestCase
+class OrcidConfigurationTest extends \PKPTestCase
 {
     private $orcidConfiguration;
     private $contextId = 10;
@@ -21,14 +21,30 @@ class OrcidConfigurationTest extends \DatabaseTestCase
 
     protected function setUp(): void
     {
-        $this->setAffectedTables(['plugin_settings']);
         $this->orcidConfiguration = new OrcidConfiguration();
         parent::setUp();
     }
 
+    protected function tearDown(): void
+    {
+        $pluginSettingsToClean = [
+            'demographicdataplugin' => ['orcidAPIPath', 'orcidClientId', 'orcidClientSecret'],
+            'orcidprofileplugin' => ['orcidProfileAPIPath', 'orcidClientId', 'orcidClientSecret']
+        ];
+        $pluginSettingsDao = \DAORegistry::getDAO('PluginSettingsDAO');
+
+        foreach ($pluginSettingsToClean as $pluginName => $settings) {
+            foreach ($settings as $settingName) {
+                $pluginSettingsDao->deleteSetting($this->contextId, $pluginName, $settingName);
+            }
+        }
+
+        parent::tearDown();
+    }
+
     private function insertPluginSettings($pluginName, $settingName, $settingValue)
     {
-        $pluginSettingsDao = DAORegistry::getDAO('PluginSettingsDAO');
+        $pluginSettingsDao = \DAORegistry::getDAO('PluginSettingsDAO');
         $pluginSettingsDao->updateSetting($this->contextId, $pluginName, $settingName, $settingValue);
     }
 
