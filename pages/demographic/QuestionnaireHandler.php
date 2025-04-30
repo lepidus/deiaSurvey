@@ -7,6 +7,7 @@ use APP\handler\Handler;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\demographicData\classes\OrcidConfiguration;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\template\TemplateManager;
 use PKP\config\Config;
@@ -211,8 +212,11 @@ class QuestionnaireHandler extends \Handler
             return;
         }
 
-        $isSandBox = $plugin->getSetting($contextId, 'orcidAPIPath') == OrcidClient::ORCID_API_URL_MEMBER_SANDBOX ||
-            $plugin->getSetting($contextId, 'orcidAPIPath') == OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX;
+        $orcidConfiguration = new OrcidConfiguration();
+        $orcidConfiguration = $orcidConfiguration->getOrcidConfiguration($contextId);
+
+        $isSandBox = $orcidConfiguration['apiPath'] == OrcidClient::ORCID_API_URL_MEMBER_SANDBOX ||
+            $orcidConfiguration['apiPath'] == OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX;
         $authorOrcidUri = ($isSandBox ? OrcidClient::ORCID_URL_SANDBOX : OrcidClient::ORCID_URL) . $authorOrcid;
 
         $demographicDataDao = new DemographicDataDAO();

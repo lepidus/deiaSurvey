@@ -2,6 +2,8 @@
 
 namespace APP\plugins\generic\demographicData\classes;
 
+use APP\plugins\generic\demographicData\classes\OrcidConfiguration;
+
 class OrcidClient
 {
     public const ORCID_URL = 'https://orcid.org/';
@@ -15,22 +17,30 @@ class OrcidClient
 
     private $plugin;
     private $contextId;
+    private $orcidConfiguration;
 
     public function __construct($plugin, $contextId)
     {
         $this->plugin = $plugin;
         $this->contextId = $contextId;
+
+        $orcidConfiguration = new OrcidConfiguration();
+        $this->orcidConfiguration = $orcidConfiguration->getOrcidConfiguration($contextId);
     }
 
     public function requestOrcid(string $code)
     {
+        if (is_null($this->orcidConfiguration)) {
+            return null;
+        }
+
         $httpClient = \Application::get()->getHttpClient();
 
-        $tokenUrl = $this->plugin->getSetting($this->contextId, 'orcidAPIPath') . 'oauth/token';
+        $tokenUrl = $this->orcidConfiguration['apiPath'] . 'oauth/token';
         $requestHeaders = ['Accept' => 'application/json'];
         $requestData = [
-            'client_id' => $this->plugin->getSetting($this->contextId, 'orcidClientId'),
-            'client_secret' => $this->plugin->getSetting($this->contextId, 'orcidClientSecret'),
+            'client_id' => $this->orcidConfiguration['clientId'],
+            'client_secret' => $this->orcidConfiguration['clientSecret'],
             'grant_type' => 'authorization_code',
             'code' => $code
         ];
@@ -50,6 +60,10 @@ class OrcidClient
 
     public function buildOAuthUrl($redirectParams)
     {
+        if (is_null($this->orcidConfiguration)) {
+            return '';
+        }
+
         $request = \Application::get()->getRequest();
 
         if ($this->isMemberApiEnabled($this->contextId)) {
@@ -70,7 +84,7 @@ class OrcidClient
 
         return $this->getOauthPath() . 'authorize?' . http_build_query(
             array(
-                'client_id' => $this->plugin->getSetting($this->contextId, 'orcidClientId'),
+                'client_id' => $this->orcidConfiguration['clientId'],
                 'response_type' => 'code',
                 'scope' => $scope,
                 'redirect_uri' => $redirectUrl)
@@ -79,7 +93,7 @@ class OrcidClient
 
     private function isMemberApiEnabled()
     {
-        $apiUrl = $this->plugin->getSetting($this->contextId, 'orcidAPIPath');
+        $apiUrl = $this->orcidConfiguration['apiPath'];
         return ($apiUrl == self::ORCID_API_URL_MEMBER || $apiUrl == self::ORCID_API_URL_MEMBER_SANDBOX);
     }
 
@@ -90,7 +104,7 @@ class OrcidClient
 
     private function getOrcidUrl()
     {
-        $apiPath = $this->plugin->getSetting($this->contextId, 'orcidAPIPath');
+        $apiPath = $this->orcidConfiguration['apiPath'];
         if ($apiPath == self::ORCID_API_URL_PUBLIC || $apiPath == self::ORCID_API_URL_MEMBER) {
             return self::ORCID_URL;
         } else {

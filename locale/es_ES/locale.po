@@ -131,3 +131,10 @@ msgstr "Miembro"
 
 msgid "plugins.generic.demographicData.settings.orcidAPIPath.memberSandbox"
 msgstr "Miembro Sandbox"
+
+msgid "plugins.generic.demographicData.settings.credentialsUsed.orcidProfile"
+msgstr "El módulo utiliza las credenciales introducidas en la configuración del módulo Perfil ORCID. "
+"Si desea utilizar otras credenciales para este módulo, utilice los campos siguientes."
+
+msgid "plugins.generic.demographicData.settings.credentialsUsed.own"
+msgstr "Este módulo utiliza las siguientes credenciales"
