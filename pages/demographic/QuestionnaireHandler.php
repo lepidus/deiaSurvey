@@ -215,8 +215,8 @@ class QuestionnaireHandler extends \Handler
         $orcidConfiguration = new OrcidConfiguration();
         $orcidConfiguration = $orcidConfiguration->getOrcidConfiguration($contextId);
 
-        $isSandBox = $this->orcidConfiguration['apiPath'] == OrcidClient::ORCID_API_URL_MEMBER_SANDBOX ||
-            $this->orcidConfiguration['apiPath'] == OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX;
+        $isSandBox = $orcidConfiguration['apiPath'] == OrcidClient::ORCID_API_URL_MEMBER_SANDBOX ||
+            $orcidConfiguration['apiPath'] == OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX;
         $authorOrcidUri = ($isSandBox ? OrcidClient::ORCID_URL_SANDBOX : OrcidClient::ORCID_URL) . $authorOrcid;
 
         $demographicDataDao = new DemographicDataDAO();
