@@ -9,8 +9,6 @@ class OrcidConfiguration
 
     public function getOrcidConfiguration(int $contextId): ?array
     {
-        $pluginSettingsDao = \DAORegistry::getDAO('PluginSettingsDAO');
-
         $demographicConfiguration = $this->getPluginOrcidConfiguration($contextId, self::DEMOGRAPHIC_PLUGIN_NAME, ['orcidAPIPath', 'orcidClientId', 'orcidClientSecret']);
         if (!is_null($demographicConfiguration)) {
             return $demographicConfiguration;
