@@ -18,6 +18,9 @@ class CustomRegistrationHandler extends \RegistrationHandler
 
         $userDao = \DAORegistry::getDAO('UserDAO');
         $user = $userDao->getByUsername($username);
+        if (!$user) {
+            return;
+        }
 
         $context = $request->getContext();
         if (!$context) {
