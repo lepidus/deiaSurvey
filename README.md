@@ -12,6 +12,8 @@ The latest release of this plugin is compatible with the following PKP applicati
 
 Using PHP 8.1 or later.
 
+For other versions of PKP applications, check the releases available at the [Releases page](https://github.com/lepidus/demographicData/releases).
+
 ## Plugin Download
 
 To download the plugin, go to the [Releases page](https://github.com/lepidus/demographicData/releases) and download the tar.gz package of the latest release compatible with your OJS.
