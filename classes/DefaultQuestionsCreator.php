@@ -7,11 +7,8 @@ use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQ
 
 class DefaultQuestionsCreator
 {
-    public function createDefaultQuestions()
+    public function createDefaultQuestions($contextId)
     {
-        $request = \Application::get()->getRequest();
-        $contextId = $request->getContext()->getId();
-
         $demographicQuestionsCount = Repo::demographicQuestion()
             ->getCollector()
             ->filterByContextIds([$contextId])
