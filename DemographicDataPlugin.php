@@ -3,7 +3,6 @@
 require_once('autoload.php');
 
 use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
-use APP\plugins\generic\demographicData\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\form\CustomRegistrationForm;
@@ -31,9 +30,6 @@ class DemographicDataPlugin extends \GenericPlugin
             HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
             HookRegistry::register('EditorAction::recordDecision', [$this, 'requestDataExternalContributors']);
             HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
-
-            $defaultQuestionsCreator = new DefaultQuestionsCreator();
-            $defaultQuestionsCreator->createDefaultQuestions();
         }
         return $success;
     }
