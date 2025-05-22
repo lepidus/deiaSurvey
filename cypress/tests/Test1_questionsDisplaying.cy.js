@@ -2,14 +2,16 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('a', 'Demographic Data').click();
     
     cy.contains('label', 'Gender');
-    cy.contains('.description', 'With which gender do you most identify? Please select one option:');
+    cy.contains('.description', 'With which gender do you most identify? Please select one option:')
+        .should('have.length', 1);
     cy.contains('label', 'Woman');
     cy.contains('label', 'Man');
     cy.contains('label', 'Non-binary or gender diverse');
     cy.contains('label', 'Prefer not to disclose');
 
     cy.contains('label', 'Race');
-    cy.contains('.description', 'How would you identify yourself in terms of race? Please select ALL the groups that apply to you:');
+    cy.contains('.description', 'How would you identify yourself in terms of race? Please select ALL the groups that apply to you:')
+        .should('have.length', 1);
     cy.contains('label', 'Asian or Pacific Islander');
     cy.contains('label', 'Black');
     cy.contains('label', 'Hispanic or Latino/a/x');
@@ -20,7 +22,8 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('label', 'Self describe');
 
     cy.contains('label', 'Ethnicity');
-    cy.contains('.description', "What are your ethnic origins or ancestry? Please select ALL the geographic areas from which your family's ancestors first originated:");
+    cy.contains('.description', "What are your ethnic origins or ancestry? Please select ALL the geographic areas from which your family's ancestors first originated:")
+        .should('have.length', 1);
     cy.contains('label', 'Western Europe');
     cy.contains('label', 'Eastern Europe');
     cy.contains('label', 'North Africa');
