@@ -170,9 +170,12 @@ class DemographicDataPlugin extends \GenericPlugin
 
     private function userShouldBeRedirected($request)
     {
-        error_log('Metodo userShouldBeRedirected');
         $context = $request->getContext();
         $user = $request->getUser();
+
+        if (is_null($user)) {
+            return false;
+        }
 
         $demographicDataDao = new DemographicDataDAO();
         $userConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
