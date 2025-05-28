@@ -160,7 +160,7 @@ class DemographicDataPlugin extends \GenericPlugin
         }
 
         $backendMenuState = $templateMgr->getState('menu');
-        if (!is_null($backendMenuState)) {
+        if (!empty($backendMenuState)) {
             $request = Application::get()->getRequest();
             if ($this->userShouldBeRedirected($request)) {
                 $request->redirect(null, 'user', 'profile');
@@ -170,6 +170,7 @@ class DemographicDataPlugin extends \GenericPlugin
 
     private function userShouldBeRedirected($request)
     {
+        error_log('Metodo userShouldBeRedirected');
         $context = $request->getContext();
         $user = $request->getUser();
 
