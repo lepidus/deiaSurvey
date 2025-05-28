@@ -163,7 +163,7 @@ class DemographicDataPlugin extends GenericPlugin
         }
 
         $backendMenuState = $templateMgr->getState('menu');
-        if (!is_null($backendMenuState)) {
+        if (!empty($backendMenuState)) {
             $request = Application::get()->getRequest();
             if ($this->userShouldBeRedirected($request)) {
                 $request->redirect(null, 'user', 'profile');
@@ -175,6 +175,10 @@ class DemographicDataPlugin extends GenericPlugin
     {
         $context = $request->getContext();
         $user = $request->getUser();
+
+        if (is_null($user)) {
+            return false;
+        }
 
         $demographicDataDao = new DemographicDataDAO();
         $userConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
