@@ -7,7 +7,7 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('label', 'Woman');
     cy.contains('label', 'Man');
     cy.contains('label', 'Non-binary or gender diverse');
-    cy.contains('label', 'Prefer not to disclose');
+    cy.contains('label', 'Prefer not to inform');
 
     cy.contains('label', 'Race');
     cy.contains('.description', 'How would you identify yourself in terms of race? Please select ALL the groups that apply to you:')
@@ -18,7 +18,7 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('label', 'Indigenous (e.g. North American Indian Navajo, South American Indian Quechua, Aboriginal or Torres Strait Islander)');
     cy.contains('label', 'Middle Eastern or North African');
     cy.contains('label', 'White');
-    cy.contains('label', 'Prefer not to disclose');
+    cy.contains('label', 'Prefer not to inform');
     cy.contains('label', 'Self describe');
 
     cy.contains('label', 'Ethnicity');
@@ -35,7 +35,7 @@ function assertDefaultQuestionsDisplay() {
     cy.contains('label', 'North America');
     cy.contains('label', 'Central America and Caribbean');
     cy.contains('label', 'South America');
-    cy.contains('label', 'Prefer not to disclose');
+    cy.contains('label', 'Prefer not to inform');
     cy.contains('label', 'Self describe');
 }
 
