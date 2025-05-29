@@ -75,9 +75,9 @@ class DefaultQuestionsCreator
                     ],
                     [
                         'optionText' => [
-                            'en' => 'Prefer not to disclose',
-                            'es' => 'Prefiero no divulgar',
-                            'pt_BR' => 'Prefiro não divulgar'
+                            'en' => 'Prefer not to inform',
+                            'es' => 'Prefiero no informar',
+                            'pt_BR' => 'Prefiro não informar'
                         ],
                         'hasInputField' => false
                     ]
@@ -150,9 +150,9 @@ class DefaultQuestionsCreator
                     ],
                     [
                         'optionText' => [
-                            'en' => 'Prefer not to disclose',
-                            'es' => 'Prefiero no divulgar',
-                            'pt_BR' => 'Prefiro não divulgar'
+                            'en' => 'Prefer not to inform',
+                            'es' => 'Prefiero no informar',
+                            'pt_BR' => 'Prefiro não informar'
                         ],
                         'hasInputField' => false
                     ],
@@ -273,9 +273,9 @@ class DefaultQuestionsCreator
                     ],
                     [
                         'optionText' => [
-                            'en' => 'Prefer not to disclose',
-                            'es' => 'Prefiero no divulgar',
-                            'pt_BR' => 'Prefiro não divulgar'
+                            'en' => 'Prefer not to inform',
+                            'es' => 'Prefiero no informar',
+                            'pt_BR' => 'Prefiro não informar'
                         ],
                         'hasInputField' => false
                     ],
