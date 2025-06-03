@@ -48,7 +48,8 @@ class DemographicDataDAO extends \DAO
         }
 
         Capsule::table('user_settings')
-            ->where('user_id', $consentSetting['id'])
+            ->where('user_id', '=', $userId)
+            ->where('setting_name', '=', 'demographicDataConsent')
             ->update([
                 'setting_value' => $settingValue
             ]);
