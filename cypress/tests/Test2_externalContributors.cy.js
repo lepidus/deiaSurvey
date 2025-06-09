@@ -96,7 +96,9 @@ function newSubmission(data) {
 	cy.get('a:contains("Make a New Submission"), div#myQueue a:contains("New Submission")').click();
 
     // === Submission Step 1 ===
-	if ('section' in data) cy.get('select[id="sectionId"],select[id="seriesId"]').select(data.section);
+    if (Cypress.env('contextTitles').en_US == 'Journal of Public Knowledge' && 'section' in data) {
+        cy.get('select[id="sectionId"],select[id="seriesId"]').select(data.section);
+    }
 	cy.get('input[id^="checklist-"]').click({multiple: true});
 	cy.get('input[id=privacyConsent]').click();
 	if ('submitterRole' in data) {
@@ -105,31 +107,60 @@ function newSubmission(data) {
 	cy.get('button.submitFormButton').click();
 
 	// === Submission Step 2 ===
-    cy.get('button:contains("Add File")');
+    if (Cypress.env('contextTitles').en_US == 'Public Knowledge Preprint Server') {
+        data.files.forEach(file => {
+			cy.get('a:contains("Add galley")').click();
+			cy.wait(2000);
+			cy.get('div.pkp_modal_panel').then($modalDiv => {
+				cy.wait(3000);
+				if ($modalDiv.find('div.header:contains("Create New Galley")').length) {
+					cy.get('div.pkp_modal_panel input[id^="label-"]').type('PDF', {delay: 0});
+					cy.get('div.pkp_modal_panel button:contains("Save")').click();
+					cy.wait(2000);
+				}
+			});
+			cy.get('select[id=genreId]').select(file.genre);
+			cy.fixture(file.file, 'base64').then(fileContent => {
+				cy.get('input[type=file]').upload(
+					{fileContent, 'fileName': file.fileName, 'mimeType': 'application/pdf', 'encoding': 'base64'}
+				);
+			});
+			cy.get('button').contains('Continue').click();
+			cy.wait(2000);
+			for (const field in file.metadata) {
+				cy.get('input[id^="' + Cypress.$.escapeSelector(field) + '"]:visible,textarea[id^="' + Cypress.$.escapeSelector(field) + '"]').type(file.metadata[field], {delay: 0});
+				cy.get('input[id^="language"').click({force: true});
+			}
+			cy.get('button').contains('Continue').click();
+			cy.get('button').contains('Complete').click();
+		});
+    } else {
+        cy.get('button:contains("Add File")');
 
-    const allowException = function(error, runnable) {
-        return false;
-    }
-    cy.on('uncaught:exception', allowException);
+        const allowException = function(error, runnable) {
+            return false;
+        }
+        cy.on('uncaught:exception', allowException);
 
-    const primaryFileGenres = ['Article Text', 'Book Manuscript', 'Chapter Manuscript'];
-    data.files.forEach(file => {
-        cy.fixture(file.file, 'base64').then(fileContent => {
-            cy.get('input[type=file]').upload(
-                {fileContent, 'fileName': file.fileName, 'mimeType': 'application/pdf', 'encoding': 'base64'}
-            );
-            var $row = cy.get('a:contains("' + file.fileName + '")').parents('.listPanel__item');
-            if (primaryFileGenres.includes(file.genre)) {
-                $row.get('button:contains("' + file.genre + '")').last().click();
-                $row.get('span:contains("' + file.genre + '")');
-            } else {
-                $row.get('button:contains("Other")').last().click();
-                cy.get('#submission-files-container .modal label:contains("' + file.genre + '")').click();
-                cy.get('#submission-files-container .modal button:contains("Save")').click();
-            }
-            $row.get('button:contains("What kind of file is this?")').should('not.exist');
+        const primaryFileGenres = ['Article Text', 'Book Manuscript', 'Chapter Manuscript'];
+        data.files.forEach(file => {
+            cy.fixture(file.file, 'base64').then(fileContent => {
+                cy.get('input[type=file]').upload(
+                    {fileContent, 'fileName': file.fileName, 'mimeType': 'application/pdf', 'encoding': 'base64'}
+                );
+                var $row = cy.get('a:contains("' + file.fileName + '")').parents('.listPanel__item');
+                if (primaryFileGenres.includes(file.genre)) {
+                    $row.get('button:contains("' + file.genre + '")').last().click();
+                    $row.get('span:contains("' + file.genre + '")');
+                } else {
+                    $row.get('button:contains("Other")').last().click();
+                    cy.get('#submission-files-container .modal label:contains("' + file.genre + '")').click();
+                    cy.get('#submission-files-container .modal button:contains("Save")').click();
+                }
+                $row.get('button:contains("What kind of file is this?")').should('not.exist');
+            });
         });
-    });
+    }
 
 	cy.location('search')
 		.then(search => {
@@ -207,7 +238,7 @@ describe('Demographic Data - External contributors data collecting', function() 
 		};
     });
 
-    it('Create and accept new submission', function() {
+    it('Creates new submission for collection of demographic data from external authors', function() {
         cy.login('ckwantes', null, 'publicknowledge');
         
         cy.contains('a', 'Demographic Data').click();
@@ -218,11 +249,13 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.contains('Back to Submissions').click();
         newSubmission(firstSubmissionData);
 
-        cy.logout();
-		cy.findSubmissionAsEditor('dbarnes', null, 'Kwantes');
-        cy.sendToReview();
-		cy.assignReviewer('Julie Janssen');
-        cy.recordEditorialDecision('Accept Submission');
+        if (Cypress.env('contextTitles').en_US == 'Journal of Public Knowledge') {
+            cy.logout();
+            cy.findSubmissionAsEditor('dbarnes', null, 'Kwantes');
+            cy.sendToReview();
+            cy.assignReviewer('Julie Janssen');
+            cy.recordEditorialDecision('Accept Submission');
+        }
     });
 
     it('Email was sent to contributors without registration', function () {
@@ -254,7 +287,7 @@ describe('Demographic Data - External contributors data collecting', function() 
                 .invoke('attr', 'href').then(href => {
                     cy.writeFile('cypress/fixtures/data.json', { url: href })
                 });
-          });
+        });
     });
 
     it('Acess questionnaire from contributors without registration', function () {
@@ -284,16 +317,18 @@ describe('Demographic Data - External contributors data collecting', function() 
         assertResponsesOfExternalAuthor('susy.almeida@outlook.com');
     });
 
-    it('New submission is created and accepted with same contributor', function () {
+    it('New submission is created with same contributor', function () {
         cy.login('ckwantes', null, 'publicknowledge');
 
         newSubmission(secondSubmissionData);
 
-        cy.logout();
-		cy.findSubmissionAsEditor('dbarnes', null, 'Kwantes');
-        cy.sendToReview();
-		cy.assignReviewer('Julie Janssen');
-        cy.recordEditorialDecision('Accept Submission');
+        if (Cypress.env('contextTitles').en_US == 'Journal of Public Knowledge') {
+            cy.logout();
+            cy.findSubmissionAsEditor('dbarnes', null, 'Kwantes');
+            cy.sendToReview();
+            cy.assignReviewer('Julie Janssen');
+            cy.recordEditorialDecision('Accept Submission');
+        }
     });
 
     it('E-mail for demographic data collection is not sent again', function () {
