@@ -3,7 +3,6 @@
 require_once('autoload.php');
 
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
-use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\form\CustomRegistrationForm;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
@@ -20,7 +19,6 @@ class DemographicDataPlugin extends \GenericPlugin
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
             HookRegistry::register('Request::redirect', [$this, 'redirectUserAfterLogin']);
-            HookRegistry::register('TemplateManager::display', [$this, 'addChangesOnTemplateDisplaying']);
             HookRegistry::register('LoadComponentHandler', [$this, 'setupTabHandler']);
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
             HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
@@ -67,7 +65,8 @@ class DemographicDataPlugin extends \GenericPlugin
     public function loadDispatcherClasses()
     {
         $dispatcherClasses = [
-            'DataCollectionDispatcher'
+            'DataCollectionDispatcher',
+            'TemplateFilterDispatcher'
         ];
 
         foreach ($dispatcherClasses as $dispatcherClass) {
@@ -163,27 +162,7 @@ class DemographicDataPlugin extends \GenericPlugin
         }
     }
 
-    public function addChangesOnTemplateDisplaying(string $hookName, array $params)
-    {
-        $templateMgr = $params[0];
-        $template = $params[1];
-
-        if ($template === 'user/profile.tpl') {
-            $templateFilterDispatcher = new TemplateFilterDispatcher($this);
-            $templateFilterDispatcher->dispatch($templateMgr);
-            return;
-        }
-
-        $backendMenuState = $templateMgr->getState('menu');
-        if (!empty($backendMenuState)) {
-            $request = Application::get()->getRequest();
-            if ($this->userShouldBeRedirected($request)) {
-                $request->redirect(null, 'user', 'profile');
-            }
-        }
-    }
-
-    private function userShouldBeRedirected($request)
+    public function userShouldBeRedirected($request)
     {
         $context = $request->getContext();
         $user = $request->getUser();

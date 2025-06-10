@@ -12,8 +12,8 @@
 <version>
 	<application>demographicData</application>
 	<type>plugins.generic</type>
-	<release>0.2.2.4</release>
-	<date>2025-06-03</date>
+	<release>0.3.0.0</release>
+	<date>2025-06-10</date>
   <lazy-load>1</lazy-load>
 	<class>DemographicDataPlugin</class>
 </version>
