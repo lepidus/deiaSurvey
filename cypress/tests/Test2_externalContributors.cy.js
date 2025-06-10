@@ -358,8 +358,9 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.recordEditorialDecision('Accept Submission');
     });
 
-    it('Email was sent on new submission', function() {
+    it('New data collection email was sent on new submission', function() {
         cy.visit('localhost:8025');
+        cy.get('b:contains("Request for demographic data collection")').should('have.length', 2);
         cy.get('b:contains("Request for demographic data collection")').eq(0).click();
 
         cy.get('#nav-html-tab').click();
