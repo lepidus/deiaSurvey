@@ -30,6 +30,7 @@ class DemographicDataPlugin extends \GenericPlugin
             HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
             HookRegistry::register('EditorAction::recordDecision', [$this, 'requestExternalContributorsDataOnAccept']);
             HookRegistry::register('SubmissionHandler::saveSubmit', [$this, 'requestExternalContributorsDataOnSubmission']);
+            HookRegistry::register('Publication::publish', [$this, 'requestExternalContributorsDataOnPosting']);
             HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
         }
         return $success;
@@ -285,6 +286,20 @@ class DemographicDataPlugin extends \GenericPlugin
         $applicationName = Application::get()->getName();
 
         if ($applicationName != 'ops' || $step !== 4 || !$stepForm->validate()) {
+            return;
+        }
+
+        $dataCollectionEmailSender = new DataCollectionEmailSender();
+        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submission->getId());
+    }
+
+    public function requestExternalContributorsDataOnPosting(string $hookName, array $params)
+    {
+        $publication = $params[0];
+        $submission = $params[2];
+        $applicationName = Application::get()->getName();
+
+        if ($applicationName != 'ops' || $publication->getData('version') > 1) {
             return;
         }
 
