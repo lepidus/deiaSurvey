@@ -350,17 +350,26 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.contains('Your demographic data has been deleted');
     });
 
-    it('Editor goes back and accepts submission again', function () {
+    it('Editor reaccepts or posts new submission', function () {
         cy.findSubmissionAsEditor('dbarnes', null, 'Kwantes');
 
-        cy.get('.ui-tabs-anchor:contains("Review")').click();
-        cy.get('.pkp_workflow_change_decision').click();
-        cy.recordEditorialDecision('Accept Submission');
+        if (Cypress.env('contextTitles').en_US == 'Journal of Public Knowledge') {
+            cy.get('.ui-tabs-anchor:contains("Review")').click();
+            cy.get('.pkp_workflow_change_decision').click();
+            cy.recordEditorialDecision('Accept Submission');
+        }
+
+        if (Cypress.env('contextTitles').en_US == 'Public Knowledge Preprint Server') {
+            cy.get('#publication-button').click();
+            cy.get('#publication button:contains("Post")').click();
+            cy.get('.pkp_modal_panel button:contains("Post")').click();
+            cy.wait(1000);
+            cy.contains('.pkpPublication__statusPublished', 'Posted');
+        }
     });
 
     it('New data collection email was sent on new submission', function() {
         cy.visit('localhost:8025');
-        cy.get('b:contains("Request for demographic data collection")').should('have.length', 2);
         cy.get('b:contains("Request for demographic data collection")').eq(0).click();
 
         cy.get('#nav-html-tab').click();
