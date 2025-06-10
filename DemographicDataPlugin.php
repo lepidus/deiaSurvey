@@ -2,7 +2,6 @@
 
 require_once('autoload.php');
 
-use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\form\CustomRegistrationForm;
@@ -28,10 +27,12 @@ class DemographicDataPlugin extends \GenericPlugin
             HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
             HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
-            HookRegistry::register('EditorAction::recordDecision', [$this, 'requestExternalContributorsDataOnAccept']);
-            HookRegistry::register('SubmissionHandler::saveSubmit', [$this, 'requestExternalContributorsDataOnSubmission']);
-            HookRegistry::register('Publication::publish', [$this, 'requestExternalContributorsDataOnPosting']);
             HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
+
+            $context = Application::get()->getRequest()->getContext();
+            if (!is_null($context)) {
+                $this->loadDispatcherClasses();
+            }
         }
         return $success;
     }
@@ -61,6 +62,18 @@ class DemographicDataPlugin extends \GenericPlugin
     {
         $request = \Application::get()->getRequest();
         return $request->getContext() !== null;
+    }
+
+    public function loadDispatcherClasses()
+    {
+        $dispatcherClasses = [
+            'DataCollectionDispatcher'
+        ];
+
+        foreach ($dispatcherClasses as $dispatcherClass) {
+            $dispatcherClass = 'APP\plugins\generic\demographicData\classes\dispatchers\\' . $dispatcherClass;
+            $dispatcher = new $dispatcherClass($this);
+        }
     }
 
     public function editAuthorSchema(string $hookName, array $params): bool
@@ -262,49 +275,6 @@ class DemographicDataPlugin extends \GenericPlugin
                 return new \JSONMessage(true, $form->fetch($request));
         }
         return parent::manage($args, $request);
-    }
-
-    public function requestExternalContributorsDataOnAccept(string $hookName, array $params)
-    {
-        $submission = $params[0];
-        $decision = $params[1];
-        $applicationName = Application::get()->getName();
-
-        if ($applicationName != 'ojs2' || $decision['decision'] != SUBMISSION_EDITOR_DECISION_ACCEPT) {
-            return;
-        }
-
-        $dataCollectionEmailSender = new DataCollectionEmailSender();
-        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submission->getId());
-    }
-
-    public function requestExternalContributorsDataOnSubmission(string $hookName, array $params)
-    {
-        $step = $params[0];
-        $submission = $params[1];
-        $stepForm = $params[2];
-        $applicationName = Application::get()->getName();
-
-        if ($applicationName != 'ops' || $step !== 4 || !$stepForm->validate()) {
-            return;
-        }
-
-        $dataCollectionEmailSender = new DataCollectionEmailSender();
-        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submission->getId());
-    }
-
-    public function requestExternalContributorsDataOnPosting(string $hookName, array $params)
-    {
-        $publication = $params[0];
-        $submission = $params[2];
-        $applicationName = Application::get()->getName();
-
-        if ($applicationName != 'ops' || $publication->getData('version') > 1) {
-            return;
-        }
-
-        $dataCollectionEmailSender = new DataCollectionEmailSender();
-        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submission->getId());
     }
 
     public function checkMigrateResponsesOrcid(string $hookName, array $params)
