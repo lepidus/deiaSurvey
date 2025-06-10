@@ -28,7 +28,8 @@ class DemographicDataPlugin extends \GenericPlugin
             HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
             HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
-            HookRegistry::register('EditorAction::recordDecision', [$this, 'requestDataExternalContributors']);
+            HookRegistry::register('EditorAction::recordDecision', [$this, 'requestExternalContributorsDataOnAccept']);
+            HookRegistry::register('SubmissionHandler::saveSubmit', [$this, 'requestExternalContributorsDataOnSubmission']);
             HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
         }
         return $success;
@@ -262,12 +263,28 @@ class DemographicDataPlugin extends \GenericPlugin
         return parent::manage($args, $request);
     }
 
-    public function requestDataExternalContributors(string $hookName, array $params)
+    public function requestExternalContributorsDataOnAccept(string $hookName, array $params)
     {
         $submission = $params[0];
         $decision = $params[1];
+        $applicationName = Application::get()->getName();
 
-        if ($decision['decision'] != SUBMISSION_EDITOR_DECISION_ACCEPT) {
+        if ($applicationName != 'ojs2' || $decision['decision'] != SUBMISSION_EDITOR_DECISION_ACCEPT) {
+            return;
+        }
+
+        $dataCollectionEmailSender = new DataCollectionEmailSender();
+        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submission->getId());
+    }
+
+    public function requestExternalContributorsDataOnSubmission(string $hookName, array $params)
+    {
+        $step = $params[0];
+        $submission = $params[1];
+        $stepForm = $params[2];
+        $applicationName = Application::get()->getName();
+
+        if ($applicationName != 'ops' || $step !== 4 || !$stepForm->validate()) {
             return;
         }
 
