@@ -39,6 +39,7 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             Hook::add('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
             Hook::add('Decision::add', [$this, 'requestDataCollectionOnAccept']);
+            Hook::add('Publication::publish', [$this, 'requestDataCollectionOnPosting']);
             Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
 
             Event::subscribe(new MigrateResponsesOnRegistration());
@@ -267,6 +268,20 @@ class DemographicDataPlugin extends GenericPlugin
 
         $dataCollectionEmailSender = new DataCollectionEmailSender();
         $dataCollectionEmailSender->sendRequestDataCollectionEmails($submissionId);
+    }
+
+    public function requestDataCollectionOnPosting(string $hookName, array $params)
+    {
+        $publication = $params[0];
+        $submission = $params[2];
+        $applicationName = Application::get()->getName();
+
+        if ($applicationName != 'ops' || $publication->getData('version') > 1) {
+            return;
+        }
+
+        $dataCollectionEmailSender = new DataCollectionEmailSender();
+        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submission->getId());
     }
 
     public function checkMigrateResponsesOrcid(string $hookName, array $params)
