@@ -8,7 +8,8 @@ This plugin allows the collection of demographic data from users via a questionn
 
 The latest release of this plugin is compatible with the following PKP applications:
 
-* OJS 3.3.0 (Releases 0.x.x.x)
+* OJS 3.3.0
+* OPS 3.3.0
 
 Using PHP 7.3 or later.
 
@@ -27,7 +28,7 @@ Once enabled, the demographic questionnaire is displayed in the users profile pa
 
 ![](docs/screenshots/Questionnaire-en.png)
 
-For authors who are not registered in the system, an e-mail is sent when the submission is accepted, requesting them to fill in the demographic questionnaire. This e-mail is only sent to authors where there is no user with the same e-mail address in the system.
+For authors who are not registered in the system, an e-mail is sent when the submission is accepted (in OJS), requesting them to fill in the demographic questionnaire. In OPS, the e-mail is sent when the submission is completed and when it is posted. This e-mail is only sent to authors where there is no user with the same e-mail address in the system.
 
 The e-mail sent offers two ways of filling in the data. The first requires an ORCID record to be authenticated, so that the data is associated with this record. The second uses the author's e-mail address and is recommended only for those who do not have an ORCID record.
 
