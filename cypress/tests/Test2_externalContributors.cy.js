@@ -84,7 +84,7 @@ function beginSubmission(submissionData) {
     cy.get('input[name="locale"][value="en"]').click();
     cy.setTinyMceContent('startSubmission-title-control', submissionData.title);
     
-    if (Cypress.env('contextTitles').en !== 'Public Knowledge Preprint Server') {
+    if (Cypress.env('contextTitles').en == 'Journal of Public Knowledge') {
         cy.get('input[name="sectionId"][value="1"]').click();
     }
     
@@ -118,10 +118,44 @@ function contributorsStep(submissionData) {
     cy.contains('button', 'Continue').click();
 }
 
+function createNewSubmission(submissionData) {
+    cy.get('div#myQueue a:contains("New Submission")').click();
+    beginSubmission(submissionData);
+    detailsStep(submissionData);
+    
+    if (Cypress.env('contextTitles').en == 'Journal of Public Knowledge') {
+        cy.uploadSubmissionFiles([{
+            'file': 'dummy.pdf',
+            'fileName': 'dummy.pdf',
+            'mimeType': 'application/pdf',
+            'genre': 'Article Text'
+        }]);
+    } else if (Cypress.env('contextTitles').en == 'Public Knowledge Preprint Server') {
+        cy.addSubmissionGalleys([{
+            'file': 'dummy.pdf',
+            'fileName': 'dummy.pdf',
+            'mimeType': 'application/pdf',
+            'genre': 'Preprint Text'
+        }]);
+    }
+
+    cy.contains('button', 'Continue').click();
+    contributorsStep(submissionData);
+    cy.contains('button', 'Continue').click();
+    cy.wait(1000);
+
+    cy.contains('button', 'Submit').click();
+    cy.get('.modal__panel:visible').within(() => {
+        cy.contains('button', 'Submit').click();
+    });
+    cy.waitJQuery();
+    cy.contains('h1', 'Submission complete');
+}
+
 describe('Demographic Data - External contributors data collecting', function() {
     let firstSubmissionData;
     let secondSubmissionData;
-    
+
     before(function() {
         firstSubmissionData = {
             title: "Test scenarios to automobile vehicles",
@@ -152,50 +186,33 @@ describe('Demographic Data - External contributors data collecting', function() 
 		};
     });
 
-    it('Creation of new submission', function() {
+    it('Creates new submission for collection of demographic data from external authors', function() {
         cy.login('ckwantes', null, 'publicknowledge');
-        
+
         cy.contains('a', 'Demographic Data').click();
         cy.get('input[name="demographicDataConsent"][value=0]').click();
         cy.get('#demographicDataForm .submitFormButton').click();
         cy.wait(1000);
         cy.contains('Back to Submissions').click();
 
-        cy.get('div#myQueue a:contains("New Submission")').click();
-        beginSubmission(firstSubmissionData);
-        detailsStep(firstSubmissionData);
-        cy.uploadSubmissionFiles([{
-			'file': 'dummy.pdf',
-			'fileName': 'dummy.pdf',
-			'mimeType': 'application/pdf',
-			'genre': 'Article Text'
-		}]);
-        cy.contains('button', 'Continue').click();
-        contributorsStep(firstSubmissionData);
-        cy.contains('button', 'Continue').click();
-        cy.wait(1000);
+        createNewSubmission(firstSubmissionData);
 
-        cy.contains('button', 'Submit').click();
-        cy.get('.modal__panel:visible').within(() => {
-            cy.contains('button', 'Submit').click();
-        });
-        cy.waitJQuery();
-        cy.contains('h1', 'Submission complete');
-    });
-    it('Editor accepts submission', function () {
-        cy.login('dbarnes', null, 'publicknowledge');
-        cy.findSubmission('myQueue', firstSubmissionData.title);
+        if (Cypress.env('contextTitles').en == 'Journal of Public Knowledge') {
+            cy.logout();
+            cy.login('dbarnes', null, 'publicknowledge');
+            cy.findSubmission('myQueue', firstSubmissionData.title);
 
-        cy.get('#workflow-button').click();
-            
-        cy.clickDecision('Send for Review');
-        cy.contains('button', 'Skip this email').click();
-        cy.contains('button', 'Record Decision').click();
-        cy.get('a.pkpButton').contains('View Submission').click();
-        cy.assignReviewer('Julie Janssen');
-        
-        cy.clickDecision('Accept Submission');
-        cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
+            cy.get('#workflow-button').click();
+
+            cy.clickDecision('Send for Review');
+            cy.contains('button', 'Skip this email').click();
+            cy.contains('button', 'Record Decision').click();
+            cy.get('a.pkpButton').contains('View Submission').click();
+            cy.assignReviewer('Julie Janssen');
+
+            cy.clickDecision('Accept Submission');
+            cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
+        }
     });
     it('Access email to collect data from contributors without registration', function () {
         cy.visit('localhost:8025');
@@ -248,41 +265,24 @@ describe('Demographic Data - External contributors data collecting', function() 
     it('New submission is created and accepted with same contributor', function () {
         cy.login('ckwantes', null, 'publicknowledge');
         
-        cy.get('div#myQueue a:contains("New Submission")').click();
-        beginSubmission(secondSubmissionData);
-        detailsStep(secondSubmissionData);
-        cy.uploadSubmissionFiles([{
-			'file': 'dummy.pdf',
-			'fileName': 'dummy.pdf',
-			'mimeType': 'application/pdf',
-			'genre': 'Article Text'
-		}]);
-        cy.contains('button', 'Continue').click();
-        contributorsStep(secondSubmissionData);
-        cy.contains('button', 'Continue').click();
-        cy.wait(1000);
-
-        cy.contains('button', 'Submit').click();
-        cy.get('.modal__panel:visible').within(() => {
-            cy.contains('button', 'Submit').click();
-        });
-        cy.waitJQuery();
-        cy.contains('h1', 'Submission complete');
-        cy.logout();
-
-        cy.login('dbarnes', null, 'publicknowledge');
-        cy.findSubmission('myQueue', secondSubmissionData.title);
-
-        cy.get('#workflow-button').click();
-
-        cy.clickDecision('Send for Review');
-        cy.contains('button', 'Skip this email').click();
-        cy.contains('button', 'Record Decision').click();
-        cy.get('a.pkpButton').contains('View Submission').click();
-        cy.assignReviewer('Julie Janssen');
+        createNewSubmission(secondSubmissionData);
         
-        cy.clickDecision('Accept Submission');
-        cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
+        if (Cypress.env('contextTitles').en == 'Journal of Public Knowledge') {
+            cy.logout();
+            cy.login('dbarnes', null, 'publicknowledge');
+            cy.findSubmission('myQueue', secondSubmissionData.title);
+
+            cy.get('#workflow-button').click();
+
+            cy.clickDecision('Send for Review');
+            cy.contains('button', 'Skip this email').click();
+            cy.contains('button', 'Record Decision').click();
+            cy.get('a.pkpButton').contains('View Submission').click();
+            cy.assignReviewer('Julie Janssen');
+            
+            cy.clickDecision('Accept Submission');
+            cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
+        }
     });
     it('E-mail for demographic data collection is not sent again', function () {
         cy.visit('localhost:8025');
@@ -307,18 +307,28 @@ describe('Demographic Data - External contributors data collecting', function() 
 
         cy.contains('Your demographic data has been deleted');
     });
-    it('Editor goes back and accepts submission again', function () {
+    it('Editor reaccepts/posts new submission', function () {
         cy.login('dbarnes', null, 'publicknowledge');
         cy.findSubmission('myQueue', secondSubmissionData.title);
 
-        cy.get('#workflow-button').click();
-        cy.clickDecision('Cancel Copyediting');
-        cy.contains('button', 'Skip this email').click();
-        cy.contains('button', 'Record Decision').click();
-        cy.get('a.pkpButton').contains('View Submission').click();
+        if (Cypress.env('contextTitles').en == 'Journal of Public Knowledge') {
+            cy.get('#workflow-button').click();
+            cy.clickDecision('Cancel Copyediting');
+            cy.contains('button', 'Skip this email').click();
+            cy.contains('button', 'Record Decision').click();
+            cy.get('a.pkpButton').contains('View Submission').click();
+            
+            cy.clickDecision('Accept Submission');
+            cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
+        }
 
-        cy.clickDecision('Accept Submission');
-        cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
+        if (Cypress.env('contextTitles').en == 'Public Knowledge Preprint Server') {
+            cy.get('#publication-button').click();
+            cy.get('#publication button:contains("Post")').click();
+            cy.get('.pkp_modal_panel button:contains("Post")').click();
+            cy.wait(1000);
+            cy.contains('.pkpPublication__statusPublished', 'Posted');
+        }
     });
     it('Contributor answers demographic questionnaire on new submission', function () {
         cy.visit('localhost:8025');
