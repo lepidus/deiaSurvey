@@ -8,22 +8,33 @@ use Illuminate\Support\Facades\Schema;
 use PKP\plugins\PluginRegistry;
 use PKP\plugins\Hook;
 use PKP\db\DAORegistry;
+use APP\core\Application;
 use APP\plugins\generic\demographicData\classes\DefaultQuestionsCreator;
 
 class SchemaMigration extends Migration
 {
     public function up(): void
     {
+        $applicationName = Application::get()->getName();
+
         if (!Schema::hasTable('demographic_questions')) {
-            Schema::create('demographic_questions', function (Blueprint $table) {
+            Schema::create('demographic_questions', function (Blueprint $table) use ($applicationName) {
                 $table->bigInteger('demographic_question_id')->autoIncrement();
                 $table->bigInteger('context_id');
                 $table->bigInteger('question_type');
 
-                $table->foreign('context_id')
-                    ->references('journal_id')
-                    ->on('journals')
-                    ->onDelete('cascade');
+                if ($applicationName == 'ojs2') {
+                    $table->foreign('context_id')
+                        ->references('journal_id')
+                        ->on('journals')
+                        ->onDelete('cascade');
+                } elseif ($applicationName == 'ops') {
+                    $table->foreign('context_id')
+                        ->references('server_id')
+                        ->on('servers')
+                        ->onDelete('cascade');
+                }
+
                 $table->index(['context_id'], 'demographic_questions_context_id');
             });
         }
@@ -128,10 +139,12 @@ class SchemaMigration extends Migration
 
     private function addDefaultQuestionsToContexts()
     {
-        $journalDao = DAORegistry::getDAO('JournalDAO');
+        $applicationName = Application::get()->getName();
+        $contextDaoName = ($applicationName == 'ojs2') ? 'JournalDAO' : 'ServerDAO';
+        $contextDao = DAORegistry::getDAO($contextDaoName);
         $defaultQuestionsCreator = new DefaultQuestionsCreator();
 
-        $contexts = $journalDao->getAll(true);
+        $contexts = $contextDao->getAll(true);
         while ($context = $contexts->next()) {
             $defaultQuestionsCreator->createDefaultQuestions($context->getId());
         }
