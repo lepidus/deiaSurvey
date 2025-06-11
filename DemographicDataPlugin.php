@@ -17,10 +17,12 @@ use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispat
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateResponsesOnRegistration;
+use APP\plugins\generic\demographicData\classes\observers\listeners\RequestDataCollectionOnSubmission;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\DemographicDataSettingsForm;
+use APP\plugins\generic\demographicData\classes\facades\Repo;
 
 class DemographicDataPlugin extends GenericPlugin
 {
@@ -36,10 +38,11 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             Hook::add('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
-            Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
+            Hook::add('Decision::add', [$this, 'requestDataCollectionOnAccept']);
             Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
 
             Event::subscribe(new MigrateResponsesOnRegistration());
+            Event::subscribe(new RequestDataCollectionOnSubmission());
         }
         return $success;
     }
@@ -249,11 +252,14 @@ class DemographicDataPlugin extends GenericPlugin
         return parent::manage($args, $request);
     }
 
-    public function requestDataExternalContributors(string $hookName, array $params)
+    public function requestDataCollectionOnAccept(string $hookName, array $params)
     {
         $decision = $params[0];
+        $applicationName = \Application::get()->getName();
 
-        if ($decision->getData('decision') != Decision::ACCEPT and $decision->getData('decision') != Decision::SKIP_EXTERNAL_REVIEW) {
+        if ($applicationName != 'ojs2'
+            || ($decision->getData('decision') != Decision::ACCEPT and $decision->getData('decision') != Decision::SKIP_EXTERNAL_REVIEW)
+        ) {
             return;
         }
 
