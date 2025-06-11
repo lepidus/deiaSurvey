@@ -2,9 +2,7 @@
 
 require_once('autoload.php');
 
-use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
-use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\form\CustomRegistrationForm;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
@@ -21,15 +19,18 @@ class DemographicDataPlugin extends \GenericPlugin
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
             HookRegistry::register('Request::redirect', [$this, 'redirectUserAfterLogin']);
-            HookRegistry::register('TemplateManager::display', [$this, 'addChangesOnTemplateDisplaying']);
             HookRegistry::register('LoadComponentHandler', [$this, 'setupTabHandler']);
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
             HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
             HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
             HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
-            HookRegistry::register('EditorAction::recordDecision', [$this, 'requestDataExternalContributors']);
             HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
+
+            $context = Application::get()->getRequest()->getContext();
+            if (!is_null($context)) {
+                $this->loadDispatcherClasses();
+            }
         }
         return $success;
     }
@@ -59,6 +60,19 @@ class DemographicDataPlugin extends \GenericPlugin
     {
         $request = \Application::get()->getRequest();
         return $request->getContext() !== null;
+    }
+
+    public function loadDispatcherClasses()
+    {
+        $dispatcherClasses = [
+            'DataCollectionDispatcher',
+            'TemplateFilterDispatcher'
+        ];
+
+        foreach ($dispatcherClasses as $dispatcherClass) {
+            $dispatcherClass = 'APP\plugins\generic\demographicData\classes\dispatchers\\' . $dispatcherClass;
+            $dispatcher = new $dispatcherClass($this);
+        }
     }
 
     public function editAuthorSchema(string $hookName, array $params): bool
@@ -148,27 +162,7 @@ class DemographicDataPlugin extends \GenericPlugin
         }
     }
 
-    public function addChangesOnTemplateDisplaying(string $hookName, array $params)
-    {
-        $templateMgr = $params[0];
-        $template = $params[1];
-
-        if ($template === 'user/profile.tpl') {
-            $templateFilterDispatcher = new TemplateFilterDispatcher($this);
-            $templateFilterDispatcher->dispatch($templateMgr);
-            return;
-        }
-
-        $backendMenuState = $templateMgr->getState('menu');
-        if (!empty($backendMenuState)) {
-            $request = Application::get()->getRequest();
-            if ($this->userShouldBeRedirected($request)) {
-                $request->redirect(null, 'user', 'profile');
-            }
-        }
-    }
-
-    private function userShouldBeRedirected($request)
+    public function userShouldBeRedirected($request)
     {
         $context = $request->getContext();
         $user = $request->getUser();
@@ -260,19 +254,6 @@ class DemographicDataPlugin extends \GenericPlugin
                 return new \JSONMessage(true, $form->fetch($request));
         }
         return parent::manage($args, $request);
-    }
-
-    public function requestDataExternalContributors(string $hookName, array $params)
-    {
-        $submission = $params[0];
-        $decision = $params[1];
-
-        if ($decision['decision'] != SUBMISSION_EDITOR_DECISION_ACCEPT) {
-            return;
-        }
-
-        $dataCollectionEmailSender = new DataCollectionEmailSender();
-        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submission->getId());
     }
 
     public function checkMigrateResponsesOrcid(string $hookName, array $params)

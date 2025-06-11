@@ -87,13 +87,19 @@ describe('Demographic Data - Questions displaying', function () {
     it('Display of questions for users just after login. Fullfilling is mandatory.', function () {
         let usersWithMandatoryFilling = {
             'rvaca': 'manager',
-            'sberardo': 'editor',
+            'sberardo': 'editor/moderator',
             'agallego': 'reviewer',
             'dsokoloff': 'author'
         };
 
         for (let username in usersWithMandatoryFilling) {
             let userRole = usersWithMandatoryFilling[username];
+            if (Cypress.env('contextTitles').en_US === 'Public Knowledge Preprint Server'
+                && userRole == 'reviewer'
+            ) {
+                continue;
+            }
+
             cy.login(username, null, 'publicknowledge');
             cy.log('User ' + username);
 
@@ -104,10 +110,10 @@ describe('Demographic Data - Questions displaying', function () {
             if (userRole == 'manager') {
                 cy.contains('.app__navItem', 'Submissions').click();
                 cy.contains('h1', 'Profile');
-                cy.contains('.app__navItem', 'Issues').click();
+                cy.contains('.app__navItem', 'Workflow').click();
                 cy.contains('h1', 'Profile');
                 cy.contains('.app__navItem', 'Website').click();
-            } else if (userRole == 'editor') {
+            } else if (userRole == 'editor/moderator') {
                 cy.contains('.app__navItem', 'Submissions').click();
                 cy.contains('h1', 'Profile');
                 cy.contains('.app__navItem', 'Editorial Activity').click();
