@@ -13,7 +13,7 @@
 	<application>demographicData</application>
 	<type>plugins.generic</type>
 	<release>0.3.0.0</release>
-	<date>2025-06-10</date>
+	<date>2025-06-11</date>
   <lazy-load>1</lazy-load>
 	<class>DemographicDataPlugin</class>
 </version>
