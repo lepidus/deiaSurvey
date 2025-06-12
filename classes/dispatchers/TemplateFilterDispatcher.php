@@ -3,18 +3,37 @@
 namespace APP\plugins\generic\demographicData\classes\dispatchers;
 
 use APP\core\Application;
+use PKP\plugins\Hook;
+use APP\plugins\generic\demographicData\classes\dispatchers\DemographicDataDispatcher;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 
-class TemplateFilterDispatcher
+class TemplateFilterDispatcher extends DemographicDataDispatcher
 {
-    private $plugin;
-
-    public function __construct($plugin)
+    protected function registerHooks(): void
     {
-        $this->plugin = $plugin;
+        Hook::add('TemplateManager::display', [$this, 'addChangesOnTemplateDisplaying']);
     }
 
-    public function dispatch($templateMgr)
+    public function addChangesOnTemplateDisplaying(string $hookName, array $params)
+    {
+        $templateMgr = $params[0];
+        $template = $params[1];
+
+        if ($template === 'user/profile.tpl') {
+            $this->addChangesToUserProfilePage($templateMgr);
+            return Hook::CONTINUE;
+        }
+
+        $backendMenuState = $templateMgr->getState('menu');
+        if (!empty($backendMenuState)) {
+            $request = Application::get()->getRequest();
+            if ($this->plugin->userShouldBeRedirected($request)) {
+                $request->redirect(null, 'user', 'profile');
+            }
+        }
+    }
+
+    public function addChangesToUserProfilePage($templateMgr)
     {
         $templateMgr->registerFilter('output', [$this, 'demographicDataTabFilter']);
 

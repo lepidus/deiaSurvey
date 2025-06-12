@@ -11,9 +11,7 @@ use APP\template\TemplateManager;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
 use PKP\core\JSONMessage;
-use APP\decision\Decision;
 use PKP\security\Role;
-use APP\plugins\generic\demographicData\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateResponsesOnRegistration;
@@ -21,6 +19,7 @@ use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
 use APP\plugins\generic\demographicData\DemographicDataSettingsForm;
+use APP\plugins\generic\demographicData\classes\facades\Repo;
 
 class DemographicDataPlugin extends GenericPlugin
 {
@@ -29,17 +28,21 @@ class DemographicDataPlugin extends GenericPlugin
         $success = parent::register($category, $path);
         if ($success && $this->getEnabled()) {
             Hook::add('Request::redirect', [$this, 'redirectUserAfterLogin']);
-            Hook::add('TemplateManager::display', [$this, 'addChangesOnTemplateDisplaying']);
             Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
             Hook::add('LoadHandler', [$this, 'addPageHandler']);
             Hook::add('Schema::get::author', [$this, 'editAuthorSchema']);
             Hook::add('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             Hook::add('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
-            Hook::add('Decision::add', [$this, 'requestDataExternalContributors']);
             Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
 
             Event::subscribe(new MigrateResponsesOnRegistration());
+
+            $context = Application::get()->getRequest()->getContext();
+            if (!is_null($context)) {
+                $this->loadDispatcherClasses();
+            }
+
         }
         return $success;
     }
@@ -69,6 +72,19 @@ class DemographicDataPlugin extends GenericPlugin
     {
         $request = Application::get()->getRequest();
         return $request->getContext() !== null;
+    }
+
+    public function loadDispatcherClasses()
+    {
+        $dispatcherClasses = [
+            'DataCollectionDispatcher',
+            'TemplateFilterDispatcher'
+        ];
+
+        foreach ($dispatcherClasses as $dispatcherClass) {
+            $dispatcherClass = 'APP\plugins\generic\demographicData\classes\dispatchers\\' . $dispatcherClass;
+            $dispatcher = new $dispatcherClass($this);
+        }
     }
 
     public function editAuthorSchema(string $hookName, array $params): bool
@@ -151,27 +167,7 @@ class DemographicDataPlugin extends GenericPlugin
         }
     }
 
-    public function addChangesOnTemplateDisplaying(string $hookName, array $params)
-    {
-        $templateMgr = $params[0];
-        $template = $params[1];
-
-        if ($template === 'user/profile.tpl') {
-            $templateFilterDispatcher = new TemplateFilterDispatcher($this);
-            $templateFilterDispatcher->dispatch($templateMgr);
-            return Hook::CONTINUE;
-        }
-
-        $backendMenuState = $templateMgr->getState('menu');
-        if (!empty($backendMenuState)) {
-            $request = Application::get()->getRequest();
-            if ($this->userShouldBeRedirected($request)) {
-                $request->redirect(null, 'user', 'profile');
-            }
-        }
-    }
-
-    private function userShouldBeRedirected($request)
+    public function userShouldBeRedirected($request)
     {
         $context = $request->getContext();
         $user = $request->getUser();
@@ -247,20 +243,6 @@ class DemographicDataPlugin extends GenericPlugin
                 return new JSONMessage(true, $form->fetch($request));
         }
         return parent::manage($args, $request);
-    }
-
-    public function requestDataExternalContributors(string $hookName, array $params)
-    {
-        $decision = $params[0];
-
-        if ($decision->getData('decision') != Decision::ACCEPT and $decision->getData('decision') != Decision::SKIP_EXTERNAL_REVIEW) {
-            return;
-        }
-
-        $submissionId = $decision->getData('submissionId');
-
-        $dataCollectionEmailSender = new DataCollectionEmailSender();
-        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submissionId);
     }
 
     public function checkMigrateResponsesOrcid(string $hookName, array $params)
