@@ -32,6 +32,7 @@ describe('Demographic Data - Plugin setup', function () {
 		cy.get('input[id^=select-cell-orcidprofileplugin]').should('be.checked');
 		cy.reload();
 
+		cy.get('#plugins-button').click();
 		cy.get('tr#' + orcidPluginRowId + ' a.show_extras').click();
 		cy.get('a[id^=' + orcidPluginRowId + '-settings-button]').click();
 

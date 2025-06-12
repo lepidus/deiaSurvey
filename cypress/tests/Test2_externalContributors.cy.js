@@ -309,7 +309,7 @@ describe('Demographic Data - External contributors data collecting', function() 
     });
     it('Editor reaccepts/posts new submission', function () {
         cy.login('dbarnes', null, 'publicknowledge');
-        cy.findSubmission('myQueue', secondSubmissionData.title);
+        cy.findSubmission('active', secondSubmissionData.title);
 
         if (Cypress.env('contextTitles').en == 'Journal of Public Knowledge') {
             cy.get('#workflow-button').click();
