@@ -9,8 +9,6 @@ use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 
 class TemplateFilterDispatcher extends DemographicDataDispatcher
 {
-    private $plugin;
-
     protected function registerHooks(): void
     {
         Hook::add('TemplateManager::display', [$this, 'addChangesOnTemplateDisplaying']);

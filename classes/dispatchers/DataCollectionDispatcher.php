@@ -5,6 +5,7 @@ namespace APP\plugins\generic\demographicData\classes\dispatchers;
 use PKP\plugins\Hook;
 use APP\core\Application;
 use APP\decision\Decision;
+use Illuminate\Support\Facades\Event;
 use APP\plugins\generic\demographicData\classes\dispatchers\DemographicDataDispatcher;
 use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
 use APP\plugins\generic\demographicData\classes\observers\listeners\RequestDataCollectionOnSubmission;
