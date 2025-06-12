@@ -11,12 +11,10 @@ use APP\template\TemplateManager;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
 use PKP\core\JSONMessage;
-use APP\decision\Decision;
 use PKP\security\Role;
 use APP\plugins\generic\demographicData\classes\migrations\SchemaMigration;
 use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
 use APP\plugins\generic\demographicData\classes\observers\listeners\MigrateResponsesOnRegistration;
-use APP\plugins\generic\demographicData\classes\observers\listeners\RequestDataCollectionOnSubmission;
 use APP\plugins\generic\demographicData\classes\OrcidClient;
 use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
 use APP\plugins\generic\demographicData\classes\DemographicDataService;
@@ -36,12 +34,9 @@ class DemographicDataPlugin extends GenericPlugin
             Hook::add('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
             Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
             Hook::add('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
-            Hook::add('Decision::add', [$this, 'requestDataCollectionOnAccept']);
-            Hook::add('Publication::publish', [$this, 'requestDataCollectionOnPosting']);
             Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
 
             Event::subscribe(new MigrateResponsesOnRegistration());
-            Event::subscribe(new RequestDataCollectionOnSubmission());
 
             $context = Application::get()->getRequest()->getContext();
             if (!is_null($context)) {
@@ -82,6 +77,7 @@ class DemographicDataPlugin extends GenericPlugin
     public function loadDispatcherClasses()
     {
         $dispatcherClasses = [
+            'DataCollectionDispatcher',
             'TemplateFilterDispatcher'
         ];
 
@@ -247,37 +243,6 @@ class DemographicDataPlugin extends GenericPlugin
                 return new JSONMessage(true, $form->fetch($request));
         }
         return parent::manage($args, $request);
-    }
-
-    public function requestDataCollectionOnAccept(string $hookName, array $params)
-    {
-        $decision = $params[0];
-        $applicationName = \Application::get()->getName();
-
-        if ($applicationName != 'ojs2'
-            || ($decision->getData('decision') != Decision::ACCEPT and $decision->getData('decision') != Decision::SKIP_EXTERNAL_REVIEW)
-        ) {
-            return;
-        }
-
-        $submissionId = $decision->getData('submissionId');
-
-        $dataCollectionEmailSender = new DataCollectionEmailSender();
-        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submissionId);
-    }
-
-    public function requestDataCollectionOnPosting(string $hookName, array $params)
-    {
-        $publication = $params[0];
-        $submission = $params[2];
-        $applicationName = Application::get()->getName();
-
-        if ($applicationName != 'ops' || $publication->getData('version') > 1) {
-            return;
-        }
-
-        $dataCollectionEmailSender = new DataCollectionEmailSender();
-        $dataCollectionEmailSender->sendRequestDataCollectionEmails($submission->getId());
     }
 
     public function checkMigrateResponsesOrcid(string $hookName, array $params)
