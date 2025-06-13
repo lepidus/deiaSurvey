@@ -8,20 +8,20 @@ Este plugin permite a coleta de dados demográficos dos usuários através de um
 
 Este plugin é compatível com as seguintes aplicações PKP:
 
-- OPS e OJS nas versões 3.3 e 3.4
+- OJS e OPS nas versões 3.3 e 3.4
 
 Verifique a última versão compatível com a sua aplicação na [Página de Versões](https://github.com/lepidus/demographicData/releases).
 
 ## Download do plugin 
 
-Para fazer download do plugin, vá até a [Página de Versões](https://github.com/lepidus/demographicData/releases) e faça download do pacote tar.gz da última versão compatível com o seu OJS.
+Para fazer download do plugin, vá até a [Página de Versões](https://github.com/lepidus/demographicData/releases) e faça download do pacote tar.gz da última versão compatível com o seu OJS/OPS.
 
 ## Instalação
 
 1. Entre na área administrativa do seu site OJS através do __Painel de Controle__.
 2. Navegue até `Configurações`> `Website`> `Plugins`> `Carregar um novo plugin`.
 3. Em __Carregar arquivo__, selecione o arquivo __demographicData.tar.gz__.
-4. Clique em __Salvar__ e o plugin será instalado no seu OJS.
+4. Clique em __Salvar__ e o plugin será instalado no seu OJS/OPS.
 
 ## Instruções de uso
 Assim que o plugin for ativado, o questionário demográfico será exibido na página de perfil do usuário. Ao acessar essa página, o usuário encontrará uma nova aba, chamada "Dados Demográficos", onde poderá consentir em responder o questionário ou não.
