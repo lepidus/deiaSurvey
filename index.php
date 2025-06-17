@@ -1,5 +1,5 @@
 <?php
 
-require_once('DemographicDataPlugin.php');
+require_once('DeiaSurveyPlugin.php');
 
-return new DemographicDataPlugin();
+return new DeiaSurveyPlugin();

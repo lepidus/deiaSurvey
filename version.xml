@@ -2,18 +2,18 @@
 <!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
 
 <!--
-  * plugins/generic/demographicData/version.xml
+  * plugins/generic/deiaSurvey/version.xml
   *
-  * Copyright (c) 2024 Lepidus Tecnologia
+  * Copyright (c) 2024-2025 Lepidus Tecnologia
   * Distributed under the GNU GPL v3. For full terms see the file LICENSE.
   *
   * Plugin version information.
   -->
 <version>
-	<application>demographicData</application>
+	<application>deiaSurvey</application>
 	<type>plugins.generic</type>
 	<release>0.3.0.0</release>
 	<date>2025-06-11</date>
   <lazy-load>1</lazy-load>
-	<class>DemographicDataPlugin</class>
+	<class>DeiaSurveyPlugin</class>
 </version>

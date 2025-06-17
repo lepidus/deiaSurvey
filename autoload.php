@@ -4,7 +4,7 @@ spl_autoload_register(function ($class) {
     $namespaceMap = [
         'APP' => dirname(__DIR__, 3) . '/classes',
         'PKP' => dirname(__DIR__, 3) . '/lib/pkp/classes',
-        'APP\plugins\generic\demographicData' => dirname(__DIR__, 3) . '/plugins/generic/demographicData',
+        'APP\plugins\generic\deiaSurvey' => dirname(__DIR__, 3) . '/plugins/generic/deiaSurvey',
     ];
 
     $classPath = str_replace('\\', '/', $class);
