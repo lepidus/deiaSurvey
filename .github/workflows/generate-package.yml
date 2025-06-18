@@ -9,7 +9,7 @@ jobs:
   create-release:
     name: Create release and package
     env:
-      PLUGIN_NAME: demographicData
+      PLUGIN_NAME: deiaSurvey
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

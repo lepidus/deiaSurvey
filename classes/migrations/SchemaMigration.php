@@ -1,11 +1,11 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\migrations;
+namespace APP\plugins\generic\deiaSurvey\classes\migrations;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use APP\plugins\generic\demographicData\classes\DefaultQuestionsCreator;
+use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 
 class SchemaMigration extends Migration
 {
@@ -117,7 +117,7 @@ class SchemaMigration extends Migration
 
     private function registerHooksForCustomSchemas()
     {
-        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = \PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         \HookRegistry::register('Schema::get::demographicQuestion', [$plugin, 'addCustomSchema']);
         \HookRegistry::register('Schema::get::demographicResponse', [$plugin, 'addCustomSchema']);
         \HookRegistry::register('Schema::get::demographicResponseOption', [$plugin, 'addCustomSchema']);

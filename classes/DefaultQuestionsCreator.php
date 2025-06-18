@@ -1,9 +1,9 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes;
+namespace APP\plugins\generic\deiaSurvey\classes;
 
-use APP\plugins\generic\demographicData\classes\facades\Repo;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
 
 class DefaultQuestionsCreator
 {

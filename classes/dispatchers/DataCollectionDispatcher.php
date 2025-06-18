@@ -1,9 +1,9 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\dispatchers;
+namespace APP\plugins\generic\deiaSurvey\classes\dispatchers;
 
-use APP\plugins\generic\demographicData\classes\dispatchers\DemographicDataDispatcher;
-use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
+use APP\plugins\generic\deiaSurvey\classes\dispatchers\DemographicDataDispatcher;
+use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
 
 class DataCollectionDispatcher extends DemographicDataDispatcher
 {

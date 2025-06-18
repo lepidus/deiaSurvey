@@ -1,5 +1,5 @@
 {capture assign="pageTitle"}
-    {translate key="plugins.generic.demographicData.questionnairePage.deleteData.title"}
+    {translate key="plugins.generic.deiaSurvey.questionnairePage.deleteData.title"}
 {/capture}
 
 {include file="frontend/components/header.tpl" pageTitleTranslated=$pageTitle}
@@ -8,11 +8,11 @@
     <h1>{$pageTitle|escape}</h1>
 
     <p>
-        {translate key="plugins.generic.demographicData.questionnairePage.deleteData.message"}
+        {translate key="plugins.generic.deiaSurvey.questionnairePage.deleteData.message"}
     </p>
 
     <a id="deleteDemographicData" href="{url op="deleteData" authorId=$authorId authorToken=$authorToken save=true}">
-        {translate key="plugins.generic.demographicData.questionnairePage.deleteMyData"}
+        {translate key="plugins.generic.deiaSurvey.questionnairePage.deleteMyData"}
     </a>
 </div>
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes;
+namespace APP\plugins\generic\deiaSurvey\classes;
 
-use APP\plugins\generic\demographicData\classes\OrcidConfiguration;
+use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 
 class OrcidClient
 {

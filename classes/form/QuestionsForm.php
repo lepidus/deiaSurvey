@@ -1,11 +1,11 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\form;
+namespace APP\plugins\generic\deiaSurvey\classes\form;
 
-use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
-use APP\plugins\generic\demographicData\classes\DemographicDataService;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
-use APP\plugins\generic\demographicData\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\template\TemplateManager;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorPost;
@@ -19,7 +19,7 @@ class QuestionsForm extends \Form
 
     public function __construct($request = null, $args = null)
     {
-        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = \PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         parent::__construct($plugin->getTemplateResource('questionsInProfile.tpl'));
 
         if ($request) {

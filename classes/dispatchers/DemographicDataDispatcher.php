@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\dispatchers;
+namespace APP\plugins\generic\deiaSurvey\classes\dispatchers;
 
 abstract class DemographicDataDispatcher
 {

@@ -1,17 +1,17 @@
 <?php
 
 /**
- * @file DemographicDataSettingsForm.php
+ * @file DeiaSurveySettingsForm.php
  *
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class DemographicDataSettingsForm
- * @ingroup plugins_generic_demographicData
+ * @class DeiaSurveySettingsForm
+ * @ingroup plugins_generic_deiaSurvey
  *
- * @brief Form for site admins to modify Demographic Data plugin settings
+ * @brief Form for site admins to modify Deia Survey plugin settings
  */
 
-namespace APP\plugins\generic\demographicData;
+namespace APP\plugins\generic\deiaSurvey;
 
 use PKP\form\Form;
 use APP\template\TemplateManager;
@@ -21,10 +21,10 @@ use PKP\form\validation\FormValidator;
 use PKP\form\validation\FormValidatorPost;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorCustom;
-use APP\plugins\generic\demographicData\classes\OrcidCredentialsValidator;
-use APP\plugins\generic\demographicData\classes\OrcidConfiguration;
+use APP\plugins\generic\deiaSurvey\classes\OrcidCredentialsValidator;
+use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 
-class DemographicDataSettingsForm extends \Form
+class DeiaSurveySettingsForm extends \Form
 {
     public $contextId;
     public $plugin;
@@ -52,14 +52,14 @@ class DemographicDataSettingsForm extends \Form
                 $this,
                 'orcidAPIPath',
                 'required',
-                'plugins.generic.demographicData.settings.orcidAPIPathRequired'
+                'plugins.generic.deiaSurvey.settings.orcidAPIPathRequired'
             ));
             $this->addCheck(
                 new \FormValidatorCustom(
                     $this,
                     'orcidClientId',
                     'required',
-                    'plugins.generic.demographicData.settings.orcidClientIdError',
+                    'plugins.generic.deiaSurvey.settings.orcidClientIdError',
                     function ($clientId) {
                         return $this->validator->validateClientId($clientId);
                     }
@@ -70,7 +70,7 @@ class DemographicDataSettingsForm extends \Form
                     $this,
                     'orcidClientSecret',
                     'required',
-                    'plugins.generic.demographicData.settings.orcidClientSecretError',
+                    'plugins.generic.deiaSurvey.settings.orcidClientSecretError',
                     function ($clientSecret) {
                         return $this->validator->validateClientSecret($clientSecret);
                     }
@@ -129,11 +129,11 @@ class DemographicDataSettingsForm extends \Form
 
         $clientId = $this->getData('orcidClientId');
         if (!$this->validator->validateClientId($clientId)) {
-            $messages[] = __('plugins.generic.demographicData.settings.orcidClientIdError');
+            $messages[] = __('plugins.generic.deiaSurvey.settings.orcidClientIdError');
         }
         $clientSecret = $this->getData('orcidClientSecret');
         if (!$this->validator->validateClientSecret($clientSecret)) {
-            $messages[] = __('plugins.generic.demographicData.settings.orcidClientSecretError');
+            $messages[] = __('plugins.generic.deiaSurvey.settings.orcidClientSecretError');
         }
         if (strlen($clientId) == 0 or strlen($clientSecret) == 0) {
             $this->plugin->setEnabled(false);

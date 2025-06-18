@@ -1,5 +1,5 @@
 function assertDefaultQuestionsDisplay() {
-    cy.contains('a', 'Demographic Data').click();
+    cy.contains('a', 'DEIA Survey').click();
     
     cy.contains('label', 'Gender');
     cy.contains('.description', 'With which gender do you most identify? Please select one option:')
@@ -51,12 +51,12 @@ function answerDefaultQuestions() {
         cy.get('input').check();
     });
 
-    cy.get('#demographicDataForm .submitFormButton').click();
+    cy.get('#deiaSurveyForm .submitFormButton').click();
     cy.wait(1000);
 }
 
 function assertResponsesToDefaultQuestions() {
-    cy.contains('a', 'Demographic Data').click();
+    cy.contains('a', 'DEIA Survey').click();
     cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
     
     cy.contains('label', 'Woman').within(() => {
@@ -83,7 +83,7 @@ function assertDisabledFields() {
     });
 }
 
-describe('Demographic Data - Questions displaying', function () {
+describe('DEIA Survey - Questions displaying', function () {
     it('Display of questions for users just after login. Fullfilling is mandatory.', function () {
         let usersWithMandatoryFilling = {
             'rvaca': 'manager',
@@ -104,7 +104,7 @@ describe('Demographic Data - Questions displaying', function () {
             cy.log('User ' + username);
 
             cy.contains('h1', 'Profile');
-            cy.contains('We request that you fill in the demographic data survey on the "Demographic Data" tab of your profile page');
+            cy.contains('We request that you fill in the DEIA survey on the "DEIA Survey" tab of your profile page');
             assertDefaultQuestionsDisplay();
 
             if (userRole == 'manager') {
@@ -129,28 +129,28 @@ describe('Demographic Data - Questions displaying', function () {
         cy.contains('h1', 'Submissions');
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('a', 'Edit Profile').click();
-        
-        cy.contains('We request that you fill in the demographic data survey on the "Demographic Data" tab of your profile page');
+
+        cy.contains('We request that you fill in the DEIA survey on the "DEIA Survey" tab of your profile page');
         assertDefaultQuestionsDisplay();
     });
     it('User can choose not to answer questions', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
-        cy.contains('a', 'Demographic Data').click();
+        cy.contains('a', 'DEIA Survey').click();
 
-        cy.contains('I consent to the processing of my Demographic Data');
-        cy.contains('I do not consent to the processing of my Demographic Data');
+        cy.contains('I consent to the processing of my data');
+        cy.contains('I do not consent to the processing of my data');
         cy.contains('You can change your consent option at any time.');
-        cy.contains('If you withdraw a previously given consent, your demographic data will be deleted');
+        cy.contains('If you withdraw a previously given consent, your data will be deleted');
 
         cy.get('input[name="demographicDataConsent"][value=0]').should('not.be.checked');
         cy.get('input[name="demographicDataConsent"][value=1]').should('not.be.checked');
         
         cy.get('input[name="demographicDataConsent"][value=0]').click();
-        cy.get('#demographicDataForm .submitFormButton').click();
+        cy.get('#deiaSurveyForm .submitFormButton').click();
         cy.wait(1000);
         cy.reload();
 
-        cy.contains('a', 'Demographic Data').click();
+        cy.contains('a', 'DEIA Survey').click();
         cy.get('input[name="demographicDataConsent"][value=0]').should('be.checked');
         assertDisabledFields();
     });
@@ -158,13 +158,13 @@ describe('Demographic Data - Questions displaying', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('a', 'Edit Profile').click();
-        cy.get('span:contains("We request that you fill in the demographic data survey")').should('not.exist');
+        cy.get('span:contains("We request that you fill in the DEIA survey")').should('not.exist');
     });
     it('User chooses to answer questions', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('a', 'Edit Profile').click();
-        cy.contains('a', 'Demographic Data').click();
+        cy.contains('a', 'DEIA Survey').click();
 
         cy.get('input[name="demographicDataConsent"][value=1]').click();
         answerDefaultQuestions();
@@ -176,14 +176,14 @@ describe('Demographic Data - Questions displaying', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('a', 'Edit Profile').click();
-        cy.contains('a', 'Demographic Data').click();
+        cy.contains('a', 'DEIA Survey').click();
 
         cy.get('input[name="demographicDataConsent"][value=0]').click();
-        cy.get('#demographicDataForm .submitFormButton').click();
+        cy.get('#deiaSurveyForm .submitFormButton').click();
         cy.wait(1000);
         cy.reload();
 
-        cy.contains('a', 'Demographic Data').click();
+        cy.contains('a', 'DEIA Survey').click();
         cy.contains('label', 'Woman').within(() => {
             cy.get('input').should('not.be.checked');
         });

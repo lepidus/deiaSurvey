@@ -15,7 +15,7 @@
  *
  */
 
-namespace APP\plugins\generic\demographicData\classes\core\traits;
+namespace APP\plugins\generic\deiaSurvey\classes\core\traits;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Query\Builder;

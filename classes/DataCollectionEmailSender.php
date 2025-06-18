@@ -1,12 +1,12 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes;
+namespace APP\plugins\generic\deiaSurvey\classes;
 
 use APP\core\Application;
-use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
-use APP\plugins\generic\demographicData\classes\DemographicDataService;
-use APP\plugins\generic\demographicData\classes\facades\Repo;
-use APP\plugins\generic\demographicData\classes\mail\mailables\RequestCollectionContributorData;
+use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
+use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\mail\mailables\RequestCollectionContributorData;
 use Illuminate\Support\Facades\Mail;
 use PKP\plugins\PluginRegistry;
 
@@ -83,7 +83,7 @@ class DataCollectionEmailSender
             ['authorId' => $author->getId(), 'authorToken' => $authorToken]
         );
 
-        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = \PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $contextId = $request->getContext()->getId();
         $orcidClient = new OrcidClient($plugin, $contextId);
 
