@@ -30,7 +30,7 @@ class QuestionnaireHandler extends \Handler
         $demographicDataService = new DemographicDataService();
 
         if (!$this->authorTokenIsValid($author, $authorToken)) {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.accessDenied'));
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
@@ -109,7 +109,7 @@ class QuestionnaireHandler extends \Handler
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
 
         if (!$this->authorTokenIsValid($author, $authorToken)) {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.accessDenied'));
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
@@ -153,13 +153,13 @@ class QuestionnaireHandler extends \Handler
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
 
         if (!$this->authorTokenIsValid($author, $authorToken)) {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.accessDenied'));
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
         $demographicDataService  = new DemographicDataService();
         if (!$demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.onlyWhoAnsweredCanDelete'));
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.onlyWhoAnsweredCanDelete'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
@@ -195,7 +195,7 @@ class QuestionnaireHandler extends \Handler
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
 
         if ($request->getUserVar('error') == 'access_denied') {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.orcidAccessDenied'));
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.orcidAccessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
@@ -204,7 +204,7 @@ class QuestionnaireHandler extends \Handler
             $orcidClient = new OrcidClient($plugin, $contextId);
             $authorOrcid = $orcidClient->requestOrcid($code);
         } catch (\GuzzleHttp\Exception\RequestException $exception) {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.orcidAuthError'));
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.orcidAuthError'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
@@ -221,13 +221,13 @@ class QuestionnaireHandler extends \Handler
 
         $demographicDataDao = new DemographicDataDAO();
         if ($demographicDataDao->thereIsUserWithSetting($authorOrcidUri, 'orcid')) {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.userWithOrcidExists'));
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.userWithOrcidExists'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
         $demographicDataService  = new DemographicDataService();
         if ($demographicDataService->authorAlreadyAnsweredQuestionnaire($author, $authorOrcidUri)) {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.demographicData.questionnairePage.alreadyAnswered'));
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.alreadyAnswered'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 

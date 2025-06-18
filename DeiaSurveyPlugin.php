@@ -37,12 +37,12 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
     public function getDisplayName()
     {
-        return __('plugins.generic.demographicData.displayName');
+        return __('plugins.generic.deiaSurvey.displayName');
     }
 
     public function getDescription()
     {
-        return __('plugins.generic.demographicData.description');
+        return __('plugins.generic.deiaSurvey.description');
     }
 
     public function getInstallEmailTemplatesFile()
@@ -126,7 +126,7 @@ class DeiaSurveyPlugin extends \GenericPlugin
     public function setupTabHandler($hookName, $params)
     {
         $component = & $params[0];
-        if ($component == 'plugins.generic.demographicData.classes.controllers.TabHandler') {
+        if ($component == 'plugins.generic.deiaSurvey.classes.controllers.TabHandler') {
             return true;
         }
         return false;
@@ -234,10 +234,10 @@ class DeiaSurveyPlugin extends \GenericPlugin
                 $templateMgr = \TemplateManager::getManager();
                 $templateMgr->registerPlugin('function', 'plugin_url', array($this, 'smartyPluginUrl'));
                 $apiOptions = [
-                    OrcidClient::ORCID_API_URL_PUBLIC => 'plugins.generic.demographicData.settings.orcidAPIPath.public',
-                    OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.demographicData.settings.orcidAPIPath.publicSandbox',
-                    OrcidClient::ORCID_API_URL_MEMBER => 'plugins.generic.demographicData.settings.orcidAPIPath.member',
-                    OrcidClient::ORCID_API_URL_MEMBER_SANDBOX => 'plugins.generic.demographicData.settings.orcidAPIPath.memberSandbox'
+                    OrcidClient::ORCID_API_URL_PUBLIC => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.public',
+                    OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.publicSandbox',
+                    OrcidClient::ORCID_API_URL_MEMBER => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.member',
+                    OrcidClient::ORCID_API_URL_MEMBER_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.memberSandbox'
                 ];
                 $templateMgr->assign('orcidApiUrls', $apiOptions);
 

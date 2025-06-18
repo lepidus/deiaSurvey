@@ -1,140 +1,140 @@
-msgid "plugins.generic.demographicData.displayName"
+msgid "plugins.generic.deiaSurvey.displayName"
 msgstr "Demographic Data"
 
-msgid "plugins.generic.demographicData.description"
+msgid "plugins.generic.deiaSurvey.description"
 msgstr "Adds custom questions for Demographic Data."
 
-msgid "plugins.generic.demographicData.consent"
+msgid "plugins.generic.deiaSurvey.consent"
 msgstr "Consent"
 
-msgid "plugins.generic.demographicData.consent.description"
+msgid "plugins.generic.deiaSurvey.consent.description"
 msgstr "You can change your consent option at any time. If you withdraw a previously given consent, your demographic data will be deleted."
 
-msgid "plugins.generic.demographicData.consent.yes"
+msgid "plugins.generic.deiaSurvey.consent.yes"
 msgstr "I consent to the processing of my Demographic Data"
 
-msgid "plugins.generic.demographicData.consent.no"
+msgid "plugins.generic.deiaSurvey.consent.no"
 msgstr "I do not consent to the processing of my Demographic Data"
 
-msgid "plugins.generic.demographicData.requestMessage"
+msgid "plugins.generic.deiaSurvey.requestMessage"
 msgstr "We request that you fill in the demographic data survey on the \"Demographic Data\" tab of your profile page."
 
-msgid "plugins.generic.demographicData.questionnairePage.index.title"
+msgid "plugins.generic.deiaSurvey.questionnairePage.index.title"
 msgstr "Demographic Questionnaire"
 
-msgid "plugins.generic.demographicData.questionnairePage.externalId.email"
+msgid "plugins.generic.deiaSurvey.questionnairePage.externalId.email"
 msgstr "The demographic data from this questionnaire will be associated with the e-mail address: <strong>{$externalId}</strong>"
 
-msgid "plugins.generic.demographicData.questionnairePage.externalId.orcid"
+msgid "plugins.generic.deiaSurvey.questionnairePage.externalId.orcid"
 msgstr "The demographic data from this questionnaire will be associated with the ORCID: <strong>{$externalId}</strong>"
 
-msgid "plugins.generic.demographicData.questionnairePage.accessDenied"
+msgid "plugins.generic.deiaSurvey.questionnairePage.accessDenied"
 msgstr "Only the author can access this page"
 
-msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.title"
+msgid "plugins.generic.deiaSurvey.questionnairePage.saveSuccess.title"
 msgstr "Questionnaire saved successfully"
 
-msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.message"
+msgid "plugins.generic.deiaSurvey.questionnairePage.saveSuccess.message"
 msgstr "Thanks for answering our demographic questionnaire!"
 
-msgid "plugins.generic.demographicData.questionnairePage.saveSuccess.checkAnswers"
+msgid "plugins.generic.deiaSurvey.questionnairePage.saveSuccess.checkAnswers"
 msgstr "Check my answers"
 
-msgid "plugins.generic.demographicData.questionnairePage.orcidAccessDenied"
+msgid "plugins.generic.deiaSurvey.questionnairePage.orcidAccessDenied"
 msgstr "You denied access to your ORCID record"
 
-msgid "plugins.generic.demographicData.questionnairePage.orcidAuthError"
+msgid "plugins.generic.deiaSurvey.questionnairePage.orcidAuthError"
 msgstr "An error occurred during your ORCID requesting. The message returned was: {$orcidAPIError}"
 
-msgid "plugins.generic.demographicData.questionnairePage.userWithOrcidExists"
+msgid "plugins.generic.deiaSurvey.questionnairePage.userWithOrcidExists"
 msgstr "There is a user registered with this ORCID in our system. Please fill in the demographic questionnaire using this user."
 
-msgid "plugins.generic.demographicData.questionnairePage.privacyStatement"
+msgid "plugins.generic.deiaSurvey.questionnairePage.privacyStatement"
 msgstr ""
 "Demographic data is collected in accordance with this journal's "
 "<a href=\"{$privacyUrl}\" target=\"_blank\">privacy statement</a>"
 
-msgid "plugins.generic.demographicData.questionnairePage.responses.title"
+msgid "plugins.generic.deiaSurvey.questionnairePage.responses.title"
 msgstr "Demographic Data"
 
-msgid "plugins.generic.demographicData.questionnairePage.responsesFor.email"
+msgid "plugins.generic.deiaSurvey.questionnairePage.responsesFor.email"
 msgstr "Showing demographic data associated with the e-mail address: <strong>{$externalId}</strong>"
 
-msgid "plugins.generic.demographicData.questionnairePage.responsesFor.orcid"
+msgid "plugins.generic.deiaSurvey.questionnairePage.responsesFor.orcid"
 msgstr "Showing demographic data associated with the ORCID: <strong>{$externalId}</strong>"
 
-msgid "plugins.generic.demographicData.questionnairePage.checkAnswersAnytime"
+msgid "plugins.generic.deiaSurvey.questionnairePage.checkAnswersAnytime"
 msgstr "You can check you demographic data at any time by visiting this same address."
 
-msgid "plugins.generic.demographicData.questionnairePage.dataMigration.email"
+msgid "plugins.generic.deiaSurvey.questionnairePage.dataMigration.email"
 msgstr "By creating a new account in the system with this same e-mail address, "
 "your demographic data will automatically be associated with the new account."
 
-msgid "plugins.generic.demographicData.questionnairePage.dataMigration.orcid"
+msgid "plugins.generic.deiaSurvey.questionnairePage.dataMigration.orcid"
 msgstr "By creating a new account in the system and add the same ORCID, "
 "your demographic data will automatically be associated with the new account."
 
-msgid "plugins.generic.demographicData.questionnairePage.deleteData.title"
+msgid "plugins.generic.deiaSurvey.questionnairePage.deleteData.title"
 msgstr "Demographic data deletion"
 
-msgid "plugins.generic.demographicData.questionnairePage.deleteData.message"
+msgid "plugins.generic.deiaSurvey.questionnairePage.deleteData.message"
 msgstr "Are you sure you want to delete your demographic data? This action cannot be undone."
 
-msgid "plugins.generic.demographicData.questionnairePage.deleteMyData"
+msgid "plugins.generic.deiaSurvey.questionnairePage.deleteMyData"
 msgstr "Delete my demographic data"
 
-msgid "plugins.generic.demographicData.questionnairePage.deleteSuccess"
+msgid "plugins.generic.deiaSurvey.questionnairePage.deleteSuccess"
 msgstr "Your demographic data has been deleted."
 
-msgid "plugins.generic.demographicData.questionnairePage.onlyWhoAnsweredCanDelete"
+msgid "plugins.generic.deiaSurvey.questionnairePage.onlyWhoAnsweredCanDelete"
 msgstr "Only authors who have already completed the demographic questionnaire can delete demographic data."
 
 
-msgid "plugins.generic.demographicData.settings.orcidAPIPathRequired"
+msgid "plugins.generic.deiaSurvey.settings.orcidAPIPathRequired"
 msgstr "Please, inform which ORCID API should be used"
 
-msgid "plugins.generic.demographicData.settings.orcidClientIdError"
+msgid "plugins.generic.deiaSurvey.settings.orcidClientIdError"
 msgstr "Invalid client ID"
 
-msgid "plugins.generic.demographicData.settings.orcidClientSecretError"
+msgid "plugins.generic.deiaSurvey.settings.orcidClientSecretError"
 msgstr "Invalid client secret"
 
-msgid "plugins.generic.demographicData.settings.title"
+msgid "plugins.generic.deiaSurvey.settings.title"
 msgstr "ORCID API Settings"
 
-msgid "plugins.generic.demographicData.settings.description"
+msgid "plugins.generic.deiaSurvey.settings.description"
 msgstr "Please configure the ORCID API access for use in pulling ORCID profile information"
 
-msgid "plugins.generic.demographicData.settings.globallyconfigured"
+msgid "plugins.generic.deiaSurvey.settings.globallyconfigured"
 msgstr "The ORCID API was configured globally by the host. The following credentials have been saved."
 
-msgid "plugins.generic.demographicData.settings.orcidAPIPath"
+msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath"
 msgstr "ORCID API"
 
-msgid "plugins.generic.demographicData.settings.orcidClientId"
+msgid "plugins.generic.deiaSurvey.settings.orcidClientId"
 msgstr "Client ID"
 
-msgid "plugins.generic.demographicData.settings.orcidClientSecret"
+msgid "plugins.generic.deiaSurvey.settings.orcidClientSecret"
 msgstr "Client Secret"
 
-msgid "plugins.generic.demographicData.settings.hidden"
+msgid "plugins.generic.deiaSurvey.settings.hidden"
 msgstr "hidden"
 
-msgid "plugins.generic.demographicData.settings.orcidAPIPath.public"
+msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.public"
 msgstr "Public"
 
-msgid "plugins.generic.demographicData.settings.orcidAPIPath.publicSandbox"
+msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.publicSandbox"
 msgstr "Public Sandbox"
 
-msgid "plugins.generic.demographicData.settings.orcidAPIPath.member"
+msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.member"
 msgstr "Member"
 
-msgid "plugins.generic.demographicData.settings.orcidAPIPath.memberSandbox"
+msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.memberSandbox"
 msgstr "Member Sandbox"
 
-msgid "plugins.generic.demographicData.settings.credentialsUsed.orcidProfile"
+msgid "plugins.generic.deiaSurvey.settings.credentialsUsed.orcidProfile"
 msgstr "The plugin is using the credentials entered in the ORCID Profile plugin settings. "
 "If you wish to use other credentials for this plugin, use the fields below."
 
-msgid "plugins.generic.demographicData.settings.credentialsUsed.own"
+msgid "plugins.generic.deiaSurvey.settings.credentialsUsed.own"
 msgstr "This plugin is using the credentials below"
