@@ -12,7 +12,7 @@
  * @brief An interface describing the methods an Collector class must implement.
  */
 
-namespace APP\plugins\generic\demographicData\classes\core\interfaces;
+namespace APP\plugins\generic\deiaSurvey\classes\core\interfaces;
 
 use Illuminate\Database\Query\Builder;
 

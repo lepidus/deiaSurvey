@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\demographicResponse;
+namespace APP\plugins\generic\deiaSurvey\classes\demographicResponse;
 
 class DemographicResponse extends \DataObject
 {

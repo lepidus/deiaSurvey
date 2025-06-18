@@ -1,10 +1,10 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests\demographicQuestion;
+namespace APP\plugins\generic\deiaSurvey\tests\demographicQuestion;
 
 require_once(dirname(__DIR__, 2) . '/autoload.php');
 
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
 
 import('lib.pkp.tests.PKPTestCase');
 

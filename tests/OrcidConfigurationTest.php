@@ -1,10 +1,10 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests;
+namespace APP\plugins\generic\deiaSurvey\tests;
 
 require_once(dirname(__DIR__, 1) . '/autoload.php');
 
-use APP\plugins\generic\demographicData\classes\OrcidConfiguration;
+use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 
 import('lib.pkp.tests.PKPTestCase');
 

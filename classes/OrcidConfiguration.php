@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes;
+namespace APP\plugins\generic\deiaSurvey\classes;
 
 class OrcidConfiguration
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\demographicResponse;
+namespace APP\plugins\generic\deiaSurvey\classes\demographicResponse;
 
-use APP\plugins\generic\demographicData\classes\demographicResponse\DAO;
+use APP\plugins\generic\deiaSurvey\classes\demographicResponse\DAO;
 
 class Repository
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\pages\user;
+namespace APP\plugins\generic\deiaSurvey\pages\user;
 
-use APP\plugins\generic\demographicData\classes\DemographicDataService;
+use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
 
 import('lib.pkp.pages.user.RegistrationHandler');
 

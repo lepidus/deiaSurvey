@@ -1,8 +1,8 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\demographicResponse;
+namespace APP\plugins\generic\deiaSurvey\classes\demographicResponse;
 
-use APP\plugins\generic\demographicData\classes\core\interfaces\CollectorInterface;
+use APP\plugins\generic\deiaSurvey\classes\core\interfaces\CollectorInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\LazyCollection;

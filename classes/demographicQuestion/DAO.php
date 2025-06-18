@@ -1,9 +1,9 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\demographicQuestion;
+namespace APP\plugins\generic\deiaSurvey\classes\demographicQuestion;
 
-use APP\plugins\generic\demographicData\classes\core\EntityDAO;
-use APP\plugins\generic\demographicData\classes\core\traits\EntityWithParent;
+use APP\plugins\generic\deiaSurvey\classes\core\EntityDAO;
+use APP\plugins\generic\deiaSurvey\classes\core\traits\EntityWithParent;
 use Illuminate\Support\LazyCollection;
 
 class DAO extends EntityDAO

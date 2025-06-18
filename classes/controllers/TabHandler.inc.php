@@ -1,10 +1,10 @@
 <?php
 
-// namespace APP\plugins\generic\demographicData\classes\controllers;
+// namespace APP\plugins\generic\deiaSurvey\classes\controllers;
 
 use APP\handler\Handler;
 use APP\notification\NotificationManager;
-use APP\plugins\generic\demographicData\classes\form\QuestionsForm;
+use APP\plugins\generic\deiaSurvey\classes\form\QuestionsForm;
 use PKP\core\JSONMessage;
 
 class TabHandler extends \Handler

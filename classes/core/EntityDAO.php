@@ -12,7 +12,7 @@
  * @brief A base class for DAOs that read and write an entity to the database
  */
 
-namespace APP\plugins\generic\demographicData\classes\core;
+namespace APP\plugins\generic\deiaSurvey\classes\core;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use PKP\db\DAO;

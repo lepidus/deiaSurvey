@@ -1,9 +1,9 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests\helpers;
+namespace APP\plugins\generic\deiaSurvey\tests\helpers;
 
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\Repository as DemographicQuestionRepository;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\Repository as DemographicQuestionRepository;
 
 import('classes.journal.Journal');
 import('lib.pkp.classes.user.User');

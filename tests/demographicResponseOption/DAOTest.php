@@ -1,12 +1,12 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests\demographicResponseOption;
+namespace APP\plugins\generic\deiaSurvey\tests\demographicResponseOption;
 
 require_once(dirname(__DIR__, 2) . '/autoload.php');
 
-use APP\plugins\generic\demographicData\classes\demographicResponseOption\DAO;
-use APP\plugins\generic\demographicData\classes\demographicResponseOption\DemographicResponseOption;
-use APP\plugins\generic\demographicData\tests\helpers\TestHelperTrait;
+use APP\plugins\generic\deiaSurvey\classes\demographicResponseOption\DAO;
+use APP\plugins\generic\deiaSurvey\classes\demographicResponseOption\DemographicResponseOption;
+use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 
 import('lib.pkp.tests.DatabaseTestCase');
 
