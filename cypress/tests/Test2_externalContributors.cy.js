@@ -271,7 +271,7 @@ describe('DEIA Survey - External contributors data collecting', function() {
 
         cy.get('#nav-tab button:contains("Text")').click();
 
-        cy.contains('In order to improve our publication, we collect DEIA data from the authors of our submissions through an online questionnaire');
+        cy.contains('In order to improve our publication, we collect DEIA (Diversity, Equity, Inclusion, and Accessibility) data from the authors of our submissions through an online questionnaire');
         cy.contains('If you do not wish to register, we recommend that you access the following address:');
         cy.contains("If you don't have an ORCID record, you can fill in the questionnaire at the following address:");
 
@@ -311,7 +311,7 @@ describe('DEIA Survey - External contributors data collecting', function() {
 
         answerDefaultQuestions();
 
-        cy.contains('Thanks for answering our DEIA survey');
+        cy.contains('Thanks for answering our DEIA Survey');
         cy.contains('a', 'Check my answers').click();
 
         assertResponsesOfExternalAuthor('susy.almeida@outlook.com');
@@ -393,7 +393,7 @@ describe('DEIA Survey - External contributors data collecting', function() {
         });
 
         answerDefaultQuestions();
-        cy.contains('Thanks for answering our DEIA survey');
+        cy.contains('Thanks for answering our DEIA Survey');
     });
 
     it('Responses reference is migrated when author registers', function () {
