@@ -35,6 +35,8 @@ class RepositoryTest extends \DatabaseTestCase
         ]);
 
         parent::setUp();
+        $this->addSchemaFile('demographicQuestion');
+        $this->addSchemaFile('demographicResponse');
         $this->demographicQuestionId = $this->createDemographicQuestion();
         $this->userId = $this->createUserMock();
         $this->params = [
@@ -44,8 +46,6 @@ class RepositoryTest extends \DatabaseTestCase
                 self::DEFAULT_LOCALE => 'Test text'
             ]
         ];
-        $this->addSchemaFile('demographicQuestion');
-        $this->addSchemaFile('demographicResponse');
     }
 
     protected function tearDown(): void

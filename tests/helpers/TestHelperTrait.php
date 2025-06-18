@@ -115,7 +115,7 @@ trait TestHelperTrait
                 $schema = &$args[0];
 
                 $schemaFile = sprintf(
-                    '%s/plugins/generic/demographicData/schemas/%s.json',
+                    '%s/plugins/generic/deiaSurvey/schemas/%s.json',
                     BASE_SYS_DIR,
                     $schemaName
                 );
