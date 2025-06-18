@@ -16,7 +16,7 @@
 
         <fieldset class="fields">
             {foreach $questions as $question}
-                {include file="../../../plugins/generic/demographicData/templates/questionnairePage/question.tpl" question=$question}
+                {include file="../../../plugins/generic/deiaSurvey/templates/questionnairePage/question.tpl" question=$question}
             {/foreach}
         </fieldset>
 

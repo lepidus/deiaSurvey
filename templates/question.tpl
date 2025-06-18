@@ -1,5 +1,3 @@
-<link rel="stylesheet" type="text/css" href="/plugins/generic/demographicData/styles/questionsInProfile.css">
-
 {assign var="questionId" value="question-{$question['questionId']}-{$question['inputType']}"}
 {if $question['type'] == $questionTypeConsts['TYPE_CHECKBOXES'] or $question['type'] == $questionTypeConsts['TYPE_RADIO_BUTTONS']}
     {assign var="isListSection" value=true}

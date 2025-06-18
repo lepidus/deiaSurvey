@@ -17,7 +17,7 @@ class QuestionnaireHandler extends \Handler
 {
     public function index($args, $request)
     {
-        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = \PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $templateMgr = \TemplateManager::getManager($request);
         $context = $request->getContext();
 
@@ -103,7 +103,7 @@ class QuestionnaireHandler extends \Handler
         $authorId = $request->getUserVar('authorId');
         $authorToken = $request->getUserVar('authorToken');
         $author = \Services::get('author')->get($authorId);
-        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = \PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $templateMgr = \TemplateManager::getManager($request);
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
@@ -147,7 +147,7 @@ class QuestionnaireHandler extends \Handler
         $authorId = $request->getUserVar('authorId');
         $authorToken = $request->getUserVar('authorToken');
         $author = \Services::get('author')->get($authorId);
-        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = \PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $templateMgr = \TemplateManager::getManager($request);
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
@@ -188,7 +188,7 @@ class QuestionnaireHandler extends \Handler
     public function orcidVerify($args, $request)
     {
         $author = \Services::get('author')->get($request->getUserVar('authorId'));
-        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = \PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $templateMgr = \TemplateManager::getManager($request);
         $contextId = $request->getContext()->getId();
 

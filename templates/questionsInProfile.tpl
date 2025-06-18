@@ -3,7 +3,11 @@
 		$('#deiaSurveyForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
 	{rdelim});
 </script>
+<link rel="stylesheet" type="text/css" href="/plugins/generic/deiaSurvey/styles/questionsInProfile.css">
 
+<h3 id="deiaSurveyTitle">
+	{translate key="plugins.generic.deiaSurvey.questionnairePage.index.title"}
+</h3>
 <form class="pkp_form" id="deiaSurveyForm" method="post" action="{url op="saveDemographicData"}" enctype="multipart/form-data">
 	{csrf}
 
@@ -22,7 +26,7 @@
 	{fbvFormArea id="demographicQuestion"}
 		<div id="Hello" name="questions">
 			{foreach $questions as $question}
-				{include file="../../../plugins/generic/demographicData/templates/question.tpl" question=$question}
+				{include file="../../../plugins/generic/deiaSurvey/templates/question.tpl" question=$question}
 			{/foreach}
 		</div>
     {/fbvFormArea}

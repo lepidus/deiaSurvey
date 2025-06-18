@@ -33,7 +33,7 @@ class TemplateFilterDispatcher extends DemographicDataDispatcher
 
     public function addChangesToUserProfilePage($templateMgr)
     {
-        $templateMgr->registerFilter('output', [$this, 'demographicDataTabFilter']);
+        $templateMgr->registerFilter('output', [$this, 'deiaSurveyTabFilter']);
 
         $request = \Application::get()->getRequest();
         $contextId = $request->getContext()->getId();
@@ -46,17 +46,17 @@ class TemplateFilterDispatcher extends DemographicDataDispatcher
         }
     }
 
-    public function demographicDataTabFilter($output, $templateMgr)
+    public function deiaSurveyTabFilter($output, $templateMgr)
     {
         $regexListItemTabPosition = '/<div[^>]+id="profileTabs"[^>]*>.*?<ul[^>]*>((?:(?!<\/ul>).)*?<li>\s*<a[^>]*?name="(?:apiSettings)"[^>]*?>.*?<\/li>)/s';
         if (preg_match($regexListItemTabPosition, $output, $matches, PREG_OFFSET_CAPTURE)) {
             $match = $matches[0][0];
             $offset = $matches[0][1];
             $newOutput = substr($output, 0, $offset + strlen($match));
-            $newOutput .= $templateMgr->fetch($this->plugin->getTemplateResource('demographicDataTab.tpl'));
+            $newOutput .= $templateMgr->fetch($this->plugin->getTemplateResource('deiaSurveyTab.tpl'));
             $newOutput .= substr($output, $offset + strlen($match));
             $output = $newOutput;
-            $templateMgr->unregisterFilter('output', [$this, 'demographicDataTabFilter']);
+            $templateMgr->unregisterFilter('output', [$this, 'deiaSurveyTabFilter']);
         }
         return $output;
     }

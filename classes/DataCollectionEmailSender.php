@@ -83,7 +83,7 @@ class DataCollectionEmailSender
             ['authorId' => $author->getId(), 'authorToken' => $authorToken]
         );
 
-        $plugin = \PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = \PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $contextId = $request->getContext()->getId();
         $orcidClient = new OrcidClient($plugin, $contextId);
 
