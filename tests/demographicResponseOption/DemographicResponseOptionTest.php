@@ -1,9 +1,9 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests\demographicResponseOption;
+namespace APP\plugins\generic\deiaSurvey\tests\demographicResponseOption;
 
 use PKP\tests\PKPTestCase;
-use APP\plugins\generic\demographicData\classes\demographicResponseOption\DemographicResponseOption;
+use APP\plugins\generic\deiaSurvey\classes\demographicResponseOption\DemographicResponseOption;
 
 class DemographicResponseOptionTest extends PKPTestCase
 {

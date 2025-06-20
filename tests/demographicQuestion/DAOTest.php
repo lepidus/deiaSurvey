@@ -1,11 +1,11 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests\demographicQuestion;
+namespace APP\plugins\generic\deiaSurvey\tests\demographicQuestion;
 
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DAO;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DAO;
 use PKP\tests\DatabaseTestCase;
-use APP\plugins\generic\demographicData\tests\helpers\TestHelperTrait;
+use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 
 class DAOTest extends DatabaseTestCase
 {

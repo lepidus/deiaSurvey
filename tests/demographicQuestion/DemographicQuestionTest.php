@@ -1,9 +1,9 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests\demographicQuestion;
+namespace APP\plugins\generic\deiaSurvey\tests\demographicQuestion;
 
 use PKP\tests\PKPTestCase;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
 
 class DemographicQuestionTest extends PKPTestCase
 {

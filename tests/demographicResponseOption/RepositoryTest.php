@@ -1,11 +1,11 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests\demographicResponseOption;
+namespace APP\plugins\generic\deiaSurvey\tests\demographicResponseOption;
 
 use PKP\tests\DatabaseTestCase;
-use APP\plugins\generic\demographicData\classes\demographicResponseOption\DemographicResponseOption;
-use APP\plugins\generic\demographicData\classes\demographicResponseOption\Repository;
-use APP\plugins\generic\demographicData\tests\helpers\TestHelperTrait;
+use APP\plugins\generic\deiaSurvey\classes\demographicResponseOption\DemographicResponseOption;
+use APP\plugins\generic\deiaSurvey\classes\demographicResponseOption\Repository;
+use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 
 class RepositoryTest extends DatabaseTestCase
 {
