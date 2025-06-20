@@ -61,7 +61,7 @@ function assertResponsesOfExternalAuthor(authorEmail) {
     cy.contains('Black');
     cy.contains('South America');
 
-    cy.contains('You can check you data at any time by visiting this same address');
+    cy.contains('You can check your data at any time by visiting this same address');
     cy.contains('By creating a new account in the system with this same e-mail address, your data will automatically be associated with the new account');
 }
 
