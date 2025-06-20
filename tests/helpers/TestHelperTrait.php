@@ -1,12 +1,12 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests\helpers;
+namespace APP\plugins\generic\deiaSurvey\tests\helpers;
 
 use APP\journal\Journal;
 use PKP\user\User;
 use PKP\plugins\Hook;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\Repository as DemographicQuestionRepository;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\Repository as DemographicQuestionRepository;
 
 trait TestHelperTrait
 {
@@ -95,7 +95,7 @@ trait TestHelperTrait
                 $schema = &$args[0];
 
                 $schemaFile = sprintf(
-                    '%s/plugins/generic/demographicData/schemas/%s.json',
+                    '%s/plugins/generic/deiaSurvey/schemas/%s.json',
                     BASE_SYS_DIR,
                     $schemaName
                 );

@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\demographicResponseOption;
+namespace APP\plugins\generic\deiaSurvey\classes\demographicResponseOption;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;

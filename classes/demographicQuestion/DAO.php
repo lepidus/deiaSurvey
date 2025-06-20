@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\demographicQuestion;
+namespace APP\plugins\generic\deiaSurvey\classes\demographicQuestion;
 
 use PKP\core\EntityDAO;
 use Illuminate\Support\LazyCollection;

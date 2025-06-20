@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\mail\mailables;
+namespace APP\plugins\generic\deiaSurvey\classes\mail\mailables;
 
 use PKP\mail\Mailable;
 use PKP\mail\traits\Configurable;

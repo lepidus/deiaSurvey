@@ -1,11 +1,11 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\observers\listeners;
+namespace APP\plugins\generic\deiaSurvey\classes\observers\listeners;
 
 use Illuminate\Events\Dispatcher;
 use PKP\observers\events\UserRegisteredContext;
-use APP\plugins\generic\demographicData\classes\facades\Repo;
-use APP\plugins\generic\demographicData\classes\DemographicDataService;
+use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
 
 class MigrateResponsesOnRegistration
 {

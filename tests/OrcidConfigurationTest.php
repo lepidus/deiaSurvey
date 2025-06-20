@@ -1,10 +1,10 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests;
+namespace APP\plugins\generic\deiaSurvey\tests;
 
 use PKP\tests\PKPTestCase;
 use PKP\db\DAORegistry;
-use APP\plugins\generic\demographicData\classes\OrcidConfiguration;
+use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 
 class OrcidConfigurationTest extends PKPTestCase
 {
@@ -26,7 +26,7 @@ class OrcidConfigurationTest extends PKPTestCase
     protected function tearDown(): void
     {
         $pluginSettingsToClean = [
-            'demographicdataplugin' => ['orcidAPIPath', 'orcidClientId', 'orcidClientSecret'],
+            'deiasurveyplugin' => ['orcidAPIPath', 'orcidClientId', 'orcidClientSecret'],
             'orcidprofileplugin' => ['orcidProfileAPIPath', 'orcidClientId', 'orcidClientSecret']
         ];
         $pluginSettingsDao = DAORegistry::getDAO('PluginSettingsDAO');
@@ -74,13 +74,13 @@ class OrcidConfigurationTest extends PKPTestCase
         $this->insertPluginSettings('orcidprofileplugin', 'orcidClientId', $this->orcidClientId);
         $this->insertPluginSettings('orcidprofileplugin', 'orcidClientSecret', $this->orcidClientSecret);
 
-        $this->insertPluginSettings('demographicdataplugin', 'orcidAPIPath', $this->demographicAPIPath);
-        $this->insertPluginSettings('demographicdataplugin', 'orcidClientId', $this->demographicClientId);
-        $this->insertPluginSettings('demographicdataplugin', 'orcidClientSecret', $this->demographicClientSecret);
+        $this->insertPluginSettings('deiasurveyplugin', 'orcidAPIPath', $this->demographicAPIPath);
+        $this->insertPluginSettings('deiasurveyplugin', 'orcidClientId', $this->demographicClientId);
+        $this->insertPluginSettings('deiasurveyplugin', 'orcidClientSecret', $this->demographicClientSecret);
         $orcidConfiguration = $this->orcidConfiguration->getOrcidConfiguration($this->contextId);
 
         $expectedConfiguration = [
-            'pluginName' => 'demographicdataplugin',
+            'pluginName' => 'deiasurveyplugin',
             'apiPath' => $this->demographicAPIPath,
             'clientId' => $this->demographicClientId,
             'clientSecret' => $this->demographicClientSecret

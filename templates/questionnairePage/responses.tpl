@@ -1,5 +1,5 @@
 {capture assign="pageTitle"}
-    {translate key="plugins.generic.demographicData.questionnairePage.responses.title"}
+    {translate key="plugins.generic.deiaSurvey.questionnairePage.responses.title"}
 {/capture}
 
 {include file="frontend/components/header.tpl" pageTitleTranslated=$pageTitle}
@@ -8,7 +8,7 @@
     <h1>{$pageTitle|escape}</h1>
 
     <p>
-        {translate key="plugins.generic.demographicData.questionnairePage.responsesFor.{$authorExternalType}" externalId=$authorExternalId}
+        {translate key="plugins.generic.deiaSurvey.questionnairePage.responsesFor.{$authorExternalType}" externalId=$authorExternalId}
     </p>
 
     <fieldset class="fields">
@@ -20,13 +20,13 @@
         {/foreach}
     </fieldset>
 
-    <p>{translate key="plugins.generic.demographicData.questionnairePage.checkAnswersAnytime"}</p>
+    <p>{translate key="plugins.generic.deiaSurvey.questionnairePage.checkAnswersAnytime"}</p>
     <p>
-        {translate key="plugins.generic.demographicData.questionnairePage.dataMigration.{$authorExternalType}" externalId=$authorExternalId}
+        {translate key="plugins.generic.deiaSurvey.questionnairePage.dataMigration.{$authorExternalType}" externalId=$authorExternalId}
     </p>
 
     <a id="deleteDemographicData" href="{url op="deleteData" authorId=$authorId authorToken=$authorToken}">
-        {translate key="plugins.generic.demographicData.questionnairePage.deleteMyData"}
+        {translate key="plugins.generic.deiaSurvey.questionnairePage.deleteMyData"}
     </a>
 </div>
 

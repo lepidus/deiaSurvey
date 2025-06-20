@@ -1,7 +1,7 @@
 import '../support/commands.js';
 
 function assertDefaultQuestionsDisplay(authorEmail) {
-    cy.contains('The demographic data from this questionnaire will be associated with the e-mail address: ' + authorEmail);
+    cy.contains('The data from this questionnaire will be associated with the e-mail address: ' + authorEmail);
 
     cy.contains('.questionTitle', 'Gender');
     cy.contains('.questionDescription', 'With which gender do you most identify? Please select one option:');
@@ -37,7 +37,7 @@ function assertDefaultQuestionsDisplay(authorEmail) {
     cy.contains('label', 'Prefer not to inform');
     cy.contains('label', 'Self describe');
 
-    cy.contains('Demographic data is collected in accordance with this journal\'s privacy statement');
+    cy.contains('Data is collected in accordance with this journal\'s privacy statement');
 }
 
 function answerDefaultQuestions() {
@@ -55,18 +55,18 @@ function answerDefaultQuestions() {
 }
 
 function assertResponsesOfExternalAuthor(authorEmail) {
-    cy.contains('Showing demographic data associated with the e-mail address: ' + authorEmail);
+    cy.contains('Showing data associated with the e-mail address: ' + authorEmail);
 
     cy.contains('Woman');
     cy.contains('Black');
     cy.contains('South America');
 
-    cy.contains('You can check you demographic data at any time by visiting this same address');
-    cy.contains('By creating a new account in the system with this same e-mail address, your demographic data will automatically be associated with the new account');
+    cy.contains('You can check your data at any time by visiting this same address');
+    cy.contains('By creating a new account in the system with this same e-mail address, your data will automatically be associated with the new account');
 }
 
 function assertResponsesOfRegisteredUser() {
-    cy.contains('a', 'Demographic Data').click();
+    cy.contains('a', 'DEIA Survey').click();
     cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
     
     cy.contains('label', 'Woman').within(() => {
@@ -152,7 +152,7 @@ function createNewSubmission(submissionData) {
     cy.contains('h1', 'Submission complete');
 }
 
-describe('Demographic Data - External contributors data collecting', function() {
+describe('DEIA Survey - External contributors data collecting', function() {
     let firstSubmissionData;
     let secondSubmissionData;
 
@@ -186,12 +186,12 @@ describe('Demographic Data - External contributors data collecting', function() 
 		};
     });
 
-    it('Creates new submission for collection of demographic data from external authors', function() {
+    it('Creates new submission for collection of DEIA data from external authors', function() {
         cy.login('ckwantes', null, 'publicknowledge');
 
-        cy.contains('a', 'Demographic Data').click();
+        cy.contains('a', 'DEIA Survey').click();
         cy.get('input[name="demographicDataConsent"][value=0]').click();
-        cy.get('#demographicDataForm .submitFormButton').click();
+        cy.get('#deiaSurveyForm .submitFormButton').click();
         cy.wait(1000);
         cy.contains('Back to Submissions').click();
 
@@ -217,17 +217,17 @@ describe('Demographic Data - External contributors data collecting', function() 
     it('Access email to collect data from contributors without registration', function () {
         cy.visit('localhost:8025');
         
-        cy.get('b:contains("Request for demographic data collection")').should('have.length', 1);
-        cy.contains('b', 'Request for demographic data collection')
+        cy.get('b:contains("Request for DEIA data collection")').should('have.length', 1);
+        cy.contains('b', 'Request for DEIA data collection')
             .parent().parent().parent()
             .within((node) => {
                 cy.contains('susy.almeida@outlook.com');
             });
-        cy.get('b:contains("Request for demographic data collection")').click();
+        cy.get('b:contains("Request for DEIA data collection")').click();
 
         cy.get('#nav-tab button:contains("Text")').click();
 
-        cy.contains('In order to improve our publication, we collect demographic data from the authors of our submissions through an online questionnaire');
+        cy.contains('In order to improve our publication, we collect DEIA (Diversity, Equity, Inclusion, and Accessibility) data from the authors of our submissions through an online questionnaire');
         cy.contains('If you do not wish to register, we recommend that you access the following address:');
         cy.contains("If you don't have an ORCID record, you can fill in the questionnaire at the following address:");
         cy.get('.text-view').within(() => {
@@ -241,12 +241,12 @@ describe('Demographic Data - External contributors data collecting', function() 
         cy.url().then(url => {
             cy.visit(url + 'breakToken');
         });
-        cy.contains('Demographic Questionnaire');
+        cy.contains('DEIA Survey');
         cy.contains('Only the author can access this page');
     });
-    it('Contributor without registration answers demographic questionnaire', function () {
+    it('Contributor without registration answers DEIA survey', function () {
         cy.visit('localhost:8025');
-        cy.get('b:contains("Request for demographic data collection")').click();
+        cy.get('b:contains("Request for DEIA data collection")').click();
 
         cy.get('#nav-tab button:contains("Text")').click();
         cy.get('.text-view').within(() => {
@@ -257,7 +257,7 @@ describe('Demographic Data - External contributors data collecting', function() 
 
         answerDefaultQuestions();
 
-        cy.contains('Thanks for answering our demographic questionnaire');
+        cy.contains('Thanks for answering our DEIA Survey');
         cy.contains('a', 'Check my answers').click();
 
         assertResponsesOfExternalAuthor('susy.almeida@outlook.com');
@@ -284,13 +284,13 @@ describe('Demographic Data - External contributors data collecting', function() 
             cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
         }
     });
-    it('E-mail for demographic data collection is not sent again', function () {
+    it('E-mail for DEIA data collection is not sent again', function () {
         cy.visit('localhost:8025');
-        cy.get('b:contains("Request for demographic data collection")').should('have.length', 1);
+        cy.get('b:contains("Request for DEIA data collection")').should('have.length', 1);
     });
-    it('Contributor without registration deletes his own demographic data', function () {
+    it('Contributor without registration deletes his own DEIA data', function () {
         cy.visit('localhost:8025');
-        cy.get('b:contains("Request for demographic data collection")').click();
+        cy.get('b:contains("Request for DEIA data collection")').click();
 
         cy.get('#nav-tab button:contains("Text")').click();
         cy.get('.text-view').within(() => {
@@ -299,13 +299,13 @@ describe('Demographic Data - External contributors data collecting', function() 
             });
         });
 
-        cy.contains('a', 'Delete my demographic data').click();
+        cy.contains('a', 'Delete my data').click();
 
-        cy.contains('Demographic data deletion');
-        cy.contains('Are you sure you want to delete your demographic data? This action cannot be undone.');
-        cy.contains('Delete my demographic data').click();
+        cy.contains('DEIA data deletion');
+        cy.contains('Are you sure you want to delete your data? This action cannot be undone.');
+        cy.contains('Delete my data').click();
 
-        cy.contains('Your demographic data has been deleted');
+        cy.contains('Your data has been deleted');
     });
     it('Editor reaccepts/posts new submission', function () {
         cy.login('dbarnes', null, 'publicknowledge');
@@ -330,9 +330,9 @@ describe('Demographic Data - External contributors data collecting', function() 
             cy.contains('.pkpPublication__statusPublished', 'Posted');
         }
     });
-    it('Contributor answers demographic questionnaire on new submission', function () {
+    it('Contributor answers DEIA survey on new submission', function () {
         cy.visit('localhost:8025');
-        cy.get('b:contains("Request for demographic data collection")').eq(0).click();
+        cy.get('b:contains("Request for DEIA data collection")').eq(0).click();
 
         cy.get('#nav-tab button:contains("Text")').click();
         cy.get('.text-view').within(() => {
@@ -342,7 +342,7 @@ describe('Demographic Data - External contributors data collecting', function() 
         });
 
         answerDefaultQuestions();
-        cy.contains('Thanks for answering our demographic questionnaire');
+        cy.contains('Thanks for answering our DEIA Survey');
     });
     it('Responses reference is migrated when author registers', function () {
         cy.register({
@@ -355,7 +355,7 @@ describe('Demographic Data - External contributors data collecting', function() 
         });
 
         cy.contains('a', 'Edit My Profile').click();
-        cy.contains('a', 'Demographic Data').click();
+        cy.contains('a', 'DEIA Survey').click();
 
         assertResponsesOfRegisteredUser();
     });

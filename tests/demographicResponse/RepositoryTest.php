@@ -1,11 +1,11 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\tests\demographicResponse;
+namespace APP\plugins\generic\deiaSurvey\tests\demographicResponse;
 
-use APP\plugins\generic\demographicData\classes\demographicResponse\DemographicResponse;
-use APP\plugins\generic\demographicData\classes\demographicResponse\Repository;
+use APP\plugins\generic\deiaSurvey\classes\demographicResponse\DemographicResponse;
+use APP\plugins\generic\deiaSurvey\classes\demographicResponse\Repository;
 use PKP\tests\DatabaseTestCase;
-use APP\plugins\generic\demographicData\tests\helpers\TestHelperTrait;
+use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 
 class RepositoryTest extends DatabaseTestCase
 {
@@ -29,6 +29,8 @@ class RepositoryTest extends DatabaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->addSchemaFile('demographicQuestion');
+        $this->addSchemaFile('demographicResponse');
         $this->demographicQuestionId = $this->createDemographicQuestion();
         $this->userId = $this->createUserMock();
         $this->params = [
@@ -40,8 +42,6 @@ class RepositoryTest extends DatabaseTestCase
             'externalId' => null,
             'externalType' => null
         ];
-        $this->addSchemaFile('demographicQuestion');
-        $this->addSchemaFile('demographicResponse');
     }
 
     public function testGetNewDemographicResponseObject(): void

@@ -1,8 +1,8 @@
-describe('Demographic Data - Plugin setup', function () {
-	const pluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-demographicdataplugin';
+describe('DEIA Survey - Plugin setup', function () {
+	const pluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-deiasurveyplugin';
 	const orcidPluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin';
 	
-	it('Enables Demographic Data plugin. Editor does not give consent', function () {
+	it('Enables DEIA Survey plugin. Editor does not give consent', function () {
 		cy.login('dbarnes', null, 'publicknowledge');
 
 		cy.contains('a', 'Website').click();
@@ -10,14 +10,14 @@ describe('Demographic Data - Plugin setup', function () {
 		cy.waitJQuery();
 		cy.get('#plugins-button').click();
 
-		cy.get('input[id^=select-cell-demographicdataplugin]').check();
-		cy.get('input[id^=select-cell-demographicdataplugin]').should('be.checked');
+		cy.get('input[id^=select-cell-deiasurveyplugin]').check();
+		cy.get('input[id^=select-cell-deiasurveyplugin]').should('be.checked');
 		cy.reload();
 
 		cy.contains('h1', 'Profile');
-		cy.contains('a', 'Demographic Data').click();
+		cy.contains('a', 'DEIA Survey').click();
 		cy.get('input[name="demographicDataConsent"][value=0]').click();
-        cy.get('#demographicDataForm .submitFormButton').click();
+        cy.get('#deiaSurveyForm .submitFormButton').click();
         cy.wait(1000);
 	});
 	it("Plugin uses ORCID plugin's settings by default", function () {
@@ -62,7 +62,7 @@ describe('Demographic Data - Plugin setup', function () {
 		cy.get('input[name="orcidClientId"]').clear().type(Cypress.env('orcidClientId'), {delay: 0});
 		cy.get('input[name="orcidClientSecret"]').clear().type(Cypress.env('orcidClientSecret'), {delay: 0});
 
-		cy.get('#demographicDataSettingsForm button:contains("OK")').click();
+		cy.get('#deiaSurveySettingsForm button:contains("OK")').click();
 		cy.wait(1000);
 
 		cy.get('a[id^=' + pluginRowId + '-settings-button]').click();

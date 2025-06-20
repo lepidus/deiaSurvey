@@ -1,11 +1,11 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\observers\listeners;
+namespace APP\plugins\generic\deiaSurvey\classes\observers\listeners;
 
 use Illuminate\Events\Dispatcher;
 use APP\core\Application;
 use PKP\observers\events\SubmissionSubmitted;
-use APP\plugins\generic\demographicData\classes\DataCollectionEmailSender;
+use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
 
 class RequestDataCollectionOnSubmission
 {

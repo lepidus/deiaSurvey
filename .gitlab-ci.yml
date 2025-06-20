@@ -1,5 +1,5 @@
 variables:
-    PLUGIN_NAME: 'demographicData'
+    PLUGIN_NAME: 'deiaSurvey'
 
 include:
   - project: 'documentacao-e-tarefas/modelosparaintegracaocontinua'

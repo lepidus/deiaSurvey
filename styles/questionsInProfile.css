@@ -1,3 +1,7 @@
+#deiaSurveyTitle {
+    margin-top: 0;
+}
+
 .responseOption {
     display: flex;
 }
