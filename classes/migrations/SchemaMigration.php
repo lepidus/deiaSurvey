@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\migrations;
+namespace APP\plugins\generic\deiaSurvey\classes\migrations;
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -9,7 +9,7 @@ use PKP\plugins\PluginRegistry;
 use PKP\plugins\Hook;
 use PKP\db\DAORegistry;
 use APP\core\Application;
-use APP\plugins\generic\demographicData\classes\DefaultQuestionsCreator;
+use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 
 class SchemaMigration extends Migration
 {

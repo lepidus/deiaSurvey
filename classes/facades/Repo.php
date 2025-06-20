@@ -1,10 +1,10 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\facades;
+namespace APP\plugins\generic\deiaSurvey\classes\facades;
 
-use APP\plugins\generic\demographicData\classes\demographicQuestion\Repository as DemographicQuestionRepository;
-use APP\plugins\generic\demographicData\classes\demographicResponse\Repository as DemographicResponseRepository;
-use APP\plugins\generic\demographicData\classes\demographicResponseOption\Repository as DemographicResponseOptionRepository;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\Repository as DemographicQuestionRepository;
+use APP\plugins\generic\deiaSurvey\classes\demographicResponse\Repository as DemographicResponseRepository;
+use APP\plugins\generic\deiaSurvey\classes\demographicResponseOption\Repository as DemographicResponseOptionRepository;
 
 class Repo extends \APP\facades\Repo
 {
