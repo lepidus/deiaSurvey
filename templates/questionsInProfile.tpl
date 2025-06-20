@@ -1,10 +1,14 @@
 <script>
 	$(function() {ldelim}
-		$('#demographicDataForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
+		$('#deiaSurveyForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
 	{rdelim});
 </script>
+<link rel="stylesheet" type="text/css" href="/plugins/generic/deiaSurvey/styles/questionsInProfile.css">
 
-<form class="pkp_form" id="demographicDataForm" method="post" action="{url op="saveDemographicData"}" enctype="multipart/form-data">
+<h3 id="deiaSurveyTitle">
+	{translate key="plugins.generic.deiaSurvey.questionnairePage.index.title"}
+</h3>
+<form class="pkp_form" id="deiaSurveyForm" method="post" action="{url op="saveDemographicData"}" enctype="multipart/form-data">
 	{csrf}
 
 	{fbvFormSection list="false" label='plugins.generic.deiaSurvey.consent' description='plugins.generic.deiaSurvey.consent.description' required=true}

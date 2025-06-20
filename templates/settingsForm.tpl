@@ -10,13 +10,13 @@
 <script>
     $(function() {ldelim}
         // Attach the form handler.
-        $('#demographicDataSettingsForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
+        $('#deiaSurveySettingsForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
     {rdelim});
 </script>
 
 <link rel="stylesheet" type="text/css" href="/plugins/generic/deiaSurvey/styles/settingsForm.css">
-<form class="pkp_form" id="demographicDataSettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
-    <div id="demographicDataSettings">
+<form class="pkp_form" id="deiaSurveySettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
+    <div id="deiaSurveySettings">
         {if $orcidConfiguration}
             <p class="pkpNotification pkpNotification--success">
                 {if $orcidConfiguration['pluginName'] == 'orcidprofileplugin'}

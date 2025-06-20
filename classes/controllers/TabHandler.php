@@ -9,7 +9,7 @@ use APP\notification\NotificationManager;
 
 class TabHandler extends Handler
 {
-    public function demographicData($args, $request)
+    public function deiaSurvey($args, $request)
     {
         $form = new QuestionsForm($request);
         $form->initData();

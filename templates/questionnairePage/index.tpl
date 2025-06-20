@@ -11,7 +11,7 @@
         {translate key="plugins.generic.deiaSurvey.questionnairePage.externalId.{$authorExternalType}" externalId=$authorExternalId}
     </p>
     
-    <form class="pkp_form" id="demographicDataForm" method="post" action="{url op="saveQuestionnaire" authorId=$authorId authorToken=$authorToken}" role="form">
+    <form class="pkp_form" id="deiaSurveyForm" method="post" action="{url op="saveQuestionnaire" authorId=$authorId authorToken=$authorToken}" role="form">
         {csrf}
 
         <fieldset class="fields">
