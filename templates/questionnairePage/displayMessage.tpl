@@ -1,5 +1,5 @@
 {capture assign="pageTitle"}
-    {translate key="plugins.generic.demographicData.questionnairePage.index.title"}
+    {translate key="plugins.generic.deiaSurvey.questionnairePage.index.title"}
 {/capture}
 
 {include file="frontend/components/header.tpl" pageTitleTranslated=$pageTitle}

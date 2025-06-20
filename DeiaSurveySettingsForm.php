@@ -47,11 +47,11 @@ class DeiaSurveySettingsForm extends Form
         $this->addCheck(new FormValidatorCSRF($this));
 
         if (!$this->orcidIsGloballyConfigured()) {
-            $this->addCheck(new FormValidator($this, 'orcidAPIPath', 'required', 'plugins.generic.demographicData.settings.orcidAPIPathRequired'));
-            $this->addCheck(new FormValidatorCustom($this, 'orcidClientId', 'required', 'plugins.generic.demographicData.settings.orcidClientIdError', function ($clientId) {
+            $this->addCheck(new FormValidator($this, 'orcidAPIPath', 'required', 'plugins.generic.deiaSurvey.settings.orcidAPIPathRequired'));
+            $this->addCheck(new FormValidatorCustom($this, 'orcidClientId', 'required', 'plugins.generic.deiaSurvey.settings.orcidClientIdError', function ($clientId) {
                 return $this->validator->validateClientId($clientId);
             }));
-            $this->addCheck(new FormValidatorCustom($this, 'orcidClientSecret', 'required', 'plugins.generic.demographicData.settings.orcidClientSecretError', function ($clientSecret) {
+            $this->addCheck(new FormValidatorCustom($this, 'orcidClientSecret', 'required', 'plugins.generic.deiaSurvey.settings.orcidClientSecretError', function ($clientSecret) {
                 return $this->validator->validateClientSecret($clientSecret);
             }));
         }
@@ -107,11 +107,11 @@ class DeiaSurveySettingsForm extends Form
 
         $clientId = $this->getData('orcidClientId');
         if (!$this->validator->validateClientId($clientId)) {
-            $messages[] = __('plugins.generic.demographicData.settings.orcidClientIdError');
+            $messages[] = __('plugins.generic.deiaSurvey.settings.orcidClientIdError');
         }
         $clientSecret = $this->getData('orcidClientSecret');
         if (!$this->validator->validateClientSecret($clientSecret)) {
-            $messages[] = __('plugins.generic.demographicData.settings.orcidClientSecretError');
+            $messages[] = __('plugins.generic.deiaSurvey.settings.orcidClientSecretError');
         }
         if (strlen($clientId) == 0 or strlen($clientSecret) == 0) {
             $this->plugin->setEnabled(false);

@@ -7,7 +7,7 @@
 <form class="pkp_form" id="demographicDataForm" method="post" action="{url op="saveDemographicData"}" enctype="multipart/form-data">
 	{csrf}
 
-	{fbvFormSection list="false" label='plugins.generic.demographicData.consent' description='plugins.generic.demographicData.consent.description' required=true}
+	{fbvFormSection list="false" label='plugins.generic.deiaSurvey.consent' description='plugins.generic.deiaSurvey.consent.description' required=true}
 		{if is_null($demographicDataConsent)}
 			{assign var=checkedConsentYes value=false}
 			{assign var=checkedConsentNo value=false}
@@ -15,8 +15,8 @@
 			{assign var=checkedConsentYes value=$demographicDataConsent}
 			{assign var=checkedConsentNo value=!$demographicDataConsent}
 		{/if}
-		{fbvElement type="radio" id="demographicDataConsentYes" name="demographicDataConsent" value=1 checked=$checkedConsentYes required=true label="plugins.generic.demographicData.consent.yes"}
-		{fbvElement type="radio" id="demographicDataConsentNo" name="demographicDataConsent" value=0 checked=$checkedConsentNo required=true label="plugins.generic.demographicData.consent.no"}
+		{fbvElement type="radio" id="demographicDataConsentYes" name="demographicDataConsent" value=1 checked=$checkedConsentYes required=true label="plugins.generic.deiaSurvey.consent.yes"}
+		{fbvElement type="radio" id="demographicDataConsentNo" name="demographicDataConsent" value=0 checked=$checkedConsentNo required=true label="plugins.generic.deiaSurvey.consent.no"}
 	{/fbvFormSection}
 
 	{fbvFormArea id="demographicQuestion"}
@@ -46,7 +46,7 @@
 		for (let reqSymbol of reqSymbols) {ldelim}
 			let reqSymbolParent = reqSymbol.parentNode;
 
-			if (!reqSymbolParent.textContent.includes('{translate key="plugins.generic.demographicData.consent"}')) {ldelim}
+			if (!reqSymbolParent.textContent.includes('{translate key="plugins.generic.deiaSurvey.consent"}')) {ldelim}
 				reqSymbol.style.display = (required ? 'inline' : 'none');
 			{rdelim}
 		{rdelim}

@@ -1,5 +1,5 @@
 {capture assign="pageTitle"}
-    {translate key="plugins.generic.demographicData.questionnairePage.index.title"}
+    {translate key="plugins.generic.deiaSurvey.questionnairePage.index.title"}
 {/capture}
 
 {include file="frontend/components/header.tpl" pageTitleTranslated=$pageTitle}
@@ -8,7 +8,7 @@
     <h1>{$pageTitle|escape}</h1>
 
     <p>
-        {translate key="plugins.generic.demographicData.questionnairePage.externalId.{$authorExternalType}" externalId=$authorExternalId}
+        {translate key="plugins.generic.deiaSurvey.questionnairePage.externalId.{$authorExternalType}" externalId=$authorExternalId}
     </p>
     
     <form class="pkp_form" id="demographicDataForm" method="post" action="{url op="saveQuestionnaire" authorId=$authorId authorToken=$authorToken}" role="form">
@@ -21,7 +21,7 @@
         </fieldset>
 
         <p class="privacyStatement">
-            {translate key="plugins.generic.demographicData.questionnairePage.privacyStatement"}
+            {translate key="plugins.generic.deiaSurvey.questionnairePage.privacyStatement"}
         </p>
 
         <div class="buttons">
