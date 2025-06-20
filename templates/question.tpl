@@ -1,4 +1,4 @@
-<link rel="stylesheet" type="text/css" href="/plugins/generic/demographicData/styles/questionsInProfile.css">
+<link rel="stylesheet" type="text/css" href="/plugins/generic/deiaSurvey/styles/questionsInProfile.css">
 
 {assign var="questionId" value="question-{$question['questionId']}-{$question['inputType']}"}
 {if $question['type'] == $questionTypeConsts['TYPE_CHECKBOXES'] or $question['type'] == $questionTypeConsts['TYPE_RADIO_BUTTONS']}

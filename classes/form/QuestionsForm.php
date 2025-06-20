@@ -1,14 +1,14 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\form;
+namespace APP\plugins\generic\deiaSurvey\classes\form;
 
 use APP\template\TemplateManager;
 use PKP\form\Form;
 use PKP\plugins\PluginRegistry;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
-use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
-use APP\plugins\generic\demographicData\classes\DemographicDataService;
-use APP\plugins\generic\demographicData\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
+use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 
 class QuestionsForm extends Form
 {
@@ -113,5 +113,5 @@ class QuestionsForm extends Form
 }
 
 if (!PKP_STRICT_MODE) {
-    class_alias('\APP\plugins\generic\demographicData\classes\form\QuestionsForm', '\QuestionsForm');
+    class_alias('\APP\plugins\generic\deiaSurvey\classes\form\QuestionsForm', '\QuestionsForm');
 }

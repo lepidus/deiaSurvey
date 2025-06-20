@@ -1,10 +1,10 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\controllers;
+namespace APP\plugins\generic\deiaSurvey\classes\controllers;
 
 use APP\handler\Handler;
 use PKP\core\JSONMessage;
-use APP\plugins\generic\demographicData\classes\form\QuestionsForm;
+use APP\plugins\generic\deiaSurvey\classes\form\QuestionsForm;
 use APP\notification\NotificationManager;
 
 class TabHandler extends Handler
@@ -30,5 +30,5 @@ class TabHandler extends Handler
 }
 
 if (!PKP_STRICT_MODE) {
-    class_alias('\APP\plugins\generic\demographicData\classes\controllers\TabHandler', '\TabHandler');
+    class_alias('\APP\plugins\generic\deiaSurvey\classes\controllers\TabHandler', '\TabHandler');
 }

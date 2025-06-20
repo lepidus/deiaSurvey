@@ -1,11 +1,11 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\classes\dispatchers;
+namespace APP\plugins\generic\deiaSurvey\classes\dispatchers;
 
 use APP\core\Application;
 use PKP\plugins\Hook;
-use APP\plugins\generic\demographicData\classes\dispatchers\DemographicDataDispatcher;
-use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\dispatchers\DemographicDataDispatcher;
+use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
 
 class TemplateFilterDispatcher extends DemographicDataDispatcher
 {

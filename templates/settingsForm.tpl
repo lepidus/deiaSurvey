@@ -14,7 +14,7 @@
     {rdelim});
 </script>
 
-<link rel="stylesheet" type="text/css" href="/plugins/generic/demographicData/styles/settingsForm.css">
+<link rel="stylesheet" type="text/css" href="/plugins/generic/deiaSurvey/styles/settingsForm.css">
 <form class="pkp_form" id="demographicDataSettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
     <div id="demographicDataSettings">
         {if $orcidConfiguration}

@@ -22,7 +22,7 @@
 	{fbvFormArea id="demographicQuestion"}
 		<div id="Hello" name="questions">
 			{foreach $questions as $question}
-				{include file="../../../plugins/generic/demographicData/templates/question.tpl" question=$question}
+				{include file="../../../plugins/generic/deiaSurvey/templates/question.tpl" question=$question}
 			{/foreach}
 		</div>
     {/fbvFormArea}

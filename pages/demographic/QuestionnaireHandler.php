@@ -1,18 +1,18 @@
 <?php
 
-namespace APP\plugins\generic\demographicData\pages\demographic;
+namespace APP\plugins\generic\deiaSurvey\pages\demographic;
 
 use APP\handler\Handler;
 use APP\core\Application;
 use APP\template\TemplateManager;
 use PKP\plugins\PluginRegistry;
 use PKP\config\Config;
-use APP\plugins\generic\demographicData\classes\facades\Repo;
-use APP\plugins\generic\demographicData\classes\DemographicDataDAO;
-use APP\plugins\generic\demographicData\classes\DemographicDataService;
-use APP\plugins\generic\demographicData\classes\OrcidConfiguration;
-use APP\plugins\generic\demographicData\classes\OrcidClient;
-use APP\plugins\generic\demographicData\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
+use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
+use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
+use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
 
 class QuestionnaireHandler extends Handler
 {
