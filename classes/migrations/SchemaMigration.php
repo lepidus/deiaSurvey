@@ -131,7 +131,7 @@ class SchemaMigration extends Migration
 
     private function registerHooksForCustomSchemas()
     {
-        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         Hook::add('Schema::get::demographicQuestion', [$plugin, 'addCustomSchema']);
         Hook::add('Schema::get::demographicResponse', [$plugin, 'addCustomSchema']);
         Hook::add('Schema::get::demographicResponseOption', [$plugin, 'addCustomSchema']);

@@ -16,7 +16,7 @@ class QuestionsForm extends Form
 
     public function __construct($request = null, $args = null)
     {
-        $plugin = PluginRegistry::getPlugin('generic', 'demographicdataplugin');
+        $plugin = PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         parent::__construct($plugin->getTemplateResource('questionsInProfile.tpl'));
 
         if ($request) {
