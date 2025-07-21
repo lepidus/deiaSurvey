@@ -236,7 +236,7 @@ describe('DEIA Survey - External contributors data collecting', function() {
             });
         });
 
-        assertDefaultQuestionsDisplay('susy.almeida@outlook.com');
+        cy.assertDefaultQuestionsDisplay('questionnairePage', 'susy.almeida@outlook.com');
 
         cy.url().then(url => {
             cy.visit(url + 'breakToken');
