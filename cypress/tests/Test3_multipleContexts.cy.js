@@ -99,13 +99,14 @@ describe('DEIA Survey - Multiple contexts', function () {
 		cy.get('input[id^=select-cell-deiasurveyplugin]').check();
 		cy.get('input[id^=select-cell-deiasurveyplugin]').should('be.checked');
 	});
-    it('Questions are displayed for authors in new context', function () {
-        cy.login('sberardo', null, newContextData.path);
-        cy.contains('h1', 'Profile');
-        cy.contains('We request that you fill in the DEIA survey on the "DEIA Survey" tab of your profile page');
-        cy.assertDefaultQuestionsDisplay('profilePage');
-
+    it('Users who answered the survey are not blocked from using the application', function () {
         cy.login('dsokoloff', null, newContextData.path);
+        cy.contains('h1', 'Submissions');
+        cy.get('.app__headerActions button').eq(1).click();
+        cy.contains('a', 'Edit Profile').click();
+        cy.get('span:contains("We request that you fill in the DEIA survey")').should('not.exist');
+        
+        cy.login('sberardo', null, newContextData.path);
         cy.contains('h1', 'Profile');
         cy.contains('We request that you fill in the DEIA survey on the "DEIA Survey" tab of your profile page');
         cy.assertDefaultQuestionsDisplay('profilePage');
