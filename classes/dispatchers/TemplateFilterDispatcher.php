@@ -38,12 +38,10 @@ class TemplateFilterDispatcher extends DemographicDataDispatcher
         $templateMgr->registerFilter('output', [$this, 'deiaSurveyTabFilter']);
 
         $request = Application::get()->getRequest();
-        $contextId = $request->getContext()->getId();
         $userId = $request->getUser()->getId();
         $demographicDataDao = new DemographicDataDAO();
-        $consent = $demographicDataDao->getDemographicConsent($contextId, $userId);
 
-        if (is_null($consent)) {
+        if (!$demographicDataDao->userHasDemographicConsent($userId)) {
             $templateMgr->registerFilter('output', [$this, 'requestMessageFilter']);
         }
     }
