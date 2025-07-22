@@ -71,7 +71,7 @@ describe('DEIA Survey - Multiple contexts', function () {
                 cy.get('input').check();
             })
         });
-        cy.contains('button', 'Save').click();
+        cy.get('button:visible:contains("Save")').click();
         cy.contains('Your changes have been saved');
 
         cy.login('dsokoloff', null, 'publicknowledge');
@@ -85,7 +85,7 @@ describe('DEIA Survey - Multiple contexts', function () {
                 cy.get('input').check();
             })
         });
-        cy.contains('button', 'Save').click();
+        cy.get('button:visible:contains("Save")').click();
         cy.contains('Your changes have been saved');
     });
     it('Admin enables DEIA Survey plugin in new context', function () {
