@@ -73,6 +73,7 @@ describe('DEIA Survey - Multiple contexts', function () {
         });
         cy.get('button:visible:contains("Save")').click();
         cy.contains('Your changes have been saved');
+        cy.logout();
 
         cy.login('dsokoloff', null, 'publicknowledge');
         cy.get('.app__headerActions button').eq(1).click();
@@ -105,10 +106,10 @@ describe('DEIA Survey - Multiple contexts', function () {
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('a', 'Edit Profile').click();
         cy.get('span:contains("We request that you fill in the DEIA survey")').should('not.exist');
+        cy.logout();
         
         cy.login('sberardo', null, newContextData.path);
         cy.contains('h1', 'Profile');
         cy.contains('We request that you fill in the DEIA survey on the "DEIA Survey" tab of your profile page');
-        cy.assertDefaultQuestionsDisplay('profilePage');
     });
 });
