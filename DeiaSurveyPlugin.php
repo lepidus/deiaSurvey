@@ -179,7 +179,7 @@ class DeiaSurveyPlugin extends GenericPlugin
         $demographicDataDao = new DemographicDataDAO();
         $userHasConsent = $demographicDataDao->userHasDemographicConsent($user->getId());
 
-        return $userHasConsent && $this->userHasMandatoryFilling($user, $context);
+        return !$userHasConsent && $this->userHasMandatoryFilling($user, $context);
     }
 
     private function userHasMandatoryFilling($user, $context)
