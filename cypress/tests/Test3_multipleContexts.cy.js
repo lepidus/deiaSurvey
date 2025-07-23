@@ -8,9 +8,6 @@ describe('DEIA Survey - Multiple contexts', function () {
             title: 'Opera House',
             initials: 'ohouse',
             abbrev: 'ohouse',
-            contactName: 'John Doe',
-            contactEmail: 'john.doe@operahouse.com',
-            country: 'United Kingdom',
             path: 'operahouse',
             languages: ['en_US', 'fr_CA'],
             primaryLanguage: 'en_US'
@@ -38,9 +35,6 @@ describe('DEIA Survey - Multiple contexts', function () {
         cy.get('input[name="name-en_US"]').type(newContextData.title, {delay: 0});
         cy.get('input[name="acronym-en_US"]').type(newContextData.initials, {delay: 0});
         cy.get('input[name="abbreviation-en_US"]').type(newContextData.abbrev, {delay: 0});
-        cy.get('input[name="contactName"]').type(newContextData.contactName, {delay: 0});
-        cy.get('input[name="contactEmail"]').type(newContextData.contactEmail, {delay: 0});
-        cy.get('#context-country-control').select(newContextData.country);
         cy.get('input[name="urlPath"]').type(newContextData.path, {delay: 0});
         for (const lang of newContextData.languages) {
             cy.get(`input[name="supportedLocales"][value="${lang}"]`).check();
