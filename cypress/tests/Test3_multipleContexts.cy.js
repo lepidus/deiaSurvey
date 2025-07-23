@@ -2,6 +2,7 @@ import '../support/commands.js';
 
 describe('DEIA Survey - Multiple contexts', function () {
     let newContextData;
+    const SECOND = 1000;
 
     before(function () {
         newContextData = {
@@ -30,7 +31,7 @@ describe('DEIA Survey - Multiple contexts', function () {
         cy.contains('h1', 'Administration');
         cy.contains('a', 'Hosted ' + contextNounUpper + 's').click();
         cy.contains('a', 'Create ' + contextNounUpper).click();
-        cy.wait(1000);
+        cy.wait(1 * SECOND);
 
         cy.get('input[name="name-en_US"]').type(newContextData.title, {delay: 0});
         cy.get('input[name="acronym-en_US"]').type(newContextData.initials, {delay: 0});
@@ -45,9 +46,8 @@ describe('DEIA Survey - Multiple contexts', function () {
             cy.get('input[name="enabled"]').check();
         });
         cy.contains('.pkpButton', 'Save').click();
-        cy.wait(10000);
 
-        cy.contains('h1', 'Settings Wizard');
+        cy.contains('h1', 'Settings Wizard', {timeout: 45 * SECOND});
         cy.get('#context-name-control-en_US').should('have.value', newContextData.title);
     });
     it('Users register to new context', function () {
