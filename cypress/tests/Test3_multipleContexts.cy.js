@@ -113,9 +113,20 @@ describe('DEIA Survey - Multiple contexts', function () {
         cy.contains("To check your data, access the survey in the '" + Cypress.env('contextTitles').en + "' " + contextNoun);
     });
     it('Users can answer the survey in the new context', function () {
+        let userAnswers = [
+            {'title': 'Gender', 'chosenOption': 'Woman'},
+            {'title': 'Race', 'chosenOption': 'White'},
+            {'title': 'Ethnicity', 'chosenOption': 'Western Europe'},
+        ];
+        
         cy.login('sberardo', null, newContextData.path);
         cy.contains('h1', 'Profile');
         cy.contains('We request that you fill in the DEIA survey on the "DEIA Survey" tab of your profile page');
         cy.assertDefaultQuestionsDisplay('profilePage');
+        cy.get('input[name="demographicDataConsent"][value=1]').click();
+        cy.answerDefaultQuestionsOnProfile(userAnswers);
+        cy.reload();
+        cy.get('span:contains("We request that you fill in the DEIA survey")').should('not.exist');
+        cy.assertResponsesToDefaultQuestions(userAnswers);
     });
 });
