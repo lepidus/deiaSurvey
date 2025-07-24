@@ -3,7 +3,7 @@ variables:
 
 include:
   - project: 'documentacao-e-tarefas/modelosparaintegracaocontinua'
-    ref: integrationTestsPhpErrors-340
+    ref: main
     file:
       - 'templates/groups/pkp_plugin.yml'
       - 'templates/groups/ojs/unit_tests.yml'
