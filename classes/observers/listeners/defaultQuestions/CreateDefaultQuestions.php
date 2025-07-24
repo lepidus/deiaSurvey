@@ -24,7 +24,6 @@ class CreateDefaultQuestions
         $plugin = $event->plugin;
         $settingName = $event->settingName;
         $newValue = $event->newValue;
-        error_log('Plugin setting changed: ' . $plugin->getName() . ' - ' . $settingName . ' - ' . $newValue);
 
         if (
             $plugin->getName() !== self::PLUGIN_NAME
