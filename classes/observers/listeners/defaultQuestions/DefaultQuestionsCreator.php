@@ -16,6 +16,7 @@ class DefaultQuestionsCreator
             ->getCount();
 
         if ($demographicQuestionsCount == 0) {
+            error_log('Creating default demographic questions for context ID: ' . $contextId);
             $defaultTestQuestions = $this->getDefaultTestQuestionsData($contextId);
 
             foreach ($defaultTestQuestions as $questionData) {

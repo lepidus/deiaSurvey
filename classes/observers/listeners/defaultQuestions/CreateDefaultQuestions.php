@@ -34,6 +34,7 @@ class CreateDefaultQuestions
         }
 
         $contextId = $event->contextId;
+        error_log('Creating default questions for context ID: ' . $contextId);
         $defaultQuestionsCreator = new DefaultQuestionsCreator();
 
         $this->registerHooksForCustomSchemas($plugin);
