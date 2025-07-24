@@ -24,6 +24,7 @@ class CreateDefaultQuestions
         $plugin = $event->plugin;
         $settingName = $event->settingName;
         $newValue = $event->newValue;
+        error_log('Plugin setting changed: ' . $plugin->getName() . ' - ' . $settingName . ' - ' . $newValue);
 
         if (
             $plugin->getName() !== self::PLUGIN_NAME
@@ -34,7 +35,6 @@ class CreateDefaultQuestions
         }
 
         $contextId = $event->contextId;
-        error_log('Creating default questions for context ID: ' . $contextId);
         $defaultQuestionsCreator = new DefaultQuestionsCreator();
 
         $this->registerHooksForCustomSchemas($plugin);
