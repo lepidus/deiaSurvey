@@ -27,7 +27,7 @@ class DeiaSurveyPlugin extends GenericPlugin
     public function register($category, $path, $mainContextId = null): bool
     {
         $success = parent::register($category, $path);
-        
+
         if ($success) {
             Event::subscribe(new CreateDefaultQuestions());
 
@@ -40,9 +40,9 @@ class DeiaSurveyPlugin extends GenericPlugin
                 Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
                 Hook::add('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
                 Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
-    
+
                 Event::subscribe(new MigrateResponsesOnRegistration());
-    
+
                 $context = Application::get()->getRequest()->getContext();
                 if (!is_null($context)) {
                     $this->loadDispatcherClasses();

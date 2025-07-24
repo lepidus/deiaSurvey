@@ -10,7 +10,7 @@ use APP\plugins\generic\deiaSurvey\classes\observers\listeners\defaultQuestions\
 class CreateDefaultQuestions
 {
     private const PLUGIN_NAME = 'deiasurveyplugin';
-    
+
     public function subscribe(Dispatcher $events): void
     {
         $events->listen(
