@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\deiaSurvey\classes;
+namespace APP\plugins\generic\deiaSurvey\classes\observers\listeners\defaultQuestions;
 
 use APP\core\Application;
 use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
