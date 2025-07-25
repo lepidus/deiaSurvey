@@ -1,6 +1,6 @@
 <?php
 
-namespace APP\plugins\generic\deiaSurvey\classes\observers\listeners\defaultQuestions;
+namespace APP\plugins\generic\deiaSurvey\classes;
 
 use APP\core\Application;
 use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
@@ -15,7 +15,7 @@ class DefaultQuestionsCreator
             ->filterByContextIds([$contextId])
             ->getCount();
 
-        if ($demographicQuestionsCount == 0) {
+        if ($demographicQuestionsCount === 0) {
             $defaultTestQuestions = $this->getDefaultTestQuestionsData($contextId);
 
             foreach ($defaultTestQuestions as $questionData) {

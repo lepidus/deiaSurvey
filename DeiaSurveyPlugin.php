@@ -13,9 +13,9 @@ use PKP\linkAction\request\AjaxModal;
 use PKP\core\JSONMessage;
 use PKP\security\Role;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
+use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\observers\listeners\MigrateResponsesOnRegistration;
-use APP\plugins\generic\deiaSurvey\classes\observers\listeners\defaultQuestions\CreateDefaultQuestions;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
 use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
@@ -28,25 +28,19 @@ class DeiaSurveyPlugin extends GenericPlugin
     {
         $success = parent::register($category, $path);
 
-        if ($success) {
-            Event::subscribe(new CreateDefaultQuestions());
+        if ($success && $this->getEnabled()) {
+            Hook::add('Request::redirect', [$this, 'redirectUserAfterLogin']);
+            Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
+            Hook::add('LoadHandler', [$this, 'addPageHandler']);
+            Hook::add('Schema::get::author', [$this, 'editAuthorSchema']);
+            Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
+            $this->registerHooksForCustomSchemas();
 
-            if ($this->getEnabled()) {
-                Hook::add('Request::redirect', [$this, 'redirectUserAfterLogin']);
-                Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
-                Hook::add('LoadHandler', [$this, 'addPageHandler']);
-                Hook::add('Schema::get::author', [$this, 'editAuthorSchema']);
-                Hook::add('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
-                Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
-                Hook::add('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
-                Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
+            Event::subscribe(new MigrateResponsesOnRegistration());
 
-                Event::subscribe(new MigrateResponsesOnRegistration());
-
-                $context = Application::get()->getRequest()->getContext();
-                if (!is_null($context)) {
-                    $this->loadDispatcherClasses();
-                }
+            $context = Application::get()->getRequest()->getContext();
+            if (!is_null($context)) {
+                $this->loadDispatcherClasses();
             }
         }
         return $success;
@@ -62,9 +56,30 @@ class DeiaSurveyPlugin extends GenericPlugin
         return __('plugins.generic.deiaSurvey.description');
     }
 
+    private function registerHooksForCustomSchemas()
+    {
+        Hook::add('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
+        Hook::add('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
+        Hook::add('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
+    }
+
     public function getInstallEmailTemplatesFile()
     {
         return $this->getPluginPath() . '/emailTemplates.xml';
+    }
+
+    public function setEnabled($enabled)
+    {
+        $contextId = $this->getCurrentContextId();
+
+        if ($enabled && $contextId != Application::CONTEXT_SITE) {
+            $defaultQuestionsCreator = new DefaultQuestionsCreator();
+
+            $this->registerHooksForCustomSchemas();
+            $defaultQuestionsCreator->createDefaultQuestions($contextId);
+        }
+
+        parent::setEnabled($enabled);
     }
 
     public function getCanEnable()
