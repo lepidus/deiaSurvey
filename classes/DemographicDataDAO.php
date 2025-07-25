@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class DemographicDataDAO extends DAO
 {
-    private function getConsentSetting(int $userId, int $contextId = null): ?array
+    public function getConsentSetting(int $userId, int $contextId = null): ?array
     {
         $result = DB::table('user_settings')
             ->where('user_id', '=', $userId)
@@ -36,7 +36,7 @@ class DemographicDataDAO extends DAO
         return $this->getConsentSetting($userId) !== null;
     }
 
-    public function getDemographicConsent(int $contextId, int $userId): ?bool
+    public function getDemographicConsentOption(int $contextId, int $userId): ?bool
     {
         $setting = $this->getConsentSetting($userId, $contextId);
 

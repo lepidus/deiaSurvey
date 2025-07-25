@@ -2,9 +2,11 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\form;
 
+use APP\core\Application;
 use APP\template\TemplateManager;
 use PKP\form\Form;
 use PKP\plugins\PluginRegistry;
+use PKP\db\DAORegistry;
 use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
@@ -58,11 +60,22 @@ class QuestionsForm extends Form
 
     public function initData()
     {
+        $applicationName = Application::get()->getName();
+        $this->setData('applicationName', $applicationName);
+        
         $context = $this->request->getContext();
         $user = $this->request->getUser();
         $demographicDataDao = new DemographicDataDAO();
-        $userConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
+        $userConsent = $demographicDataDao->getDemographicConsentOption($context->getId(), $user->getId());
         $this->setData('demographicDataConsent', $userConsent);
+
+        $userConsentSetting = $demographicDataDao->getConsentSetting($user->getId());
+        if (!is_null($userConsentSetting)) {
+            $contextDao = DAORegistry::getDAO(($applicationName == 'ojs2') ? 'JournalDAO' : 'ServerDAO');
+            $context = $contextDao->getById($userConsentSetting['contextId']);
+            $userConsentSetting['contextName'] = $context->getLocalizedName();
+        }
+        $this->setData('userConsentSetting', $userConsentSetting);
 
         $demographicDataService  = new DemographicDataService();
         $questions = $demographicDataService->retrieveAllQuestions($context->getId(), true);
@@ -97,7 +110,7 @@ class QuestionsForm extends Form
         $demographicDataService  = new DemographicDataService();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
-        $previousConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
+        $previousConsent = $demographicDataDao->getDemographicConsentOption($context->getId(), $user->getId());
         $newConsent = $this->getData('demographicDataConsent');
 
         $demographicDataDao->updateDemographicConsent($context->getId(), $user->getId(), $newConsent);
