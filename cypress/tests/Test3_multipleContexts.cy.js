@@ -2,6 +2,8 @@ import '../support/commands.js';
 
 describe('DEIA Survey - Multiple contexts', function () {
     let newContextData;
+    let contextNounUpper = 'Journal';
+    let contextNoun = 'journal';
 
     before(function () {
         newContextData = {
@@ -15,16 +17,14 @@ describe('DEIA Survey - Multiple contexts', function () {
             languages: ['en', 'fr_CA'],
             primaryLanguage: 'en'
         };
-    });
 
-    it('Creates new context', function () {
-        let contextNounUpper = 'Journal';
-        let contextNoun = 'journal';
         if (Cypress.env('contextTitles').en == 'Public Knowledge Preprint Server') {
             contextNounUpper = 'Server';
             contextNoun = 'preprint server';
         }
+    });
 
+    it('Creates new context', function () {
         cy.login('admin', 'admin');
 
         cy.get('.profile a[id^="pkpDropdown"]').click();
