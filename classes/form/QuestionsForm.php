@@ -62,7 +62,7 @@ class QuestionsForm extends Form
     {
         $applicationName = Application::get()->getName();
         $this->setData('applicationName', $applicationName);
-        
+
         $context = $this->request->getContext();
         $user = $this->request->getUser();
         $demographicDataDao = new DemographicDataDAO();
