@@ -15,7 +15,7 @@ class DefaultQuestionsCreator
             ->filterByContextIds([$contextId])
             ->getCount();
 
-        if ($demographicQuestionsCount == 0) {
+        if ($demographicQuestionsCount === 0) {
             $defaultTestQuestions = $this->getDefaultTestQuestionsData($contextId);
 
             foreach ($defaultTestQuestions as $questionData) {

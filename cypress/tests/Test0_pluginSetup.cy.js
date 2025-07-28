@@ -11,6 +11,7 @@ describe('DEIA Survey - Plugin setup', function () {
 		cy.get('#plugins-button').click();
 
 		cy.get('input[id^=select-cell-deiasurveyplugin]').check();
+		cy.contains('The plugin "DEIA Survey" has been enabled', {timeout: 15000});
 		cy.get('input[id^=select-cell-deiasurveyplugin]').should('be.checked');
 		cy.reload();
 

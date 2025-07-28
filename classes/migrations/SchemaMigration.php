@@ -5,11 +5,7 @@ namespace APP\plugins\generic\deiaSurvey\classes\migrations;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use PKP\plugins\PluginRegistry;
-use PKP\plugins\Hook;
-use PKP\db\DAORegistry;
 use APP\core\Application;
-use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 
 class SchemaMigration extends Migration
 {
@@ -123,30 +119,6 @@ class SchemaMigration extends Migration
                 $table->index(['demographic_response_id'], 'demographic_response_setting_id');
                 $table->unique(['demographic_response_id', 'locale', 'setting_name'], 'demographic_response_settings_pkey');
             });
-        }
-
-        $this->registerHooksForCustomSchemas();
-        $this->addDefaultQuestionsToContexts();
-    }
-
-    private function registerHooksForCustomSchemas()
-    {
-        $plugin = PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
-        Hook::add('Schema::get::demographicQuestion', [$plugin, 'addCustomSchema']);
-        Hook::add('Schema::get::demographicResponse', [$plugin, 'addCustomSchema']);
-        Hook::add('Schema::get::demographicResponseOption', [$plugin, 'addCustomSchema']);
-    }
-
-    private function addDefaultQuestionsToContexts()
-    {
-        $applicationName = Application::get()->getName();
-        $contextDaoName = ($applicationName == 'ojs2') ? 'JournalDAO' : 'ServerDAO';
-        $contextDao = DAORegistry::getDAO($contextDaoName);
-        $defaultQuestionsCreator = new DefaultQuestionsCreator();
-
-        $contexts = $contextDao->getAll(true);
-        while ($context = $contexts->next()) {
-            $defaultQuestionsCreator->createDefaultQuestions($context->getId());
         }
     }
 }
