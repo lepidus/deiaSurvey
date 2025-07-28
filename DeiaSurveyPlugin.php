@@ -5,6 +5,7 @@ require_once('autoload.php');
 use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
 use APP\plugins\generic\deiaSurvey\classes\form\CustomRegistrationForm;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
+use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\observers\listeners\MigrateResponsesOnRegistration;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
@@ -22,10 +23,8 @@ class DeiaSurveyPlugin extends \GenericPlugin
             HookRegistry::register('LoadComponentHandler', [$this, 'setupTabHandler']);
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
             HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
-            HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
-            HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
-            HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
             HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
+            $this->registerHooksForCustomSchemas();
 
             $context = Application::get()->getRequest()->getContext();
             if (!is_null($context)) {
@@ -45,9 +44,30 @@ class DeiaSurveyPlugin extends \GenericPlugin
         return __('plugins.generic.deiaSurvey.description');
     }
 
+    private function registerHooksForCustomSchemas()
+    {
+        HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
+        HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
+        HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
+    }
+
     public function getInstallEmailTemplatesFile()
     {
         return $this->getPluginPath() . '/emailTemplates.xml';
+    }
+
+    public function setEnabled($enabled)
+    {
+        $contextId = $this->getCurrentContextId();
+
+        if ($enabled && $contextId != CONTEXT_SITE) {
+            $defaultQuestionsCreator = new DefaultQuestionsCreator();
+
+            $this->registerHooksForCustomSchemas();
+            $defaultQuestionsCreator->createDefaultQuestions($contextId);
+        }
+
+        parent::setEnabled($enabled);
     }
 
     public function getCanEnable()
