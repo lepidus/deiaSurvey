@@ -64,8 +64,7 @@ class QuestionsForm extends Form
         $this->setData('applicationName', $applicationName);
 
         $context = $this->request->getContext();
-        $user = $this->request->getUser();
-        $this->initConsentData($context, $user, $applicationName);
+        $this->initConsentData($context, $applicationName);
 
         $demographicDataService  = new DemographicDataService();
         $questions = $demographicDataService->retrieveAllQuestions($context->getId(), true);
@@ -75,17 +74,22 @@ class QuestionsForm extends Form
         parent::initData();
     }
 
-    private function initConsentData($context, $user, $applicationName)
+    private function initConsentData($context, $applicationName)
     {
+        $user = $this->request->getUser();
         $demographicDataDao = new DemographicDataDAO();
+
         $userConsent = $demographicDataDao->getDemographicConsentOption($context->getId(), $user->getId());
         $this->setData('demographicDataConsent', $userConsent);
 
         $userConsentSetting = $demographicDataDao->getConsentSetting($user->getId());
         if (!is_null($userConsentSetting)) {
             $contextDao = DAORegistry::getDAO(($applicationName == 'ojs2') ? 'JournalDAO' : 'ServerDAO');
-            $consentSettingContext = $contextDao->getById($userConsentSetting['contextId']);
-            $userConsentSetting['contextName'] = $consentSettingContext->getLocalizedName();
+            $userConsentSetting = array_map(function ($contextConsent) use ($contextDao) {
+                $consentSettingContext = $contextDao->getById($contextConsent['contextId']);
+                $contextConsent['contextName'] = $consentSettingContext->getLocalizedName();
+                return $contextConsent;
+            }, $userConsentSetting['value']);
         }
         $this->setData('userConsentSetting', $userConsentSetting);
     }
