@@ -12,7 +12,7 @@
 <version>
 	<application>deiaSurvey</application>
 	<type>plugins.generic</type>
-	<release>1.2.2.0</release>
-	<date>2025-07-22</date>
+	<release>1.2.3.0</release>
+	<date>2025-07-28</date>
   <class>DeiaSurveyPlugin</class>
 </version>
