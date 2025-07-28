@@ -22,12 +22,12 @@ msgstr "We request that you fill in the DEIA survey on the \"DEIA Survey\" tab o
 msgid "plugins.generic.deiaSurvey.alreadyAnswered.ojs2"
 msgstr "You have already answered the DEIA survey in the \"{$contextName}\" journal."
 " Therefore, you do not need to answer it again in this journal."
-" To check your data, access the survey in the \"{$contextName}\" journal."
+" To check your data, access the survey in \"{$contextName}\"."
 
 msgid "plugins.generic.deiaSurvey.alreadyAnswered.ops"
 msgstr "You have already answered the DEIA survey in the \"{$contextName}\" preprint server."
-" Therefore, you do not need to answer it again in this server."
-" To check your data, access the survey in the \"{$contextName}\" preprint server."
+" Therefore, you do not need to answer it again in this preprint server."
+" To check your data, access the survey in \"{$contextName}\"."
 
 msgid "plugins.generic.deiaSurvey.questionnairePage.index.title"
 msgstr "DEIA Survey (Diversity, Equity, Inclusion and Accessibility)"

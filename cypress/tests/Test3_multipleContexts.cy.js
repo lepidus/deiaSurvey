@@ -110,7 +110,7 @@ describe('DEIA Survey - Multiple contexts', function () {
 
         cy.contains('You have already answered the DEIA survey in the "' + Cypress.env('contextTitles').en + '" ' + contextNoun);
         cy.contains('Therefore, you do not need to answer it again in this ' + contextNoun);
-        cy.contains('To check your data, access the survey in the "' + Cypress.env('contextTitles').en + '" ' + contextNoun);
+        cy.contains('To check your data, access the survey in "' + Cypress.env('contextTitles').en + '"');
     });
     it('Users can answer the survey in the new context', function () {
         let userAnswers = [
