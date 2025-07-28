@@ -72,8 +72,8 @@ class QuestionsForm extends Form
         $userConsentSetting = $demographicDataDao->getConsentSetting($user->getId());
         if (!is_null($userConsentSetting)) {
             $contextDao = DAORegistry::getDAO(($applicationName == 'ojs2') ? 'JournalDAO' : 'ServerDAO');
-            $context = $contextDao->getById($userConsentSetting['contextId']);
-            $userConsentSetting['contextName'] = $context->getLocalizedName();
+            $consentSettingContext = $contextDao->getById($userConsentSetting['contextId']);
+            $userConsentSetting['contextName'] = $consentSettingContext->getLocalizedName();
         }
         $this->setData('userConsentSetting', $userConsentSetting);
 
