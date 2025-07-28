@@ -65,6 +65,18 @@ class QuestionsForm extends Form
 
         $context = $this->request->getContext();
         $user = $this->request->getUser();
+        $this->initConsentData($context, $user, $applicationName);
+
+        $demographicDataService  = new DemographicDataService();
+        $questions = $demographicDataService->retrieveAllQuestions($context->getId(), true);
+        $this->setData('questions', $questions);
+        $this->setData('questionTypeConsts', DemographicQuestion::getQuestionTypeConstants());
+
+        parent::initData();
+    }
+
+    private function initConsentData($context, $user, $applicationName)
+    {
         $demographicDataDao = new DemographicDataDAO();
         $userConsent = $demographicDataDao->getDemographicConsentOption($context->getId(), $user->getId());
         $this->setData('demographicDataConsent', $userConsent);
@@ -76,13 +88,6 @@ class QuestionsForm extends Form
             $userConsentSetting['contextName'] = $consentSettingContext->getLocalizedName();
         }
         $this->setData('userConsentSetting', $userConsentSetting);
-
-        $demographicDataService  = new DemographicDataService();
-        $questions = $demographicDataService->retrieveAllQuestions($context->getId(), true);
-        $this->setData('questions', $questions);
-        $this->setData('questionTypeConsts', DemographicQuestion::getQuestionTypeConstants());
-
-        parent::initData();
     }
 
     public function validate($callHooks = true)
