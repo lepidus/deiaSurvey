@@ -59,3 +59,46 @@ Cypress.Commands.add('assertDefaultQuestionsDisplay', function(place, authorEmai
         cy.contains('Data is collected in accordance with this journal\'s privacy statement');
     }
 });
+
+Cypress.Commands.add('answerDefaultQuestionsOnProfile', function(questions) {
+    for (const question of questions) {
+        cy.contains('label', question['title']).parent().within(() => {
+            if (question['chosenOption'] == 'Self describe') {
+                cy.contains('label', 'Self describe').parent().parent().within(() => {
+                    cy.get('input[type="checkbox"]').check();
+                    cy.get('input[type="text"]').clear().type(question['selfDescribeValue']);
+                });
+            } else {
+                cy.contains('label', question['chosenOption']).within(() => {
+                    cy.get('input').check();
+                });
+            }
+        });
+    }
+
+    cy.get('#deiaSurveyForm .submitFormButton').click();
+    cy.wait(1000);
+});
+
+Cypress.Commands.add('assertResponsesToDefaultQuestions', function(questions) {
+    cy.contains('a', 'DEIA Survey').click();
+    cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
+    
+    for (const question of questions) {
+        cy.contains('label', question['title']).parent().within(() => {
+            if (question['chosenOption'] == 'Self describe') {
+                cy.contains('label', 'Self describe').parent().parent().within(() => {
+                    cy.get('input[type="checkbox"]').should('be.checked');
+                    cy.get('input[type="text"]').should('have.value', question['selfDescribeValue']);
+                });
+            } else {
+                cy.contains('label', question['chosenOption']).within(() => {
+                    cy.get('input').should('be.checked');
+                });
+            }
+        });
+    }
+
+    cy.get('#deiaSurveyForm .submitFormButton').click();
+    cy.wait(1000);
+});

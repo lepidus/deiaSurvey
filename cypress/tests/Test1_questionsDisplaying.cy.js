@@ -1,37 +1,5 @@
 import '../support/commands.js';
 
-function answerDefaultQuestions() {
-    cy.contains('label', 'Woman').within(() => {
-        cy.get('input').check();
-    });
-    cy.contains('label', 'Self describe').eq(0).parent().parent().within(() => {
-        cy.get('input[type="checkbox"]').check();
-        cy.get('input[type="text"]').clear().type('Slavic');
-    });
-    cy.contains('label', 'Eastern Europe').within(() => {
-        cy.get('input').check();
-    });
-
-    cy.get('#deiaSurveyForm .submitFormButton').click();
-    cy.wait(1000);
-}
-
-function assertResponsesToDefaultQuestions() {
-    cy.contains('a', 'DEIA Survey').click();
-    cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
-    
-    cy.contains('label', 'Woman').within(() => {
-        cy.get('input').should('be.checked');
-    });
-    cy.contains('label', 'Self describe').eq(0).parent().parent().within(() => {
-        cy.get('input[type="checkbox"]').should('be.checked');
-        cy.get('input[type="text"]').should('have.value', 'Slavic');
-    });
-    cy.contains('label', 'Eastern Europe').within(() => {
-        cy.get('input').should('be.checked');
-    });
-}
-
 function assertDisabledFields() {
     cy.contains('label', 'Woman').within(() => {
         cy.get('input').should('be.disabled');
@@ -122,16 +90,22 @@ describe('DEIA Survey - Questions displaying', function () {
         cy.get('span:contains("We request that you fill in the DEIA survey")').should('not.exist');
     });
     it('User chooses to answer questions', function () {
+        let userAnswers = [
+            {'title': 'Gender', 'chosenOption': 'Woman'},
+            {'title': 'Race', 'chosenOption': 'Self describe', 'selfDescribeValue': 'Slavic'},
+            {'title': 'Ethnicity', 'chosenOption': 'Eastern Europe'},
+        ];
+        
         cy.login('dsokoloff', null, 'publicknowledge');
         cy.get('.app__headerActions button').eq(1).click();
         cy.contains('a', 'Edit Profile').click();
         cy.contains('a', 'DEIA Survey').click();
 
         cy.get('input[name="demographicDataConsent"][value=1]').click();
-        answerDefaultQuestions();
+        cy.answerDefaultQuestionsOnProfile(userAnswers);
 
         cy.reload();
-        assertResponsesToDefaultQuestions();
+        cy.assertResponsesToDefaultQuestions(userAnswers);
     });
     it('User removes consent, leading to data deletion', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
