@@ -27,7 +27,7 @@ msgstr "Você já respondeu o questionário DEIA no periódico \"{$contextName}\
 msgid "plugins.generic.deiaSurvey.alreadyAnswered.ops"
 msgstr "Você já respondeu o questionário DEIA no servidor \"{$contextName}\"."
 " Portanto, você não precisa respondê-lo novamente neste servidor."
-" Para verificar seus dados, acesse o questionário no servidor \"{$contextName}\"."
+" Para verificar seus dados, acesse o questionário no servidor de preprints \"{$contextName}\"."
 
 msgid "plugins.generic.deiaSurvey.questionnairePage.index.title"
 msgstr "Questionário DEIA (Diversidade, Equidade, Inclusão e Acessibilidade)"

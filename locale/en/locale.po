@@ -27,7 +27,7 @@ msgstr "You have already answered the DEIA survey in the \"{$contextName}\" jour
 msgid "plugins.generic.deiaSurvey.alreadyAnswered.ops"
 msgstr "You have already answered the DEIA survey in the \"{$contextName}\" server."
 " Therefore, you do not need to answer it again in this server."
-" To check your data, access the survey in the \"{$contextName}\" server."
+" To check your data, access the survey in the \"{$contextName}\" preprint server."
 
 msgid "plugins.generic.deiaSurvey.questionnairePage.index.title"
 msgstr "DEIA Survey (Diversity, Equity, Inclusion and Accessibility)"
