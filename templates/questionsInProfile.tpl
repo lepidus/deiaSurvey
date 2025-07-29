@@ -8,6 +8,19 @@
 <h3 id="deiaSurveyTitle">
 	{translate key="plugins.generic.deiaSurvey.questionnairePage.index.title"}
 </h3>
+{if is_null($demographicDataConsent) && $userConsentSetting}
+	<div id="demographicAlreadyAnsweredMessage" class="pkp_notification">
+		{capture assign="content"}
+			{translate key="plugins.generic.deiaSurvey.alreadyAnswered.{$applicationName}" contextName=$userConsentSetting[0]['contextName']}
+		{/capture}
+		{include
+			file="controllers/notification/inPlaceNotificationContent.tpl"
+			notificationId="demographicAlreadyAnsweredMessage-"|uniqid
+			notificationStyleClass="notifySuccess"
+			notificationContents=$content
+		}
+	</div>
+{/if}
 <form class="pkp_form" id="deiaSurveyForm" method="post" action="{url op="saveDemographicData"}" enctype="multipart/form-data">
 	{csrf}
 

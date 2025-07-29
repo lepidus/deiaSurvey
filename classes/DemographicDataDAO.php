@@ -6,7 +6,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 
 class DemographicDataDAO extends \DAO
 {
-    private function getConsentSetting(int $userId, int $contextId = null): ?array
+    public function getConsentSetting(int $userId): ?array
     {
         $result = Capsule::table('user_settings')
             ->where('user_id', '=', $userId)
@@ -19,15 +19,13 @@ class DemographicDataDAO extends \DAO
 
         $setting = get_object_vars($result);
         $settingValue = json_decode($setting['setting_value'], true);
-        if (is_null($contextId) || $settingValue['contextId'] == $contextId) {
-            return [
-                'id' => $setting['user_setting_id'],
-                'contextId' => $settingValue['contextId'],
-                'consentOption' => $settingValue['consentOption']
-            ];
+
+        // Handles wrong data structure used in previous versions
+        if (array_key_exists('contextId', $settingValue)) {
+            $settingValue = [$settingValue];
         }
 
-        return null;
+        return ['id' => $setting['user_setting_id'], 'value' => $settingValue];
     }
 
     public function userHasDemographicConsent(int $userId): bool
@@ -35,19 +33,25 @@ class DemographicDataDAO extends \DAO
         return $this->getConsentSetting($userId) !== null;
     }
 
-    public function getDemographicConsent(int $contextId, int $userId): ?bool
+    public function getDemographicConsentOption(int $contextId, int $userId): ?bool
     {
-        $setting = $this->getConsentSetting($userId, $contextId);
+        $setting = $this->getConsentSetting($userId);
 
-        return $setting ? $setting['consentOption'] : null;
+        foreach ($setting['value'] as $contextConsent) {
+            if ($contextConsent['contextId'] == $contextId) {
+                return $contextConsent['consentOption'];
+            }
+        }
+
+        return null;
     }
 
     public function updateDemographicConsent(int $contextId, int $userId, bool $consentOption)
     {
-        $consentSetting = $this->getConsentSetting($userId, $contextId);
-        $settingValue = json_encode(['contextId' => $contextId, 'consentOption' => $consentOption]);
+        $consentSetting = $this->getConsentSetting($userId);
 
         if (is_null($consentSetting)) {
+            $settingValue = json_encode([['contextId' => $contextId, 'consentOption' => $consentOption]]);
             Capsule::table('user_settings')->insert([
                 'user_id' => $userId,
                 'setting_name' => 'demographicDataConsent',
@@ -56,6 +60,20 @@ class DemographicDataDAO extends \DAO
             ]);
 
             return;
+        }
+
+        $settingValue = $consentSetting['value'];
+        $contextIsPresent = false;
+        foreach ($settingValue as $key => $contextConsent) {
+            if ($contextConsent['contextId'] == $contextId) {
+                $settingValue[$key]['consentOption'] = $consentOption;
+                $contextIsPresent = true;
+                break;
+            }
+        }
+
+        if (!$contextIsPresent) {
+            $settingValue[] = ['contextId' => $contextId, 'consentOption' => $consentOption];
         }
 
         Capsule::table('user_settings')
