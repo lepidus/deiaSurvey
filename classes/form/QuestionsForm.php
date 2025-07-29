@@ -61,11 +61,10 @@ class QuestionsForm extends \Form
 
     public function initData()
     {
+        $this->setData('applicationName', \Application::get()->getName());
+
         $context = $this->request->getContext();
-        $user = $this->request->getUser();
-        $demographicDataDao = new DemographicDataDAO();
-        $userConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
-        $this->setData('demographicDataConsent', $userConsent);
+        $this->initConsentData($context);
 
         $demographicDataService  = new DemographicDataService();
         $questions = $demographicDataService->retrieveAllQuestions($context->getId(), true);
@@ -73,6 +72,26 @@ class QuestionsForm extends \Form
         $this->setData('questionTypeConsts', DemographicQuestion::getQuestionTypeConstants());
 
         parent::initData();
+    }
+
+    private function initConsentData($context)
+    {
+        $user = $this->request->getUser();
+        $demographicDataDao = new DemographicDataDAO();
+
+        $userConsent = $demographicDataDao->getDemographicConsentOption($context->getId(), $user->getId());
+        $this->setData('demographicDataConsent', $userConsent);
+
+        $userConsentSetting = $demographicDataDao->getConsentSetting($user->getId());
+        if (!is_null($userConsentSetting)) {
+            $contextDao = \DAORegistry::getDAO('JournalDAO');
+            $userConsentSetting = array_map(function ($contextConsent) use ($contextDao) {
+                $consentSettingContext = $contextDao->getById($contextConsent['contextId']);
+                $contextConsent['contextName'] = $consentSettingContext->getLocalizedName();
+                return $contextConsent;
+            }, $userConsentSetting['value']);
+        }
+        $this->setData('userConsentSetting', $userConsentSetting);
     }
 
     public function validate($callHooks = true)
@@ -100,7 +119,7 @@ class QuestionsForm extends \Form
         $demographicDataService  = new DemographicDataService();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
-        $previousConsent = $demographicDataDao->getDemographicConsent($context->getId(), $user->getId());
+        $previousConsent = $demographicDataDao->getDemographicConsentOption($context->getId(), $user->getId());
         $newConsent = $this->getData('demographicDataConsent');
 
         $demographicDataDao->updateDemographicConsent($context->getId(), $user->getId(), $newConsent);

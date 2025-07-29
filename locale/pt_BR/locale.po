@@ -19,6 +19,16 @@ msgstr "Eu não concordo com o processamento dos meus dados"
 msgid "plugins.generic.deiaSurvey.requestMessage"
 msgstr "Requisitamos que você preencha o questionário DEIA presente na aba \"Questionário DEIA\" da sua página de perfil."
 
+msgid "plugins.generic.deiaSurvey.alreadyAnswered.ojs2"
+msgstr "Você já respondeu o questionário DEIA no periódico \"{$contextName}\"."
+" Portanto, você não precisa respondê-lo novamente neste periódico."
+" Para verificar seus dados, acesse o questionário em \"{$contextName}\"."
+
+msgid "plugins.generic.deiaSurvey.alreadyAnswered.ops"
+msgstr "Você já respondeu o questionário DEIA no servidor de preprints \"{$contextName}\"."
+" Portanto, você não precisa respondê-lo novamente neste servidor de preprints."
+" Para verificar seus dados, acesse o questionário em \"{$contextName}\"."
+
 msgid "plugins.generic.deiaSurvey.questionnairePage.index.title"
 msgstr "Questionário DEIA (Diversidade, Equidade, Inclusão e Acessibilidade)"
 
