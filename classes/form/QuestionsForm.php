@@ -61,11 +61,10 @@ class QuestionsForm extends \Form
 
     public function initData()
     {
-        $applicationName = \Application::get()->getName();
-        $this->setData('applicationName', $applicationName);
+        $this->setData('applicationName', \Application::get()->getName());
 
         $context = $this->request->getContext();
-        $this->initConsentData($context, $applicationName);
+        $this->initConsentData($context);
 
         $demographicDataService  = new DemographicDataService();
         $questions = $demographicDataService->retrieveAllQuestions($context->getId(), true);
@@ -75,7 +74,7 @@ class QuestionsForm extends \Form
         parent::initData();
     }
 
-    private function initConsentData($context, $applicationName)
+    private function initConsentData($context)
     {
         $user = $this->request->getUser();
         $demographicDataDao = new DemographicDataDAO();
@@ -85,7 +84,7 @@ class QuestionsForm extends \Form
 
         $userConsentSetting = $demographicDataDao->getConsentSetting($user->getId());
         if (!is_null($userConsentSetting)) {
-            $contextDao = \DAORegistry::getDAO(($applicationName == 'ojs2') ? 'JournalDAO' : 'ServerDAO');
+            $contextDao = \DAORegistry::getDAO('JournalDAO');
             $userConsentSetting = array_map(function ($contextConsent) use ($contextDao) {
                 $consentSettingContext = $contextDao->getById($contextConsent['contextId']);
                 $contextConsent['contextName'] = $consentSettingContext->getLocalizedName();
