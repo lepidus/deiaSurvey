@@ -38,6 +38,10 @@ class DemographicDataDAO extends DAO
     {
         $setting = $this->getConsentSetting($userId);
 
+        if (is_null($setting)) {
+            return null;
+        }
+
         foreach ($setting['value'] as $contextConsent) {
             if ($contextConsent['contextId'] == $contextId) {
                 return $contextConsent['consentOption'];
