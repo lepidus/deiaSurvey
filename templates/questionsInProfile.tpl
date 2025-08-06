@@ -77,20 +77,26 @@
 		let demographicDataConsentYes = document.getElementById('demographicDataConsentYes');
 		let demographicDataConsentNo = document.getElementById('demographicDataConsentNo');
 
-		demographicDataConsentYes.addEventListener('change', (event) => {ldelim}
-			if (event.currentTarget.checked) {ldelim}
-				setRequirementOnQuestions(true);
-			{rdelim}
-		{rdelim});
+		{if !is_null($demographicDataConsent) || is_null($userConsentSetting)}
+			demographicDataConsentYes.addEventListener('change', (event) => {ldelim}
+				if (event.currentTarget.checked) {ldelim}
+					setRequirementOnQuestions(true);
+				{rdelim}
+			{rdelim});
 
-		demographicDataConsentNo.addEventListener('change', (event) => {ldelim}
-			if (event.currentTarget.checked) {ldelim}
+			demographicDataConsentNo.addEventListener('change', (event) => {ldelim}
+				if (event.currentTarget.checked) {ldelim}
+					setRequirementOnQuestions(false);
+				{rdelim}
+			{rdelim});
+
+			if (demographicDataConsentNo.checked) {ldelim}
 				setRequirementOnQuestions(false);
 			{rdelim}
-		{rdelim});
-
-		if (demographicDataConsentNo.checked) {ldelim}
+		{else}
 			setRequirementOnQuestions(false);
-		{rdelim}
+			demographicDataConsentYes.disabled = true;
+			demographicDataConsentNo.disabled = true;
+		{/if}
 	{rdelim});
 </script>
