@@ -96,9 +96,19 @@ class QuestionsForm extends \Form
 
     public function validate($callHooks = true)
     {
-        $consent = $this->getData('demographicDataConsent');
+        $dataConsentOption = $this->getData('demographicDataConsent');
+        
+        $demographicDataDao = new DemographicDataDAO();
+        $context = $this->request->getContext();
+        $user = $this->request->getUser();
+        $userConsentSetting = $demographicDataDao->getConsentSetting($user->getId());
+        $previousConsentOption = $demographicDataDao->getDemographicConsentOption($context->getId(), $user->getId());
 
-        if ($consent) {
+        if (!is_null($userConsentSetting) && is_null($previousConsentOption)) {
+            return false;
+        }
+
+        if ($dataConsentOption) {
             $locale = $this->defaultLocale;
 
             foreach ($this->getData('responses') as $questionId => $response) {
@@ -115,7 +125,7 @@ class QuestionsForm extends \Form
 
     public function execute(...$functionArgs)
     {
-        $demographicDataDao = new DemographicDataDAO();
+        /*$demographicDataDao = new DemographicDataDAO();
         $demographicDataService  = new DemographicDataService();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
@@ -128,7 +138,8 @@ class QuestionsForm extends \Form
             $demographicDataService->registerUserResponses($user->getId(), $this->getData('responses'), $this->getData('responseOptionsInputs'));
         } elseif ($newConsent == '0' and $previousConsent) {
             $demographicDataService->deleteUserResponses($user->getId(), $context->getId());
-        }
+        }*/
+        error_log('aaaah vai executar');
 
         parent::execute(...$functionArgs);
     }
