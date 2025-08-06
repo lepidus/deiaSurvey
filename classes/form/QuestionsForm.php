@@ -97,7 +97,7 @@ class QuestionsForm extends \Form
     public function validate($callHooks = true)
     {
         $dataConsentOption = $this->getData('demographicDataConsent');
-        
+
         $demographicDataDao = new DemographicDataDAO();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
@@ -125,7 +125,7 @@ class QuestionsForm extends \Form
 
     public function execute(...$functionArgs)
     {
-        /*$demographicDataDao = new DemographicDataDAO();
+        $demographicDataDao = new DemographicDataDAO();
         $demographicDataService  = new DemographicDataService();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
@@ -138,7 +138,7 @@ class QuestionsForm extends \Form
             $demographicDataService->registerUserResponses($user->getId(), $this->getData('responses'), $this->getData('responseOptionsInputs'));
         } elseif ($newConsent == '0' and $previousConsent) {
             $demographicDataService->deleteUserResponses($user->getId(), $context->getId());
-        }*/
+        }
         error_log('aaaah vai executar');
 
         parent::execute(...$functionArgs);
