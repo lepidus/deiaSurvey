@@ -1,5 +1,17 @@
 import '../support/commands.js';
 
+function assertDisabledFields() {
+    cy.contains('label', 'Woman').within(() => {
+        cy.get('input').should('be.disabled');
+    });
+    cy.contains('label', 'Self describe').within(() => {
+        cy.get('input').should('be.disabled');
+    });
+    cy.contains('label', 'Eastern Europe').within(() => {
+        cy.get('input').should('be.disabled');
+    });
+}
+
 describe('DEIA Survey - Multiple contexts', function () {
     let newContextData;
     let contextNounUpper = 'Journal';
@@ -100,7 +112,7 @@ describe('DEIA Survey - Multiple contexts', function () {
 		cy.get('input[id^=select-cell-deiasurveyplugin]').check();
 		cy.get('input[id^=select-cell-deiasurveyplugin]').should('be.checked');
 	});
-    it('Users who answered the survey do not need to answer it on a second context', function () {
+    it('Users who answered the survey can not need answer it on a second context', function () {
         cy.login('dsokoloff', null, newContextData.path);
         cy.contains('h1', 'Submissions');
         cy.get('.app__headerActions button').eq(1).click();
@@ -111,17 +123,13 @@ describe('DEIA Survey - Multiple contexts', function () {
         cy.contains('You have already answered the DEIA survey in the "' + Cypress.env('contextTitles').en + '" ' + contextNoun);
         cy.contains('Therefore, you do not need to answer it again in this ' + contextNoun);
         cy.contains('To check your data, access the survey in "' + Cypress.env('contextTitles').en + '"');
+        assertDisabledFields();
     });
     it('Users can answer the survey in the new context', function () {
         let sberardoAnswers = [
             {'title': 'Gender', 'chosenOption': 'Woman'},
             {'title': 'Race', 'chosenOption': 'White'},
             {'title': 'Ethnicity', 'chosenOption': 'Western Europe'},
-        ];
-        let dsokoloffAnswers = [
-            {'title': 'Gender', 'chosenOption': 'Woman'},
-            {'title': 'Race', 'chosenOption': 'Self describe', 'selfDescribeValue': 'Slavic'},
-            {'title': 'Ethnicity', 'chosenOption': 'Eastern Europe'},
         ];
         
         cy.login('sberardo', null, newContextData.path);
@@ -133,18 +141,5 @@ describe('DEIA Survey - Multiple contexts', function () {
         cy.reload();
         cy.get('span:contains("We request that you fill in the DEIA survey")').should('not.exist');
         cy.assertResponsesToDefaultQuestions(sberardoAnswers);
-        cy.logout();
-
-        cy.login('dsokoloff', null, newContextData.path);
-        cy.get('.app__headerActions button').eq(1).click();
-        cy.contains('a', 'Edit Profile').click();
-        cy.contains('DEIA Survey').click();
-        cy.contains('You have already answered the DEIA survey');
-        cy.assertDefaultQuestionsDisplay('profilePage');
-        cy.get('input[name="demographicDataConsent"][value=1]').click();
-        cy.answerDefaultQuestionsOnProfile(dsokoloffAnswers);
-        cy.reload();
-        cy.get('span:contains("You have already answered the DEIA survey")').should('not.exist');
-        cy.assertResponsesToDefaultQuestions(dsokoloffAnswers);
     });
 });
