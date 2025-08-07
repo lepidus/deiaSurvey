@@ -73,7 +73,7 @@ class DemographicQuestionTest extends PKPTestCase
     {
         $this->demographicQuestion->setIsTranslated(false);
 
-        $questionTextKey = 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestionText';
+        $questionTextKey = 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.title';
         $expectedQuestionText = __($questionTextKey);
         $this->demographicQuestion->setQuestionText($questionTextKey);
         $questionText = $this->demographicQuestion->getLocalizedQuestionText();

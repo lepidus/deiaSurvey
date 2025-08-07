@@ -16,9 +16,7 @@ trait TestHelperTrait
     {
         $params = [
             'contextId' => $this->createJournalMock(),
-            'questionText' => [
-                self::DEFAULT_LOCALE => 'Test text'
-            ],
+            'questionText' => 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.title',
             'questionType' => DemographicQuestion::TYPE_TEXTAREA,
             'questionDescription' => [
                 self::DEFAULT_LOCALE => 'Test description'

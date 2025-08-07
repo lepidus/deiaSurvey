@@ -12,6 +12,9 @@
         "questionType": {
             "type": "integer"
         },
+        "isTranslated": {
+            "type": "boolean"
+        },
         "questionText": {
             "type": "string",
             "multilingual": true
