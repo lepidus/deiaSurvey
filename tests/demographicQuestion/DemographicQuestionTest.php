@@ -50,10 +50,32 @@ class DemographicQuestionTest extends PKPTestCase
         $this->assertEquals('select', $this->demographicQuestion->getQuestionInputType());
     }
 
-    public function testGetQuestionText(): void
+    public function setQuestionIsTranslated(): void
     {
+        $this->demographicQuestion->setIsTranslated(true);
+        $this->assertTrue($this->demographicQuestion->getIsTranslated());
+
+        $this->demographicQuestion->setIsTranslated(false);
+        $this->assertFalse($this->demographicQuestion->getIsTranslated());
+    }
+
+    public function testGetQuestionTextForTranslated(): void
+    {
+        $this->demographicQuestion->setIsTranslated(true);
+
         $expectedQuestionText = "What is your ethnicity?";
         $this->demographicQuestion->setQuestionText($expectedQuestionText, 'en');
+        $questionText = $this->demographicQuestion->getLocalizedQuestionText();
+        $this->assertEquals($expectedQuestionText, $questionText);
+    }
+
+    public function testGetQuestionTextForNotTranslated(): void
+    {
+        $this->demographicQuestion->setIsTranslated(false);
+
+        $questionTextKey = 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestionText';
+        $expectedQuestionText = __($questionTextKey);
+        $this->demographicQuestion->setQuestionText($questionTextKey);
         $questionText = $this->demographicQuestion->getLocalizedQuestionText();
         $this->assertEquals($expectedQuestionText, $questionText);
     }

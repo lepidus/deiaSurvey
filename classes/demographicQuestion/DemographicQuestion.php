@@ -59,14 +59,33 @@ class DemographicQuestion extends \PKP\core\DataObject
         return $mapTypeInput[$this->getQuestionType()];
     }
 
-    public function getLocalizedQuestionText()
+    public function isTranslated()
     {
-        return $this->getLocalizedData('questionText');
+        return $this->getData('isTranslated') ?? false;
     }
 
-    public function setQuestionText($title, $locale)
+    public function setIsTranslated($isTranslated)
     {
-        $this->setData('questionText', $title, $locale);
+        $this->setData('isTranslated', $isTranslated);
+    }
+
+    public function getLocalizedQuestionText()
+    {
+        if ($this->isTranslated()) {
+            return $this->getLocalizedData('questionText');
+        }
+
+        return __($this->getData('questionText'));
+    }
+
+    public function setQuestionText($title, $locale = null)
+    {
+        if ($this->isTranslated()) {
+            $this->setData('questionText', $title, $locale);
+            return;
+        }
+
+        $this->setData('questionText', $title);
     }
 
     public function getLocalizedQuestionDescription()
