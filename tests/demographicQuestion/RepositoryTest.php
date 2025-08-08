@@ -33,8 +33,8 @@ class RepositoryTest extends DatabaseTestCase
         $this->locale = "en";
         $this->params = [
             'contextId' => $this->contextId,
-            'questionText' => 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.title',
-            'questionDescription' => 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.description',
+            'questionText' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title',
+            'questionDescription' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.description',
             'questionType' => DemographicQuestion::TYPE_TEXTAREA,
             'isTranslated' => false
         ];
@@ -60,8 +60,8 @@ class RepositoryTest extends DatabaseTestCase
         $fetchedDemographicQuestion = $repository->get($insertedDemographicQuestionId, $this->contextId);
         self::assertEquals($this->params, $fetchedDemographicQuestion->_data);
 
-        $this->params['questionText'] = 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.updatedTitle';
-        $this->params['questionDescription'] = 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.updatedDescription';
+        $this->params['questionText'] = 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.updatedTitle';
+        $this->params['questionDescription'] = 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.updatedDescription';
         $repository->edit($demographicQuestion, $this->params);
 
         $fetchedDemographicQuestion = $repository->get($demographicQuestion->getId(), $this->contextId);

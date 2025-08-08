@@ -13,6 +13,9 @@
             "type": "string",
             "multilingual": true
         }, 
+        "isTranslated": {
+            "type": "boolean"
+        },
         "hasInputField": {
             "type": "boolean"
         }

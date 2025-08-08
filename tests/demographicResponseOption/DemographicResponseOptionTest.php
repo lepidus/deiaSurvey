@@ -47,7 +47,7 @@ class DemographicResponseOptionTest extends PKPTestCase
     {
         $this->demographicResponseOption->setIsTranslated(false);
 
-        $optionTextKey = 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.title';
+        $optionTextKey = 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title';
         $expectedResponseOptionText = __($optionTextKey);
         $this->demographicResponseOption->setOptionText($optionTextKey);
         $optionText = $this->demographicResponseOption->getLocalizedOptionText();
