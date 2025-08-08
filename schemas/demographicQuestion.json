@@ -16,8 +16,7 @@
             "type": "boolean"
         },
         "questionText": {
-            "type": "string",
-            "multilingual": true
+            "type": "string"
         }, 
         "questionDescription": {
             "type": "string",
