@@ -61,6 +61,28 @@ class DAOTest extends DatabaseTestCase
         ], $fetchedDemographicResponseOption->getAllData());
     }
 
+    public function testCreateResponseOptionWithTranslatedText(): void
+    {
+        $locale = 'en';
+        $demographicResponseOption = $this->createDemographicResponseOptionObject();
+        $demographicResponseOption->setIsTranslated(true);
+        $demographicResponseOption->setOptionText('Translated option text', $locale);
+        $insertedObjectId = $this->demographicResponseOptionDAO->insert($demographicResponseOption);
+
+        $fetchedDemographicResponseOption = $this->demographicResponseOptionDAO->get(
+            $insertedObjectId,
+            $this->demographicQuestionId
+        );
+
+        self::assertEquals([
+            'id' => $insertedObjectId,
+            'demographicQuestionId' => $this->demographicQuestionId,
+            'optionText' => [$locale => 'Translated option text'],
+            'isTranslated' => true,
+            'hasInputField' => true,
+        ], $fetchedDemographicResponseOption->getAllData());
+    }
+
     public function testEditDemographicResponseOption(): void
     {
         $demographicResponseOption = $this->createDemographicResponseOptionObject();
