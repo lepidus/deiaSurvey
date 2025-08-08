@@ -33,6 +33,18 @@ class DAOTest extends DatabaseTestCase
         $this->addSchemaFile('demographicQuestion');
     }
 
+    private function createDemographicQuestionObject($locale)
+    {
+        $demographicQuestion = $this->demographicQuestionDAO->newDataObject();
+        $demographicQuestion->setContextId($this->contextId);
+        $demographicQuestion->setQuestionType(DemographicQuestion::TYPE_RADIO_BUTTONS);
+        $demographicQuestion->setIsTranslated(false);
+        $demographicQuestion->setQuestionText('plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.title');
+        $demographicQuestion->setQuestionDescription('plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.description');
+
+        return $demographicQuestion;
+    }
+
     public function testNewDataObjectIsInstanceOfDemographicQuestion(): void
     {
         $demographicQuestion = $this->demographicQuestionDAO->newDataObject();
@@ -57,7 +69,7 @@ class DAOTest extends DatabaseTestCase
             'questionType' => DemographicQuestion::TYPE_RADIO_BUTTONS,
             'isTranslated' => false,
             'questionText' => 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.title',
-            'questionDescription' => [$locale => 'Test description']
+            'questionDescription' => 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.description'
         ], $fetchedDemographicQuestion->_data);
     }
 
@@ -68,6 +80,7 @@ class DAOTest extends DatabaseTestCase
         $demographicQuestion = $this->createDemographicQuestionObject($locale);
         $demographicQuestion->setIsTranslated(true);
         $demographicQuestion->setQuestionText('Translated question text', $locale);
+        $demographicQuestion->setQuestionDescription('Test description', $locale);
         $insertedDemographicQuestionId = $this->demographicQuestionDAO->insert($demographicQuestion);
 
         $fetchedDemographicQuestion = $this->demographicQuestionDAO->get(
@@ -114,6 +127,7 @@ class DAOTest extends DatabaseTestCase
         );
 
         $fetchedDemographicQuestion->setQuestionText('plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.updatedTitle');
+        $fetchedDemographicQuestion->setQuestionDescription('plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.updatedDescription');
         $this->demographicQuestionDAO->update($fetchedDemographicQuestion);
 
         $fetchedDemographicQuestionEdited = $this->demographicQuestionDAO->get(
@@ -125,17 +139,5 @@ class DAOTest extends DatabaseTestCase
             $fetchedDemographicQuestionEdited->getLocalizedQuestionText(),
             __('plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.updatedTitle')
         );
-    }
-
-    private function createDemographicQuestionObject($locale)
-    {
-        $demographicQuestion = $this->demographicQuestionDAO->newDataObject();
-        $demographicQuestion->setContextId($this->contextId);
-        $demographicQuestion->setQuestionType(DemographicQuestion::TYPE_RADIO_BUTTONS);
-        $demographicQuestion->setIsTranslated(false);
-        $demographicQuestion->setQuestionText('plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.title');
-        $demographicQuestion->setQuestionDescription('Test description', $locale);
-
-        return $demographicQuestion;
     }
 }

@@ -74,6 +74,11 @@ class DAO extends EntityDAO
             $demographicQuestion->setData('questionText', unserialize($serializedQuestionText));
         }
 
+        if ($demographicQuestion->isTranslated() && @unserialize($demographicQuestion->getData('questionDescription'))) {
+            $serializedQuestionDescription = $demographicQuestion->getData('questionDescription');
+            $demographicQuestion->setData('questionDescription', unserialize($serializedQuestionDescription));
+        }
+
         return $demographicQuestion;
     }
 }

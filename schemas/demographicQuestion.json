@@ -19,8 +19,7 @@
             "type": "string"
         }, 
         "questionDescription": {
-            "type": "string",
-            "multilingual": true
+            "type": "string"
         }
     }
 }

@@ -80,8 +80,10 @@ class DemographicQuestionTest extends PKPTestCase
         $this->assertEquals($expectedQuestionText, $questionText);
     }
 
-    public function testGetQuestionDescription(): void
+    public function testGetQuestionDescriptionForTranslated(): void
     {
+        $this->demographicQuestion->setIsTranslated(true);
+
         $expectedQuestionDescription = "Ethnicity refers to a group of people who share
             common cultural, historical, linguistic, or ancestral characteristics.
             These characteristics may include geographic origin, language, religion, customs,
@@ -90,6 +92,17 @@ class DemographicQuestionTest extends PKPTestCase
             of a group of people.";
 
         $this->demographicQuestion->setQuestionDescription($expectedQuestionDescription, 'en');
+        $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
+        $this->assertEquals($expectedQuestionDescription, $questionDescription);
+    }
+
+    public function testGetQuestionDescriptionForNotTranslated(): void
+    {
+        $this->demographicQuestion->setIsTranslated(false);
+
+        $questionDescriptionKey = 'plugin.generic.deiaSurvey.demographicQuestion.exampleQuestion.description';
+        $expectedQuestionDescription = __($questionDescriptionKey);
+        $this->demographicQuestion->setQuestionDescription($questionDescriptionKey);
         $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
         $this->assertEquals($expectedQuestionDescription, $questionDescription);
     }
