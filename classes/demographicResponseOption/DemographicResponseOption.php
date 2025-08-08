@@ -2,26 +2,40 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\demographicResponseOption;
 
+use APP\plugins\generic\deiaSurvey\classes\traits\DemographicModelsTrait;
+
 class DemographicResponseOption extends \PKP\core\DataObject
 {
+    use DemographicModelsTrait;
+
     public function getDemographicQuestionId(): int
     {
         return $this->getData('demographicQuestionId');
     }
 
-    public function setDemographicQuestionId($demographicQuestionId)
+    public function setDemographicQuestionId(int $demographicQuestionId)
     {
         $this->setData('demographicQuestionId', $demographicQuestionId);
     }
 
-    public function getLocalizedOptionText()
+    public function isTranslated(): bool
     {
-        return $this->getLocalizedData('optionText');
+        return $this->getData('isTranslated') ?? false;
     }
 
-    public function setOptionText(string $text, string $locale)
+    public function setIsTranslated(bool $isTranslated)
     {
-        $this->setData('optionText', $text, $locale);
+        $this->setData('isTranslated', $isTranslated);
+    }
+
+    public function getLocalizedOptionText(): string
+    {
+        return $this->getLocalizedTextualData('optionText');
+    }
+
+    public function setOptionText(string $text, ?string $locale = null)
+    {
+        $this->setTextualData('optionText', $text, $locale);
     }
 
     public function hasInputField(): bool

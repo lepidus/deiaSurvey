@@ -3,9 +3,12 @@
 namespace APP\plugins\generic\deiaSurvey\classes\demographicQuestion;
 
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\traits\DemographicModelsTrait;
 
 class DemographicQuestion extends \PKP\core\DataObject
 {
+    use DemographicModelsTrait;
+
     public const TYPE_SMALL_TEXT_FIELD = 1;
     public const TYPE_TEXT_FIELD = 2;
     public const TYPE_TEXTAREA = 3;
@@ -87,25 +90,6 @@ class DemographicQuestion extends \PKP\core\DataObject
     public function setQuestionDescription($descriptionText, $locale = null)
     {
         $this->setTextualData('questionDescription', $descriptionText, $locale);
-    }
-
-    private function getLocalizedTextualData($dataName)
-    {
-        if ($this->isTranslated()) {
-            return $this->getLocalizedData($dataName);
-        }
-
-        return __($this->getData($dataName));
-    }
-
-    private function setTextualData($dataName, $dataValue, $locale = null)
-    {
-        if ($this->isTranslated()) {
-            $this->setData($dataName, $dataValue, $locale);
-            return;
-        }
-
-        $this->setData($dataName, $dataValue);
     }
 
     public function getResponseOptions()

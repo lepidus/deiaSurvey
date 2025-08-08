@@ -50,13 +50,13 @@ class DemographicQuestionTest extends PKPTestCase
         $this->assertEquals('select', $this->demographicQuestion->getQuestionInputType());
     }
 
-    public function setQuestionIsTranslated(): void
+    public function testGetQuestionIsTranslated(): void
     {
         $this->demographicQuestion->setIsTranslated(true);
-        $this->assertTrue($this->demographicQuestion->getIsTranslated());
+        $this->assertTrue($this->demographicQuestion->isTranslated());
 
         $this->demographicQuestion->setIsTranslated(false);
-        $this->assertFalse($this->demographicQuestion->getIsTranslated());
+        $this->assertFalse($this->demographicQuestion->isTranslated());
     }
 
     public function testGetQuestionTextForTranslated(): void
