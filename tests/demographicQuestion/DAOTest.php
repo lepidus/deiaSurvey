@@ -33,7 +33,7 @@ class DAOTest extends DatabaseTestCase
         $this->addSchemaFile('demographicQuestion');
     }
 
-    private function createDemographicQuestionObject($locale)
+    private function createDemographicQuestionObject()
     {
         $demographicQuestion = $this->demographicQuestionDAO->newDataObject();
         $demographicQuestion->setContextId($this->contextId);
@@ -53,9 +53,7 @@ class DAOTest extends DatabaseTestCase
 
     public function testCreateDemographicQuestion(): void
     {
-        $locale = 'en';
-
-        $demographicQuestion = $this->createDemographicQuestionObject($locale);
+        $demographicQuestion = $this->createDemographicQuestionObject();
         $insertedDemographicQuestionId = $this->demographicQuestionDAO->insert($demographicQuestion);
 
         $fetchedDemographicQuestion = $this->demographicQuestionDAO->get(
@@ -77,7 +75,7 @@ class DAOTest extends DatabaseTestCase
     {
         $locale = 'en';
 
-        $demographicQuestion = $this->createDemographicQuestionObject($locale);
+        $demographicQuestion = $this->createDemographicQuestionObject();
         $demographicQuestion->setIsTranslated(true);
         $demographicQuestion->setQuestionText('Translated question text', $locale);
         $demographicQuestion->setQuestionDescription('Test description', $locale);
@@ -100,9 +98,7 @@ class DAOTest extends DatabaseTestCase
 
     public function testDeleteDemographicQuestion(): void
     {
-        $locale = 'en';
-
-        $demographicQuestion = $this->createDemographicQuestionObject($locale);
+        $demographicQuestion = $this->createDemographicQuestionObject();
         $insertedDemographicQuestionId = $this->demographicQuestionDAO->insert($demographicQuestion);
 
         $fetchedDemographicQuestion = $this->demographicQuestionDAO->get(
@@ -116,9 +112,7 @@ class DAOTest extends DatabaseTestCase
 
     public function testEditDemographicQuestion(): void
     {
-        $locale = 'en';
-
-        $demographicQuestion = $this->createDemographicQuestionObject($locale);
+        $demographicQuestion = $this->createDemographicQuestionObject();
         $insertedDemographicQuestionId = $this->demographicQuestionDAO->insert($demographicQuestion);
 
         $fetchedDemographicQuestion = $this->demographicQuestionDAO->get(
