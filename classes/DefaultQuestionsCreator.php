@@ -39,6 +39,7 @@ class DefaultQuestionsCreator
             [
                 'contextId' => $contextId,
                 'questionType' => DemographicQuestion::TYPE_RADIO_BUTTONS,
+                'isDefaultQuestion' => true,
                 'isTranslated' => false,
                 'questionText' => 'plugins.generic.deiaSurvey.defaultQuestion.gender.title',
                 'questionDescription' => 'plugins.generic.deiaSurvey.defaultQuestion.gender.description',
@@ -68,6 +69,7 @@ class DefaultQuestionsCreator
             [
                 'contextId' => $contextId,
                 'questionType' => DemographicQuestion::TYPE_CHECKBOXES,
+                'isDefaultQuestion' => true,
                 'isTranslated' => false,
                 'questionText' => 'plugins.generic.deiaSurvey.defaultQuestion.race.title',
                 'questionDescription' => 'plugins.generic.deiaSurvey.defaultQuestion.race.description',
@@ -117,6 +119,7 @@ class DefaultQuestionsCreator
             [
                 'contextId' => $contextId,
                 'questionType' => DemographicQuestion::TYPE_CHECKBOXES,
+                'isDefaultQuestion' => true,
                 'isTranslated' => false,
                 'questionText' => 'plugins.generic.deiaSurvey.defaultQuestion.ethnicity.title',
                 'questionDescription' => 'plugins.generic.deiaSurvey.defaultQuestion.ethnicity.description',
