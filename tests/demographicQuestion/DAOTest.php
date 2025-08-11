@@ -39,6 +39,7 @@ class DAOTest extends DatabaseTestCase
         $demographicQuestion->setContextId($this->contextId);
         $demographicQuestion->setQuestionType(DemographicQuestion::TYPE_RADIO_BUTTONS);
         $demographicQuestion->setIsTranslated(false);
+        $demographicQuestion->setIsDefaultQuestion(true);
         $demographicQuestion->setQuestionText('plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title');
         $demographicQuestion->setQuestionDescription('plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.description');
 
@@ -66,6 +67,7 @@ class DAOTest extends DatabaseTestCase
             'contextId' => $this->contextId,
             'questionType' => DemographicQuestion::TYPE_RADIO_BUTTONS,
             'isTranslated' => false,
+            'isDefaultQuestion' => true,
             'questionText' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title',
             'questionDescription' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.description'
         ], $fetchedDemographicQuestion->_data);
@@ -91,6 +93,7 @@ class DAOTest extends DatabaseTestCase
             'contextId' => $this->contextId,
             'questionType' => DemographicQuestion::TYPE_RADIO_BUTTONS,
             'isTranslated' => true,
+            'isDefaultQuestion' => true,
             'questionText' => [$locale => 'Translated question text'],
             'questionDescription' => [$locale => 'Test description']
         ], $fetchedDemographicQuestion->_data);

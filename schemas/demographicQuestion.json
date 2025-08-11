@@ -15,6 +15,9 @@
         "isTranslated": {
             "type": "boolean"
         },
+        "isDefaultQuestion": {
+            "type": "boolean"
+        },
         "questionText": {
             "type": "string"
         }, 

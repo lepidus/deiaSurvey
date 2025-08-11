@@ -36,7 +36,8 @@ class RepositoryTest extends DatabaseTestCase
             'questionText' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title',
             'questionDescription' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.description',
             'questionType' => DemographicQuestion::TYPE_TEXTAREA,
-            'isTranslated' => false
+            'isTranslated' => false,
+            'isDefaultQuestion' => true,
         ];
         $this->addSchemaFile('demographicQuestion');
     }
