@@ -52,11 +52,24 @@ class DemographicQuestionTest extends PKPTestCase
 
     public function testGetQuestionIsTranslated(): void
     {
+        $this->assertFalse($this->demographicQuestion->isTranslated());
+
         $this->demographicQuestion->setIsTranslated(true);
         $this->assertTrue($this->demographicQuestion->isTranslated());
 
         $this->demographicQuestion->setIsTranslated(false);
         $this->assertFalse($this->demographicQuestion->isTranslated());
+    }
+
+    public function testGetQuestionIsDefaultQuestion(): void
+    {
+        $this->assertFalse($this->demographicQuestion->isDefaultQuestion());
+
+        $this->demographicQuestion->setIsDefaultQuestion(true);
+        $this->assertTrue($this->demographicQuestion->isDefaultQuestion());
+
+        $this->demographicQuestion->setIsDefaultQuestion(false);
+        $this->assertFalse($this->demographicQuestion->isDefaultQuestion());
     }
 
     public function testGetQuestionTextForTranslated(): void

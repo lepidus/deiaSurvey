@@ -72,6 +72,16 @@ class DemographicQuestion extends \PKP\core\DataObject
         $this->setData('isTranslated', $isTranslated);
     }
 
+    public function isDefaultQuestion()
+    {
+        return $this->getData('isDefaultQuestion') ?? false;
+    }
+
+    public function setIsDefaultQuestion($isDefaultQuestion)
+    {
+        $this->setData('isDefaultQuestion', $isDefaultQuestion);
+    }
+
     public function getLocalizedQuestionText()
     {
         return $this->getLocalizedTextualData('questionText');
