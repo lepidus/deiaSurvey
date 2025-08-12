@@ -38,7 +38,7 @@ class LocalizeQuestionsTextsMigration extends Migration
 
                 foreach ($defaultQuestionData['responseOptions'] as $defaultResponseOption) {
                     $defaultResponseOptionText = __($defaultResponseOption['optionText'], [], self::BASE_LOCALE);
-                    if ($defaultResponseOptionText === $responseOptionText) {
+                    if (str_contains($responseOptionText, $defaultResponseOptionText)) {
                         $this->cleanResponseOptionTextualData($responseOption);
 
                         Repo::demographicResponseOption()->edit($responseOption, [
