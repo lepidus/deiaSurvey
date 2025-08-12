@@ -5,6 +5,7 @@ namespace APP\plugins\generic\deiaSurvey\classes\migrations;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 
 class LocalizeQuestionsTextsMigration extends Migration
 {
@@ -13,17 +14,19 @@ class LocalizeQuestionsTextsMigration extends Migration
     public function up(): void
     {
         $allQuestions = Repo::demographicQuestion()->getCollector()->getMany();
+        $defaultQuestionsData = (new DefaultQuestionsCreator())->getDefaultQuestionsData(0);
 
         foreach ($allQuestions as $question) {
             if ($this->isPreviousStandardQuestion($question)) {
                 $questionName = strtolower($question->getData('questionText')['en']);
+                $defaultQuestionData = $defaultQuestionsData[$questionName];
 
                 $this->cleanQuestionTextualData($question);
                 Repo::demographicQuestion()->edit($question, [
-                    'isTranslated' => true,
-                    'isDefaultQuestion' => true,
-                    'questionText' => "plugins.generic.deiaSurvey.defaultQuestion.$questionName.title",
-                    'questionDescription' => "plugins.generic.deiaSurvey.defaultQuestion.$questionName.description"
+                    'isTranslated' => $defaultQuestionData['isTranslated'],
+                    'isDefaultQuestion' => $defaultQuestionData['isDefaultQuestion'],
+                    'questionText' => $defaultQuestionData['questionText'],
+                    'questionDescription' => $defaultQuestionData['questionDescription']
                 ]);
             }
         }
