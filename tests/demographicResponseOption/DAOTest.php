@@ -69,7 +69,30 @@ class DAOTest extends \DatabaseTestCase
         self::assertEquals([
             'id' => $insertedObjectId,
             'demographicQuestionId' => $this->demographicQuestionId,
-            'optionText' => [self::DEFAULT_LOCALE => 'First response option, with input field'],
+            'optionText' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleResponseOption.text',
+            'isTranslated' => false,
+            'hasInputField' => true,
+        ], $fetchedDemographicResponseOption->getAllData());
+    }
+
+    public function testCreateResponseOptionWithTranslatedText(): void
+    {
+        $demographicResponseOption = $this->createDemographicResponseOptionObject();
+        $demographicResponseOption->unsetData('optionText');
+        $demographicResponseOption->setIsTranslated(true);
+        $demographicResponseOption->setOptionText('Translated option text', self::DEFAULT_LOCALE);
+        $insertedObjectId = $this->demographicResponseOptionDAO->insert($demographicResponseOption);
+
+        $fetchedDemographicResponseOption = $this->demographicResponseOptionDAO->get(
+            $insertedObjectId,
+            $this->demographicQuestionId
+        );
+
+        self::assertEquals([
+            'id' => $insertedObjectId,
+            'demographicQuestionId' => $this->demographicQuestionId,
+            'optionText' => [self::DEFAULT_LOCALE => 'Translated option text'],
+            'isTranslated' => true,
             'hasInputField' => true,
         ], $fetchedDemographicResponseOption->getAllData());
     }
@@ -83,16 +106,19 @@ class DAOTest extends \DatabaseTestCase
             $insertedObjectId,
             $this->demographicQuestionId
         );
-        $fetchedDemographicResponseOption->setOptionText('Updated text', self::DEFAULT_LOCALE);
+        $fetchedDemographicResponseOption->setOptionText('plugins.generic.deiaSurvey.demographicQuestion.exampleResponseOption.updatedText');
 
         $this->demographicResponseOptionDAO->update($fetchedDemographicResponseOption);
 
-        $objectEdited = $this->demographicResponseOptionDAO->get(
+        $editedResponseOption = $this->demographicResponseOptionDAO->get(
             $insertedObjectId,
             $this->demographicQuestionId
         );
 
-        self::assertEquals($objectEdited->getData('optionText'), [self::DEFAULT_LOCALE => 'Updated text']);
+        self::assertEquals(
+            $editedResponseOption->getData('optionText'),
+            'plugins.generic.deiaSurvey.demographicQuestion.exampleResponseOption.updatedText'
+        );
     }
 
     public function testDeleteDemographicResponseOption(): void
