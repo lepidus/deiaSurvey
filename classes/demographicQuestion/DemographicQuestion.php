@@ -3,9 +3,12 @@
 namespace APP\plugins\generic\deiaSurvey\classes\demographicQuestion;
 
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\traits\DemographicModelsTrait;
 
 class DemographicQuestion extends \PKP\core\DataObject
 {
+    use DemographicModelsTrait;
+
     public const TYPE_SMALL_TEXT_FIELD = 1;
     public const TYPE_TEXT_FIELD = 2;
     public const TYPE_TEXTAREA = 3;
@@ -59,24 +62,44 @@ class DemographicQuestion extends \PKP\core\DataObject
         return $mapTypeInput[$this->getQuestionType()];
     }
 
-    public function getLocalizedQuestionText()
+    public function isTranslated()
     {
-        return $this->getLocalizedData('questionText');
+        return $this->getData('isTranslated') ?? false;
     }
 
-    public function setQuestionText($title, $locale)
+    public function setIsTranslated($isTranslated)
     {
-        $this->setData('questionText', $title, $locale);
+        $this->setData('isTranslated', $isTranslated);
+    }
+
+    public function isDefaultQuestion()
+    {
+        return $this->getData('isDefaultQuestion') ?? false;
+    }
+
+    public function setIsDefaultQuestion($isDefaultQuestion)
+    {
+        $this->setData('isDefaultQuestion', $isDefaultQuestion);
+    }
+
+    public function getLocalizedQuestionText()
+    {
+        return $this->getLocalizedTextualData('questionText');
+    }
+
+    public function setQuestionText($title, $locale = null)
+    {
+        $this->setTextualData('questionText', $title, $locale);
     }
 
     public function getLocalizedQuestionDescription()
     {
-        return $this->getLocalizedData('questionDescription');
+        return $this->getLocalizedTextualData('questionDescription');
     }
 
-    public function setQuestionDescription($descriptionText, $locale)
+    public function setQuestionDescription($descriptionText, $locale = null)
     {
-        $this->setData('questionDescription', $descriptionText, $locale);
+        $this->setTextualData('questionDescription', $descriptionText, $locale);
     }
 
     public function getResponseOptions()

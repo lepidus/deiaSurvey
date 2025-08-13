@@ -148,3 +148,98 @@ msgstr "El módulo utiliza las credenciales introducidas en la configuración de
 
 msgid "plugins.generic.deiaSurvey.settings.credentialsUsed.own"
 msgstr "Este módulo utiliza las siguientes credenciales"
+
+
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.title"
+msgstr "Género"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.description"
+msgstr "¿Con qué género te identificas más? Por favor, selecciona una opción:"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.responseOption.woman"
+msgstr "Mujer"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.responseOption.man"
+msgstr "Hombre"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.responseOption.nonBinary"
+msgstr "No binario o género diverso"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.responseOption.preferNotToInform"
+msgstr "Prefiero no informar"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.race.title"
+msgstr "Raza"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.race.description"
+msgstr "¿Cómo te identificas en términos de raza? Por favor, selecciona TODOS los grupos que correspondan:"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.race.responseOption.asianPacificIslander"
+msgstr "Asiático o Isleño del Pacífico"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.race.responseOption.black"
+msgstr "Negro/a"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.race.responseOption.hispanicLatino"
+msgstr "Hispano/a o Latino/a"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.race.responseOption.indigenous"
+msgstr "Indígena"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.race.responseOption.middleEasternNorthAfrican"
+msgstr "Medio Oriente o Norte de África"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.race.responseOption.white"
+msgstr "Blanco/a"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.race.responseOption.preferNotToInform"
+msgstr "Prefiero no informar"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.race.responseOption.selfDescribe"
+msgstr "Autodescripción"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.title"
+msgstr "Etnicidad"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.description"
+msgstr "¿Cuáles son tus orígenes étnicos o ascendencia? Por favor, selecciona TODAS las áreas geográficas de donde provienen los antepasados de tu familia:"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.westernEurope"
+msgstr "Europa Occidental (e.g. Grecia, Suecia, Reino Unido)"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.easternEurope"
+msgstr "Europa Oriental (e.g. Hungría, Polonia, Rusia)"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.northAfrica"
+msgstr "Norte de África (e.g. Egipto, Marruecos, Sudán)"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.subSaharanAfrica"
+msgstr "África Subsahariana (e.g. Kenia, Nigeria, Sudáfrica)"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.westAsiaMiddleEast"
+msgstr "Asia Occidental / Medio Oriente (e.g. Irán, Israel, Arabia Saudita)"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.southSoutheastAsia"
+msgstr "Asia del Sur y Sudeste (e.g. India, Indonesia, Singapur)"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.eastCentralAsia"
+msgstr "Asia Oriental y Central (e.g. China, Japón, Uzbekistán)"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.pacificOceania"
+msgstr "Pacífico / Oceanía (e.g. Australia, Papúa Nueva Guinea, Fiyi)"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.northAmerica"
+msgstr "América del Norte (Canadá, Estados Unidos)"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.centralAmericaCaribbean"
+msgstr "América Central y el Caribe (e.g. Jamaica, México, Panamá)"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.southAmerica"
+msgstr "América del Sur (e.g. Brasil, Chile, Colombia)"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.preferNotToInform"
+msgstr "Prefiero no informar"
+
+msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.selfDescribe"
+msgstr "Autodescripción"
