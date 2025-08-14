@@ -32,10 +32,10 @@ class DefaultQuestionsCreator
         }
     }
 
-    private function getDefaultQuestionsData(int $contextId): array
+    public function getDefaultQuestionsData(int $contextId): array
     {
         return [
-            [
+            'gender' => [
                 'contextId' => $contextId,
                 'questionType' => DemographicQuestion::TYPE_RADIO_BUTTONS,
                 'isDefaultQuestion' => true,
@@ -65,7 +65,7 @@ class DefaultQuestionsCreator
                     ]
                 ]
             ],
-            [
+            'race' => [
                 'contextId' => $contextId,
                 'questionType' => DemographicQuestion::TYPE_CHECKBOXES,
                 'isDefaultQuestion' => true,
@@ -115,7 +115,7 @@ class DefaultQuestionsCreator
                     ]
                 ]
             ],
-            [
+            'ethnicity' => [
                 'contextId' => $contextId,
                 'questionType' => DemographicQuestion::TYPE_CHECKBOXES,
                 'isDefaultQuestion' => true,
