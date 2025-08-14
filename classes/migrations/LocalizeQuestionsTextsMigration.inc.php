@@ -1,9 +1,7 @@
 <?php
 
-namespace APP\plugins\generic\deiaSurvey\classes\migrations;
-
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 
@@ -22,7 +20,7 @@ class LocalizeQuestionsTextsMigration extends Migration
                 continue;
             }
 
-            $questionName = strtolower($question->getData('questionText')[self::BASE_LOCALE]);
+            $questionName = strtolower($this->getDataInBaseLocale($question, 'questionText'));
             $defaultQuestionData = $defaultQuestionsData[$questionName];
 
             $this->cleanQuestionTextualData($question);
@@ -34,7 +32,7 @@ class LocalizeQuestionsTextsMigration extends Migration
             ]);
 
             foreach ($question->getResponseOptions() as $responseOption) {
-                $responseOptionText = $responseOption->getData('optionText')[self::BASE_LOCALE];
+                $responseOptionText = $this->getDataInBaseLocale($responseOption, 'optionText');
 
                 foreach ($defaultQuestionData['responseOptions'] as $defaultResponseOption) {
                     $defaultResponseOptionText = __($defaultResponseOption['optionText'], [], self::BASE_LOCALE);
@@ -52,17 +50,23 @@ class LocalizeQuestionsTextsMigration extends Migration
         }
     }
 
+    private function getDataInBaseLocale($dataObject, $dataName)
+    {
+        $dataValue = $dataObject->getData($dataName);
+        return $dataValue[self::BASE_LOCALE] ?? $dataValue['en'];
+    }
+
     private function isPreviousStandardQuestion($question): bool
     {
         return is_null($question->getData('isTranslated'))
             && is_null($question->getData('isDefaultQuestion'))
             && is_array($question->getData('questionText'))
-            && in_array($question->getData('questionText')[self::BASE_LOCALE], self::PREVIOUS_STANDARD_QUESTIONS);
+            && in_array($this->getDataInBaseLocale($question, 'questionText'), self::PREVIOUS_STANDARD_QUESTIONS);
     }
 
     private function cleanQuestionTextualData($question)
     {
-        DB::table('demographic_question_settings')
+        Capsule::table('demographic_question_settings')
             ->where('demographic_question_id', $question->getId())
             ->whereIn('setting_name', ['questionText', 'questionDescription'])
             ->delete();
@@ -70,7 +74,7 @@ class LocalizeQuestionsTextsMigration extends Migration
 
     private function cleanResponseOptionTextualData($responseOption)
     {
-        DB::table('demographic_response_option_settings')
+        Capsule::table('demographic_response_option_settings')
             ->where('demographic_response_option_id', $responseOption->getId())
             ->whereIn('setting_name', ['optionText'])
             ->delete();
