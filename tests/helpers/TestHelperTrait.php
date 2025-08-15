@@ -34,28 +34,30 @@ trait TestHelperTrait
 
     private function createDemographicQuestion()
     {
-        $params = [
+        $questionData = [
             'contextId' => $this->createJournalMock(),
-            'questionText' => [
-                self::DEFAULT_LOCALE => 'Test text'
-            ],
             'questionType' => DemographicQuestion::TYPE_TEXTAREA,
-            'questionDescription' => [
-                self::DEFAULT_LOCALE => 'Test description'
-            ]
+            'questionText' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title',
+            'questionDescription' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.description',
+            'isTranslated' => false
         ];
 
         $repository = app(DemographicQuestionRepository::class);
-        $demographicQuestion = $repository->newDataObject($params);
+        $demographicQuestion = $repository->newDataObject($questionData);
         return $repository->add($demographicQuestion);
     }
 
     private function createDemographicResponseOptionObject()
     {
+        $responseOptionData = [
+            'demographicQuestionId' => $this->demographicQuestionId,
+            'optionText' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleResponseOption.text',
+            'isTranslated' => false,
+            'hasInputField' => true,
+        ];
+
         $demographicResponseOption = $this->demographicResponseOptionDAO->newDataObject();
-        $demographicResponseOption->setDemographicQuestionId($this->demographicQuestionId);
-        $demographicResponseOption->setOptionText('First response option, with input field', self::DEFAULT_LOCALE);
-        $demographicResponseOption->setHasInputField(true);
+        $demographicResponseOption->setAllData($responseOptionData);
 
         return $demographicResponseOption;
     }

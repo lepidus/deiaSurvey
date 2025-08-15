@@ -1,7 +1,5 @@
 <?php
 
-// namespace APP\plugins\generic\deiaSurvey\classes\controllers;
-
 use APP\handler\Handler;
 use APP\notification\NotificationManager;
 use APP\plugins\generic\deiaSurvey\classes\form\QuestionsForm;

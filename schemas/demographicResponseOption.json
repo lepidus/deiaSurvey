@@ -10,9 +10,11 @@
             "type": "integer"
         },
         "optionText": {
-            "type": "string",
-            "multilingual": true
-        }, 
+            "type": "string"
+        },
+        "isTranslated": {
+            "type": "boolean"
+        },
         "hasInputField": {
             "type": "boolean"
         }

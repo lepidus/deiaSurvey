@@ -32,7 +32,7 @@ Cypress.Commands.add('assertDefaultQuestionsDisplay', function(place, authorEmai
     cy.contains('label', 'Asian or Pacific Islander');
     cy.contains('label', 'Black');
     cy.contains('label', 'Hispanic or Latino/a/x');
-    cy.contains('label', 'Indigenous (e.g. North American Indian Navajo, South American Indian Quechua, Aboriginal or Torres Strait Islander)');
+    cy.contains('label', 'Indigenous');
     cy.contains('label', 'Middle Eastern or North African');
     cy.contains('label', 'White');
     cy.contains('label', 'Prefer not to inform');

@@ -67,6 +67,18 @@ class DAO extends EntityDAO
 
     public function fromRow(object $row): \DataObject
     {
-        return parent::fromRow($row);
+        $demographicQuestion = parent::fromRow($row);
+
+        if ($demographicQuestion->isTranslated() && @unserialize($demographicQuestion->getData('questionText'))) {
+            $serializedQuestionText = $demographicQuestion->getData('questionText');
+            $demographicQuestion->setData('questionText', unserialize($serializedQuestionText));
+        }
+
+        if ($demographicQuestion->isTranslated() && @unserialize($demographicQuestion->getData('questionDescription'))) {
+            $serializedQuestionDescription = $demographicQuestion->getData('questionDescription');
+            $demographicQuestion->setData('questionDescription', unserialize($serializedQuestionDescription));
+        }
+
+        return $demographicQuestion;
     }
 }
