@@ -64,7 +64,7 @@ class DemographicQuestion extends \PKP\core\DataObject
 
     public function isTranslated()
     {
-        return $this->getData('isTranslated') ?? false;
+        return $this->getData('isTranslated');
     }
 
     public function setIsTranslated($isTranslated)

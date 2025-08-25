@@ -52,7 +52,7 @@ class DemographicQuestionTest extends PKPTestCase
 
     public function testGetQuestionIsTranslated(): void
     {
-        $this->assertFalse($this->demographicQuestion->isTranslated());
+        $this->assertNull($this->demographicQuestion->isTranslated());
 
         $this->demographicQuestion->setIsTranslated(true);
         $this->assertTrue($this->demographicQuestion->isTranslated());
@@ -93,6 +93,20 @@ class DemographicQuestionTest extends PKPTestCase
         $this->assertEquals($expectedQuestionText, $questionText);
     }
 
+    public function testGetQuestionTextWithNoTranslatedData(): void
+    {
+        $questionTextKey = 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title';
+        $expectedQuestionText = __($questionTextKey);
+        $this->demographicQuestion->setQuestionText($questionTextKey);
+        $questionText = $this->demographicQuestion->getLocalizedQuestionText();
+        $this->assertEquals($expectedQuestionText, $questionText);
+
+        $expectedQuestionText = "What is your ethnicity?";
+        $this->demographicQuestion->setData('questionText', $expectedQuestionText, 'en');
+        $questionText = $this->demographicQuestion->getLocalizedQuestionText();
+        $this->assertEquals($expectedQuestionText, $questionText);
+    }
+
     public function testGetQuestionDescriptionForTranslated(): void
     {
         $this->demographicQuestion->setIsTranslated(true);
@@ -116,6 +130,20 @@ class DemographicQuestionTest extends PKPTestCase
         $questionDescriptionKey = 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.description';
         $expectedQuestionDescription = __($questionDescriptionKey);
         $this->demographicQuestion->setQuestionDescription($questionDescriptionKey);
+        $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
+        $this->assertEquals($expectedQuestionDescription, $questionDescription);
+    }
+
+    public function testGetQuestionDescriptionWithNoTranslatedData(): void
+    {
+        $questionDescriptionKey = 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.description';
+        $expectedQuestionDescription = __($questionDescriptionKey);
+        $this->demographicQuestion->setQuestionDescription($questionDescriptionKey);
+        $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
+        $this->assertEquals($expectedQuestionDescription, $questionDescription);
+
+        $expectedQuestionDescription = "Lorem ipsum dolor sit amet";
+        $this->demographicQuestion->setData('questionDescription', $expectedQuestionDescription, 'en');
         $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
         $this->assertEquals($expectedQuestionDescription, $questionDescription);
     }
