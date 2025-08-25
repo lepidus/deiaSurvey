@@ -9,3 +9,12 @@ include:
       - 'templates/groups/ojs/unit_tests.yml'
       - 'templates/groups/ojs/cypress_tests.yml'
       - 'templates/groups/ops/cypress_tests.yml'
+
+# Desabilita os jobs de testes de aceitação da aplicação, por enquanto
+ojs_integration_tests:
+  rules:
+    - when: never
+
+ops_integration_tests:
+  rules:
+    - when: never
