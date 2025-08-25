@@ -18,9 +18,9 @@ class DemographicResponseOption extends \PKP\core\DataObject
         $this->setData('demographicQuestionId', $demographicQuestionId);
     }
 
-    public function isTranslated(): bool
+    public function isTranslated(): ?bool
     {
-        return $this->getData('isTranslated') ?? false;
+        return $this->getData('isTranslated');
     }
 
     public function setIsTranslated(bool $isTranslated)
