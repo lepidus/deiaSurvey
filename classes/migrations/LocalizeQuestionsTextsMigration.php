@@ -18,20 +18,16 @@ class LocalizeQuestionsTextsMigration extends Migration
         $defaultQuestionsData = (new DefaultQuestionsCreator())->getDefaultQuestionsData(0);
 
         foreach ($allQuestions as $question) {
-            if (!$this->isPreviousStandardQuestion($question)) {
-                continue;
-            }
-
-            $questionName = strtolower($question->getData('questionText')[self::BASE_LOCALE]);
+            $isPreviousStandardQuestion = $this->isPreviousStandardQuestion($question);
+            $questionName = $isPreviousStandardQuestion
+                ? $question->getData('questionText')[self::BASE_LOCALE]
+                : __($question->getData('questionText'), [], self::BASE_LOCALE);
+            $questionName = strtolower($questionName);
             $defaultQuestionData = $defaultQuestionsData[$questionName];
 
-            $this->cleanQuestionTextualData($question);
-            Repo::demographicQuestion()->edit($question, [
-                'isTranslated' => $defaultQuestionData['isTranslated'],
-                'isDefaultQuestion' => $defaultQuestionData['isDefaultQuestion'],
-                'questionText' => $defaultQuestionData['questionText'],
-                'questionDescription' => $defaultQuestionData['questionDescription']
-            ]);
+            if ($isPreviousStandardQuestion) {
+                $this->migrateDemographicQuestion($question, $defaultQuestionData);
+            }
 
             foreach ($question->getResponseOptions() as $responseOption) {
                 $responseOptionText = $responseOption->getData('optionText')[self::BASE_LOCALE];
@@ -50,6 +46,17 @@ class LocalizeQuestionsTextsMigration extends Migration
                 }
             }
         }
+    }
+
+    private function migrateDemographicQuestion($question, $defaultQuestionData)
+    {
+        $this->cleanQuestionTextualData($question);
+        Repo::demographicQuestion()->edit($question, [
+            'isTranslated' => $defaultQuestionData['isTranslated'],
+            'isDefaultQuestion' => $defaultQuestionData['isDefaultQuestion'],
+            'questionText' => $defaultQuestionData['questionText'],
+            'questionDescription' => $defaultQuestionData['questionDescription']
+        ]);
     }
 
     private function isPreviousStandardQuestion($question): bool
