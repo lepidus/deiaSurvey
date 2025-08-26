@@ -39,12 +39,7 @@ class LocalizeQuestionsTextsMigration extends Migration
                 foreach ($defaultQuestionData['responseOptions'] as $defaultResponseOption) {
                     $defaultResponseOptionText = __($defaultResponseOption['optionText'], [], self::BASE_LOCALE);
                     if (str_contains($responseOptionText, $defaultResponseOptionText)) {
-                        $this->cleanResponseOptionTextualData($responseOption);
-
-                        Repo::demographicResponseOption()->edit($responseOption, [
-                            'optionText' => $defaultResponseOption['optionText'],
-                            'isTranslated' => $defaultResponseOption['isTranslated']
-                        ]);
+                        $this->migrateDemographicResponseOption($responseOption, $defaultResponseOption);
                         break;
                     }
                 }
@@ -60,6 +55,15 @@ class LocalizeQuestionsTextsMigration extends Migration
             'isDefaultQuestion' => $defaultQuestionData['isDefaultQuestion'],
             'questionText' => $defaultQuestionData['questionText'],
             'questionDescription' => $defaultQuestionData['questionDescription']
+        ]);
+    }
+
+    private function migrateDemographicResponseOption($responseOption, $defaultResponseOption)
+    {
+        $this->cleanResponseOptionTextualData($responseOption);
+        Repo::demographicResponseOption()->edit($responseOption, [
+            'optionText' => $defaultResponseOption['optionText'],
+            'isTranslated' => $defaultResponseOption['isTranslated']
         ]);
     }
 
