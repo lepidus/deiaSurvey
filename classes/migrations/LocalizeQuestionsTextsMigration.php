@@ -18,38 +18,53 @@ class LocalizeQuestionsTextsMigration extends Migration
         $defaultQuestionsData = (new DefaultQuestionsCreator())->getDefaultQuestionsData(0);
 
         foreach ($allQuestions as $question) {
-            if (!$this->isPreviousStandardQuestion($question)) {
-                continue;
-            }
-
-            $questionName = strtolower($question->getData('questionText')[self::BASE_LOCALE]);
+            $isPreviousStandardQuestion = $this->isPreviousStandardQuestion($question);
+            $questionName = $isPreviousStandardQuestion
+                ? $question->getData('questionText')[self::BASE_LOCALE]
+                : __($question->getData('questionText'), [], self::BASE_LOCALE);
+            $questionName = strtolower($questionName);
             $defaultQuestionData = $defaultQuestionsData[$questionName];
 
-            $this->cleanQuestionTextualData($question);
-            Repo::demographicQuestion()->edit($question, [
-                'isTranslated' => $defaultQuestionData['isTranslated'],
-                'isDefaultQuestion' => $defaultQuestionData['isDefaultQuestion'],
-                'questionText' => $defaultQuestionData['questionText'],
-                'questionDescription' => $defaultQuestionData['questionDescription']
-            ]);
+            if ($isPreviousStandardQuestion) {
+                $this->migrateDemographicQuestion($question, $defaultQuestionData);
+            }
 
             foreach ($question->getResponseOptions() as $responseOption) {
+                if (!$this->isPreviousStandardResponseOption($responseOption)) {
+                    continue;
+                }
+
                 $responseOptionText = $responseOption->getData('optionText')[self::BASE_LOCALE];
 
                 foreach ($defaultQuestionData['responseOptions'] as $defaultResponseOption) {
                     $defaultResponseOptionText = __($defaultResponseOption['optionText'], [], self::BASE_LOCALE);
                     if (str_contains($responseOptionText, $defaultResponseOptionText)) {
-                        $this->cleanResponseOptionTextualData($responseOption);
-
-                        Repo::demographicResponseOption()->edit($responseOption, [
-                            'optionText' => $defaultResponseOption['optionText'],
-                            'isTranslated' => $defaultResponseOption['isTranslated']
-                        ]);
+                        $this->migrateDemographicResponseOption($responseOption, $defaultResponseOption);
                         break;
                     }
                 }
             }
         }
+    }
+
+    private function migrateDemographicQuestion($question, $defaultQuestionData)
+    {
+        $this->cleanQuestionTextualData($question);
+        Repo::demographicQuestion()->edit($question, [
+            'isTranslated' => $defaultQuestionData['isTranslated'],
+            'isDefaultQuestion' => $defaultQuestionData['isDefaultQuestion'],
+            'questionText' => $defaultQuestionData['questionText'],
+            'questionDescription' => $defaultQuestionData['questionDescription']
+        ]);
+    }
+
+    private function migrateDemographicResponseOption($responseOption, $defaultResponseOption)
+    {
+        $this->cleanResponseOptionTextualData($responseOption);
+        Repo::demographicResponseOption()->edit($responseOption, [
+            'optionText' => $defaultResponseOption['optionText'],
+            'isTranslated' => $defaultResponseOption['isTranslated']
+        ]);
     }
 
     private function isPreviousStandardQuestion($question): bool
@@ -58,6 +73,12 @@ class LocalizeQuestionsTextsMigration extends Migration
             && is_null($question->getData('isDefaultQuestion'))
             && is_array($question->getData('questionText'))
             && in_array($question->getData('questionText')[self::BASE_LOCALE], self::PREVIOUS_STANDARD_QUESTIONS);
+    }
+
+    private function isPreviousStandardResponseOption($responseOption): bool
+    {
+        return is_null($responseOption->getData('isTranslated'))
+            && is_array($responseOption->getData('optionText'));
     }
 
     private function cleanQuestionTextualData($question)
