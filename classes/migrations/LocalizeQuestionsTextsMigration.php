@@ -30,6 +30,10 @@ class LocalizeQuestionsTextsMigration extends Migration
             }
 
             foreach ($question->getResponseOptions() as $responseOption) {
+                if (!$this->isPreviousStandardResponseOption($responseOption)) {
+                    continue;
+                }
+
                 $responseOptionText = $responseOption->getData('optionText')[self::BASE_LOCALE];
 
                 foreach ($defaultQuestionData['responseOptions'] as $defaultResponseOption) {
@@ -65,6 +69,12 @@ class LocalizeQuestionsTextsMigration extends Migration
             && is_null($question->getData('isDefaultQuestion'))
             && is_array($question->getData('questionText'))
             && in_array($question->getData('questionText')[self::BASE_LOCALE], self::PREVIOUS_STANDARD_QUESTIONS);
+    }
+
+    private function isPreviousStandardResponseOption($responseOption): bool
+    {
+        return is_null($responseOption->getData('isTranslated'))
+            && is_array($responseOption->getData('optionText'));
     }
 
     private function cleanQuestionTextualData($question)
