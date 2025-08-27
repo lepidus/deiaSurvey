@@ -6,11 +6,11 @@ trait DemographicModelsTrait
 {
     private function getLocalizedTextualData($dataName)
     {
-        if ($this->isTranslated()) {
-            return $this->getLocalizedData($dataName);
-        }
+        $isTranslated = $this->isTranslated() ?? (gettype($this->getData($dataName)) === 'array');
 
-        return __($this->getData($dataName));
+        return $isTranslated
+            ? $this->getLocalizedData($dataName)
+            : __($this->getData($dataName));
     }
 
     private function setTextualData($dataName, $dataValue, $locale = null)

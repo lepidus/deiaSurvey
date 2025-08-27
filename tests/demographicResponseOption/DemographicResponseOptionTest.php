@@ -28,6 +28,8 @@ class DemographicResponseOptionTest extends \PKPTestCase
 
     public function testGetResponseOptionIsTranslated(): void
     {
+        $this->assertNull($this->demographicResponseOption->isTranslated());
+
         $this->demographicResponseOption->setIsTranslated(true);
         $this->assertTrue($this->demographicResponseOption->isTranslated());
 
@@ -55,6 +57,22 @@ class DemographicResponseOptionTest extends \PKPTestCase
         $this->demographicResponseOption->setOptionText($optionTextKey);
         $optionText = $this->demographicResponseOption->getLocalizedOptionText();
 
+        $this->assertEquals($expectedResponseOptionText, $optionText);
+    }
+
+    public function testGetOptionTextWithNoTranslatedData(): void
+    {
+        $optionTextKey = 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title';
+        $expectedResponseOptionText = __($optionTextKey);
+        $this->demographicResponseOption->setData('optionText', $optionTextKey);
+        $optionText = $this->demographicResponseOption->getLocalizedOptionText();
+        $this->assertEquals($expectedResponseOptionText, $optionText);
+
+        $this->demographicResponseOption->unsetData('optionText');
+
+        $expectedResponseOptionText = "Less than a minimum wage";
+        $this->demographicResponseOption->setData('optionText', $expectedResponseOptionText, 'en_US');
+        $optionText = $this->demographicResponseOption->getLocalizedOptionText();
         $this->assertEquals($expectedResponseOptionText, $optionText);
     }
 
