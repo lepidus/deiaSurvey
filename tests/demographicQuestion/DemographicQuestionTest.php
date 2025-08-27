@@ -55,7 +55,7 @@ class DemographicQuestionTest extends \PKPTestCase
 
     public function testGetQuestionIsTranslated(): void
     {
-        $this->assertFalse($this->demographicQuestion->isTranslated());
+        $this->assertNull($this->demographicQuestion->isTranslated());
 
         $this->demographicQuestion->setIsTranslated(true);
         $this->assertTrue($this->demographicQuestion->isTranslated());
@@ -80,7 +80,7 @@ class DemographicQuestionTest extends \PKPTestCase
         $this->demographicQuestion->setIsTranslated(true);
 
         $expectedQuestionText = "What is your ethnicity?";
-        $this->demographicQuestion->setQuestionText($expectedQuestionText, 'en');
+        $this->demographicQuestion->setQuestionText($expectedQuestionText, 'en_US');
         $questionText = $this->demographicQuestion->getLocalizedQuestionText();
         $this->assertEquals($expectedQuestionText, $questionText);
     }
@@ -96,6 +96,22 @@ class DemographicQuestionTest extends \PKPTestCase
         $this->assertEquals($expectedQuestionText, $questionText);
     }
 
+    public function testGetQuestionTextWithNoTranslatedData(): void
+    {
+        $questionTextKey = 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title';
+        $expectedQuestionText = __($questionTextKey);
+        $this->demographicQuestion->setData('questionText', $questionTextKey);
+        $questionText = $this->demographicQuestion->getLocalizedQuestionText();
+        $this->assertEquals($expectedQuestionText, $questionText);
+
+        $this->demographicQuestion->unsetData('questionText');
+
+        $expectedQuestionText = "What is your ethnicity?";
+        $this->demographicQuestion->setData('questionText', $expectedQuestionText, 'en_US');
+        $questionText = $this->demographicQuestion->getLocalizedQuestionText();
+        $this->assertEquals($expectedQuestionText, $questionText);
+    }
+
     public function testGetQuestionDescriptionForTranslated(): void
     {
         $this->demographicQuestion->setIsTranslated(true);
@@ -107,7 +123,7 @@ class DemographicQuestionTest extends \PKPTestCase
             and can play a significant role in shaping the individual and collective identity
             of a group of people.";
 
-        $this->demographicQuestion->setQuestionDescription($expectedQuestionDescription, 'en');
+        $this->demographicQuestion->setQuestionDescription($expectedQuestionDescription, 'en_US');
         $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
         $this->assertEquals($expectedQuestionDescription, $questionDescription);
     }
@@ -122,4 +138,21 @@ class DemographicQuestionTest extends \PKPTestCase
         $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
         $this->assertEquals($expectedQuestionDescription, $questionDescription);
     }
+
+    public function testGetQuestionDescriptionWithNoTranslatedData(): void
+    {
+        $questionDescriptionKey = 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.description';
+        $expectedQuestionDescription = __($questionDescriptionKey);
+        $this->demographicQuestion->setData('questionDescription', $questionDescriptionKey);
+        $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
+        $this->assertEquals($expectedQuestionDescription, $questionDescription);
+
+        $this->demographicQuestion->unsetData('questionDescription');
+
+        $expectedQuestionDescription = "Lorem ipsum dolor sit amet";
+        $this->demographicQuestion->setData('questionDescription', $expectedQuestionDescription, 'en_US');
+        $questionDescription = $this->demographicQuestion->getLocalizedQuestionDescription();
+        $this->assertEquals($expectedQuestionDescription, $questionDescription);
+    }
+
 }
