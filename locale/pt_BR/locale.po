@@ -149,6 +149,11 @@ msgstr "O plugin está utilizando as credenciais informadas nas configurações 
 msgid "plugins.generic.deiaSurvey.settings.credentialsUsed.own"
 msgstr "Este plugin está utilizando as credenciais informadas abaixo"
 
+msgid "plugins.generic.deiaSurvey.settings.encryptionSecretDefined"
+msgstr "Você definiu um segredo no arquivo de configuração do site ('api_key_secret')"
+
+msgid "plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined"
+msgstr "Você não definiu um segredo no arquivo de configuração do site ('api_key_secret')"
 
 
 msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.title"

@@ -142,6 +142,12 @@ msgstr "Member"
 msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.memberSandbox"
 msgstr "Member Sandbox"
 
+msgid "plugins.generic.deiaSurvey.settings.encryptionSecretDefined"
+msgstr "You have set a secret in the website configuration file ('api_key_secret')"
+
+msgid "plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined"
+msgstr "You have not set a secret in the website configuration file ('api_key_secret')"
+
 msgid "plugins.generic.deiaSurvey.settings.credentialsUsed.orcidProfile"
 msgstr "The plugin is using the credentials entered in the ORCID Profile plugin settings. "
 "If you wish to use other credentials for this plugin, use the fields below."
