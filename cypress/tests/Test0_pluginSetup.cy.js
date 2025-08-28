@@ -49,6 +49,7 @@ describe('DEIA Survey - Plugin setup', function () {
 		cy.get('tr#' + pluginRowId + ' a.show_extras').click();
 		cy.get('a[id^=' + pluginRowId + '-settings-button]').click();
 		cy.contains("The plugin is using the credentials entered in the ORCID Profile plugin settings. If you wish to use other credentials for this plugin, use the fields below");
+		cy.contains("You have set a secret in the website configuration file ('api_key_secret')");
 	});
 	it("Adds ORCID credentials to own plugin settings", function() {
 		cy.login('dbarnes', null, 'publicknowledge');
