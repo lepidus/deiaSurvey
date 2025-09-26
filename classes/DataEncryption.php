@@ -3,11 +3,12 @@
 namespace APP\plugins\generic\deiaSurvey\classes;
 
 use PKP\config\Config;
+use Illuminate\Encryption\Encrypter;
 use Exception;
 
 class DataEncryption
 {
-    private const ENCRYPTION_CIPHER = 'AES-256-CBC';
+    private const ENCRYPTION_CIPHER = 'aes-256-cbc';
 
     public function secretConfigExists(): bool
     {
@@ -25,51 +26,42 @@ class DataEncryption
         if ($secret === "") {
             throw new Exception("DEIA Survey - A secret must be set in the config file ('api_key_secret') so that keys can be encrypted and decrypted");
         }
-        return $secret;
+
+        return $this->normalizeSecret($secret);
+    }
+
+    private function normalizeSecret(string $secret): string
+    {
+        return hash('sha256', $secret, true);
     }
 
     public function encryptString(string $plainText): string
     {
         $secret = $this->getSecretFromConfig();
-        $initializationVector = openssl_random_pseudo_bytes(
-            openssl_cipher_iv_length(self::ENCRYPTION_CIPHER)
-        );
-        $encryptedString = openssl_encrypt(
-            $plainText,
-            self::ENCRYPTION_CIPHER,
-            $secret,
-            0,
-            $initializationVector
-        );
+        $encrypter = new Encrypter($secret, self::ENCRYPTION_CIPHER);
 
-        if ($encryptedString === false) {
+        try {
+            $encryptedString = $encrypter->encrypt($plainText);
+        } catch (Exception $e) {
             throw new Exception("DEIA Survey - Failed to encrypt string");
         }
 
-        return base64_encode($initializationVector . '::' . $encryptedString);
+        return base64_encode($encryptedString);
     }
 
     public function decryptString(string $encryptedText): string
     {
         $secret = $this->getSecretFromConfig();
-        $data = base64_decode($encryptedText);
-        if ($data === false) {
-            throw new Exception("DEIA Survey - Invalid base64 encoded data");
-        }
+        $encrypter = new Encrypter($secret, self::ENCRYPTION_CIPHER);
 
-        list($initializationVector, $encryptedString) = explode('::', $data, 2);
-        $decrypted = openssl_decrypt(
-            $encryptedString,
-            self::ENCRYPTION_CIPHER,
-            $secret,
-            0,
-            $initializationVector
-        );
+        $payload = base64_decode($encryptedText);
 
-        if ($decrypted === false) {
+        try {
+            $decryptedString = $encrypter->decrypt($payload);
+        } catch (Exception $e) {
             throw new Exception("DEIA Survey - Failed to decrypt string");
         }
 
-        return $decrypted;
+        return $decryptedString;
     }
 }
