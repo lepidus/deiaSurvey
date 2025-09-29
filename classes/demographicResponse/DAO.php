@@ -91,22 +91,22 @@ class DAO extends EntityDAO
         $demographicResponse = parent::fromRow($row);
 
         $encrypter = new DataEncryption();
-        $demographicResponseValue = $demographicResponse->getValue();
-        if ($encrypter->textIsEncrypted($demographicResponseValue)) {
-            $demographicResponseValue = $encrypter->decryptString($demographicResponseValue);
+        $value = $demographicResponse->getValue();
+        if ($encrypter->textIsEncrypted($value)) {
+            $value = $encrypter->decryptString($value);
         }
 
-        if (@unserialize($demographicResponseValue)) {
-            $demographicResponse->setValue(unserialize($demographicResponseValue));
+        if (@unserialize($value)) {
+            $demographicResponse->setValue(unserialize($value));
         }
 
-        $demographicResponseOptionsInputValue = $demographicResponse->getOptionsInputValue();
-        if ($encrypter->textIsEncrypted($demographicResponseOptionsInputValue)) {
-            $demographicResponseOptionsInputValue = $encrypter->decryptString($demographicResponseOptionsInputValue);
+        $optionsInputValue = $demographicResponse->getOptionsInputValue();
+        if (!is_null($optionsInputValue) && $encrypter->textIsEncrypted($optionsInputValue)) {
+            $optionsInputValue = $encrypter->decryptString($optionsInputValue);
         }
 
-        if (@unserialize($demographicResponseOptionsInputValue)) {
-            $demographicResponse->setOptionsInputValue(unserialize($demographicResponseOptionsInputValue));
+        if (@unserialize($optionsInputValue)) {
+            $demographicResponse->setOptionsInputValue(unserialize($optionsInputValue));
         }
 
         return $demographicResponse;
