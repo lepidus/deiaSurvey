@@ -46,7 +46,7 @@ class DataEncryption
             throw new Exception("DEIA Survey - Failed to encrypt string");
         }
 
-        return base64_encode($encryptedString);
+        return 'base64:' . base64_encode($encryptedString);
     }
 
     public function decryptString(string $encryptedText): string
@@ -54,6 +54,7 @@ class DataEncryption
         $secret = $this->getSecretFromConfig();
         $encrypter = new Encrypter($secret, self::ENCRYPTION_CIPHER);
 
+        $encryptedText = str_replace('base64:', '', $encryptedText);
         $payload = base64_decode($encryptedText);
 
         try {
