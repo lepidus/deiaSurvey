@@ -34,7 +34,22 @@ class DAO extends EntityDAO
 
     public function insert(DemographicResponse $demographicResponse): int
     {
-        return parent::_insert($demographicResponse);
+        $responseValue = $demographicResponse->getValue();
+        $demographicResponse->setValue(serialize($responseValue));
+
+        $optionsInputValue = $demographicResponse->getOptionsInputValue();
+        if (!empty($optionsInputValue)) {
+            $demographicResponse->setOptionsInputValue(serialize($optionsInputValue));
+        }
+
+        $insertedId = parent::_insert($demographicResponse);
+
+        $demographicResponse->setValue($responseValue);
+        if (!empty($optionsInputValue)) {
+            $demographicResponse->setOptionsInputValue($optionsInputValue);
+        }
+
+        return $insertedId;
     }
 
     public function delete(DemographicResponse $demographicResponse)
