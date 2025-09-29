@@ -35,6 +35,20 @@ class DataEncryption
         return hash('sha256', $secret, true);
     }
 
+    public function textIsEncrypted(string $text): bool
+    {
+        if (!str_starts_with($text, 'base64:')) {
+            return false;
+        }
+
+        try {
+            $this->decryptString($text);
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
     public function encryptString(string $plainText): string
     {
         $secret = $this->getSecretFromConfig();
