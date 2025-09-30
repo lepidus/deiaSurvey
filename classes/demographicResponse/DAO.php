@@ -35,35 +35,33 @@ class DAO extends EntityDAO
 
     public function insert(DemographicResponse $demographicResponse): int
     {
-        $encrypter = new DataEncryption();
         $responseValue = $demographicResponse->getValue();
-        $encryptedResponseValue = $encrypter->encryptString(serialize($responseValue));
-        $demographicResponse->setValue($encryptedResponseValue);
-
         $optionsInputValue = $demographicResponse->getOptionsInputValue();
-        if (!is_null($optionsInputValue)) {
-            $encryptedOptionsInputValue = $encrypter->encryptString(serialize($optionsInputValue));
-            $demographicResponse->setOptionsInputValue($encryptedOptionsInputValue);
-        }
+
+        $this->encryptResponseData($demographicResponse);
 
         $insertedId = parent::_insert($demographicResponse);
 
-        $demographicResponse->setValue($responseValue);
-        if (!is_null($optionsInputValue)) {
-            $demographicResponse->setOptionsInputValue($optionsInputValue);
-        }
+        $this->restoreEncryptedResponseData($demographicResponse, $responseValue, $optionsInputValue);
 
         return $insertedId;
+    }
+
+    public function update(DemographicResponse $demographicResponse)
+    {
+        $responseValue = $demographicResponse->getValue();
+        $optionsInputValue = $demographicResponse->getOptionsInputValue();
+
+        $this->encryptResponseData($demographicResponse);
+
+        parent::_update($demographicResponse);
+
+        $this->restoreEncryptedResponseData($demographicResponse, $responseValue, $optionsInputValue);
     }
 
     public function delete(DemographicResponse $demographicResponse)
     {
         return parent::_delete($demographicResponse);
-    }
-
-    public function update(DemographicResponse $demographicResponse)
-    {
-        return parent::_update($demographicResponse);
     }
 
     public function getCount(Collector $query): int
@@ -110,5 +108,27 @@ class DAO extends EntityDAO
         }
 
         return $demographicResponse;
+    }
+
+    private function encryptResponseData(DemographicResponse $demographicResponse)
+    {
+        $encrypter = new DataEncryption();
+        $responseValue = $demographicResponse->getValue();
+        $encryptedResponseValue = $encrypter->encryptString(serialize($responseValue));
+        $demographicResponse->setValue($encryptedResponseValue);
+
+        $optionsInputValue = $demographicResponse->getOptionsInputValue();
+        if (!empty($optionsInputValue)) {
+            $encryptedOptionsInputValue = $encrypter->encryptString(serialize($optionsInputValue));
+            $demographicResponse->setOptionsInputValue($encryptedOptionsInputValue);
+        }
+    }
+
+    private function restoreEncryptedResponseData($demographicResponse, $responseValue, $optionsInputValue)
+    {
+        $demographicResponse->setValue($responseValue);
+        if (!empty($optionsInputValue)) {
+            $demographicResponse->setOptionsInputValue($optionsInputValue);
+        }
     }
 }
