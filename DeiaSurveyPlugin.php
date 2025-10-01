@@ -7,11 +7,14 @@ use APP\core\Application;
 use PKP\plugins\Hook;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Event;
+use APP\notification\NotificationManager;
+use APP\notification\Notification;
 use APP\template\TemplateManager;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
 use PKP\core\JSONMessage;
 use PKP\security\Role;
+use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
@@ -27,8 +30,9 @@ class DeiaSurveyPlugin extends GenericPlugin
     public function register($category, $path, $mainContextId = null): bool
     {
         $success = parent::register($category, $path);
+        $encrypter = new DataEncryption();
 
-        if ($success && $this->getEnabled()) {
+        if ($success && $this->getEnabled() && $encrypter->secretConfigExists()) {
             Hook::add('Request::redirect', [$this, 'redirectUserAfterLogin']);
             Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
             Hook::add('LoadHandler', [$this, 'addPageHandler']);
@@ -77,6 +81,15 @@ class DeiaSurveyPlugin extends GenericPlugin
 
             $this->registerHooksForCustomSchemas();
             $defaultQuestionsCreator->createDefaultQuestions($contextId);
+
+            $encrypter = new DataEncryption();
+            if (!$encrypter->secretConfigExists()) {
+                $currentUser = Application::get()->getRequest()->getUser();
+                $notificationMgr = new NotificationManager();
+                $notificationMessage = 'plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined';
+                $notificationMgr->createTrivialNotification($currentUser->getId(), Notification::NOTIFICATION_TYPE_WARNING, ['contents' => __($notificationMessage)]);
+            }
+
         }
 
         parent::setEnabled($enabled);

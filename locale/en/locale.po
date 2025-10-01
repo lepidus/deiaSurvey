@@ -146,7 +146,8 @@ msgid "plugins.generic.deiaSurvey.settings.encryptionSecretDefined"
 msgstr "You have set a secret in the website configuration file ('api_key_secret')"
 
 msgid "plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined"
-msgstr "You have not set a secret in the website configuration file ('api_key_secret')"
+msgstr "You have not set a secret in the website configuration file ('api_key_secret')."
+" The plugin will not work until this is done."
 
 msgid "plugins.generic.deiaSurvey.settings.credentialsUsed.orcidProfile"
 msgstr "The plugin is using the credentials entered in the ORCID Profile plugin settings. "
