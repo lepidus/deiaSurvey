@@ -9,6 +9,7 @@ use Exception;
 class DataEncryption
 {
     private const ENCRYPTION_CIPHER = 'aes-256-cbc';
+    private const BASE64_PREFIX = 'base64:';
 
     public function secretConfigExists(): bool
     {
@@ -37,7 +38,7 @@ class DataEncryption
 
     public function textIsEncrypted(string $text): bool
     {
-        if (!str_starts_with($text, 'base64:')) {
+        if (!str_starts_with($text, self::BASE64_PREFIX)) {
             return false;
         }
 
@@ -60,7 +61,7 @@ class DataEncryption
             throw new Exception("DEIA Survey - Failed to encrypt string");
         }
 
-        return 'base64:' . base64_encode($encryptedString);
+        return self::BASE64_PREFIX . base64_encode($encryptedString);
     }
 
     public function decryptString(string $encryptedText): string
@@ -68,7 +69,7 @@ class DataEncryption
         $secret = $this->getSecretFromConfig();
         $encrypter = new Encrypter($secret, self::ENCRYPTION_CIPHER);
 
-        $encryptedText = str_replace('base64:', '', $encryptedText);
+        $encryptedText = str_replace(self::BASE64_PREFIX, '', $encryptedText);
         $payload = base64_decode($encryptedText);
 
         try {
