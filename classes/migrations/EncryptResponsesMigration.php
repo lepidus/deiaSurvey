@@ -28,6 +28,13 @@ class EncryptResponsesMigration extends Migration
                 continue;
             }
 
+            if ($row['setting_name'] == 'optionsInputValue') {
+                $optionsInputValue = unserialize($settingValue);
+                if (empty($optionsInputValue)) {
+                    continue;
+                }
+            }
+
             $encryptedValue = $encrypter->encryptString($settingValue);
             DB::table('demographic_response_settings')
                 ->where('demographic_response_setting_id', $row['demographic_response_setting_id'])
