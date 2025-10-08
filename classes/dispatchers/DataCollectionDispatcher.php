@@ -26,7 +26,7 @@ class DataCollectionDispatcher extends DemographicDataDispatcher
         $applicationName = Application::get()->getName();
 
         if ($applicationName != 'ojs2'
-            || ($decision->getData('decision') != Decision::ACCEPT and $decision->getData('decision') != Decision::SKIP_EXTERNAL_REVIEW)
+            || ($decision->getData('decision') != Decision::ACCEPT && $decision->getData('decision') != Decision::SKIP_EXTERNAL_REVIEW)
         ) {
             return;
         }
