@@ -21,6 +21,7 @@ use PKP\form\validation\FormValidator;
 use PKP\form\validation\FormValidatorPost;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorCustom;
+use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 use APP\plugins\generic\deiaSurvey\classes\OrcidCredentialsValidator;
 use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 
@@ -100,6 +101,9 @@ class DeiaSurveySettingsForm extends \Form
         $templateMgr->assign('globallyConfigured', $this->orcidIsGloballyConfigured());
         $templateMgr->assign('pluginName', $this->plugin->getName());
         $templateMgr->assign('applicationName', \Application::get()->getName());
+
+        $dataEncryption = new DataEncryption();
+        $templateMgr->assign('encryptionSecretDefined', $dataEncryption->secretConfigExists());
 
         $orcidConfiguration = new OrcidConfiguration();
         $currentOrcidConfiguration = $orcidConfiguration->getOrcidConfiguration($this->contextId);
