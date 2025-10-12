@@ -2,6 +2,9 @@
 
 require_once('autoload.php');
 
+use PKP\plugins\GenericPlugin;
+use Illuminate\Database\Migrations\Migration;
+use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
 use APP\plugins\generic\deiaSurvey\classes\form\CustomRegistrationForm;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
@@ -10,15 +13,15 @@ use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\observers\listeners\MigrateResponsesOnRegistration;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\plugins\generic\deiaSurvey\DeiaSurveySettingsForm;
-use Illuminate\Database\Migrations\Migration;
-use PKP\plugins\GenericPlugin;
 
 class DeiaSurveyPlugin extends \GenericPlugin
 {
     public function register($category, $path, $mainContextId = null): bool
     {
         $success = parent::register($category, $path);
-        if ($success && $this->getEnabled()) {
+        $encrypter = new DataEncryption();
+
+        if ($success && $this->getEnabled() && $encrypter->secretConfigExists()) {
             HookRegistry::register('Request::redirect', [$this, 'redirectUserAfterLogin']);
             HookRegistry::register('LoadComponentHandler', [$this, 'setupTabHandler']);
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
@@ -65,6 +68,14 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
             $this->registerHooksForCustomSchemas();
             $defaultQuestionsCreator->createDefaultQuestions($contextId);
+
+            $encrypter = new DataEncryption();
+            if (!$encrypter->secretConfigExists()) {
+                $currentUser = Application::get()->getRequest()->getUser();
+                $notificationMgr = new NotificationManager();
+                $notificationMessage = 'plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined';
+                $notificationMgr->createTrivialNotification($currentUser->getId(), NOTIFICATION_TYPE_WARNING, ['contents' => __($notificationMessage)]);
+            }
         }
 
         parent::setEnabled($enabled);
