@@ -52,8 +52,6 @@ class DataEncryption
     public function encryptString(string $plainText): string
     {
         $secret = $this->getSecretFromConfig();
-        error_log($secret . '  --  ' . strlen($secret));
-        error_log(self::ENCRYPTION_CIPHER);
         $encrypter = new Encrypter($secret, self::ENCRYPTION_CIPHER);
 
         try {
