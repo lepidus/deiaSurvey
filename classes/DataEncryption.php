@@ -7,7 +7,7 @@ use Exception;
 
 class DataEncryption
 {
-    private const ENCRYPTION_CIPHER = 'aes-256-cbc';
+    private const ENCRYPTION_CIPHER = 'AES-256-CBC';
     private const BASE64_PREFIX = 'base64:';
 
     public function secretConfigExists(): bool
@@ -52,6 +52,8 @@ class DataEncryption
     public function encryptString(string $plainText): string
     {
         $secret = $this->getSecretFromConfig();
+        error_log($secret . '  --  ' . strlen($secret));
+        error_log(self::ENCRYPTION_CIPHER);
         $encrypter = new Encrypter($secret, self::ENCRYPTION_CIPHER);
 
         try {

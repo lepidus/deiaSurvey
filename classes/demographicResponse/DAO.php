@@ -5,6 +5,7 @@ namespace APP\plugins\generic\deiaSurvey\classes\demographicResponse;
 use APP\plugins\generic\deiaSurvey\classes\core\EntityDAO;
 use APP\plugins\generic\deiaSurvey\classes\core\traits\EntityWithParent;
 use Illuminate\Support\LazyCollection;
+use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 
 class DAO extends EntityDAO
 {
@@ -34,17 +35,33 @@ class DAO extends EntityDAO
 
     public function insert(DemographicResponse $demographicResponse): int
     {
-        return parent::_insert($demographicResponse);
+        $responseValue = $demographicResponse->getValue();
+        $optionsInputValue = $demographicResponse->getOptionsInputValue();
+
+        $this->encryptResponseData($demographicResponse);
+
+        $insertedId = parent::_insert($demographicResponse);
+
+        $this->restoreEncryptedResponseData($demographicResponse, $responseValue, $optionsInputValue);
+
+        return $insertedId;
+    }
+
+    public function update(DemographicResponse $demographicResponse)
+    {
+        $responseValue = $demographicResponse->getValue();
+        $optionsInputValue = $demographicResponse->getOptionsInputValue();
+
+        $this->encryptResponseData($demographicResponse);
+
+        parent::_update($demographicResponse);
+
+        $this->restoreEncryptedResponseData($demographicResponse, $responseValue, $optionsInputValue);
     }
 
     public function delete(DemographicResponse $demographicResponse)
     {
         return parent::_delete($demographicResponse);
-    }
-
-    public function update(DemographicResponse $demographicResponse)
-    {
-        return parent::_update($demographicResponse);
     }
 
     public function getCount(Collector $query): int
@@ -71,16 +88,47 @@ class DAO extends EntityDAO
     {
         $demographicResponse = parent::fromRow($row);
 
-        if (@unserialize($demographicResponse->getValue())) {
-            $serializedValue = $demographicResponse->getValue();
-            $demographicResponse->setValue(unserialize($serializedValue));
+        $encrypter = new DataEncryption();
+        $value = $demographicResponse->getValue();
+        if ($encrypter->textIsEncrypted($value)) {
+            $value = $encrypter->decryptString($value);
         }
 
-        if (@unserialize($demographicResponse->getOptionsInputValue())) {
-            $serializedValue = $demographicResponse->getOptionsInputValue();
-            $demographicResponse->setOptionsInputValue(unserialize($serializedValue));
+        if (@unserialize($value)) {
+            $demographicResponse->setValue(unserialize($value));
+        }
+
+        $optionsInputValue = $demographicResponse->getOptionsInputValue();
+        if (!is_null($optionsInputValue) && $encrypter->textIsEncrypted($optionsInputValue)) {
+            $optionsInputValue = $encrypter->decryptString($optionsInputValue);
+        }
+
+        if (@unserialize($optionsInputValue)) {
+            $demographicResponse->setOptionsInputValue(unserialize($optionsInputValue));
         }
 
         return $demographicResponse;
+    }
+
+    private function encryptResponseData(DemographicResponse $demographicResponse)
+    {
+        $encrypter = new DataEncryption();
+        $responseValue = $demographicResponse->getValue();
+        $encryptedResponseValue = $encrypter->encryptString(serialize($responseValue));
+        $demographicResponse->setValue($encryptedResponseValue);
+
+        $optionsInputValue = $demographicResponse->getOptionsInputValue();
+        if (!empty($optionsInputValue)) {
+            $encryptedOptionsInputValue = $encrypter->encryptString(serialize($optionsInputValue));
+            $demographicResponse->setOptionsInputValue($encryptedOptionsInputValue);
+        }
+    }
+
+    private function restoreEncryptedResponseData($demographicResponse, $responseValue, $optionsInputValue)
+    {
+        $demographicResponse->setValue($responseValue);
+        if (!empty($optionsInputValue)) {
+            $demographicResponse->setOptionsInputValue($optionsInputValue);
+        }
     }
 }
