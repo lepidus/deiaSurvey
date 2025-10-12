@@ -139,7 +139,7 @@ class DemographicDataService
             $response->setExternalType($externalType);
             $response->setOptionsInputValue($optionsInputValue);
 
-            if ($questionType == 'text' or $questionType == 'textarea') {
+            if ($questionType == 'text' || $questionType == 'textarea') {
                 $response->setData('responseValue', $responseInput, $locale);
             } else {
                 $response->setData('responseValue', $responseInput);

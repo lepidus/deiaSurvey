@@ -114,7 +114,7 @@ class QuestionsForm extends \Form
             foreach ($this->getData('responses') as $questionId => $response) {
                 $inputType = explode('-', $questionId)[2];
 
-                if (($inputType == 'text' or $inputType == 'textarea') and empty($response[$locale])) {
+                if (($inputType == 'text' || $inputType == 'textarea') && empty($response[$locale])) {
                     return false;
                 }
             }
@@ -136,10 +136,9 @@ class QuestionsForm extends \Form
 
         if ($newConsent == '1') {
             $demographicDataService->registerUserResponses($user->getId(), $this->getData('responses'), $this->getData('responseOptionsInputs'));
-        } elseif ($newConsent == '0' and $previousConsent) {
+        } elseif ($newConsent == '0' && $previousConsent) {
             $demographicDataService->deleteUserResponses($user->getId(), $context->getId());
         }
-        error_log('aaaah vai executar');
 
         parent::execute(...$functionArgs);
     }

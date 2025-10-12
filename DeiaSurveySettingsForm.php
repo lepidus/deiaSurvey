@@ -139,7 +139,7 @@ class DeiaSurveySettingsForm extends \Form
         if (!$this->validator->validateClientSecret($clientSecret)) {
             $messages[] = __('plugins.generic.deiaSurvey.settings.orcidClientSecretError');
         }
-        if (strlen($clientId) == 0 or strlen($clientSecret) == 0) {
+        if (strlen($clientId) == 0 || strlen($clientSecret) == 0) {
             $this->plugin->setEnabled(false);
         }
         return $messages;
