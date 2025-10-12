@@ -1,7 +1,5 @@
 <?php
 
-namespace APP\plugins\generic\deiaSurvey\classes\migrations;
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use APP\plugins\generic\deiaSurvey\classes\DataEncryption;

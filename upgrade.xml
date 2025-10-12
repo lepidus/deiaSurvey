@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE install SYSTEM "../../../lib/pkp/dtd/install.dtd">
 
-<install version="0.4.1.0">
+<install version="0.4.2.0">
     <migration
         class="plugins.generic.deiaSurvey.classes.migrations.LocalizeQuestionsTextsMigration"
+    />
+    <migration
+        class="plugins.generic.deiaSurvey.classes.migrations.EncryptResponsesMigration"
     />
 </install>
