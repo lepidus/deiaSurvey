@@ -14,6 +14,7 @@ use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
 use PKP\core\JSONMessage;
 use PKP\security\Role;
+use PKP\security\Validation;
 use PKP\plugins\PluginRegistry;
 use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
@@ -45,7 +46,7 @@ class DeiaSurveyPlugin extends GenericPlugin
             $context = Application::get()->getRequest()->getContext();
             if (!is_null($context)) {
                 $this->loadDispatcherClasses();
-                PluginRegistry::register('reports', $this->getReportPlugin(), $this->getPluginPath());
+                $this->registerReportPlugin();
             }
         }
         return $success;
@@ -61,9 +62,12 @@ class DeiaSurveyPlugin extends GenericPlugin
         return __('plugins.generic.deiaSurvey.description');
     }
 
-    public function getReportPlugin()
+    public function registerReportPlugin()
     {
-        return new DeiaSurveyReportPlugin();
+        if (Validation::isSiteAdmin()) {
+            $reportPlugin = new DeiaSurveyReportPlugin();
+            PluginRegistry::register('reports', $reportPlugin, $this->getPluginPath());
+        }
     }
 
     private function registerHooksForCustomSchemas()
