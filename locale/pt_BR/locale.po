@@ -249,3 +249,12 @@ msgstr "Prefiro não informar"
 
 msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.selfDescribe"
 msgstr "Auto-descrição"
+
+
+
+
+msgid "plugins.generic.deiaSurvey.report.displayName"
+msgstr "Relatório do Questionário DEIA"
+
+msgid "plugins.generic.deiaSurvey.report.description"
+msgstr "Gera um relatório dos dados DEIA coletados para o contexto atual por meio do questionário DEIA"

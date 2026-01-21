@@ -250,3 +250,12 @@ msgstr "Prefer not to inform"
 
 msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.selfDescribe"
 msgstr "Self describe"
+
+
+
+
+msgid "plugins.generic.deiaSurvey.report.displayName"
+msgstr "DEIA Survey Report"
+
+msgid "plugins.generic.deiaSurvey.report.description"
+msgstr "Generates a report of the DEIA data collected for the current context through the DEIA Survey"
