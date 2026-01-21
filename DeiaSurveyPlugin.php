@@ -221,17 +221,7 @@ class DeiaSurveyPlugin extends GenericPlugin
         $demographicDataDao = new DemographicDataDAO();
         $userHasConsent = $demographicDataDao->userHasDemographicConsent($user->getId());
 
-        return !$userHasConsent && $this->userHasMandatoryFilling($user, $context);
-    }
-
-    private function userHasMandatoryFilling($user, $context)
-    {
-        $userRoles = $user->getRoles(Application::CONTEXT_SITE);
-        $userRoles = array_map(function ($role) {
-            return $role->getRoleId();
-        }, $userRoles);
-
-        return !in_array(Role::ROLE_ID_SITE_ADMIN, $userRoles);
+        return !$userHasConsent && !Validation::isSiteAdmin();
     }
 
     public function getInstallMigration(): Migration
