@@ -4,6 +4,7 @@ namespace APP\plugins\generic\deiaSurvey\tests\report;
 
 use PKP\tests\PKPTestCase;
 use APP\plugins\generic\deiaSurvey\report\classes\ContextStatistics;
+use APP\plugins\generic\deiaSurvey\report\classes\QuestionStatistics;
 
 class ContextStatisticsTest extends PKPTestCase
 {
@@ -35,5 +36,21 @@ class ContextStatisticsTest extends PKPTestCase
 
         $this->contextStatistics->incrementUsersNoConsentCount();
         $this->assertEquals(2, $this->contextStatistics->getUsersNoConsentCount());
+    }
+
+    public function testHasQuestionsStatistics()
+    {
+        $firstQuestionId = 2112;
+        $firstQuestionStatistics = new QuestionStatistics();
+        $firstQuestionStatistics->incrementOptionCount(12);
+
+        $this->contextStatistics->addQuestionStatistics($firstQuestionId, $firstQuestionStatistics);
+        $this->assertEquals($firstQuestionStatistics, $this->contextStatistics->getQuestionStatistics($firstQuestionId));
+    }
+
+    public function testGestNonExistentQuestionStatistics()
+    {
+        $questionId = 2113;
+        $this->assertNull($this->contextStatistics->getQuestionStatistics($questionId));
     }
 }
