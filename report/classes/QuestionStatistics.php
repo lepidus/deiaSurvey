@@ -6,7 +6,6 @@ class QuestionStatistics
 {
     private array $responseOptionsCounts;
 
-
     public function __construct()
     {
         $this->responseOptionsCounts = [];
