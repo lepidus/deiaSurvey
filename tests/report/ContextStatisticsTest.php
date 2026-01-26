@@ -16,26 +16,16 @@ class ContextStatisticsTest extends PKPTestCase
         $this->contextStatistics = new ContextStatistics();
     }
 
-    public function testUsersConsentCount()
+    public function testHasConsentCount()
     {
-        $this->assertEquals(0, $this->contextStatistics->getUsersConsentCount());
-
-        $this->contextStatistics->incrementUsersConsentCount();
-        $this->assertEquals(1, $this->contextStatistics->getUsersConsentCount());
-
-        $this->contextStatistics->incrementUsersConsentCount();
-        $this->assertEquals(2, $this->contextStatistics->getUsersConsentCount());
+        $this->contextStatistics->setUsersConsentCount(123);
+        $this->assertEquals(123, $this->contextStatistics->getUsersConsentCount());
     }
 
-    public function testUsersNoConsentCount()
+    public function testHasNoConsentCount()
     {
-        $this->assertEquals(0, $this->contextStatistics->getUsersNoConsentCount());
-
-        $this->contextStatistics->incrementUsersNoConsentCount();
-        $this->assertEquals(1, $this->contextStatistics->getUsersNoConsentCount());
-
-        $this->contextStatistics->incrementUsersNoConsentCount();
-        $this->assertEquals(2, $this->contextStatistics->getUsersNoConsentCount());
+        $this->contextStatistics->setUsersNoConsentCount(987);
+        $this->assertEquals(987, $this->contextStatistics->getUsersNoConsentCount());
     }
 
     public function testHasQuestionsStatistics()
@@ -48,7 +38,7 @@ class ContextStatisticsTest extends PKPTestCase
         $this->assertEquals($firstQuestionStatistics, $this->contextStatistics->getQuestionStatistics($firstQuestionId));
     }
 
-    public function testGestNonExistentQuestionStatistics()
+    public function testGetsNonExistentQuestionStatistics()
     {
         $questionId = 2113;
         $this->assertNull($this->contextStatistics->getQuestionStatistics($questionId));

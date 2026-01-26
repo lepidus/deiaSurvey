@@ -17,9 +17,9 @@ class ContextStatistics
         $this->questionsStatistics = [];
     }
 
-    public function incrementUsersConsentCount(): void
+    public function setUsersConsentCount(int $count): void
     {
-        $this->usersConsentCount++;
+        $this->usersConsentCount = $count;
     }
 
     public function getUsersConsentCount(): int
@@ -27,9 +27,9 @@ class ContextStatistics
         return $this->usersConsentCount;
     }
 
-    public function incrementUsersNoConsentCount(): void
+    public function setUsersNoConsentCount(int $count): void
     {
-        $this->usersNotConsentCount++;
+        $this->usersNotConsentCount = $count;
     }
 
     public function getUsersNoConsentCount(): int
