@@ -43,4 +43,31 @@ class ContextStatisticsTest extends PKPTestCase
         $questionId = 2113;
         $this->assertNull($this->contextStatistics->getQuestionStatistics($questionId));
     }
+
+    public function testPrintsStatsAccordingToGuide()
+    {
+        $contextPrintGuide = [
+            12 => [12, 13, 14],
+            13 => [21, 22],
+        ];
+
+        $firstQuestionStatistics = new QuestionStatistics();
+        $firstQuestionStatistics->incrementOptionCount(12);
+        $firstQuestionStatistics->incrementOptionCount(12);
+        $firstQuestionStatistics->incrementOptionCount(13);
+        $firstQuestionStatistics->incrementOptionCount(14);
+        $firstQuestionStatistics->incrementOptionCount(14);
+        $firstQuestionStatistics->incrementOptionCount(14);
+
+        $secondQuestionStatistics = new QuestionStatistics();
+        $secondQuestionStatistics->incrementOptionCount(21);
+        $secondQuestionStatistics->incrementOptionCount(21);
+        $secondQuestionStatistics->incrementOptionCount(22);
+
+        $this->contextStatistics->addQuestionStatistics(13, $secondQuestionStatistics);
+        $this->contextStatistics->addQuestionStatistics(12, $firstQuestionStatistics);
+
+        $expectedPrintedStats = [2, 1, 3, 2, 1];
+        $this->assertEquals($expectedPrintedStats, $this->contextStatistics->printStatistics($contextPrintGuide));
+    }
 }

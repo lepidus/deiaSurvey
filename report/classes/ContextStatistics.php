@@ -46,4 +46,26 @@ class ContextStatistics
     {
         return $this->questionsStatistics[$questionId] ?? null;
     }
+
+    public function printStatistics(array $contextPrintGuide): array
+    {
+        $resultStats = [];
+
+        foreach ($contextPrintGuide as $questionId => $responseOptionIds) {
+            $questionStats = $this->getQuestionStatistics($questionId);
+
+            if (is_null($questionStats)) {
+                continue;
+            }
+
+            foreach ($responseOptionIds as $responseOptionId) {
+                $count = $questionStats->getOptionCount($responseOptionId);
+                if (!is_null($count)) {
+                    $resultStats[] = $count;
+                }
+            }
+        }
+
+        return $resultStats;
+    }
 }
