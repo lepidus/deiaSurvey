@@ -13,7 +13,6 @@ use APP\template\TemplateManager;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
 use PKP\core\JSONMessage;
-use PKP\security\Role;
 use PKP\security\Validation;
 use PKP\plugins\PluginRegistry;
 use APP\plugins\generic\deiaSurvey\classes\DataEncryption;

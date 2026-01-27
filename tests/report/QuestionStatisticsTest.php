@@ -43,6 +43,6 @@ class QuestionStatisticsTest extends PKPTestCase
     public function testGetNonexistentResponseOptionCount(): void
     {
         $nonExistentResponseOptionId = 123;
-        $this->assertNull($this->questionStatistics->getOptionCount($nonExistentResponseOptionId));
+        $this->assertEquals(0, $this->questionStatistics->getOptionCount($nonExistentResponseOptionId));
     }
 }

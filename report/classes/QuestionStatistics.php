@@ -20,9 +20,9 @@ class QuestionStatistics
         $this->responseOptionsCounts[$responseOptionId]++;
     }
 
-    public function getOptionCount(int $responseOptionId): ?int
+    public function getOptionCount(int $responseOptionId): int
     {
-        return $this->responseOptionsCounts[$responseOptionId] ?? null;
+        return $this->responseOptionsCounts[$responseOptionId] ?? 0;
     }
 
     public function getAllCounts(): array
