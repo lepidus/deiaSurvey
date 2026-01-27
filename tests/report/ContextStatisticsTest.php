@@ -66,8 +66,10 @@ class ContextStatisticsTest extends PKPTestCase
 
         $this->contextStatistics->addQuestionStatistics(13, $secondQuestionStatistics);
         $this->contextStatistics->addQuestionStatistics(12, $firstQuestionStatistics);
+        $this->contextStatistics->setUsersConsentCount(123);
+        $this->contextStatistics->setUsersNoConsentCount(987);
 
-        $expectedPrintedStats = [2, 1, 3, 2, 1];
+        $expectedPrintedStats = [2, 1, 3, 2, 1, 123, 987];
         $this->assertEquals($expectedPrintedStats, $this->contextStatistics->printStatistics($contextPrintGuide));
     }
 }

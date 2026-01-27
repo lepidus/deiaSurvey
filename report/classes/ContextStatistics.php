@@ -66,6 +66,9 @@ class ContextStatistics
             }
         }
 
+        $resultStats[] = $this->getUsersConsentCount();
+        $resultStats[] = $this->getUsersNoConsentCount();
+
         return $resultStats;
     }
 }
