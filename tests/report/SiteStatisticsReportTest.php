@@ -49,14 +49,14 @@ class SiteStatisticsReportTest extends PKPTestCase
         $questionStats->incrementOptionCount(2);
 
         $secondQuestionStats = new QuestionStatistics();
-        $secondQuestionStats->incrementOptionCount(1);
-        $secondQuestionStats->incrementOptionCount(2);
-        $secondQuestionStats->incrementOptionCount(2);
+        $secondQuestionStats->incrementOptionCount(4);
+        $secondQuestionStats->incrementOptionCount(5);
+        $secondQuestionStats->incrementOptionCount(5);
 
         $thirdQuestionStats = new QuestionStatistics();
-        $thirdQuestionStats->incrementOptionCount(1);
-        $thirdQuestionStats->incrementOptionCount(2);
-        $thirdQuestionStats->incrementOptionCount(2);
+        $thirdQuestionStats->incrementOptionCount(7);
+        $thirdQuestionStats->incrementOptionCount(8);
+        $thirdQuestionStats->incrementOptionCount(8);
 
         $contextStats = new ContextStatistics();
         $contextStats->addQuestionStatistics(1, $questionStats);
@@ -66,6 +66,15 @@ class SiteStatisticsReportTest extends PKPTestCase
         $contextStats->setUsersNoConsentCount(3);
 
         return $contextStats;
+    }
+
+    private function createTestPrintingGuide(): array
+    {
+        return [
+            1 => [1, 2, 3],
+            2 => [4, 5, 6],
+            3 => [7, 8, 9]
+        ];
     }
 
     private function generateExpectedHeader(): array
@@ -96,9 +105,10 @@ class SiteStatisticsReportTest extends PKPTestCase
 
     public function testHasContextsStatistics()
     {
-        $this->siteReport->addContextStatistics($this->context, $this->contextStats);
+        $emptyPrintingGuide = [];
+        $this->siteReport->addContextStatistics($this->context, $this->contextStats, $emptyPrintingGuide);
         $this->assertEquals(
-            [['context' => $this->context, 'statistics' => $this->contextStats]],
+            [['context' => $this->context, 'statistics' => $this->contextStats, 'printingGuide' => $emptyPrintingGuide]],
             $this->siteReport->getContextsStatistics()
         );
     }
@@ -107,5 +117,25 @@ class SiteStatisticsReportTest extends PKPTestCase
     {
         $expectedHeader = $this->generateExpectedHeader();
         $this->assertEquals($expectedHeader, $this->siteReport->getReportHeader());
+    }
+
+    public function testWritesReport()
+    {
+        $printingGuide = $this->createTestPrintingGuide();
+        $csvFilePath = '/tmp/deia_survey_site_report_test.csv';
+        $this->siteReport->addContextStatistics($this->context, $this->contextStats, $printingGuide);
+        $this->siteReport->writeReport($csvFilePath);
+
+        $this->assertFileExists($csvFilePath);
+        $csvRows = array_map('str_getcsv', file($csvFilePath));
+
+        $expectedHeader = $this->generateExpectedHeader();
+        $this->assertEquals($expectedHeader[0], $csvRows[0]);
+        $this->assertEquals($expectedHeader[1], $csvRows[1]);
+
+        $expectedDataRow = ['Test Journal', '1', '2', '0', '1', '2', '0', '1', '2', '0', '5', '3'];
+        $this->assertEquals($expectedDataRow, $csvRows[2]);
+
+        unlink($csvFilePath);
     }
 }

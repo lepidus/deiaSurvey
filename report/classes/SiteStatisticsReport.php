@@ -18,11 +18,12 @@ class SiteStatisticsReport
         $this->contextsStatistics = [];
     }
 
-    public function addContextStatistics(Context $context, ContextStatistics $statistics): void
+    public function addContextStatistics(Context $context, ContextStatistics $statistics, array $printingGuide): void
     {
         $this->contextsStatistics[] = [
             'context' => $context,
-            'statistics' => $statistics
+            'statistics' => $statistics,
+            'printingGuide' => $printingGuide
         ];
     }
 
@@ -56,5 +57,25 @@ class SiteStatisticsReport
         $secondRow[] = '';
 
         return [$firstRow, $secondRow];
+    }
+
+    public function writeReport(string $filePath)
+    {
+        $csvFile = fopen($filePath, 'wt');
+
+        $reportHeader = $this->getReportHeader();
+        fputcsv($csvFile, $reportHeader[0]);
+        fputcsv($csvFile, $reportHeader[1]);
+
+        foreach ($this->contextsStatistics as $contextData) {
+            $context = $contextData['context'];
+            $contextStats = $contextData['statistics'];
+
+            $row = [$context->getLocalizedName($this->locale)];
+            $row = array_merge($row, $contextStats->printStatistics($contextData['printingGuide']));
+            fputcsv($csvFile, $row);
+        }
+
+        fclose($csvFile);
     }
 }
