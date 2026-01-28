@@ -15,7 +15,7 @@ class LocalizeQuestionsTextsMigration extends Migration
     public function up(): void
     {
         $allQuestions = Repo::demographicQuestion()->getCollector()->getMany();
-        $defaultQuestionsData = (new DefaultQuestionsCreator())->getDefaultQuestionsData(0);
+        $defaultQuestionsData = DefaultQuestionsCreator::getDefaultQuestionsData(0);
 
         foreach ($allQuestions as $question) {
             $isPreviousStandardQuestion = $this->isPreviousStandardQuestion($question);

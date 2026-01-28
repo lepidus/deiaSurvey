@@ -102,4 +102,40 @@ class DemographicDataDAO extends DAO
 
         return $countUsers > 0;
     }
+
+    public function getConsentStatsByContext(int $contextId): array
+    {
+        $results = DB::table('user_settings')
+            ->where('setting_name', '=', 'demographicDataConsent')
+            ->get();
+
+        $consentCount = 0;
+        $noConsentCount = 0;
+
+        foreach ($results as $result) {
+            $setting = get_object_vars($result);
+            $settingValue = json_decode($setting['setting_value'], true);
+
+            // Handles wrong data structure used in previous versions
+            if (array_key_exists('contextId', $settingValue)) {
+                $settingValue = [$settingValue];
+            }
+
+            foreach ($settingValue as $contextConsent) {
+                if ($contextConsent['contextId'] == $contextId) {
+                    if ($contextConsent['consentOption']) {
+                        $consentCount++;
+                    } else {
+                        $noConsentCount++;
+                    }
+                    break;
+                }
+            }
+        }
+
+        return [
+            'consentCount' => $consentCount,
+            'noConsentCount' => $noConsentCount
+        ];
+    }
 }

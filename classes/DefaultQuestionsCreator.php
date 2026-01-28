@@ -33,7 +33,7 @@ class DefaultQuestionsCreator
         }
     }
 
-    public function getDefaultQuestionsData(int $contextId): array
+    public static function getDefaultQuestionsData(int $contextId): array
     {
         return [
             'gender' => [

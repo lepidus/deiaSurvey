@@ -13,17 +13,17 @@ use APP\template\TemplateManager;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
 use PKP\core\JSONMessage;
-use PKP\security\Role;
+use PKP\security\Validation;
+use PKP\plugins\PluginRegistry;
 use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\observers\listeners\MigrateResponsesOnRegistration;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
-use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
 use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
 use APP\plugins\generic\deiaSurvey\DeiaSurveySettingsForm;
-use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\report\DeiaSurveyReportPlugin;
 
 class DeiaSurveyPlugin extends GenericPlugin
 {
@@ -45,6 +45,7 @@ class DeiaSurveyPlugin extends GenericPlugin
             $context = Application::get()->getRequest()->getContext();
             if (!is_null($context)) {
                 $this->loadDispatcherClasses();
+                $this->registerReportPlugin();
             }
         }
         return $success;
@@ -58,6 +59,14 @@ class DeiaSurveyPlugin extends GenericPlugin
     public function getDescription()
     {
         return __('plugins.generic.deiaSurvey.description');
+    }
+
+    public function registerReportPlugin()
+    {
+        if (Validation::isSiteAdmin()) {
+            $reportPlugin = new DeiaSurveyReportPlugin();
+            PluginRegistry::register('reports', $reportPlugin, $this->getPluginPath());
+        }
     }
 
     private function registerHooksForCustomSchemas()
@@ -89,7 +98,6 @@ class DeiaSurveyPlugin extends GenericPlugin
                 $notificationMessage = 'plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined';
                 $notificationMgr->createTrivialNotification($currentUser->getId(), Notification::NOTIFICATION_TYPE_WARNING, ['contents' => __($notificationMessage)]);
             }
-
         }
 
         parent::setEnabled($enabled);
@@ -159,9 +167,9 @@ class DeiaSurveyPlugin extends GenericPlugin
             if (!$schema) {
                 throw new \Exception(
                     'Schema failed to decode. This usually means it is invalid JSON. Requested: '
-                    . $schemaFile
-                    . '. Last JSON error: '
-                    . json_last_error()
+                        . $schemaFile
+                        . '. Last JSON error: '
+                        . json_last_error()
                 );
             }
         }
@@ -170,7 +178,7 @@ class DeiaSurveyPlugin extends GenericPlugin
 
     public function setupTabHandler($hookName, $params)
     {
-        $component = & $params[0];
+        $component = &$params[0];
         if ($component == 'plugins.generic.deiaSurvey.classes.controllers.TabHandler') {
             return true;
         }
@@ -196,7 +204,7 @@ class DeiaSurveyPlugin extends GenericPlugin
 
         $request = Application::get()->getRequest();
         if ($this->userShouldBeRedirected($request)) {
-            $url = $request->getDispatcher()->url($request, ROUTE_PAGE, null, 'user', 'profile');
+            $url = $request->getDispatcher()->url($request, Application::ROUTE_PAGE, null, 'user', 'profile');
         }
     }
 
@@ -212,17 +220,7 @@ class DeiaSurveyPlugin extends GenericPlugin
         $demographicDataDao = new DemographicDataDAO();
         $userHasConsent = $demographicDataDao->userHasDemographicConsent($user->getId());
 
-        return !$userHasConsent && $this->userHasMandatoryFilling($user, $context);
-    }
-
-    private function userHasMandatoryFilling($user, $context)
-    {
-        $userRoles = $user->getRoles(Application::CONTEXT_SITE);
-        $userRoles = array_map(function ($role) {
-            return $role->getRoleId();
-        }, $userRoles);
-
-        return !in_array(Role::ROLE_ID_SITE_ADMIN, $userRoles);
+        return !$userHasConsent && !Validation::isSiteAdmin();
     }
 
     public function getInstallMigration(): Migration
