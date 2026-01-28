@@ -11,11 +11,13 @@ class SiteStatisticsReport
 {
     private string $locale;
     private array $contextsStatistics;
+    private $UTF8_BOM;
 
     public function __construct(string $locale)
     {
         $this->locale = $locale;
         $this->contextsStatistics = [];
+        $this->UTF8_BOM = chr(0xEF) . chr(0xBB) . chr(0xBF);
     }
 
     public function addContextStatistics(Context $context, ContextStatistics $statistics, array $printingGuide): void
@@ -62,6 +64,7 @@ class SiteStatisticsReport
     public function writeReport(string $filePath)
     {
         $csvFile = fopen($filePath, 'wt');
+        fprintf($csvFile, $this->UTF8_BOM);
 
         $reportHeader = $this->getReportHeader();
         fputcsv($csvFile, $reportHeader[0]);

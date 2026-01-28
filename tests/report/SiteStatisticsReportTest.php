@@ -127,15 +127,21 @@ class SiteStatisticsReportTest extends PKPTestCase
         $this->siteReport->writeReport($csvFilePath);
 
         $this->assertFileExists($csvFilePath);
-        $csvRows = array_map('str_getcsv', file($csvFilePath));
+        $csvFile = fopen($csvFilePath, 'r');
+        $UTF8_BOM = chr(0xEF) . chr(0xBB) . chr(0xBF);
+        fread($csvFile, strlen($UTF8_BOM));
 
         $expectedHeader = $this->generateExpectedHeader();
-        $this->assertEquals($expectedHeader[0], $csvRows[0]);
-        $this->assertEquals($expectedHeader[1], $csvRows[1]);
+        $row = fgetcsv($csvFile);
+        $this->assertEquals($expectedHeader[0], $row);
+        $row = fgetcsv($csvFile);
+        $this->assertEquals($expectedHeader[1], $row);
 
         $expectedDataRow = ['Test Journal', '1', '2', '0', '1', '2', '0', '1', '2', '0', '5', '3'];
-        $this->assertEquals($expectedDataRow, $csvRows[2]);
+        $row = fgetcsv($csvFile);
+        $this->assertEquals($expectedDataRow, $row);
 
+        fclose($csvFile);
         unlink($csvFilePath);
     }
 }
