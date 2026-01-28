@@ -3,7 +3,9 @@
 namespace APP\plugins\generic\deiaSurvey\report\classes\factories;
 
 use APP\core\Application;
+use PKP\facades\Locale;
 use APP\plugins\generic\deiaSurvey\report\classes\SiteStatisticsReport;
+use APP\plugins\generic\deiaSurvey\report\classes\factories\ContextStatisticsFactory;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 
 class SiteStatisticsReportFactory
@@ -14,7 +16,7 @@ class SiteStatisticsReportFactory
         $report = new SiteStatisticsReport($locale);
 
         $contextDao = Application::get()->getContextDAO();
-        $contexts = $contextDao->getAll(true)->toArray();
+        $contexts = $contextDao->getAll(true);
 
         while ($context = $contexts->next()) {
             $demographicQuestionsCount = Repo::demographicQuestion()

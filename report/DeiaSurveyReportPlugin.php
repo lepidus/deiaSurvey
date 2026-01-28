@@ -4,6 +4,7 @@ namespace APP\plugins\generic\deiaSurvey\report;
 
 use PKP\plugins\ReportPlugin;
 use PKP\config\Config;
+use APP\plugins\generic\deiaSurvey\report\classes\factories\SiteStatisticsReportFactory;
 
 class DeiaSurveyReportPlugin extends ReportPlugin
 {
@@ -33,6 +34,11 @@ class DeiaSurveyReportPlugin extends ReportPlugin
 
     public function display($args, $request)
     {
-        $context = $request->getContext();
+        header('content-type: text/comma-separated-values');
+        header('content-disposition: attachment; filename=site-deia-report-' . date('Ymd') . '.csv');
+
+        $siteStatsReportFactory = new SiteStatisticsReportFactory();
+        $report = $siteStatsReportFactory->createSiteReport();
+        $report->writeReport('php://output');
     }
 }
