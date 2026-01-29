@@ -6,9 +6,9 @@ use APP\plugins\generic\deiaSurvey\report\classes\QuestionStatistics;
 
 class ContextStatistics
 {
-    private int $usersConsentCount;
-    private int $usersNotConsentCount;
-    private array $questionsStatistics;
+    private $usersConsentCount;
+    private $usersNotConsentCount;
+    private $questionsStatistics;
 
     public function __construct()
     {

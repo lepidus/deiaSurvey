@@ -9,8 +9,8 @@ import('lib.pkp.classes.context.Context');
 
 class SiteStatisticsReport
 {
-    private string $locale;
-    private array $contextsStatistics;
+    private $locale;
+    private $contextsStatistics;
     private $UTF8_BOM;
 
     public function __construct(string $locale)

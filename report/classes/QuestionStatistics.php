@@ -4,7 +4,7 @@ namespace APP\plugins\generic\deiaSurvey\report\classes;
 
 class QuestionStatistics
 {
-    private array $responseOptionsCounts;
+    private $responseOptionsCounts;
 
     public function __construct()
     {
