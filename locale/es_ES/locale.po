@@ -250,3 +250,24 @@ msgstr "Prefiero no informar"
 
 msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.selfDescribe"
 msgstr "Autodescripción"
+
+
+
+
+msgid "plugins.generic.deiaSurvey.report.displayName"
+msgstr "Informe del Cuestionario DEIA"
+
+msgid "plugins.generic.deiaSurvey.report.description"
+msgstr "Genera un informe de los datos DEIA recopilados para el contexto actual a través del Cuestionario DEIA"
+
+msgid "plugins.generic.deiaSurvey.report.contextName.ojs2"
+msgstr "Nombre de la Revista"
+
+msgid "plugins.generic.deiaSurvey.report.contextName.ops"
+msgstr "Nombre del Servidor de Preprints"
+
+msgid "plugins.generic.deiaSurvey.report.usersWhoConsented"
+msgstr "Usuarios que consintieron"
+
+msgid "plugins.generic.deiaSurvey.report.usersWhoDidNotConsent"
+msgstr "Usuarios que no consintieron"
