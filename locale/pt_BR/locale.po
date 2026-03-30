@@ -115,6 +115,9 @@ msgstr "Configurações da API ORCID"
 msgid "plugins.generic.deiaSurvey.settings.description"
 msgstr "Por favor, configure o acesso a API do ORCID para recuperar informações da ORCID"
 
+msgid "plugins.generic.deiaSurvey.settings.questionBlocks"
+msgstr "Blocos de Perguntas"
+
 msgid "plugins.generic.deiaSurvey.settings.globallyconfigured"
 msgstr "A API ORCID foi configurada globalmente pelo host. As seguintes credenciais foram salvas."
 

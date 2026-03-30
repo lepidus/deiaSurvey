@@ -247,11 +247,12 @@ class DeiaSurveyPlugin extends \GenericPlugin
                             null,
                             'manage',
                             null,
-                            array(
+                            [
                                 'verb' => 'settings',
+                                'method' => 'display',
                                 'plugin' => $this->getName(),
                                 'category' => 'generic'
-                            )
+                            ]
                         ),
                         $this->getDisplayName()
                     ),
@@ -267,31 +268,37 @@ class DeiaSurveyPlugin extends \GenericPlugin
     {
         $context = $request->getContext();
         $contextId = ($context == null) ? 0 : $context->getId();
+        $templateMgr = \TemplateManager::getManager($request);
 
-        switch ($request->getUserVar('verb')) {
-            case 'settings':
-                $templateMgr = \TemplateManager::getManager();
-                $templateMgr->registerPlugin('function', 'plugin_url', array($this, 'smartyPluginUrl'));
-                $apiOptions = [
-                    OrcidClient::ORCID_API_URL_PUBLIC => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.public',
-                    OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.publicSandbox',
-                    OrcidClient::ORCID_API_URL_MEMBER => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.member',
-                    OrcidClient::ORCID_API_URL_MEMBER_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.memberSandbox'
-                ];
-                $templateMgr->assign('orcidApiUrls', $apiOptions);
+        if ($request->getUserVar('verb') == 'settings') {
+            switch ($request->getUserVar('method')) {
+                case 'display':
+                    $templateMgr->assign('pluginName', $this->getName());
+                    return new \JSONMessage(true, $templateMgr->fetch($this->getTemplateResource('settings/index.tpl')));
+                case 'form':
+                    $templateMgr->registerPlugin('function', 'plugin_url', array($this, 'smartyPluginUrl'));
+                    $apiOptions = [
+                        OrcidClient::ORCID_API_URL_PUBLIC => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.public',
+                        OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.publicSandbox',
+                        OrcidClient::ORCID_API_URL_MEMBER => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.member',
+                        OrcidClient::ORCID_API_URL_MEMBER_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.memberSandbox'
+                    ];
+                    $templateMgr->assign('orcidApiUrls', $apiOptions);
 
-                $form = new DeiaSurveySettingsForm($this, $contextId);
-                if ($request->getUserVar('save')) {
-                    $form->readInputData();
-                    if ($form->validate()) {
-                        $form->execute();
-                        return new \JSONMessage(true);
+                    $form = new DeiaSurveySettingsForm($this, $contextId);
+                    if ($request->getUserVar('save')) {
+                        $form->readInputData();
+                        if ($form->validate()) {
+                            $form->execute();
+                            return new \JSONMessage(true);
+                        }
+                    } else {
+                        $form->initData();
                     }
-                } else {
-                    $form->initData();
-                }
-                return new \JSONMessage(true, $form->fetch($request));
+                    return new \JSONMessage(true, $form->fetch($request));
+            }
         }
+
         return parent::manage($args, $request);
     }
 

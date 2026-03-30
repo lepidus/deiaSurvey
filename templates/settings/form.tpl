@@ -14,7 +14,7 @@
     {rdelim});
 </script>
 
-<form class="pkp_form" id="deiaSurveySettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
+<form class="pkp_form" id="deiaSurveySettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" method="form" save=true}">
     <div id="deiaSurveySettings">
         <p class="pkpNotification {if $encryptionSecretDefined}pkpNotification--success{else}pkpNotification--warning{/if}">
             {if $encryptionSecretDefined}
@@ -54,7 +54,7 @@
                         {translate key="plugins.generic.deiaSurvey.settings.orcidClientSecret"}: <i>{translate key="plugins.generic.deiaSurvey.settings.hidden"}</i>
                     </p>
                 {else}
-                    {fbvElement type="text" id="orcidClientSecret" class="orcidClientSecret" value=$orcidClientSecret required="true" label="plugins.generic.deiaSurvey.settings.orcidClientSecret" maxlength="40" size=$fbvStyles.size.MEDIUM disabled=$globallyConfigured}
+                    {fbvElement type="text" password="true" id="orcidClientSecret" class="orcidClientSecret" value=$orcidClientSecret required="true" label="plugins.generic.deiaSurvey.settings.orcidClientSecret" maxlength="40" size=$fbvStyles.size.MEDIUM disabled=$globallyConfigured}
                 {/if}
             {/fbvFormSection}
         {/fbvFormArea}
