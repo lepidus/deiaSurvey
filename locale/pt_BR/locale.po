@@ -274,3 +274,43 @@ msgstr "Usuários que consentiram"
 
 msgid "plugins.generic.deiaSurvey.report.usersWhoDidNotConsent"
 msgstr "Usuários que não consentiram"
+
+
+msgid "plugins.generic.deiaSurvey.questionBlocks"
+msgstr "Blocos de Perguntas"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.edit"
+msgstr "Bloco de Perguntas"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.demographicQuestions"
+msgstr "Perguntas"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.create"
+msgstr "Criar Bloco de Perguntas"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.title"
+msgstr "Título"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.description"
+msgstr "Descrição"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.completed"
+msgstr "Concluído"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.active"
+msgstr "Ativo"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.noneCreated"
+msgstr "Não há blocos de perguntas criados."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmActivate"
+msgstr "Tem certeza de que deseja ativar este bloco de perguntas?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmDeactivate"
+msgstr "Tem certeza de que deseja desativar este bloco de perguntas?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmDelete"
+msgstr "Tem certeza de que deseja excluir este bloco de perguntas?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.form.titleRequired" 
+msgstr "É necessário um título para o bloco de perguntas."

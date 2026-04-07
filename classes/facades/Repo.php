@@ -2,12 +2,18 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\facades;
 
+use APP\plugins\generic\deiaSurvey\classes\demographicForm\Repository as DemographicFormRepository;
 use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\Repository as DemographicQuestionRepository;
 use APP\plugins\generic\deiaSurvey\classes\demographicResponse\Repository as DemographicResponseRepository;
 use APP\plugins\generic\deiaSurvey\classes\demographicResponseOption\Repository as DemographicResponseOptionRepository;
 
 class Repo
 {
+    public static function demographicForm(): DemographicFormRepository
+    {
+        return app(DemographicFormRepository::class);
+    }
+
     public static function demographicQuestion(): DemographicQuestionRepository
     {
         return app(DemographicQuestionRepository::class);

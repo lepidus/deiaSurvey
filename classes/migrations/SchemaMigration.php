@@ -10,15 +10,50 @@ class SchemaMigration extends Migration
 {
     public function up(): void
     {
+        if (!Capsule::schema()->hasTable('demographic_forms')) {
+            Capsule::schema()->create('demographic_forms', function (Blueprint $table) {
+                $table->bigInteger('demographic_form_id')->autoIncrement();
+                $table->bigInteger('context_id');
+                $table->float('seq', 8, 2)->nullable();
+                $table->smallInteger('is_active')->nullable();
+
+                $contextDao = \Application::getContextDAO();
+                $tableName = $contextDao->tableName;
+                $table->foreign('context_id')
+                    ->references($contextDao->primaryKeyColumn)
+                    ->on($contextDao->tableName)
+                    ->onDelete('cascade');
+                $table->index(['context_id'], 'demographic_forms_context_id');
+            });
+        }
+
+        if (!Capsule::schema()->hasTable('demographic_form_settings')) {
+            Capsule::schema()->create('demographic_form_settings', function (Blueprint $table) {
+                $table->bigIncrements('demographic_form_setting_id');
+                $table->bigInteger('demographic_form_id');
+                $table->string('locale', 14)->default('');
+                $table->string('setting_name', 255);
+                $table->longText('setting_value')->nullable();
+
+                $table->foreign('demographic_form_id')
+                    ->references('demographic_form_id')
+                    ->on('demographic_forms')
+                    ->onDelete('cascade');
+                $table->index(['demographic_form_id'], 'demographic_form_settings_id');
+                $table->unique(['demographic_form_id', 'locale', 'setting_name'], 'demographic_form_settings_pkey');
+            });
+        }
+
         if (!Capsule::schema()->hasTable('demographic_questions')) {
             Capsule::schema()->create('demographic_questions', function (Blueprint $table) {
                 $table->bigInteger('demographic_question_id')->autoIncrement();
                 $table->bigInteger('context_id');
                 $table->bigInteger('question_type');
 
+                $contextDao = \Application::getContextDAO();
                 $table->foreign('context_id')
-                    ->references('journal_id')
-                    ->on('journals')
+                    ->references($contextDao->primaryKeyColumn)
+                    ->on($contextDao->tableName)
                     ->onDelete('cascade');
                 $table->index(['context_id'], 'demographic_questions_context_id');
             });

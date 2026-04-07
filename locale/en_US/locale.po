@@ -255,8 +255,6 @@ msgid "plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.selfD
 msgstr "Self describe"
 
 
-
-
 msgid "plugins.generic.deiaSurvey.report.displayName"
 msgstr "DEIA Survey Report"
 
@@ -274,3 +272,43 @@ msgstr "Users Who Consented"
 
 msgid "plugins.generic.deiaSurvey.report.usersWhoDidNotConsent"
 msgstr "Users Who Did Not Consent"
+
+
+msgid "plugins.generic.deiaSurvey.questionBlocks"
+msgstr "Question Blocks"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.edit"
+msgstr "Question Block"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.demographicQuestions"
+msgstr "Questions"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.create"
+msgstr "Create Question Block"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.title"
+msgstr "Title"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.description"
+msgstr "Description"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.completed"
+msgstr "Completed"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.active"
+msgstr "Active"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.noneCreated"
+msgstr "No question blocks have been created."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmActivate"
+msgstr "Are you sure you wish to activate this question block?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmDeactivate"
+msgstr "Are you sure you wish to deactivate this question block?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmDelete"
+msgstr "Are you sure you wish to delete this question block?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.form.titleRequired"
+msgstr "A title is required for the question block."

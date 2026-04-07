@@ -22,7 +22,7 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
         if ($success && $this->getEnabled() && $encrypter->secretConfigExists()) {
             HookRegistry::register('Request::redirect', [$this, 'redirectUserAfterLogin']);
-            HookRegistry::register('LoadComponentHandler', [$this, 'setupTabHandler']);
+            HookRegistry::register('LoadComponentHandler', [$this, 'setupHandlers']);
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
             HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
             HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
@@ -57,6 +57,7 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
     private function registerHooksForCustomSchemas()
     {
+        HookRegistry::register('Schema::get::demographicForm', [$this, 'addCustomSchema']);
         HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
         HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
         HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
@@ -162,13 +163,14 @@ class DeiaSurveyPlugin extends \GenericPlugin
         return $schema;
     }
 
-    public function setupTabHandler($hookName, $params)
+    public function setupHandlers($hookName, $params)
     {
         $component = &$params[0];
-        if ($component == 'plugins.generic.deiaSurvey.classes.controllers.TabHandler') {
-            return true;
-        }
-        return false;
+        $handledComponents = [
+            'plugins.generic.deiaSurvey.classes.controllers.TabHandler',
+            'plugins.generic.deiaSurvey.classes.controllers.grid.demographicForm.DemographicFormGridHandler',
+        ];
+        return in_array($component, $handledComponents, true);
     }
 
     public function addPageHandler($hookName, $params)
