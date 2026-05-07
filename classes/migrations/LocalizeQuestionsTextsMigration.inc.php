@@ -12,7 +12,7 @@ class LocalizeQuestionsTextsMigration extends Migration
 
     public function up(): void
     {
-        $allQuestions = Repo::demographicQuestion()->getCollector()->getMany();
+        $allQuestions = Repo::deiaQuestion()->getCollector()->getMany();
         $defaultQuestionsData = DefaultQuestionsCreator::getDefaultQuestionsData(0);
 
         foreach ($allQuestions as $question) {
@@ -24,7 +24,7 @@ class LocalizeQuestionsTextsMigration extends Migration
             $defaultQuestionData = $defaultQuestionsData[$questionName];
 
             if ($isPreviousStandardQuestion) {
-                $this->migrateDemographicQuestion($question, $defaultQuestionData);
+                $this->migrateDeiaQuestion($question, $defaultQuestionData);
             }
 
             foreach ($question->getResponseOptions() as $responseOption) {
@@ -37,7 +37,7 @@ class LocalizeQuestionsTextsMigration extends Migration
                 foreach ($defaultQuestionData['responseOptions'] as $defaultResponseOption) {
                     $defaultResponseOptionText = __($defaultResponseOption['optionText'], [], self::BASE_LOCALE);
                     if (strpos($responseOptionText, $defaultResponseOptionText) !== false) {
-                        $this->migrateDemographicResponseOption($responseOption, $defaultResponseOption);
+                        $this->migrateDeiaResponseOption($responseOption, $defaultResponseOption);
                         break;
                     }
                 }
@@ -51,10 +51,10 @@ class LocalizeQuestionsTextsMigration extends Migration
         return $dataValue[self::BASE_LOCALE] ?? $dataValue['en'];
     }
 
-    private function migrateDemographicQuestion($question, $defaultQuestionData)
+    private function migrateDeiaQuestion($question, $defaultQuestionData)
     {
         $this->cleanQuestionTextualData($question);
-        Repo::demographicQuestion()->edit($question, [
+        Repo::deiaQuestion()->edit($question, [
             'isTranslated' => $defaultQuestionData['isTranslated'],
             'isDefaultQuestion' => $defaultQuestionData['isDefaultQuestion'],
             'questionText' => $defaultQuestionData['questionText'],
@@ -62,10 +62,10 @@ class LocalizeQuestionsTextsMigration extends Migration
         ]);
     }
 
-    private function migrateDemographicResponseOption($responseOption, $defaultResponseOption)
+    private function migrateDeiaResponseOption($responseOption, $defaultResponseOption)
     {
         $this->cleanResponseOptionTextualData($responseOption);
-        Repo::demographicResponseOption()->edit($responseOption, [
+        Repo::deiaResponseOption()->edit($responseOption, [
             'optionText' => $defaultResponseOption['optionText'],
             'isTranslated' => $defaultResponseOption['isTranslated']
         ]);
@@ -87,16 +87,16 @@ class LocalizeQuestionsTextsMigration extends Migration
 
     private function cleanQuestionTextualData($question)
     {
-        Capsule::table('demographic_question_settings')
-            ->where('demographic_question_id', $question->getId())
+        Capsule::table('deia_question_settings')
+            ->where('deia_question_id', $question->getId())
             ->whereIn('setting_name', ['questionText', 'questionDescription'])
             ->delete();
     }
 
     private function cleanResponseOptionTextualData($responseOption)
     {
-        Capsule::table('demographic_response_option_settings')
-            ->where('demographic_response_option_id', $responseOption->getId())
+        Capsule::table('deia_response_option_settings')
+            ->where('deia_response_option_id', $responseOption->getId())
             ->whereIn('setting_name', ['optionText'])
             ->delete();
     }

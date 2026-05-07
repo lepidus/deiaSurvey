@@ -71,16 +71,16 @@ describe('DEIA Survey - Questions displaying', function () {
         cy.contains('You can change your consent option at any time.');
         cy.contains('If you withdraw a previously given consent, your data will be deleted');
 
-        cy.get('input[name="demographicDataConsent"][value=0]').should('not.be.checked');
-        cy.get('input[name="demographicDataConsent"][value=1]').should('not.be.checked');
+        cy.get('input[name="deiaDataConsent"][value=0]').should('not.be.checked');
+        cy.get('input[name="deiaDataConsent"][value=1]').should('not.be.checked');
         
-        cy.get('input[name="demographicDataConsent"][value=0]').click();
+        cy.get('input[name="deiaDataConsent"][value=0]').click();
         cy.get('#deiaSurveyForm .submitFormButton').click();
         cy.wait(1000);
         cy.reload();
 
         cy.contains('a', 'DEIA Survey').click();
-        cy.get('input[name="demographicDataConsent"][value=0]').should('be.checked');
+        cy.get('input[name="deiaDataConsent"][value=0]').should('be.checked');
         assertDisabledFields();
     });
     it('Request message is not shown anymore. Author can now access other parts of the application.', function () {
@@ -101,7 +101,7 @@ describe('DEIA Survey - Questions displaying', function () {
         cy.contains('a', 'Edit Profile').click();
         cy.contains('a', 'DEIA Survey').click();
 
-        cy.get('input[name="demographicDataConsent"][value=1]').click();
+        cy.get('input[name="deiaDataConsent"][value=1]').click();
         cy.answerDefaultQuestionsOnProfile(userAnswers);
 
         cy.reload();
@@ -113,7 +113,7 @@ describe('DEIA Survey - Questions displaying', function () {
         cy.contains('a', 'Edit Profile').click();
         cy.contains('a', 'DEIA Survey').click();
 
-        cy.get('input[name="demographicDataConsent"][value=0]').click();
+        cy.get('input[name="deiaDataConsent"][value=0]').click();
         cy.get('#deiaSurveyForm .submitFormButton').click();
         cy.wait(1000);
         cy.reload();

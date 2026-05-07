@@ -2,7 +2,7 @@
 
 namespace APP\plugins\generic\deiaSurvey\pages\user;
 
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 
 import('lib.pkp.pages.user.RegistrationHandler');
 
@@ -27,7 +27,7 @@ class CustomRegistrationHandler extends \RegistrationHandler
             return;
         }
 
-        $demographicDataService = new DemographicDataService();
-        $demographicDataService->migrateResponsesByUserIdentifier($context, $user, 'email');
+        $deiaDataService = new DeiaDataService();
+        $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'email');
     }
 }

@@ -6,7 +6,7 @@ use APP\plugins\generic\deiaSurvey\report\classes\ContextStatistics;
 use APP\plugins\generic\deiaSurvey\report\classes\factories\QuestionStatisticsFactory;
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 
 class ContextStatisticsFactory
 {
@@ -20,7 +20,7 @@ class ContextStatisticsFactory
     public function createContextStatistics(): ContextStatistics
     {
         $contextStats = new ContextStatistics();
-        $questions = Repo::demographicQuestion()
+        $questions = Repo::deiaQuestion()
             ->getCollector()
             ->filterByContextIds([$this->contextId])
             ->getMany();
@@ -32,8 +32,8 @@ class ContextStatisticsFactory
             $contextStats->addQuestionStatistics($question->getId(), $questionStats);
         }
 
-        $demographicDataDao = new DemographicDataDAO();
-        $contextConsentStats = $demographicDataDao->getConsentStatsByContext($this->contextId);
+        $deiaDataDao = new DeiaDataDAO();
+        $contextConsentStats = $deiaDataDao->getConsentStatsByContext($this->contextId);
         $contextStats->setUsersConsentCount($contextConsentStats['consentCount']);
         $contextStats->setUsersNoConsentCount($contextConsentStats['noConsentCount']);
 
@@ -44,7 +44,7 @@ class ContextStatisticsFactory
     {
         $defaultQuestionsData = DefaultQuestionsCreator::getDefaultQuestionsData($this->contextId);
         $printingGuide = [];
-        $contextQuestions = Repo::demographicQuestion()
+        $contextQuestions = Repo::deiaQuestion()
             ->getCollector()
             ->filterByContextIds([$this->contextId])
             ->getMany();
@@ -68,7 +68,7 @@ class ContextStatisticsFactory
     private function createQuestionStatsPrintingGuide(int $questionId, array $responseOptionsData): array
     {
         $responseOptionsGuide = [];
-        $responseOptions = Repo::demographicResponseOption()
+        $responseOptions = Repo::deiaResponseOption()
             ->getCollector()
             ->filterByQuestionIds([$questionId])
             ->getMany();

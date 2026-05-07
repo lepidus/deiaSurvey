@@ -2,10 +2,10 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\dispatchers;
 
-use APP\plugins\generic\deiaSurvey\classes\dispatchers\DemographicDataDispatcher;
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\dispatchers\DeiaDataDispatcher;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 
-class TemplateFilterDispatcher extends DemographicDataDispatcher
+class TemplateFilterDispatcher extends DeiaDataDispatcher
 {
     protected function registerHooks(): void
     {
@@ -37,9 +37,9 @@ class TemplateFilterDispatcher extends DemographicDataDispatcher
 
         $request = \Application::get()->getRequest();
         $userId = $request->getUser()->getId();
-        $demographicDataDao = new DemographicDataDAO();
+        $deiaDataDao = new DeiaDataDAO();
 
-        if (!$demographicDataDao->userHasDemographicConsent($userId)) {
+        if (!$deiaDataDao->userHasDeiaConsent($userId)) {
             $templateMgr->registerFilter('output', [$this, 'requestMessageFilter']);
         }
     }

@@ -7,14 +7,14 @@ use PKP\core\JSONMessage;
 
 class TabHandler extends \Handler
 {
-    public function demographicData($args, $request)
+    public function deiaData($args, $request)
     {
         $form = new QuestionsForm($request);
         $form->initData();
         return new \JSONMessage(true, $form->fetch($request));
     }
 
-    public function saveDemographicData($args, $request)
+    public function saveDeiaData($args, $request)
     {
         $form = new QuestionsForm($request, $args);
         if ($form->validate()) {

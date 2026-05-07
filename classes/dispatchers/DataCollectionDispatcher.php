@@ -2,10 +2,10 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\dispatchers;
 
-use APP\plugins\generic\deiaSurvey\classes\dispatchers\DemographicDataDispatcher;
+use APP\plugins\generic\deiaSurvey\classes\dispatchers\DeiaDataDispatcher;
 use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
 
-class DataCollectionDispatcher extends DemographicDataDispatcher
+class DataCollectionDispatcher extends DeiaDataDispatcher
 {
     protected function registerHooks(): void
     {

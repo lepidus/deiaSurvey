@@ -5,10 +5,10 @@ require_once('autoload.php');
 use PKP\plugins\GenericPlugin;
 use Illuminate\Database\Migrations\Migration;
 use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\plugins\generic\deiaSurvey\DeiaSurveySettingsForm;
 use APP\plugins\generic\deiaSurvey\report\DeiaSurveyReportPlugin;
@@ -57,10 +57,10 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
     private function registerHooksForCustomSchemas()
     {
-        HookRegistry::register('Schema::get::demographicForm', [$this, 'addCustomSchema']);
-        HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
-        HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
-        HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
+        HookRegistry::register('Schema::get::deiaQuestionBlock', [$this, 'addCustomSchema']);
+        HookRegistry::register('Schema::get::deiaQuestion', [$this, 'addCustomSchema']);
+        HookRegistry::register('Schema::get::deiaResponse', [$this, 'addCustomSchema']);
+        HookRegistry::register('Schema::get::deiaResponseOption', [$this, 'addCustomSchema']);
     }
 
     public function getInstallEmailTemplatesFile()
@@ -119,12 +119,12 @@ class DeiaSurveyPlugin extends \GenericPlugin
     {
         $schema = &$params[0];
 
-        $schema->properties->{'demographicToken'} = (object) [
+        $schema->properties->{'deiaToken'} = (object) [
             'type' => 'string',
             'apiSummary' => true,
             'validation' => ['nullable'],
         ];
-        $schema->properties->{'demographicOrcid'} = (object) [
+        $schema->properties->{'deiaOrcid'} = (object) [
             'type' => 'string',
             'apiSummary' => true,
             'validation' => ['nullable'],
@@ -168,7 +168,10 @@ class DeiaSurveyPlugin extends \GenericPlugin
         $component = &$params[0];
         $handledComponents = [
             'plugins.generic.deiaSurvey.classes.controllers.TabHandler',
-            'plugins.generic.deiaSurvey.classes.controllers.grid.demographicForm.DemographicFormGridHandler',
+            'plugins.generic.deiaSurvey.classes.controllers.grid.deiaQuestionBlock.DeiaQuestionBlockGridHandler',
+            'plugins.generic.deiaSurvey.classes.controllers.grid.deiaQuestion.DeiaQuestionGridHandler',
+            'plugins.generic.deiaSurvey.classes.controllers.listbuilder.deiaQuestion.'
+                . 'DeiaQuestionResponseOptionListbuilderHandler',
         ];
         return in_array($component, $handledComponents, true);
     }
@@ -178,8 +181,8 @@ class DeiaSurveyPlugin extends \GenericPlugin
         $page = $params[0];
         $op = $params[1];
 
-        if ($page == 'demographicQuestionnaire') {
-            define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\demographic\QuestionnaireHandler');
+        if ($page == 'deiaQuestionnaire') {
+            define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler');
             return true;
         }
 
@@ -212,8 +215,8 @@ class DeiaSurveyPlugin extends \GenericPlugin
             return false;
         }
 
-        $demographicDataDao = new DemographicDataDAO();
-        $userHasConsent = $demographicDataDao->userHasDemographicConsent($user->getId());
+        $deiaDataDao = new DeiaDataDAO();
+        $userHasConsent = $deiaDataDao->userHasDeiaConsent($user->getId());
 
         return !$userHasConsent && $this->userHasMandatoryFilling($user, $context);
     }
@@ -317,8 +320,8 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
         if ($userOrcid) {
             $context = \Application::get()->getRequest()->getContext();
-            $demographicDataService = new DemographicDataService();
-            $demographicDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
+            $deiaDataService = new DeiaDataService();
+            $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
         }
     }
 }

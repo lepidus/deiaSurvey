@@ -282,7 +282,7 @@ msgstr "Blocos de Perguntas"
 msgid "plugins.generic.deiaSurvey.questionBlocks.edit"
 msgstr "Bloco de Perguntas"
 
-msgid "plugins.generic.deiaSurvey.questionBlocks.demographicQuestions"
+msgid "plugins.generic.deiaSurvey.questionBlocks.deiaQuestions"
 msgstr "Perguntas"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.create"
@@ -314,3 +314,54 @@ msgstr "Tem certeza de que deseja excluir este bloco de perguntas?"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.form.titleRequired" 
 msgstr "É necessário um título para o bloco de perguntas."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.defaultTitle"
+msgstr "Perguntas DEIA"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.defaultDescription"
+msgstr "Perguntas padrão do questionário DEIA."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.create"
+msgstr "Criar pergunta"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.noneCreated"
+msgstr "Nenhuma pergunta foi criada neste bloco."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.text"
+msgstr "Texto da pergunta"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.options"
+msgstr "Opções de resposta"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.optionText"
+msgstr "Texto da opção"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.optionHasInputField"
+msgstr "Inclui campo de texto"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.changeType"
+msgstr "Se você alterar para este tipo de pergunta, as opções de resposta não estarão disponíveis."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.form.questionTextRequired"
+msgstr "O texto da pergunta é obrigatório."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.form.questionTypeRequired"
+msgstr "O tipo da pergunta é obrigatório."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.smallText"
+msgstr "Campo de texto curto"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.text"
+msgstr "Campo de texto"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.textarea"
+msgstr "Área de texto"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.checkboxes"
+msgstr "Caixas de seleção"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.radioButtons"
+msgstr "Botões de opção"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.select"
+msgstr "Lista suspensa"
