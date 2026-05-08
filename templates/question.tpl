@@ -1,4 +1,4 @@
-{assign var="questionId" value="question-{$question['questionId']}-{$question['inputType']}"}
+{assign var="questionId" value="question-{$question['id']}-{$question['inputType']}"}
 {if $question['type'] == $questionTypeConsts['TYPE_CHECKBOXES'] or $question['type'] == $questionTypeConsts['TYPE_RADIO_BUTTONS']}
     {assign var="isListSection" value=true}
 {/if}

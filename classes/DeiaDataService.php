@@ -37,7 +37,6 @@ class DeiaDataService
         foreach ($deiaQuestionBlocks as $deiaQuestionBlock) {
             $questionBlockData = [
                 'id' => $deiaQuestionBlock->getId(),
-                'questionBlockId' => $deiaQuestionBlock->getId(),
                 'title' => $deiaQuestionBlock->getLocalizedTitle(),
                 'description' => $deiaQuestionBlock->getLocalizedDescription(),
                 'questions' => []
@@ -52,7 +51,6 @@ class DeiaDataService
             foreach ($deiaQuestions as $deiaQuestion) {
                 $questionData = [
                     'id' => $deiaQuestion->getId(),
-                    'questionId' => $deiaQuestion->getId(),
                     'type' => $deiaQuestion->getQuestionType(),
                     'inputType' => $deiaQuestion->getQuestionInputType(),
                     'title' => $deiaQuestion->getLocalizedQuestionText(),

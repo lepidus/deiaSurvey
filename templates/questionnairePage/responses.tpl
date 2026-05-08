@@ -15,7 +15,7 @@
         {foreach $questions as $question}
             <div class="authorResponse">
                 <span class="questionTitle">{$question['title']}</span>
-                <span class="responseValue">{$responses[$question['questionId']]}</span>
+                <span class="responseValue">{$responses[$question['id']]}</span>
             </div>
         {/foreach}
     </fieldset>

@@ -1,5 +1,5 @@
 <div class="question">
-    {assign var="questionId" value="question-{$question['questionId']}-{$question['inputType']}"}
+    {assign var="questionId" value="question-{$question['id']}-{$question['inputType']}"}
     <span class="questionTitle">{$question['title']}</span>
     <span class="questionDescription">{$question['description']}</span>
 
