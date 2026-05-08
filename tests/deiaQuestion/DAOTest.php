@@ -39,6 +39,7 @@ class DAOTest extends \DatabaseTestCase
         $this->deiaQuestionDAO = app(DAO::class);
         $this->contextId = $this->createJournalMock();
         $this->addSchemaFile('deiaQuestion');
+        $this->addSchemaFile('deiaQuestionBlock');
     }
 
     protected function tearDown(): void
