@@ -18,47 +18,49 @@ class DeiaQuestionGridRow extends \GridRow
             $router = $request->getRouter();
             $deiaQuestionBlockId = $element->getQuestionBlockId();
 
-            $this->addAction(
-                new \LinkAction(
-                    'edit',
-                    new \AjaxModal(
-                        $router->url(
-                            $request,
-                            null,
-                            null,
-                            'editDeiaQuestion',
-                            null,
-                            ['rowId' => $rowId, 'deiaQuestionBlockId' => $deiaQuestionBlockId]
+            if ($element->getData('canEdit')) {
+                $this->addAction(
+                    new \LinkAction(
+                        'edit',
+                        new \AjaxModal(
+                            $router->url(
+                                $request,
+                                null,
+                                null,
+                                'editDeiaQuestion',
+                                null,
+                                ['rowId' => $rowId, 'deiaQuestionBlockId' => $deiaQuestionBlockId]
+                            ),
+                            __('grid.action.edit'),
+                            'modal_edit',
+                            true
                         ),
                         __('grid.action.edit'),
-                        'modal_edit',
-                        true
-                    ),
-                    __('grid.action.edit'),
-                    'edit'
-                )
-            );
+                        'edit'
+                    )
+                );
 
-            $this->addAction(
-                new \LinkAction(
-                    'delete',
-                    new \RemoteActionConfirmationModal(
-                        $request->getSession(),
-                        __('plugins.generic.deiaSurvey.questionBlocks.questions.confirmDelete'),
-                        null,
-                        $router->url(
-                            $request,
+                $this->addAction(
+                    new \LinkAction(
+                        'delete',
+                        new \RemoteActionConfirmationModal(
+                            $request->getSession(),
+                            __('plugins.generic.deiaSurvey.questionBlocks.questions.confirmDelete'),
                             null,
-                            null,
-                            'deleteDeiaQuestion',
-                            null,
-                            ['rowId' => $rowId, 'deiaQuestionBlockId' => $deiaQuestionBlockId]
-                        )
-                    ),
-                    __('grid.action.delete'),
-                    'delete'
-                )
-            );
+                            $router->url(
+                                $request,
+                                null,
+                                null,
+                                'deleteDeiaQuestion',
+                                null,
+                                ['rowId' => $rowId, 'deiaQuestionBlockId' => $deiaQuestionBlockId]
+                            )
+                        ),
+                        __('grid.action.delete'),
+                        'delete'
+                    )
+                );
+            }
         }
     }
 }
