@@ -56,8 +56,12 @@ class QuestionnaireHandler extends \Handler
 
         if ($deiaDataService->authorAlreadyAnsweredQuestionnaire($author)) {
             $templateToDisplay = 'questionnairePage/responses.tpl';
+            $questions = $deiaDataService->retrieveAllQuestions($context->getId());
             $authorResponses = $deiaDataService->getExternalAuthorResponses($context->getId(), $authorExternalId, $authorExternalType);
-            $templateMgr->assign(['responses' => $authorResponses]);
+            $templateMgr->assign([
+                'questions' => $questions,
+                'responses' => $authorResponses
+            ]);
         }
 
         return $templateMgr->display($plugin->getTemplateResource($templateToDisplay));

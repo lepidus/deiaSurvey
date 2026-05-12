@@ -60,7 +60,7 @@ function newSubmission(data) {
         cy.get('select[id="sectionId"],select[id="seriesId"]').select(data.section);
     }
 	cy.get('input[id^="checklist-"]').click({multiple: true});
-	cy.get('input[id=privacyConsent]').click();
+	cy.get('input[name="privacyConsent"]').click();
 	if ('submitterRole' in data) {
 		cy.get('input[name=userGroupId]').parent().contains(data.submitterRole).click();
 	}
