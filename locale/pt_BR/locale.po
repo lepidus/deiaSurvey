@@ -316,10 +316,10 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.form.titleRequired"
 msgstr "É necessário um título para o bloco de perguntas."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.defaultTitle"
-msgstr "Perguntas DEIA"
+msgstr "Perguntas SciELO"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.defaultDescription"
-msgstr "Perguntas padrão do questionário DEIA."
+msgstr ""
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.create"
 msgstr "Criar pergunta"

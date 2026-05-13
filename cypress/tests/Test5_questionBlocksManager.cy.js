@@ -2,7 +2,7 @@ import '../support/commands.js';
 
 describe('DEIA Survey - Question blocks manager', function () {
     const pluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-deiasurveyplugin';
-    const defaultQuestionBlockTitle = 'DEIA questions';
+    const defaultQuestionBlockTitle = 'SciELO Questions';
     const questionBlock = {
         title: 'Funding DEIA questions',
         editedTitle: 'Funding and access DEIA questions',

@@ -150,13 +150,13 @@ class RenameDemographicToDeiaMigration extends Migration
                     'deia_question_block_id' => $questionBlockId,
                     'locale' => 'en_US',
                     'setting_name' => 'title',
-                    'setting_value' => 'DEIA questions',
+                    'setting_value' => 'SciELO Questions',
                 ]);
                 Capsule::table('deia_question_block_settings')->insert([
                     'deia_question_block_id' => $questionBlockId,
                     'locale' => 'en_US',
                     'setting_name' => 'description',
-                    'setting_value' => 'Default DEIA survey questions.',
+                    'setting_value' => '',
                 ]);
             }
 
