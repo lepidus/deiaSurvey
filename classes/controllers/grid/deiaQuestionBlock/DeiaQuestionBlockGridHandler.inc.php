@@ -86,16 +86,6 @@ class DeiaQuestionBlockGridHandler extends \GridHandler
 
         $this->addColumn(
             new GridColumn(
-                'completed',
-                'plugins.generic.deiaSurvey.questionBlocks.completed',
-                null,
-                null,
-                $deiaQuestionBlockGridCellProvider
-            )
-        );
-
-        $this->addColumn(
-            new GridColumn(
                 'active',
                 'plugins.generic.deiaSurvey.questionBlocks.active',
                 null,
@@ -167,7 +157,7 @@ class DeiaQuestionBlockGridHandler extends \GridHandler
         $templateMgr = \TemplateManager::getManager($request);
         $templateMgr->assign([
             'deiaQuestionBlockId' => $deiaQuestionBlock->getId(),
-            'canEdit' => $deiaQuestionBlock->getCompleteCount() == 0
+            'canEdit' => !$deiaQuestionBlock->getActive()
         ]);
 
         return new JSONMessage(
@@ -261,7 +251,7 @@ class DeiaQuestionBlockGridHandler extends \GridHandler
 
         $deiaQuestionBlock = Repo::deiaQuestionBlock()->get($deiaQuestionBlockId, $context->getId());
 
-        if ($request->checkCSRF() && isset($deiaQuestionBlock) && $deiaQuestionBlock->getCompleteCount() == 0) {
+        if ($request->checkCSRF() && isset($deiaQuestionBlock) && !$deiaQuestionBlock->getActive()) {
             Repo::deiaQuestionBlock()->delete($deiaQuestionBlock);
 
             $notificationMgr = new NotificationManager();

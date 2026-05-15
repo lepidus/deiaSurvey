@@ -13,8 +13,6 @@ class DeiaQuestionBlockGridCellProvider extends \GridCellProvider
         switch ($columnId) {
             case 'name':
                 return array('label' => $element->getLocalizedTitle());
-            case 'completed':
-                return array('label' => $element->getCompleteCount() ?? 0);
             case 'active':
                 return array('selected' => $element->getActive());
         }

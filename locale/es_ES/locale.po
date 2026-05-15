@@ -294,9 +294,6 @@ msgstr "Título"
 msgid "plugins.generic.deiaSurvey.questionBlocks.description"
 msgstr "Descripción"
 
-msgid "plugins.generic.deiaSurvey.questionBlocks.completed"
-msgstr "Completado"
-
 msgid "plugins.generic.deiaSurvey.questionBlocks.active"
 msgstr "Activo"
 

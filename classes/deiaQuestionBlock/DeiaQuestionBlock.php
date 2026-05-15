@@ -24,16 +24,6 @@ class DeiaQuestionBlock extends \DataObject
         $this->setData('contextId', $contextId);
     }
 
-    public function getCompleteCount()
-    {
-        return $this->getData('completeCount');
-    }
-
-    public function setCompleteCount($completeCount)
-    {
-        $this->setData('completeCount', $completeCount);
-    }
-
     public function getSequence(): ?int
     {
         return $this->getData('sequence');

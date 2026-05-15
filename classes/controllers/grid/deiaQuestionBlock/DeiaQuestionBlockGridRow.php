@@ -18,7 +18,7 @@ class DeiaQuestionBlockGridRow extends \GridRow
         if (!empty($rowId) && is_numeric($rowId)) {
             $router = $request->getRouter();
 
-            $canEdit = $element->getCompleteCount() == 0;
+            $canEdit = !$element->getActive();
 
             if ($canEdit) {
                 $this->addAction(
