@@ -25,7 +25,7 @@ class DeiaDataDAO extends \DAO
             $settingValue = [$settingValue];
         }
 
-        return ['id' => $setting['user_setting_id'], 'value' => $settingValue];
+        return ['value' => $settingValue];
     }
 
     public function userHasDeiaConsent(int $userId): bool

@@ -276,7 +276,8 @@ class DeiaSurveyPlugin extends \GenericPlugin
         $templateMgr = \TemplateManager::getManager($request);
 
         if ($request->getUserVar('verb') == 'settings') {
-            switch ($request->getUserVar('method')) {
+            $method = $request->getUserVar('method') ?: 'display';
+            switch ($method) {
                 case 'display':
                     $templateMgr->assign('pluginName', $this->getName());
                     return new \JSONMessage(true, $templateMgr->fetch($this->getTemplateResource('settings/index.tpl')));
