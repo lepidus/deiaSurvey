@@ -106,7 +106,10 @@ class RenameDemographicToDeiaMigration extends Migration
                 $table->string('setting_name', 255);
                 $table->longText('setting_value')->nullable();
                 $table->index(['deia_question_block_id'], 'deia_question_block_settings_id');
-                $table->unique(['deia_question_block_id', 'locale', 'setting_name'], 'deia_question_block_settings_pkey');
+                $table->unique(
+                    ['deia_question_block_id', 'locale', 'setting_name'],
+                    'deia_question_block_settings_pkey'
+                );
             });
         }
 
@@ -146,18 +149,7 @@ class RenameDemographicToDeiaMigration extends Migration
                 ]);
                 $questionBlockId = (int) Capsule::getPdo()->lastInsertId();
 
-                Capsule::table('deia_question_block_settings')->insert([
-                    'deia_question_block_id' => $questionBlockId,
-                    'locale' => 'en_US',
-                    'setting_name' => 'title',
-                    'setting_value' => 'SciELO Questions',
-                ]);
-                Capsule::table('deia_question_block_settings')->insert([
-                    'deia_question_block_id' => $questionBlockId,
-                    'locale' => 'en_US',
-                    'setting_name' => 'description',
-                    'setting_value' => '',
-                ]);
+                $this->insertDefaultQuestionBlockSettings($questionBlockId);
             }
 
             $questions = Capsule::table('deia_questions')
@@ -193,6 +185,30 @@ class RenameDemographicToDeiaMigration extends Migration
                     ->where('deia_response_option_id', '=', $responseOptionId)
                     ->update(['seq' => ++$sequence]);
             }
+        }
+    }
+
+    private function insertDefaultQuestionBlockSettings(int $questionBlockId): void
+    {
+        $defaultTitles = [
+            'en_US' => 'SciELO Questions',
+            'pt_BR' => 'Perguntas SciELO',
+            'es_ES' => 'Preguntas SciELO',
+        ];
+
+        foreach ($defaultTitles as $locale => $title) {
+            Capsule::table('deia_question_block_settings')->insert([
+                'deia_question_block_id' => $questionBlockId,
+                'locale' => $locale,
+                'setting_name' => 'title',
+                'setting_value' => $title,
+            ]);
+            Capsule::table('deia_question_block_settings')->insert([
+                'deia_question_block_id' => $questionBlockId,
+                'locale' => $locale,
+                'setting_name' => 'description',
+                'setting_value' => '',
+            ]);
         }
     }
 
