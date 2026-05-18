@@ -1,0 +1,100 @@
+<?php
+
+namespace APP\plugins\generic\deiaSurvey\classes\deiaResponse;
+
+use APP\plugins\generic\deiaSurvey\classes\core\interfaces\CollectorInterface;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\LazyCollection;
+
+class Collector implements CollectorInterface
+{
+    public $dao;
+    public $questionIds = null;
+    public $userIds = null;
+    public $contextIds = null;
+    public $externalIds = null;
+    public $externalTypes = null;
+
+    public function __construct(DAO $dao)
+    {
+        $this->dao = $dao;
+    }
+
+    public function filterByQuestionIds(?array $questionIds): Collector
+    {
+        $this->questionIds = $questionIds;
+        return $this;
+    }
+
+    public function filterByUserIds(?array $userIds): Collector
+    {
+        $this->userIds = $userIds;
+        return $this;
+    }
+
+    public function filterByContextIds(?array $contextIds): Collector
+    {
+        $this->contextIds = $contextIds;
+        return $this;
+    }
+
+    public function filterByExternalIds(?array $externalIds): Collector
+    {
+        $this->externalIds = $externalIds;
+        return $this;
+    }
+
+    public function filterByExternalTypes(?array $externalTypes): Collector
+    {
+        $this->externalTypes = $externalTypes;
+        return $this;
+    }
+
+    public function getQueryBuilder(): Builder
+    {
+        $queryBuilder = Capsule::table($this->dao->table . ' as deia_responses')
+            ->select(['deia_responses.*']);
+
+        if (isset($this->questionIds)) {
+            $queryBuilder->whereIn('deia_responses.deia_question_id', $this->questionIds);
+        }
+
+        if (isset($this->userIds)) {
+            $queryBuilder->whereIn('deia_responses.user_id', $this->userIds);
+        }
+
+        if (isset($this->contextIds)) {
+            $queryBuilder->whereIn('deia_responses.deia_question_id', function ($q) {
+                $q->select('dq.deia_question_id')
+                    ->from('deia_questions', 'dq')
+                    ->whereIn('dq.context_id', $this->contextIds);
+            });
+        }
+
+        if (isset($this->externalIds)) {
+            $queryBuilder->whereIn('deia_responses.external_id', $this->externalIds);
+        }
+
+        if (isset($this->externalTypes)) {
+            $queryBuilder->whereIn('deia_responses.external_type', $this->externalTypes);
+        }
+
+        return $queryBuilder;
+    }
+
+    public function getCount(): int
+    {
+        return $this->dao->getCount($this);
+    }
+
+    public function getIds(): Collection
+    {
+        return $this->dao->getIds($this);
+    }
+
+    public function getMany(): LazyCollection
+    {
+        return $this->dao->getMany($this);
+    }
+}

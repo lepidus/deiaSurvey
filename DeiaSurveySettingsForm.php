@@ -39,7 +39,7 @@ class DeiaSurveySettingsForm extends \Form
 
     public function __construct($plugin, $contextId)
     {
-        parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
+        parent::__construct($plugin->getTemplateResource('settings/form.tpl'));
 
         $this->contextId = $contextId;
         $this->plugin = $plugin;

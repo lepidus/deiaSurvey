@@ -8,41 +8,43 @@
 <h3 id="deiaSurveyTitle">
 	{translate key="plugins.generic.deiaSurvey.questionnairePage.index.title"}
 </h3>
-{if is_null($demographicDataConsent) && $userConsentSetting}
-	<div id="demographicAlreadyAnsweredMessage" class="pkp_notification">
+{if is_null($deiaDataConsent) && $userConsentSetting}
+	<div id="deiaAlreadyAnsweredMessage" class="pkp_notification">
 		{capture assign="content"}
 			{translate key="plugins.generic.deiaSurvey.alreadyAnswered.{$applicationName}" contextName=$userConsentSetting[0]['contextName']}
 		{/capture}
 		{include
 			file="controllers/notification/inPlaceNotificationContent.tpl"
-			notificationId="demographicAlreadyAnsweredMessage-"|uniqid
+			notificationId="deiaAlreadyAnsweredMessage-"|uniqid
 			notificationStyleClass="notifySuccess"
 			notificationContents=$content
 		}
 	</div>
 {/if}
-<form class="pkp_form" id="deiaSurveyForm" method="post" action="{url op="saveDemographicData"}" enctype="multipart/form-data">
+<form class="pkp_form" id="deiaSurveyForm" method="post" action="{url op="saveDeiaData"}" enctype="multipart/form-data">
 	{csrf}
 
 	{fbvFormSection list="false" label='plugins.generic.deiaSurvey.consent' description='plugins.generic.deiaSurvey.consent.description' required=true}
-		{if is_null($demographicDataConsent)}
+		{if is_null($deiaDataConsent)}
 			{assign var=checkedConsentYes value=false}
 			{assign var=checkedConsentNo value=false}
 		{else}
-			{assign var=checkedConsentYes value=$demographicDataConsent}
-			{assign var=checkedConsentNo value=!$demographicDataConsent}
+			{assign var=checkedConsentYes value=$deiaDataConsent}
+			{assign var=checkedConsentNo value=!$deiaDataConsent}
 		{/if}
-		{fbvElement type="radio" id="demographicDataConsentYes" name="demographicDataConsent" value=1 checked=$checkedConsentYes required=true label="plugins.generic.deiaSurvey.consent.yes"}
-		{fbvElement type="radio" id="demographicDataConsentNo" name="demographicDataConsent" value=0 checked=$checkedConsentNo required=true label="plugins.generic.deiaSurvey.consent.no"}
+		{fbvElement type="radio" id="deiaDataConsentYes" name="deiaDataConsent" value=1 checked=$checkedConsentYes required=true label="plugins.generic.deiaSurvey.consent.yes"}
+		{fbvElement type="radio" id="deiaDataConsentNo" name="deiaDataConsent" value=0 checked=$checkedConsentNo required=true label="plugins.generic.deiaSurvey.consent.no"}
 	{/fbvFormSection}
 
-	{fbvFormArea id="demographicQuestion"}
-		<div id="Hello" name="questions">
-			{foreach $questions as $question}
-				{include file="../../../plugins/generic/deiaSurvey/templates/question.tpl" question=$question}
-			{/foreach}
-		</div>
-    {/fbvFormArea}
+	{foreach $questionBlocks as $questionBlock}
+		{fbvFormArea id="questionBlock_"|concat:$questionBlock['id'] title=$questionBlock['title'] translate=false}
+			{fbvFormSection	description=$questionBlock['description'] translate=false}
+				{foreach $questionBlock['questions'] as $question}
+					{include file="../../../plugins/generic/deiaSurvey/templates/question.tpl" question=$question}
+				{/foreach}
+			{/fbvFormSection}
+		{/fbvFormArea}
+	{/foreach}
 
 	<p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 
@@ -51,7 +53,7 @@
 
 <script>
 	function setRequirementOnQuestions(required){ldelim}
-		let questions = document.querySelectorAll('[id^="demographicResponses"]');
+		let questions = document.querySelectorAll('[id^="deiaResponses"]');
 		let reqSymbols = document.querySelectorAll('span.req');
 		let reqErrorMessages = document.querySelectorAll('label.error');
 
@@ -74,29 +76,29 @@
 	{rdelim}
 	
 	$(document).ready(function () {ldelim}
-		let demographicDataConsentYes = document.getElementById('demographicDataConsentYes');
-		let demographicDataConsentNo = document.getElementById('demographicDataConsentNo');
+		let deiaDataConsentYes = document.getElementById('deiaDataConsentYes');
+		let deiaDataConsentNo = document.getElementById('deiaDataConsentNo');
 
-		{if !is_null($demographicDataConsent) || is_null($userConsentSetting)}
-			demographicDataConsentYes.addEventListener('change', (event) => {ldelim}
+		{if !is_null($deiaDataConsent) || is_null($userConsentSetting)}
+			deiaDataConsentYes.addEventListener('change', (event) => {ldelim}
 				if (event.currentTarget.checked) {ldelim}
 					setRequirementOnQuestions(true);
 				{rdelim}
 			{rdelim});
 
-			demographicDataConsentNo.addEventListener('change', (event) => {ldelim}
+			deiaDataConsentNo.addEventListener('change', (event) => {ldelim}
 				if (event.currentTarget.checked) {ldelim}
 					setRequirementOnQuestions(false);
 				{rdelim}
 			{rdelim});
 
-			if (demographicDataConsentNo.checked) {ldelim}
+			if (deiaDataConsentNo.checked) {ldelim}
 				setRequirementOnQuestions(false);
 			{rdelim}
 		{else}
 			setRequirementOnQuestions(false);
-			demographicDataConsentYes.disabled = true;
-			demographicDataConsentNo.disabled = true;
+			deiaDataConsentYes.disabled = true;
+			deiaDataConsentNo.disabled = true;
 		{/if}
 	{rdelim});
 </script>

@@ -15,8 +15,16 @@
         {csrf}
 
         <fieldset class="fields">
-            {foreach $questions as $question}
-                {include file="../../../plugins/generic/deiaSurvey/templates/questionnairePage/question.tpl" question=$question}
+            {foreach $questionBlocks as $questionBlock}
+                <section class="questionBlock">
+                    <h2>{$questionBlock['title']|escape}</h2>
+                    {if $questionBlock['description']}
+                        <p>{$questionBlock['description']|strip_unsafe_html}</p>
+                    {/if}
+                    {foreach $questionBlock['questions'] as $question}
+                        {include file="../../../plugins/generic/deiaSurvey/templates/questionnairePage/question.tpl" question=$question}
+                    {/foreach}
+                </section>
             {/foreach}
         </fieldset>
 
@@ -25,7 +33,7 @@
         </p>
 
         <div class="buttons">
-            <button id="submitDemographicQuestionnaire" class="submit" type="submit">
+            <button id="submitDeiaQuestionnaire" class="submit" type="submit">
                 {translate key="common.save"}
             </button>
         </div>

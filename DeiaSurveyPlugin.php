@@ -5,10 +5,10 @@ require_once('autoload.php');
 use PKP\plugins\GenericPlugin;
 use Illuminate\Database\Migrations\Migration;
 use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\plugins\generic\deiaSurvey\DeiaSurveySettingsForm;
 use APP\plugins\generic\deiaSurvey\report\DeiaSurveyReportPlugin;
@@ -22,7 +22,7 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
         if ($success && $this->getEnabled() && $encrypter->secretConfigExists()) {
             HookRegistry::register('Request::redirect', [$this, 'redirectUserAfterLogin']);
-            HookRegistry::register('LoadComponentHandler', [$this, 'setupTabHandler']);
+            HookRegistry::register('LoadComponentHandler', [$this, 'setupHandlers']);
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
             HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
             HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
@@ -57,9 +57,10 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
     private function registerHooksForCustomSchemas()
     {
-        HookRegistry::register('Schema::get::demographicQuestion', [$this, 'addCustomSchema']);
-        HookRegistry::register('Schema::get::demographicResponse', [$this, 'addCustomSchema']);
-        HookRegistry::register('Schema::get::demographicResponseOption', [$this, 'addCustomSchema']);
+        HookRegistry::register('Schema::get::deiaQuestionBlock', [$this, 'addCustomSchema']);
+        HookRegistry::register('Schema::get::deiaQuestion', [$this, 'addCustomSchema']);
+        HookRegistry::register('Schema::get::deiaResponse', [$this, 'addCustomSchema']);
+        HookRegistry::register('Schema::get::deiaResponseOption', [$this, 'addCustomSchema']);
     }
 
     public function getInstallEmailTemplatesFile()
@@ -118,12 +119,12 @@ class DeiaSurveyPlugin extends \GenericPlugin
     {
         $schema = &$params[0];
 
-        $schema->properties->{'demographicToken'} = (object) [
+        $schema->properties->{'deiaToken'} = (object) [
             'type' => 'string',
             'apiSummary' => true,
             'validation' => ['nullable'],
         ];
-        $schema->properties->{'demographicOrcid'} = (object) [
+        $schema->properties->{'deiaOrcid'} = (object) [
             'type' => 'string',
             'apiSummary' => true,
             'validation' => ['nullable'],
@@ -162,13 +163,17 @@ class DeiaSurveyPlugin extends \GenericPlugin
         return $schema;
     }
 
-    public function setupTabHandler($hookName, $params)
+    public function setupHandlers($hookName, $params)
     {
         $component = &$params[0];
-        if ($component == 'plugins.generic.deiaSurvey.classes.controllers.TabHandler') {
-            return true;
-        }
-        return false;
+        $handledComponents = [
+            'plugins.generic.deiaSurvey.classes.controllers.TabHandler',
+            'plugins.generic.deiaSurvey.classes.controllers.grid.deiaQuestionBlock.DeiaQuestionBlockGridHandler',
+            'plugins.generic.deiaSurvey.classes.controllers.grid.deiaQuestion.DeiaQuestionGridHandler',
+            'plugins.generic.deiaSurvey.classes.controllers.listbuilder.deiaQuestion.'
+                . 'DeiaQuestionResponseOptionListbuilderHandler',
+        ];
+        return in_array($component, $handledComponents, true);
     }
 
     public function addPageHandler($hookName, $params)
@@ -176,8 +181,8 @@ class DeiaSurveyPlugin extends \GenericPlugin
         $page = $params[0];
         $op = $params[1];
 
-        if ($page == 'demographicQuestionnaire') {
-            define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\demographic\QuestionnaireHandler');
+        if ($page == 'deiaQuestionnaire') {
+            define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler');
             return true;
         }
 
@@ -210,8 +215,8 @@ class DeiaSurveyPlugin extends \GenericPlugin
             return false;
         }
 
-        $demographicDataDao = new DemographicDataDAO();
-        $userHasConsent = $demographicDataDao->userHasDemographicConsent($user->getId());
+        $deiaDataDao = new DeiaDataDAO();
+        $userHasConsent = $deiaDataDao->userHasDeiaConsent($user->getId());
 
         return !$userHasConsent && $this->userHasMandatoryFilling($user, $context);
     }
@@ -247,11 +252,12 @@ class DeiaSurveyPlugin extends \GenericPlugin
                             null,
                             'manage',
                             null,
-                            array(
+                            [
                                 'verb' => 'settings',
+                                'method' => 'display',
                                 'plugin' => $this->getName(),
                                 'category' => 'generic'
-                            )
+                            ]
                         ),
                         $this->getDisplayName()
                     ),
@@ -267,31 +273,38 @@ class DeiaSurveyPlugin extends \GenericPlugin
     {
         $context = $request->getContext();
         $contextId = ($context == null) ? 0 : $context->getId();
+        $templateMgr = \TemplateManager::getManager($request);
 
-        switch ($request->getUserVar('verb')) {
-            case 'settings':
-                $templateMgr = \TemplateManager::getManager();
-                $templateMgr->registerPlugin('function', 'plugin_url', array($this, 'smartyPluginUrl'));
-                $apiOptions = [
-                    OrcidClient::ORCID_API_URL_PUBLIC => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.public',
-                    OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.publicSandbox',
-                    OrcidClient::ORCID_API_URL_MEMBER => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.member',
-                    OrcidClient::ORCID_API_URL_MEMBER_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.memberSandbox'
-                ];
-                $templateMgr->assign('orcidApiUrls', $apiOptions);
+        if ($request->getUserVar('verb') == 'settings') {
+            $method = $request->getUserVar('method') ?: 'display';
+            switch ($method) {
+                case 'display':
+                    $templateMgr->assign('pluginName', $this->getName());
+                    return new \JSONMessage(true, $templateMgr->fetch($this->getTemplateResource('settings/index.tpl')));
+                case 'form':
+                    $templateMgr->registerPlugin('function', 'plugin_url', array($this, 'smartyPluginUrl'));
+                    $apiOptions = [
+                        OrcidClient::ORCID_API_URL_PUBLIC => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.public',
+                        OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.publicSandbox',
+                        OrcidClient::ORCID_API_URL_MEMBER => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.member',
+                        OrcidClient::ORCID_API_URL_MEMBER_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.memberSandbox'
+                    ];
+                    $templateMgr->assign('orcidApiUrls', $apiOptions);
 
-                $form = new DeiaSurveySettingsForm($this, $contextId);
-                if ($request->getUserVar('save')) {
-                    $form->readInputData();
-                    if ($form->validate()) {
-                        $form->execute();
-                        return new \JSONMessage(true);
+                    $form = new DeiaSurveySettingsForm($this, $contextId);
+                    if ($request->getUserVar('save')) {
+                        $form->readInputData();
+                        if ($form->validate()) {
+                            $form->execute();
+                            return new \JSONMessage(true);
+                        }
+                    } else {
+                        $form->initData();
                     }
-                } else {
-                    $form->initData();
-                }
-                return new \JSONMessage(true, $form->fetch($request));
+                    return new \JSONMessage(true, $form->fetch($request));
+            }
         }
+
         return parent::manage($args, $request);
     }
 
@@ -308,8 +321,8 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
         if ($userOrcid) {
             $context = \Application::get()->getRequest()->getContext();
-            $demographicDataService = new DemographicDataService();
-            $demographicDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
+            $deiaDataService = new DeiaDataService();
+            $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
         }
     }
 }

@@ -17,12 +17,12 @@ class SiteStatisticsReportFactory
         $contexts = $contextDao->getAll(true);
 
         while ($context = $contexts->next()) {
-            $demographicQuestionsCount = Repo::demographicQuestion()
+            $deiaQuestionsCount = Repo::deiaQuestion()
                 ->getCollector()
                 ->filterByContextIds([$context->getId()])
                 ->getCount();
 
-            if ($demographicQuestionsCount > 0) {
+            if ($deiaQuestionsCount > 0) {
                 $contextStatsFactory = new ContextStatisticsFactory($context->getId());
                 $contextPrintingGuide = $contextStatsFactory->createContextStatsPrintingGuide();
                 $contextStats = $contextStatsFactory->createContextStatistics();

@@ -9,6 +9,7 @@ describe('DEIA Survey - Plugin setup', function () {
 
 		cy.waitJQuery();
 		cy.get('#plugins-button').click();
+		cy.waitJQuery();
 
 		cy.get('input[id^=select-cell-deiasurveyplugin]').check();
 		cy.contains('The plugin "DEIA Survey" has been enabled', {timeout: 15000});
@@ -17,7 +18,7 @@ describe('DEIA Survey - Plugin setup', function () {
 
 		cy.contains('h1', 'Profile');
 		cy.contains('a', 'DEIA Survey').click();
-		cy.get('input[name="demographicDataConsent"][value=0]').click();
+		cy.get('input[name="deiaDataConsent"][value=0]').click();
         cy.get('#deiaSurveyForm .submitFormButton').click();
         cy.wait(1000);
 	});
@@ -28,6 +29,7 @@ describe('DEIA Survey - Plugin setup', function () {
 
 		cy.waitJQuery();
 		cy.get('#plugins-button').click();
+		cy.waitJQuery();
 
 		cy.get('tr#' + orcidPluginRowId + ' a.show_extras').click();
 		cy.get('a[id^=' + orcidPluginRowId + '-settings-button]').click();
@@ -52,6 +54,7 @@ describe('DEIA Survey - Plugin setup', function () {
 
 		cy.waitJQuery();
 		cy.get('#plugins-button').click();
+		cy.waitJQuery();
 		cy.get('tr#' + pluginRowId + ' a.show_extras').click();
 		cy.get('a[id^=' + pluginRowId + '-settings-button]').click();
 

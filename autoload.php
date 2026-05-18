@@ -1,10 +1,12 @@
 <?php
 
 spl_autoload_register(function ($class) {
+    $baseSysDir = defined('BASE_SYS_DIR') ? BASE_SYS_DIR : dirname(__DIR__, 3);
+
     $namespaceMap = [
-        'APP' => dirname(__DIR__, 3) . '/classes',
-        'PKP' => dirname(__DIR__, 3) . '/lib/pkp/classes',
-        'APP\plugins\generic\deiaSurvey' => dirname(__DIR__, 3) . '/plugins/generic/deiaSurvey',
+        'APP\plugins\generic\deiaSurvey' => $baseSysDir . '/plugins/generic/deiaSurvey',
+        'APP' => $baseSysDir . '/classes',
+        'PKP' => $baseSysDir . '/lib/pkp/classes',
     ];
 
     $classPath = str_replace('\\', '/', $class);

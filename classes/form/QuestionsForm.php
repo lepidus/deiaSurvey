@@ -2,9 +2,9 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\form;
 
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
-use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\template\TemplateManager;
 use PKP\form\validation\FormValidatorCSRF;
@@ -27,7 +27,7 @@ class QuestionsForm extends \Form
         }
 
         if ($args) {
-            $this->setData('demographicDataConsent', $args['demographicDataConsent']);
+            $this->setData('deiaDataConsent', $args['deiaDataConsent']);
             $this->loadQuestionResponsesByForm($args);
         }
 
@@ -66,10 +66,10 @@ class QuestionsForm extends \Form
         $context = $this->request->getContext();
         $this->initConsentData($context);
 
-        $demographicDataService  = new DemographicDataService();
-        $questions = $demographicDataService->retrieveAllQuestions($context->getId(), true);
-        $this->setData('questions', $questions);
-        $this->setData('questionTypeConsts', DemographicQuestion::getQuestionTypeConstants());
+        $deiaDataService  = new DeiaDataService();
+        $questionBlocks = $deiaDataService->retrieveQuestionBlocks($context->getId(), true);
+        $this->setData('questionBlocks', $questionBlocks);
+        $this->setData('questionTypeConsts', DeiaQuestion::getQuestionTypeConstants());
 
         parent::initData();
     }
@@ -77,12 +77,12 @@ class QuestionsForm extends \Form
     private function initConsentData($context)
     {
         $user = $this->request->getUser();
-        $demographicDataDao = new DemographicDataDAO();
+        $deiaDataDao = new DeiaDataDAO();
 
-        $userConsent = $demographicDataDao->getDemographicConsentOption($context->getId(), $user->getId());
-        $this->setData('demographicDataConsent', $userConsent);
+        $userConsent = $deiaDataDao->getDeiaConsentOption($context->getId(), $user->getId());
+        $this->setData('deiaDataConsent', $userConsent);
 
-        $userConsentSetting = $demographicDataDao->getConsentSetting($user->getId());
+        $userConsentSetting = $deiaDataDao->getConsentSetting($user->getId());
         if (!is_null($userConsentSetting)) {
             $contextDao = \DAORegistry::getDAO('JournalDAO');
             $userConsentSetting = array_map(function ($contextConsent) use ($contextDao) {
@@ -96,13 +96,13 @@ class QuestionsForm extends \Form
 
     public function validate($callHooks = true)
     {
-        $dataConsentOption = $this->getData('demographicDataConsent');
+        $dataConsentOption = $this->getData('deiaDataConsent');
 
-        $demographicDataDao = new DemographicDataDAO();
+        $deiaDataDao = new DeiaDataDAO();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
-        $userConsentSetting = $demographicDataDao->getConsentSetting($user->getId());
-        $previousConsentOption = $demographicDataDao->getDemographicConsentOption($context->getId(), $user->getId());
+        $userConsentSetting = $deiaDataDao->getConsentSetting($user->getId());
+        $previousConsentOption = $deiaDataDao->getDeiaConsentOption($context->getId(), $user->getId());
 
         if (!is_null($userConsentSetting) && is_null($previousConsentOption)) {
             return false;
@@ -125,19 +125,19 @@ class QuestionsForm extends \Form
 
     public function execute(...$functionArgs)
     {
-        $demographicDataDao = new DemographicDataDAO();
-        $demographicDataService  = new DemographicDataService();
+        $deiaDataDao = new DeiaDataDAO();
+        $deiaDataService  = new DeiaDataService();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
-        $previousConsent = $demographicDataDao->getDemographicConsentOption($context->getId(), $user->getId());
-        $newConsent = $this->getData('demographicDataConsent');
+        $previousConsent = $deiaDataDao->getDeiaConsentOption($context->getId(), $user->getId());
+        $newConsent = $this->getData('deiaDataConsent');
 
-        $demographicDataDao->updateDemographicConsent($context->getId(), $user->getId(), $newConsent);
+        $deiaDataDao->updateDeiaConsent($context->getId(), $user->getId(), $newConsent);
 
         if ($newConsent == '1') {
-            $demographicDataService->registerUserResponses($user->getId(), $this->getData('responses'), $this->getData('responseOptionsInputs'));
+            $deiaDataService->registerUserResponses($user->getId(), $this->getData('responses'), $this->getData('responseOptionsInputs'));
         } elseif ($newConsent == '0' && $previousConsent) {
-            $demographicDataService->deleteUserResponses($user->getId(), $context->getId());
+            $deiaDataService->deleteUserResponses($user->getId(), $context->getId());
         }
 
         parent::execute(...$functionArgs);

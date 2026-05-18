@@ -1,0 +1,38 @@
+{
+    "title": "DEIA Question",
+    "description": "A question regarding the user's DEIA information",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "contextId": {
+            "type": "integer"
+        },
+        "questionBlockId": {
+            "type": "integer"
+        },
+        "sequence": {
+            "type": "integer",
+            "default": 0,
+            "validation": [
+                "nullable"
+            ]
+        },
+        "questionType": {
+            "type": "integer"
+        },
+        "isTranslated": {
+            "type": "boolean"
+        },
+        "isDefaultQuestion": {
+            "type": "boolean"
+        },
+        "questionText": {
+            "type": "string"
+        }, 
+        "questionDescription": {
+            "type": "string"
+        }
+    }
+}
