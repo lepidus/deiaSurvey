@@ -25,7 +25,7 @@
         {translate key="plugins.generic.deiaSurvey.questionnairePage.dataMigration.{$authorExternalType}" externalId=$authorExternalId}
     </p>
 
-    <a id="deleteDemographicData" href="{url op="deleteData" authorId=$authorId authorToken=$authorToken}">
+    <a id="deleteDeiaData" href="{url op="deleteData" authorId=$authorId authorToken=$authorToken}">
         {translate key="plugins.generic.deiaSurvey.questionnairePage.deleteMyData"}
     </a>
 </div>

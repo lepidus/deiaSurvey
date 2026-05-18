@@ -6,11 +6,11 @@ use PKP\plugins\Hook;
 use APP\core\Application;
 use APP\decision\Decision;
 use Illuminate\Support\Facades\Event;
-use APP\plugins\generic\deiaSurvey\classes\dispatchers\DemographicDataDispatcher;
+use APP\plugins\generic\deiaSurvey\classes\dispatchers\DeiaDataDispatcher;
 use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
 use APP\plugins\generic\deiaSurvey\classes\observers\listeners\RequestDataCollectionOnSubmission;
 
-class DataCollectionDispatcher extends DemographicDataDispatcher
+class DataCollectionDispatcher extends DeiaDataDispatcher
 {
     protected function registerHooks(): void
     {

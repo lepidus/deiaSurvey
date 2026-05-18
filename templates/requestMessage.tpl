@@ -1,8 +1,8 @@
-<div id="demographicRequestMessage" class="pkp_notification" style="background-color: white;">
+<div id="deiaRequestMessage" class="pkp_notification" style="background-color: white;">
     {assign var="content" value="plugins.generic.deiaSurvey.requestMessage"}
     {include
         file="controllers/notification/inPlaceNotificationContent.tpl"
-        notificationId="demographicRequestMessage-"|uniqid
+        notificationId="deiaRequestMessage-"|uniqid
         notificationStyleClass="notifyWarning"
         notificationTitle="common.warning"|translate
         notificationContents=$content|translate

@@ -82,7 +82,7 @@ Cypress.Commands.add('answerDefaultQuestionsOnProfile', function(questions) {
 
 Cypress.Commands.add('assertResponsesToDefaultQuestions', function(questions) {
     cy.contains('a', 'DEIA Survey').click();
-    cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
+    cy.get('input[name="deiaDataConsent"][value=1]').should('be.checked');
     
     for (const question of questions) {
         cy.contains('label', question['title']).parent().within(() => {

@@ -5,7 +5,7 @@ namespace APP\plugins\generic\deiaSurvey\classes\observers\listeners;
 use Illuminate\Events\Dispatcher;
 use PKP\observers\events\UserRegisteredContext;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 
 class MigrateResponsesOnRegistration
 {
@@ -22,7 +22,7 @@ class MigrateResponsesOnRegistration
         $user = $event->recipient;
         $context = $event->context;
 
-        $demographicDataService = new DemographicDataService();
-        $demographicDataService->migrateResponsesByUserIdentifier($context, $user, 'email');
+        $deiaDataService = new DeiaDataService();
+        $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'email');
     }
 }

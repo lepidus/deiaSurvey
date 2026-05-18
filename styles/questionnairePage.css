@@ -61,7 +61,7 @@
     padding-left: 0.75em;
 }
 
-#submitDemographicQuestionnaire {
+#submitDeiaQuestionnaire {
     cursor: pointer;
     padding: 0 1em;
     background: #eee;
@@ -76,7 +76,7 @@
     color: #006798;
 }
 
-#deleteDemographicData {
+#deleteDeiaData {
     display: inline-block;
     padding: 0 1em;
     background: #eee;

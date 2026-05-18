@@ -16,7 +16,7 @@ class TabHandler extends Handler
         return new JSONMessage(true, $form->fetch($request));
     }
 
-    public function saveDemographicData($args, $request)
+    public function saveDeiaData($args, $request)
     {
         $form = new QuestionsForm($request, $args);
         if ($form->validate()) {

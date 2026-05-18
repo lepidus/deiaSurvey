@@ -1,0 +1,43 @@
+{
+    "title": "Deia Response",
+    "description": "The response of deia question",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "readOnly": true
+      },
+      "deiaQuestionId": {
+        "type": "integer"
+      },
+      "userId": {
+        "type": "integer",
+        "validation": [
+          "nullable"
+        ]
+      },
+      "externalId": {
+        "type": "string",
+        "validation": [
+          "nullable"
+        ]
+      },
+      "externalType": {
+        "type": "string",
+        "validation": [
+          "nullable"
+        ]
+      },
+      "responseValue": {
+        "type": "string",
+        "validation": [
+          "nullable"
+        ]
+      },
+      "optionsInputValue": {
+        "type": "string",
+        "validation": [
+          "nullable"
+        ]
+      }
+    }
+}

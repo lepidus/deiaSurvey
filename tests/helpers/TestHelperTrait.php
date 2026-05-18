@@ -10,8 +10,8 @@ use PKP\core\Dispatcher;
 use PKP\core\Registry;
 use PKP\plugins\Hook;
 use APP\plugins\generic\deiaSurvey\DeiaSurveyPlugin;
-use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
-use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\Repository as DemographicQuestionRepository;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\Repository as DeiaQuestionRepository;
 
 trait TestHelperTrait
 {
@@ -23,51 +23,51 @@ trait TestHelperTrait
     private const TEST_OPTION_TEXT = 'plugins.generic.deiaSurvey.defaultQuestion.gender.responseOption.woman';
     private const TEST_UPDATED_OPTION_TEXT = 'plugins.generic.deiaSurvey.defaultQuestion.gender.responseOption.man';
 
-    private function createDemographicQuestion()
+    private function createDeiaQuestion()
     {
         $questionData = [
             'contextId' => $this->createJournalMock(),
             'questionText' => self::TEST_QUESTION_TEXT,
             'questionDescription' => self::TEST_QUESTION_DESCRIPTION,
-            'questionType' => DemographicQuestion::TYPE_TEXTAREA,
+            'questionType' => DeiaQuestion::TYPE_TEXTAREA,
             'isTranslated' => false
         ];
 
-        $repository = app(DemographicQuestionRepository::class);
-        $demographicQuestion = $repository->newDataObject($questionData);
-        return $repository->add($demographicQuestion);
+        $repository = app(DeiaQuestionRepository::class);
+        $deiaQuestion = $repository->newDataObject($questionData);
+        return $repository->add($deiaQuestion);
     }
 
-    private function createDemographicResponseOptionObject()
+    private function createDeiaResponseOptionObject()
     {
         $responseOptionData = [
-            'demographicQuestionId' => $this->demographicQuestionId,
+            'deiaQuestionId' => $this->deiaQuestionId,
             'optionText' => self::TEST_OPTION_TEXT,
             'isTranslated' => false,
             'hasInputField' => true,
         ];
 
-        $demographicResponseOption = $this->demographicResponseOptionDAO->newDataObject();
-        $demographicResponseOption->setAllData($responseOptionData);
+        $deiaResponseOption = $this->deiaResponseOptionDAO->newDataObject();
+        $deiaResponseOption->setAllData($responseOptionData);
 
-        return $demographicResponseOption;
+        return $deiaResponseOption;
     }
 
-    private function createDemographicResponseObject($externalAuthor = false)
+    private function createDeiaResponseObject($externalAuthor = false)
     {
-        $demographicResponse = $this->demographicResponseDAO->newDataObject();
-        $demographicResponse->setDemographicQuestionId($this->demographicQuestionId);
-        $demographicResponse->setValue([self::DEFAULT_LOCALE => 'Test text']);
-        $demographicResponse->setOptionsInputValue([45 => 'Aditional information for response option']);
+        $deiaResponse = $this->deiaResponseDAO->newDataObject();
+        $deiaResponse->setDeiaQuestionId($this->deiaQuestionId);
+        $deiaResponse->setValue([self::DEFAULT_LOCALE => 'Test text']);
+        $deiaResponse->setOptionsInputValue([45 => 'Aditional information for response option']);
 
         if ($externalAuthor) {
-            $demographicResponse->setExternalId('external.author@lepidus.com.br');
-            $demographicResponse->setExternalType('email');
+            $deiaResponse->setExternalId('external.author@lepidus.com.br');
+            $deiaResponse->setExternalType('email');
         } else {
-            $demographicResponse->setUserId($this->createUserMock());
+            $deiaResponse->setUserId($this->createUserMock());
         }
 
-        return $demographicResponse;
+        return $deiaResponse;
     }
 
     private function createJournalMock()

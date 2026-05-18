@@ -136,7 +136,7 @@ describe('DEIA Survey - Multiple contexts', function () {
         cy.contains('h1', 'Profile');
         cy.contains('We request that you fill in the DEIA survey on the "DEIA Survey" tab of your profile page');
         cy.assertDefaultQuestionsDisplay('profilePage');
-        cy.get('input[name="demographicDataConsent"][value=1]').click();
+        cy.get('input[name="deiaDataConsent"][value=1]').click();
         cy.answerDefaultQuestionsOnProfile(sberardoAnswers);
         cy.reload();
         cy.get('span:contains("We request that you fill in the DEIA survey")').should('not.exist');

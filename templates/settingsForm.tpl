@@ -3,7 +3,7 @@
  *
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * Demographic Data plugin settings
+ * Deia Data plugin settings
  *
 *}
 
