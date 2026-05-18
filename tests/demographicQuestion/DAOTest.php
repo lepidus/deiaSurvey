@@ -40,8 +40,8 @@ class DAOTest extends DatabaseTestCase
         $demographicQuestion->setQuestionType(DemographicQuestion::TYPE_RADIO_BUTTONS);
         $demographicQuestion->setIsTranslated(false);
         $demographicQuestion->setIsDefaultQuestion(true);
-        $demographicQuestion->setQuestionText('plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title');
-        $demographicQuestion->setQuestionDescription('plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.description');
+        $demographicQuestion->setQuestionText(self::TEST_QUESTION_TEXT);
+        $demographicQuestion->setQuestionDescription(self::TEST_QUESTION_DESCRIPTION);
 
         return $demographicQuestion;
     }
@@ -68,8 +68,8 @@ class DAOTest extends DatabaseTestCase
             'questionType' => DemographicQuestion::TYPE_RADIO_BUTTONS,
             'isTranslated' => false,
             'isDefaultQuestion' => true,
-            'questionText' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title',
-            'questionDescription' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.description'
+            'questionText' => self::TEST_QUESTION_TEXT,
+            'questionDescription' => self::TEST_QUESTION_DESCRIPTION
         ], $fetchedDemographicQuestion->_data);
     }
 
@@ -123,8 +123,10 @@ class DAOTest extends DatabaseTestCase
             $this->contextId
         );
 
-        $fetchedDemographicQuestion->setQuestionText('plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.updatedTitle');
-        $fetchedDemographicQuestion->setQuestionDescription('plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.updatedDescription');
+        $this->initializeRequestRouter();
+        $this->initializePluginLocaleData();
+        $fetchedDemographicQuestion->setQuestionText(self::TEST_UPDATED_QUESTION_TEXT);
+        $fetchedDemographicQuestion->setQuestionDescription(self::TEST_UPDATED_QUESTION_DESCRIPTION);
         $this->demographicQuestionDAO->update($fetchedDemographicQuestion);
 
         $fetchedDemographicQuestionEdited = $this->demographicQuestionDAO->get(
@@ -134,7 +136,7 @@ class DAOTest extends DatabaseTestCase
 
         self::assertEquals(
             $fetchedDemographicQuestionEdited->getLocalizedQuestionText(),
-            __('plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.updatedTitle')
+            __(self::TEST_UPDATED_QUESTION_TEXT)
         );
     }
 }

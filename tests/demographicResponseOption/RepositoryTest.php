@@ -33,7 +33,7 @@ class RepositoryTest extends DatabaseTestCase
         $this->demographicQuestionId = $this->createDemographicQuestion();
         $this->params = [
             'demographicQuestionId' => $this->demographicQuestionId,
-            'optionText' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleResponseOption.text',
+            'optionText' => self::TEST_OPTION_TEXT,
             'isTranslated' => false,
             'hasInputField' => true,
         ];
@@ -58,7 +58,7 @@ class RepositoryTest extends DatabaseTestCase
         $fetchedResponseOption = $repository->get($insertedResponseOptionId);
         self::assertEquals($this->params, $fetchedResponseOption->getAllData());
 
-        $this->params['optionText'] = 'plugins.generic.deiaSurvey.demographicQuestion.exampleResponseOption.updatedText';
+        $this->params['optionText'] = self::TEST_UPDATED_OPTION_TEXT;
         $repository->edit($responseOption, $this->params);
 
         $fetchedResponseOption = $repository->get($responseOption->getId());

@@ -55,7 +55,7 @@ class DAOTest extends DatabaseTestCase
         self::assertEquals([
             'id' => $insertedObjectId,
             'demographicQuestionId' => $this->demographicQuestionId,
-            'optionText' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleResponseOption.text',
+            'optionText' => self::TEST_OPTION_TEXT,
             'isTranslated' => false,
             'hasInputField' => true,
         ], $fetchedDemographicResponseOption->getAllData());
@@ -93,7 +93,7 @@ class DAOTest extends DatabaseTestCase
             $this->demographicQuestionId
         );
         $fetchedDemographicResponseOption->setOptionText(
-            'plugins.generic.deiaSurvey.demographicQuestion.exampleResponseOption.updatedText'
+            self::TEST_UPDATED_OPTION_TEXT
         );
 
         $this->demographicResponseOptionDAO->update($fetchedDemographicResponseOption);
@@ -105,7 +105,7 @@ class DAOTest extends DatabaseTestCase
 
         self::assertEquals(
             $editedResponseOption->getData('optionText'),
-            'plugins.generic.deiaSurvey.demographicQuestion.exampleResponseOption.updatedText'
+            self::TEST_UPDATED_OPTION_TEXT
         );
     }
 

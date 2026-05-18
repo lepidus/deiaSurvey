@@ -3,21 +3,32 @@
 namespace APP\plugins\generic\deiaSurvey\tests\helpers;
 
 use APP\journal\Journal;
+use APP\core\Application;
+use APP\core\PageRouter;
 use PKP\user\User;
+use PKP\core\Dispatcher;
+use PKP\core\Registry;
 use PKP\plugins\Hook;
+use APP\plugins\generic\deiaSurvey\DeiaSurveyPlugin;
 use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
 use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\Repository as DemographicQuestionRepository;
 
 trait TestHelperTrait
 {
     private const DEFAULT_LOCALE = "en";
+    private const TEST_QUESTION_TEXT = 'plugins.generic.deiaSurvey.defaultQuestion.gender.title';
+    private const TEST_QUESTION_DESCRIPTION = 'plugins.generic.deiaSurvey.defaultQuestion.gender.description';
+    private const TEST_UPDATED_QUESTION_TEXT = 'plugins.generic.deiaSurvey.defaultQuestion.race.title';
+    private const TEST_UPDATED_QUESTION_DESCRIPTION = 'plugins.generic.deiaSurvey.defaultQuestion.race.description';
+    private const TEST_OPTION_TEXT = 'plugins.generic.deiaSurvey.defaultQuestion.gender.responseOption.woman';
+    private const TEST_UPDATED_OPTION_TEXT = 'plugins.generic.deiaSurvey.defaultQuestion.gender.responseOption.man';
 
     private function createDemographicQuestion()
     {
         $questionData = [
             'contextId' => $this->createJournalMock(),
-            'questionText' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title',
-            'questionDescription' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.description',
+            'questionText' => self::TEST_QUESTION_TEXT,
+            'questionDescription' => self::TEST_QUESTION_DESCRIPTION,
             'questionType' => DemographicQuestion::TYPE_TEXTAREA,
             'isTranslated' => false
         ];
@@ -31,7 +42,7 @@ trait TestHelperTrait
     {
         $responseOptionData = [
             'demographicQuestionId' => $this->demographicQuestionId,
-            'optionText' => 'plugins.generic.deiaSurvey.demographicQuestion.exampleResponseOption.text',
+            'optionText' => self::TEST_OPTION_TEXT,
             'isTranslated' => false,
             'hasInputField' => true,
         ];
@@ -115,5 +126,28 @@ trait TestHelperTrait
                 return true;
             }
         );
+    }
+
+    private function initializePluginLocaleData(): void
+    {
+        $plugin = new DeiaSurveyPlugin();
+        $plugin->pluginPath = 'plugins/generic/deiaSurvey';
+        $plugin->addLocaleData();
+    }
+
+    private function initializeRequestRouter(): void
+    {
+        Registry::delete('request');
+        $application = Application::get();
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['PATH_INFO'] = 'index/test-page/test-op';
+        $request = $application->getRequest();
+
+        $router = new PageRouter();
+        $router->setApplication($application);
+        $dispatcher = new Dispatcher();
+        $dispatcher->setApplication($application);
+        $router->setDispatcher($dispatcher);
+        $request->setRouter($router);
     }
 }

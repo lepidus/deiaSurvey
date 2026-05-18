@@ -4,15 +4,20 @@ namespace APP\plugins\generic\deiaSurvey\tests\demographicResponseOption;
 
 use PKP\tests\PKPTestCase;
 use APP\plugins\generic\deiaSurvey\classes\demographicResponseOption\DemographicResponseOption;
+use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 
 class DemographicResponseOptionTest extends PKPTestCase
 {
+    use TestHelperTrait;
+
     private DemographicResponseOption $demographicResponseOption;
 
     protected function setUp(): void
     {
         $this->demographicResponseOption = new DemographicResponseOption();
         parent::setUp();
+        $this->initializeRequestRouter();
+        $this->initializePluginLocaleData();
     }
 
     public function testGetDemographicQuestionId(): void
@@ -47,7 +52,7 @@ class DemographicResponseOptionTest extends PKPTestCase
     {
         $this->demographicResponseOption->setIsTranslated(false);
 
-        $optionTextKey = 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title';
+        $optionTextKey = self::TEST_OPTION_TEXT;
         $expectedResponseOptionText = __($optionTextKey);
         $this->demographicResponseOption->setOptionText($optionTextKey);
         $optionText = $this->demographicResponseOption->getLocalizedOptionText();
@@ -57,7 +62,7 @@ class DemographicResponseOptionTest extends PKPTestCase
 
     public function testGetOptionTextWithNoTranslatedData(): void
     {
-        $optionTextKey = 'plugins.generic.deiaSurvey.demographicQuestion.exampleQuestion.title';
+        $optionTextKey = self::TEST_OPTION_TEXT;
         $expectedResponseOptionText = __($optionTextKey);
         $this->demographicResponseOption->setData('optionText', $optionTextKey);
         $optionText = $this->demographicResponseOption->getLocalizedOptionText();
