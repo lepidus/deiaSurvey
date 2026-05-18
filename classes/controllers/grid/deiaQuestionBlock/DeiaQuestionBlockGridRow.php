@@ -18,32 +18,28 @@ class DeiaQuestionBlockGridRow extends \GridRow
         if (!empty($rowId) && is_numeric($rowId)) {
             $router = $request->getRouter();
 
-            $canEdit = !$element->getActive();
-
-            if ($canEdit) {
-                $this->addAction(
-                    new \LinkAction(
-                        'edit',
-                        new \AjaxModal(
-                            $router->url(
-                                $request,
-                                null,
-                                null,
-                                'editDeiaQuestionBlock',
-                                null,
-                                ['rowId' => $rowId]
-                            ),
-                            __('grid.action.edit'),
-                            'modal_edit',
-                            true
+            $this->addAction(
+                new \LinkAction(
+                    'edit',
+                    new \AjaxModal(
+                        $router->url(
+                            $request,
+                            null,
+                            null,
+                            'editDeiaQuestionBlock',
+                            null,
+                            ['rowId' => $rowId]
                         ),
                         __('grid.action.edit'),
-                        'edit'
-                    )
-                );
-            }
+                        'modal_edit',
+                        true
+                    ),
+                    __('grid.action.edit'),
+                    'edit'
+                )
+            );
 
-            if ($canEdit) {
+            if (!$element->getActive()) {
                 $this->addAction(
                     new \LinkAction(
                         'delete',

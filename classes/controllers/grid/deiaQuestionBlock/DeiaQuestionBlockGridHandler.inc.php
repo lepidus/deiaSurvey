@@ -157,7 +157,7 @@ class DeiaQuestionBlockGridHandler extends \GridHandler
         $templateMgr = \TemplateManager::getManager($request);
         $templateMgr->assign([
             'deiaQuestionBlockId' => $deiaQuestionBlock->getId(),
-            'canEdit' => !$deiaQuestionBlock->getActive()
+            'canEdit' => true
         ]);
 
         return new JSONMessage(
