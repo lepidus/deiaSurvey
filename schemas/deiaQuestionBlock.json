@@ -1,0 +1,37 @@
+{
+    "title": "DEIA Question Block",
+    "description": "A block containing DEIA questions for the user to answer",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "contextId": {
+            "type": "integer"
+        },
+        "title": {
+            "type": "string",
+            "multilingual": true,
+            "validation": [
+                "nullable"
+            ]
+        },
+        "description": {
+            "type": "string",
+            "multilingual": true,
+            "validation": [
+                "nullable"
+            ]
+        },
+        "active": {
+            "type": "boolean"
+        },
+        "sequence": {
+            "type": "integer",
+            "default": 0,
+            "validation": [
+                "nullable"
+            ]
+        }
+    }
+}

@@ -9,6 +9,13 @@
         "deiaQuestionId": {
             "type": "integer"
         },
+        "sequence": {
+            "type": "integer",
+            "default": 0,
+            "validation": [
+                "nullable"
+            ]
+        },
         "optionText": {
             "type": "string"
         }, 

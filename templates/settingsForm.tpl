@@ -15,7 +15,7 @@
 </script>
 
 <link rel="stylesheet" type="text/css" href="/plugins/generic/deiaSurvey/styles/settingsForm.css">
-<form class="pkp_form" id="deiaSurveySettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" save=true}">
+<form class="pkp_form" id="deiaSurveySettingsForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT op="manage" category="generic" plugin=$pluginName verb="settings" method="form" save=true}">
     <div id="deiaSurveySettings">
         <p class="pkpNotification {if $encryptionSecretDefined}pkpNotification--success{else}pkpNotification--warning{/if}">
             {if $encryptionSecretDefined}

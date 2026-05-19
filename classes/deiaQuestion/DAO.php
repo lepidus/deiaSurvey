@@ -2,8 +2,8 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\deiaQuestion;
 
-use PKP\core\EntityDAO;
 use Illuminate\Support\LazyCollection;
+use PKP\core\EntityDAO;
 use PKP\core\traits\EntityWithParent;
 
 class DAO extends EntityDAO
@@ -17,6 +17,8 @@ class DAO extends EntityDAO
     public $primaryTableColumns = [
         'id' => 'deia_question_id',
         'contextId' => 'context_id',
+        'questionBlockId' => 'deia_question_block_id',
+        'sequence' => 'seq',
         'questionType' => 'question_type'
     ];
 

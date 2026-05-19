@@ -9,6 +9,19 @@
         "contextId": {
             "type": "integer"
         },
+        "questionBlockId": {
+            "type": "integer",
+            "validation": [
+                "nullable"
+            ]
+        },
+        "sequence": {
+            "type": "integer",
+            "default": 0,
+            "validation": [
+                "nullable"
+            ]
+        },
         "questionType": {
             "type": "integer"
         },

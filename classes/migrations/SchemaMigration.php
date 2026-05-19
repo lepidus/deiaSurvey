@@ -2,10 +2,10 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\migrations;
 
+use APP\core\Application;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use APP\core\Application;
 
 class SchemaMigration extends Migration
 {
@@ -13,10 +13,55 @@ class SchemaMigration extends Migration
     {
         $applicationName = Application::get()->getName();
 
+        if (!Schema::hasTable('deia_question_blocks')) {
+            Schema::create('deia_question_blocks', function (Blueprint $table) use ($applicationName) {
+                $table->bigInteger('deia_question_block_id')->autoIncrement();
+                $table->bigInteger('context_id');
+                $table->float('seq', 8, 2)->nullable();
+                $table->smallInteger('is_active')->nullable();
+
+                if ($applicationName == 'ojs2') {
+                    $table->foreign('context_id')
+                        ->references('journal_id')
+                        ->on('journals')
+                        ->onDelete('cascade');
+                } elseif ($applicationName == 'ops') {
+                    $table->foreign('context_id')
+                        ->references('server_id')
+                        ->on('servers')
+                        ->onDelete('cascade');
+                }
+
+                $table->index(['context_id'], 'deia_question_blocks_context_id');
+            });
+        }
+
+        if (!Schema::hasTable('deia_question_block_settings')) {
+            Schema::create('deia_question_block_settings', function (Blueprint $table) {
+                $table->bigIncrements('deia_question_block_setting_id');
+                $table->bigInteger('deia_question_block_id');
+                $table->string('locale', 14)->default('');
+                $table->string('setting_name', 255);
+                $table->longText('setting_value')->nullable();
+
+                $table->foreign('deia_question_block_id')
+                    ->references('deia_question_block_id')
+                    ->on('deia_question_blocks')
+                    ->onDelete('cascade');
+                $table->index(['deia_question_block_id'], 'deia_question_block_settings_id');
+                $table->unique(
+                    ['deia_question_block_id', 'locale', 'setting_name'],
+                    'deia_question_block_settings_pkey'
+                );
+            });
+        }
+
         if (!Schema::hasTable('deia_questions')) {
             Schema::create('deia_questions', function (Blueprint $table) use ($applicationName) {
                 $table->bigInteger('deia_question_id')->autoIncrement();
                 $table->bigInteger('context_id');
+                $table->bigInteger('deia_question_block_id')->nullable();
+                $table->float('seq', 8, 2)->nullable();
                 $table->bigInteger('question_type');
 
                 if ($applicationName == 'ojs2') {
@@ -32,6 +77,11 @@ class SchemaMigration extends Migration
                 }
 
                 $table->index(['context_id'], 'deia_questions_context_id');
+                $table->foreign('deia_question_block_id')
+                    ->references('deia_question_block_id')
+                    ->on('deia_question_blocks')
+                    ->onDelete('cascade');
+                $table->index(['deia_question_block_id'], 'deia_questions_block_id');
             });
         }
 
@@ -56,6 +106,7 @@ class SchemaMigration extends Migration
             Schema::create('deia_response_options', function (Blueprint $table) {
                 $table->bigInteger('deia_response_option_id')->autoIncrement();
                 $table->bigInteger('deia_question_id');
+                $table->float('seq', 8, 2)->nullable();
 
                 $table->foreign('deia_question_id')
                     ->references('deia_question_id')

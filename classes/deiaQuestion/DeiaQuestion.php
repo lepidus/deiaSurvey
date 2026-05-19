@@ -48,6 +48,26 @@ class DeiaQuestion extends \PKP\core\DataObject
         $this->setData('questionType', $questionType);
     }
 
+    public function getQuestionBlockId(): ?int
+    {
+        return $this->getData('questionBlockId');
+    }
+
+    public function setQuestionBlockId(?int $questionBlockId): void
+    {
+        $this->setData('questionBlockId', $questionBlockId);
+    }
+
+    public function getSequence(): ?int
+    {
+        return $this->getData('sequence');
+    }
+
+    public function setSequence(?int $sequence): void
+    {
+        $this->setData('sequence', $sequence);
+    }
+
     public function getQuestionInputType(): string
     {
         $mapTypeInput = [

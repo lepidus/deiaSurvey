@@ -2,8 +2,8 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\deiaResponseOption;
 
-use PKP\core\EntityDAO;
 use Illuminate\Support\LazyCollection;
+use PKP\core\EntityDAO;
 use PKP\core\traits\EntityWithParent;
 
 class DAO extends EntityDAO
@@ -17,6 +17,7 @@ class DAO extends EntityDAO
     public $primaryTableColumns = [
         'id' => 'deia_response_option_id',
         'deiaQuestionId' => 'deia_question_id',
+        'sequence' => 'seq',
     ];
 
     public function getParentColumn(): string

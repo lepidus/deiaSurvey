@@ -270,3 +270,39 @@ msgstr "Usuarios que consintieron"
 
 msgid "plugins.generic.deiaSurvey.report.usersWhoDidNotConsent"
 msgstr "Usuarios que no consintieron"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks"
+msgstr "Bloques de Preguntas"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.create"
+msgstr "Crear Bloque de Preguntas"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.title"
+msgstr "Título"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.description"
+msgstr "Descripción"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.active"
+msgstr "Activo"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.noneCreated"
+msgstr "No hay bloques de preguntas creados."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmActivate"
+msgstr "¿Está seguro de que desea activar este bloque de preguntas?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmDeactivate"
+msgstr "¿Está seguro de que desea desactivar este bloque de preguntas?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmDelete"
+msgstr "¿Está seguro de que desea eliminar este bloque de preguntas?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.form.titleRequired"
+msgstr "Se requiere un título para el bloque de preguntas."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.defaultTitle"
+msgstr "Preguntas SciELO"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.defaultDescription"
+msgstr ""
