@@ -36,13 +36,15 @@
 		{fbvElement type="radio" id="deiaDataConsentNo" name="deiaDataConsent" value=0 checked=$checkedConsentNo required=true label="plugins.generic.deiaSurvey.consent.no"}
 	{/fbvFormSection}
 
-	{fbvFormArea id="deiaQuestion"}
-		<div id="Hello" name="questions">
-			{foreach $questions as $question}
-				{include file="../../../plugins/generic/deiaSurvey/templates/question.tpl" question=$question}
-			{/foreach}
-		</div>
-    {/fbvFormArea}
+	{foreach $questionBlocks as $questionBlock}
+		{fbvFormArea id="questionBlock_"|concat:$questionBlock['id'] title=$questionBlock['title'] translate=false}
+			{fbvFormSection	description=$questionBlock['description'] translate=false}
+				{foreach $questionBlock['questions'] as $question}
+					{include file="../../../plugins/generic/deiaSurvey/templates/question.tpl" question=$question}
+				{/foreach}
+			{/fbvFormSection}
+		{/fbvFormArea}
+	{/foreach}
 
 	<p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 

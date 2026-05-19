@@ -3,14 +3,13 @@
 namespace APP\plugins\generic\deiaSurvey\classes\form;
 
 use APP\core\Application;
-use APP\template\TemplateManager;
-use PKP\form\Form;
-use PKP\plugins\PluginRegistry;
-use PKP\db\DAORegistry;
-use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
-use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
+use APP\template\TemplateManager;
+use PKP\db\DAORegistry;
+use PKP\form\Form;
+use PKP\plugins\PluginRegistry;
 
 class QuestionsForm extends Form
 {
@@ -66,9 +65,8 @@ class QuestionsForm extends Form
         $context = $this->request->getContext();
         $this->initConsentData($context, $applicationName);
 
-        $deiaDataService  = new DeiaDataService();
-        $questions = $deiaDataService->retrieveAllQuestions($context->getId(), true);
-        $this->setData('questions', $questions);
+        $deiaDataService = new DeiaDataService();
+        $this->setData('questionBlocks', $deiaDataService->retrieveQuestionBlocks($context->getId(), true));
         $this->setData('questionTypeConsts', DeiaQuestion::getQuestionTypeConstants());
 
         parent::initData();
@@ -127,7 +125,7 @@ class QuestionsForm extends Form
     public function execute(...$functionArgs)
     {
         $deiaDataDao = new DeiaDataDAO();
-        $deiaDataService  = new DeiaDataService();
+        $deiaDataService = new DeiaDataService();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
         $previousConsent = $deiaDataDao->getDeiaConsentOption($context->getId(), $user->getId());
