@@ -2,10 +2,10 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\deiaResponseOption;
 
-use PKP\tests\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\DeiaResponseOption;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\Repository;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
+use PKP\tests\DatabaseTestCase;
 
 class RepositoryTest extends DatabaseTestCase
 {
@@ -36,6 +36,7 @@ class RepositoryTest extends DatabaseTestCase
             'optionText' => self::TEST_OPTION_TEXT,
             'isTranslated' => false,
             'hasInputField' => true,
+            'sequence' => null,
         ];
     }
 

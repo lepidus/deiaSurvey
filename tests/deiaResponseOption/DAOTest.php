@@ -2,10 +2,10 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\deiaResponseOption;
 
-use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\DeiaResponseOption;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\DAO;
-use PKP\tests\DatabaseTestCase;
+use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\DeiaResponseOption;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
+use PKP\tests\DatabaseTestCase;
 
 class DAOTest extends DatabaseTestCase
 {
@@ -58,6 +58,7 @@ class DAOTest extends DatabaseTestCase
             'optionText' => self::TEST_OPTION_TEXT,
             'isTranslated' => false,
             'hasInputField' => true,
+            'sequence' => null,
         ], $fetchedDeiaResponseOption->getAllData());
     }
 
@@ -80,6 +81,7 @@ class DAOTest extends DatabaseTestCase
             'optionText' => [$locale => 'Translated option text'],
             'isTranslated' => true,
             'hasInputField' => true,
+            'sequence' => null,
         ], $fetchedDeiaResponseOption->getAllData());
     }
 

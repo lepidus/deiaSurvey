@@ -4,8 +4,9 @@ namespace APP\plugins\generic\deiaSurvey\classes\deiaResponseOption;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
-use PKP\core\interfaces\CollectorInterface;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\LazyCollection;
+use PKP\core\interfaces\CollectorInterface;
 
 class Collector implements CollectorInterface
 {
@@ -32,7 +33,11 @@ class Collector implements CollectorInterface
             $queryBuilder->whereIn('dro.deia_question_id', $this->questionIds);
         }
 
-        return $queryBuilder;
+        if (Schema::hasColumn($this->dao->table, 'seq')) {
+            $queryBuilder->orderBy('dro.seq', 'asc');
+        }
+
+        return $queryBuilder->orderBy('dro.deia_response_option_id', 'asc');
     }
 
     public function getCount(): int

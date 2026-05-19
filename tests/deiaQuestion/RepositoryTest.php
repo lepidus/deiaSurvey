@@ -4,8 +4,8 @@ namespace APP\plugins\generic\deiaSurvey\tests\deiaQuestion;
 
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\Repository;
-use PKP\tests\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
+use PKP\tests\DatabaseTestCase;
 
 class RepositoryTest extends DatabaseTestCase
 {
@@ -30,12 +30,14 @@ class RepositoryTest extends DatabaseTestCase
     {
         parent::setUp();
         $this->contextId = $this->createJournalMock();
-        $this->locale = "en";
+        $this->locale = 'en';
         $this->params = [
             'contextId' => $this->contextId,
             'questionText' => self::TEST_QUESTION_TEXT,
             'questionDescription' => self::TEST_QUESTION_DESCRIPTION,
             'questionType' => DeiaQuestion::TYPE_TEXTAREA,
+            'questionBlockId' => null,
+            'sequence' => null,
             'isTranslated' => false,
             'isDefaultQuestion' => true,
         ];

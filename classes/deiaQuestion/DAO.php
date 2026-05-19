@@ -2,6 +2,8 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\deiaQuestion;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\LazyCollection;
 use PKP\core\EntityDAO;
 use PKP\core\traits\EntityWithParent;
@@ -82,5 +84,25 @@ class DAO extends EntityDAO
         }
 
         return $deiaQuestion;
+    }
+
+    public function resequence(int $deiaQuestionBlockId): void
+    {
+        if (!Schema::hasColumn($this->table, 'deia_question_block_id') || !Schema::hasColumn($this->table, 'seq')) {
+            return;
+        }
+
+        $deiaQuestionIds = DB::table($this->table)
+            ->where('deia_question_block_id', '=', $deiaQuestionBlockId)
+            ->orderBy('seq')
+            ->orderBy($this->primaryKeyColumn)
+            ->pluck($this->primaryKeyColumn);
+
+        $sequence = 0;
+        foreach ($deiaQuestionIds as $deiaQuestionId) {
+            DB::table($this->table)
+                ->where($this->primaryKeyColumn, '=', $deiaQuestionId)
+                ->update(['seq' => ++$sequence]);
+        }
     }
 }

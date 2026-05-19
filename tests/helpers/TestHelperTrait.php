@@ -2,20 +2,20 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\helpers;
 
-use APP\journal\Journal;
 use APP\core\Application;
 use APP\core\PageRouter;
-use PKP\user\User;
+use APP\journal\Journal;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\Repository as DeiaQuestionRepository;
+use APP\plugins\generic\deiaSurvey\DeiaSurveyPlugin;
 use PKP\core\Dispatcher;
 use PKP\core\Registry;
 use PKP\plugins\Hook;
-use APP\plugins\generic\deiaSurvey\DeiaSurveyPlugin;
-use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
-use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\Repository as DeiaQuestionRepository;
+use PKP\user\User;
 
 trait TestHelperTrait
 {
-    private const DEFAULT_LOCALE = "en";
+    private const DEFAULT_LOCALE = 'en';
     private const TEST_QUESTION_TEXT = 'plugins.generic.deiaSurvey.defaultQuestion.gender.title';
     private const TEST_QUESTION_DESCRIPTION = 'plugins.generic.deiaSurvey.defaultQuestion.gender.description';
     private const TEST_UPDATED_QUESTION_TEXT = 'plugins.generic.deiaSurvey.defaultQuestion.race.title';
@@ -30,6 +30,8 @@ trait TestHelperTrait
             'questionText' => self::TEST_QUESTION_TEXT,
             'questionDescription' => self::TEST_QUESTION_DESCRIPTION,
             'questionType' => DeiaQuestion::TYPE_TEXTAREA,
+            'questionBlockId' => null,
+            'sequence' => null,
             'isTranslated' => false
         ];
 
@@ -45,6 +47,7 @@ trait TestHelperTrait
             'optionText' => self::TEST_OPTION_TEXT,
             'isTranslated' => false,
             'hasInputField' => true,
+            'sequence' => null,
         ];
 
         $deiaResponseOption = $this->deiaResponseOptionDAO->newDataObject();

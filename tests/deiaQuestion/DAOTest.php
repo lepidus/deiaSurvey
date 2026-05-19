@@ -2,10 +2,10 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\deiaQuestion;
 
-use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DAO;
-use PKP\tests\DatabaseTestCase;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
+use PKP\tests\DatabaseTestCase;
 
 class DAOTest extends DatabaseTestCase
 {
@@ -40,6 +40,8 @@ class DAOTest extends DatabaseTestCase
         $deiaQuestion->setQuestionType(DeiaQuestion::TYPE_RADIO_BUTTONS);
         $deiaQuestion->setIsTranslated(false);
         $deiaQuestion->setIsDefaultQuestion(true);
+        $deiaQuestion->setQuestionBlockId(null);
+        $deiaQuestion->setSequence(null);
         $deiaQuestion->setQuestionText(self::TEST_QUESTION_TEXT);
         $deiaQuestion->setQuestionDescription(self::TEST_QUESTION_DESCRIPTION);
 
@@ -66,6 +68,8 @@ class DAOTest extends DatabaseTestCase
             'id' => $insertedDeiaQuestionId,
             'contextId' => $this->contextId,
             'questionType' => DeiaQuestion::TYPE_RADIO_BUTTONS,
+            'questionBlockId' => null,
+            'sequence' => null,
             'isTranslated' => false,
             'isDefaultQuestion' => true,
             'questionText' => self::TEST_QUESTION_TEXT,
@@ -92,6 +96,8 @@ class DAOTest extends DatabaseTestCase
             'id' => $insertedDeiaQuestionId,
             'contextId' => $this->contextId,
             'questionType' => DeiaQuestion::TYPE_RADIO_BUTTONS,
+            'questionBlockId' => null,
+            'sequence' => null,
             'isTranslated' => true,
             'isDefaultQuestion' => true,
             'questionText' => [$locale => 'Translated question text'],

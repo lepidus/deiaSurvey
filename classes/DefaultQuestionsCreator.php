@@ -4,7 +4,6 @@ namespace APP\plugins\generic\deiaSurvey\classes;
 
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
-use Illuminate\Support\Facades\Schema;
 
 class DefaultQuestionsCreator
 {
@@ -15,9 +14,24 @@ class DefaultQuestionsCreator
             ->filterByContextIds([$contextId])
             ->getCount();
 
-        $questionBlockId = $this->ensureDefaultQuestionBlock($contextId);
-
         if ($deiaQuestionsCount === 0) {
+            $questionBlock = Repo::deiaQuestionBlock()->newDataObject([
+                'contextId' => $contextId,
+                'title' => [
+                    'en' => 'SciELO Questions',
+                    'pt_BR' => 'Perguntas SciELO',
+                    'es' => 'Preguntas SciELO',
+                ],
+                'description' => [
+                    'en' => '',
+                    'pt_BR' => '',
+                    'es' => '',
+                ],
+                'active' => 1,
+                'sequence' => 1,
+            ]);
+            $questionBlockId = Repo::deiaQuestionBlock()->add($questionBlock);
+
             $defaultTestQuestions = $this->getDefaultQuestionsData($contextId);
             $questionSequence = 0;
 
@@ -38,78 +52,6 @@ class DefaultQuestionsCreator
                 }
             }
         }
-    }
-
-    public function ensureDefaultQuestionBlock(int $contextId): ?int
-    {
-        if (!$this->schemaSupportsQuestionBlocks()) {
-            return null;
-        }
-
-        $questionBlocks = Repo::deiaQuestionBlock()
-            ->getCollector()
-            ->filterByContextIds([$contextId])
-            ->getMany()
-            ->toArray();
-
-        if (!empty($questionBlocks)) {
-            return (int) reset($questionBlocks)->getId();
-        }
-
-        $questionBlock = Repo::deiaQuestionBlock()->newDataObject([
-            'contextId' => $contextId,
-            'title' => [
-                'en' => 'SciELO Questions',
-                'pt_BR' => 'Perguntas SciELO',
-                'es' => 'Preguntas SciELO',
-            ],
-            'description' => [
-                'en' => '',
-                'pt_BR' => '',
-                'es' => '',
-            ],
-            'active' => 1,
-            'sequence' => 1,
-        ]);
-        $questionBlockId = Repo::deiaQuestionBlock()->add($questionBlock);
-
-        $this->assignExistingQuestionsToBlock($contextId, $questionBlockId);
-
-        return $questionBlockId;
-    }
-
-    private function assignExistingQuestionsToBlock(int $contextId, int $questionBlockId): void
-    {
-        $questions = Repo::deiaQuestion()
-            ->getCollector()
-            ->filterByContextIds([$contextId])
-            ->getMany();
-
-        $questionSequence = 0;
-        foreach ($questions as $question) {
-            if (!$question->getQuestionBlockId()) {
-                Repo::deiaQuestion()->edit($question, [
-                    'questionBlockId' => $questionBlockId,
-                    'sequence' => ++$questionSequence,
-                ]);
-            }
-
-            $optionSequence = 0;
-            foreach ($question->getResponseOptions() as $responseOption) {
-                Repo::deiaResponseOption()->edit($responseOption, [
-                    'sequence' => ++$optionSequence,
-                ]);
-            }
-        }
-    }
-
-    private function schemaSupportsQuestionBlocks(): bool
-    {
-        return Schema::hasTable('deia_question_blocks')
-            && Schema::hasTable('deia_question_block_settings')
-            && Schema::hasColumn('deia_questions', 'deia_question_block_id')
-            && Schema::hasColumn('deia_questions', 'seq')
-            && Schema::hasColumn('deia_response_options', 'seq');
     }
 
     public static function getDefaultQuestionsData(int $contextId): array

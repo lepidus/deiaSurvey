@@ -182,6 +182,9 @@ class DeiaSurveyPlugin extends GenericPlugin
         $allowedComponents = [
             'plugins.generic.deiaSurvey.classes.controllers.TabHandler',
             'plugins.generic.deiaSurvey.classes.controllers.grid.deiaQuestionBlock.DeiaQuestionBlockGridHandler',
+            'plugins.generic.deiaSurvey.classes.controllers.grid.deiaQuestion.DeiaQuestionGridHandler',
+            'plugins.generic.deiaSurvey.classes.controllers.listbuilder.deiaQuestion.'
+                . 'DeiaQuestionResponseOptionListbuilderHandler',
         ];
 
         if (in_array($component, $allowedComponents)) {

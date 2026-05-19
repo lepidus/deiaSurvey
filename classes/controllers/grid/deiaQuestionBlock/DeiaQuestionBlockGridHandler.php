@@ -4,8 +4,8 @@ namespace APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBl
 
 use APP\notification\NotificationManager;
 use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\form\DeiaQuestionBlockForm;
-use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\template\TemplateManager;
 use PKP\controllers\grid\feature\OrderGridItemsFeature;
 use PKP\controllers\grid\GridColumn;
 use PKP\controllers\grid\GridHandler;
@@ -33,6 +33,8 @@ class DeiaQuestionBlockGridHandler extends GridHandler
                 'createDeiaQuestionBlock',
                 'editDeiaQuestionBlock',
                 'updateDeiaQuestionBlock',
+                'deiaQuestionBlockBasics',
+                'deiaQuestionBlockElements',
                 'activateDeiaQuestionBlock',
                 'deactivateDeiaQuestionBlock',
                 'deleteDeiaQuestionBlock',
@@ -105,9 +107,6 @@ class DeiaQuestionBlockGridHandler extends GridHandler
 
     protected function loadData($request, $filter = null)
     {
-        $defaultQuestionsCreator = new DefaultQuestionsCreator();
-        $defaultQuestionsCreator->ensureDefaultQuestionBlock($request->getContext()->getId());
-
         return Repo::deiaQuestionBlock()->getCollector()
             ->filterByContextIds([$request->getContext()->getId()])
             ->getMany()
@@ -138,9 +137,45 @@ class DeiaQuestionBlockGridHandler extends GridHandler
 
     public function editDeiaQuestionBlock($args, $request)
     {
-        $form = new DeiaQuestionBlockForm($this->plugin, (int) $request->getUserVar('rowId'));
+        $context = $request->getContext();
+        $deiaQuestionBlock = Repo::deiaQuestionBlock()->get((int) $request->getUserVar('rowId'), $context->getId());
+
+        $templateMgr = TemplateManager::getManager($request);
+        $templateMgr->assign([
+            'deiaQuestionBlockId' => $deiaQuestionBlock->getId(),
+            'canEdit' => true,
+        ]);
+
+        return new JSONMessage(
+            true,
+            $templateMgr->fetch($this->plugin->getTemplateResource('deiaQuestionBlocks/editDeiaQuestionBlock.tpl'))
+        );
+    }
+
+    public function deiaQuestionBlockBasics($args, $request)
+    {
+        $form = new DeiaQuestionBlockForm($this->plugin, (int) $request->getUserVar('deiaQuestionBlockId'));
         $form->initData();
         return new JSONMessage(true, $form->fetch($request));
+    }
+
+    public function deiaQuestionBlockElements($args, $request)
+    {
+        $templateMgr = TemplateManager::getManager($request);
+        $dispatcher = $request->getDispatcher();
+
+        return $templateMgr->fetchAjax(
+            'deiaQuestionGridContainer',
+            $dispatcher->url(
+                $request,
+                ROUTE_COMPONENT,
+                null,
+                'plugins.generic.deiaSurvey.classes.controllers.grid.deiaQuestion.DeiaQuestionGridHandler',
+                'fetchGrid',
+                null,
+                ['deiaQuestionBlockId' => (int) $request->getUserVar('deiaQuestionBlockId')]
+            )
+        );
     }
 
     public function updateDeiaQuestionBlock($args, $request)
