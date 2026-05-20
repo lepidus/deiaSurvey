@@ -5,8 +5,8 @@ namespace APP\plugins\generic\deiaSurvey\classes;
 use APP\core\Application;
 use Illuminate\Support\Facades\Mail;
 use PKP\plugins\PluginRegistry;
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataDAO;
-use APP\plugins\generic\deiaSurvey\classes\DemographicDataService;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\mail\mailables\RequestCollectionContributorData;
 
@@ -18,10 +18,10 @@ class DataCollectionEmailSender
         $nonRegisteredAuthors = $this->getNonRegisteredAuthors($submission);
 
         if (!empty($nonRegisteredAuthors)) {
-            $demographicDataService  = new DemographicDataService();
+            $deiaDataService  = new DeiaDataService();
 
             foreach ($nonRegisteredAuthors as $author) {
-                if (!$demographicDataService->authorAlreadyAnsweredQuestionnaire($author)) {
+                if (!$deiaDataService->authorAlreadyAnsweredQuestionnaire($author)) {
                     $this->sendEmailToAuthor($submission, $author);
                 }
             }
@@ -32,12 +32,12 @@ class DataCollectionEmailSender
     {
         $publication = $submission->getCurrentPublication();
         $nonRegisteredAuthors = [];
-        $demographicDataDao = new DemographicDataDAO();
+        $deiaDataDao = new DeiaDataDAO();
 
         foreach ($publication->getData('authors') as $author) {
             $authorEmail = $author->getData('email');
 
-            if (!$demographicDataDao->thereIsUserWithSetting($authorEmail, 'email')) {
+            if (!$deiaDataDao->thereIsUserWithSetting($authorEmail, 'email')) {
                 $nonRegisteredAuthors[] = $author;
             }
         }
@@ -71,13 +71,13 @@ class DataCollectionEmailSender
     private function getQuestionnaireUrls($request, $author): array
     {
         $authorToken = md5(microtime() . $author->getData('email'));
-        Repo::author()->edit($author, ['demographicToken' => $authorToken]);
+        Repo::author()->edit($author, ['deiaToken' => $authorToken]);
 
         $questionnaireUrl = $request->getDispatcher()->url(
             $request,
             Application::ROUTE_PAGE,
             null,
-            'demographicQuestionnaire',
+            'deiaQuestionnaire',
             null,
             null,
             ['authorId' => $author->getId(), 'authorToken' => $authorToken]

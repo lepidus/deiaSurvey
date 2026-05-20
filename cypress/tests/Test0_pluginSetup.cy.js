@@ -17,7 +17,7 @@ describe('DEIA Survey - Plugin setup', function () {
 
 		cy.contains('h1', 'Profile');
 		cy.contains('a', 'DEIA Survey').click();
-		cy.get('input[name="demographicDataConsent"][value=0]').click();
+		cy.get('input[name="deiaDataConsent"][value=0]').click();
         cy.get('#deiaSurveyForm .submitFormButton').click();
         cy.wait(1000);
 	});

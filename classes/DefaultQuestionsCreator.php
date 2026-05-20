@@ -2,31 +2,52 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes;
 
-use APP\core\Application;
-use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\DemographicQuestion;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 
 class DefaultQuestionsCreator
 {
     public function createDefaultQuestions($contextId)
     {
-        $demographicQuestionsCount = Repo::demographicQuestion()
+        $deiaQuestionsCount = Repo::deiaQuestion()
             ->getCollector()
             ->filterByContextIds([$contextId])
             ->getCount();
 
-        if ($demographicQuestionsCount === 0) {
+        if ($deiaQuestionsCount === 0) {
+            $questionBlock = Repo::deiaQuestionBlock()->newDataObject([
+                'contextId' => $contextId,
+                'title' => [
+                    'en' => 'SciELO Questions',
+                    'pt_BR' => 'Perguntas SciELO',
+                    'es' => 'Preguntas SciELO',
+                ],
+                'description' => [
+                    'en' => '',
+                    'pt_BR' => '',
+                    'es' => '',
+                ],
+                'active' => 1,
+                'sequence' => 1,
+            ]);
+            $questionBlockId = Repo::deiaQuestionBlock()->add($questionBlock);
+
             $defaultTestQuestions = $this->getDefaultQuestionsData($contextId);
+            $questionSequence = 0;
 
             foreach ($defaultTestQuestions as $questionData) {
-                $questionObject = Repo::demographicQuestion()->newDataObject($questionData);
-                $demographicQuestionId = Repo::demographicQuestion()->add($questionObject);
+                $questionData['questionBlockId'] = $questionBlockId;
+                $questionData['sequence'] = ++$questionSequence;
+                $questionObject = Repo::deiaQuestion()->newDataObject($questionData);
+                $deiaQuestionId = Repo::deiaQuestion()->add($questionObject);
 
                 if (isset($questionData['responseOptions'])) {
+                    $optionSequence = 0;
                     foreach ($questionData['responseOptions'] as $optionData) {
-                        $optionData['demographicQuestionId'] = $demographicQuestionId;
-                        $responseOptionObject = Repo::demographicResponseOption()->newDataObject($optionData);
-                        Repo::demographicResponseOption()->add($responseOptionObject);
+                        $optionData['deiaQuestionId'] = $deiaQuestionId;
+                        $optionData['sequence'] = ++$optionSequence;
+                        $responseOptionObject = Repo::deiaResponseOption()->newDataObject($optionData);
+                        Repo::deiaResponseOption()->add($responseOptionObject);
                     }
                 }
             }
@@ -38,7 +59,7 @@ class DefaultQuestionsCreator
         return [
             'gender' => [
                 'contextId' => $contextId,
-                'questionType' => DemographicQuestion::TYPE_RADIO_BUTTONS,
+                'questionType' => DeiaQuestion::TYPE_RADIO_BUTTONS,
                 'isDefaultQuestion' => true,
                 'isTranslated' => false,
                 'questionText' => 'plugins.generic.deiaSurvey.defaultQuestion.gender.title',
@@ -68,7 +89,7 @@ class DefaultQuestionsCreator
             ],
             'race' => [
                 'contextId' => $contextId,
-                'questionType' => DemographicQuestion::TYPE_CHECKBOXES,
+                'questionType' => DeiaQuestion::TYPE_CHECKBOXES,
                 'isDefaultQuestion' => true,
                 'isTranslated' => false,
                 'questionText' => 'plugins.generic.deiaSurvey.defaultQuestion.race.title',
@@ -118,7 +139,7 @@ class DefaultQuestionsCreator
             ],
             'ethnicity' => [
                 'contextId' => $contextId,
-                'questionType' => DemographicQuestion::TYPE_CHECKBOXES,
+                'questionType' => DeiaQuestion::TYPE_CHECKBOXES,
                 'isDefaultQuestion' => true,
                 'isTranslated' => false,
                 'questionText' => 'plugins.generic.deiaSurvey.defaultQuestion.ethnicity.title',

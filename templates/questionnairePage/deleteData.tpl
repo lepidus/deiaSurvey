@@ -11,7 +11,7 @@
         {translate key="plugins.generic.deiaSurvey.questionnairePage.deleteData.message"}
     </p>
 
-    <a id="deleteDemographicData" href="{url op="deleteData" authorId=$authorId authorToken=$authorToken save=true}">
+    <a id="deleteDeiaData" href="{url op="deleteData" authorId=$authorId authorToken=$authorToken save=true}">
         {translate key="plugins.generic.deiaSurvey.questionnairePage.deleteMyData"}
     </a>
 </div>

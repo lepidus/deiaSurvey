@@ -25,7 +25,7 @@
         </p>
 
         <div class="buttons">
-            <button id="submitDemographicQuestionnaire" class="submit" type="submit">
+            <button id="submitDeiaQuestionnaire" class="submit" type="submit">
                 {translate key="common.save"}
             </button>
         </div>

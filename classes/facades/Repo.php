@@ -2,24 +2,30 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\facades;
 
-use APP\plugins\generic\deiaSurvey\classes\demographicQuestion\Repository as DemographicQuestionRepository;
-use APP\plugins\generic\deiaSurvey\classes\demographicResponse\Repository as DemographicResponseRepository;
-use APP\plugins\generic\deiaSurvey\classes\demographicResponseOption\Repository as DemographicResponseOptionRepository;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\Repository as DeiaQuestionRepository;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestionBlock\Repository as DeiaQuestionBlockRepository;
+use APP\plugins\generic\deiaSurvey\classes\deiaResponse\Repository as DeiaResponseRepository;
+use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\Repository as DeiaResponseOptionRepository;
 
 class Repo extends \APP\facades\Repo
 {
-    public static function demographicQuestion(): DemographicQuestionRepository
+    public static function deiaQuestion(): DeiaQuestionRepository
     {
-        return app(DemographicQuestionRepository::class);
+        return app(DeiaQuestionRepository::class);
     }
 
-    public static function demographicResponse(): DemographicResponseRepository
+    public static function deiaQuestionBlock(): DeiaQuestionBlockRepository
     {
-        return app(DemographicResponseRepository::class);
+        return app(DeiaQuestionBlockRepository::class);
     }
 
-    public static function demographicResponseOption(): DemographicResponseOptionRepository
+    public static function deiaResponse(): DeiaResponseRepository
     {
-        return app(DemographicResponseOptionRepository::class);
+        return app(DeiaResponseRepository::class);
+    }
+
+    public static function deiaResponseOption(): DeiaResponseOptionRepository
+    {
+        return app(DeiaResponseOptionRepository::class);
     }
 }

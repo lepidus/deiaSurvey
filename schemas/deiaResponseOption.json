@@ -1,0 +1,29 @@
+{
+    "title": "Deia response option",
+    "description": "A response option for a given deia question",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "deiaQuestionId": {
+            "type": "integer"
+        },
+        "sequence": {
+            "type": "integer",
+            "default": 0,
+            "validation": [
+                "nullable"
+            ]
+        },
+        "optionText": {
+            "type": "string"
+        }, 
+        "isTranslated": {
+            "type": "boolean"
+        },
+        "hasInputField": {
+            "type": "boolean"
+        }
+    }
+}

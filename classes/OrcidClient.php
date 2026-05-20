@@ -77,7 +77,7 @@ class OrcidClient
             $request,
             Application::ROUTE_PAGE,
             null,
-            'demographicQuestionnaire',
+            'deiaQuestionnaire',
             'orcidVerify',
             null,
             $redirectParams

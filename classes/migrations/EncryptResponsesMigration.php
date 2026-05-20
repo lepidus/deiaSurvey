@@ -15,7 +15,7 @@ class EncryptResponsesMigration extends Migration
             return;
         }
 
-        $result = DB::table('demographic_response_settings')->get();
+        $result = DB::table('deia_response_settings')->get();
 
         foreach ($result as $row) {
             $row = get_object_vars($row);
@@ -36,8 +36,8 @@ class EncryptResponsesMigration extends Migration
             }
 
             $encryptedValue = $encrypter->encryptString($settingValue);
-            DB::table('demographic_response_settings')
-                ->where('demographic_response_setting_id', $row['demographic_response_setting_id'])
+            DB::table('deia_response_settings')
+                ->where('deia_response_setting_id', $row['deia_response_setting_id'])
                 ->update([
                     'setting_value' => $encryptedValue
                 ]);

@@ -7,19 +7,19 @@ use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 
 class QuestionStatisticsFactory
 {
-    private int $demographicQuestionId;
+    private int $deiaQuestionId;
 
-    public function __construct(int $demographicQuestionId)
+    public function __construct(int $deiaQuestionId)
     {
-        $this->demographicQuestionId = $demographicQuestionId;
+        $this->deiaQuestionId = $deiaQuestionId;
     }
 
     public function createQuestionStatistics(): QuestionStatistics
     {
         $questionStats = new QuestionStatistics();
-        $responses = Repo::demographicResponse()
+        $responses = Repo::deiaResponse()
             ->getCollector()
-            ->filterByQuestionIds([$this->demographicQuestionId])
+            ->filterByQuestionIds([$this->deiaQuestionId])
             ->getMany();
 
         foreach ($responses as $response) {

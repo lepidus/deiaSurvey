@@ -271,3 +271,93 @@ msgstr "Users Who Consented"
 
 msgid "plugins.generic.deiaSurvey.report.usersWhoDidNotConsent"
 msgstr "Users Who Did Not Consent"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks"
+msgstr "Question Blocks"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.edit"
+msgstr "Question Block"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.deiaQuestions"
+msgstr "Questions"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.create"
+msgstr "Create Question Block"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.title"
+msgstr "Title"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.description"
+msgstr "Description"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.active"
+msgstr "Active"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.noneCreated"
+msgstr "No question blocks have been created."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmActivate"
+msgstr "Are you sure you wish to activate this question block?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmDeactivate"
+msgstr "Are you sure you wish to deactivate this question block?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.confirmDelete"
+msgstr "Are you sure you wish to delete this question block?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.form.titleRequired"
+msgstr "A title is required for the question block."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.defaultTitle"
+msgstr "SciELO Questions"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.defaultDescription"
+msgstr ""
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.create"
+msgstr "Create question"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.noneCreated"
+msgstr "No questions have been created in this block."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.text"
+msgstr "Question text"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.options"
+msgstr "Response options"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.optionText"
+msgstr "Option text"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.optionHasInputField"
+msgstr "Includes an input field"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.changeType"
+msgstr "If you change to this question type, the response options will not be available."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.confirmDelete"
+msgstr "Are you sure you wish to delete this question?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.form.questionTextRequired"
+msgstr "Question text is required."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.form.questionTypeRequired"
+msgstr "Question type is required."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.smallText"
+msgstr "Small text field"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.text"
+msgstr "Text field"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.textarea"
+msgstr "Textarea"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.checkboxes"
+msgstr "Checkboxes"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.radioButtons"
+msgstr "Radio buttons"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.select"
+msgstr "Drop-down box"

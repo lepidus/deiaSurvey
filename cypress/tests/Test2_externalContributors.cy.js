@@ -27,7 +27,7 @@ function assertResponsesOfExternalAuthor(authorEmail) {
 
 function assertResponsesOfRegisteredUser() {
     cy.contains('a', 'DEIA Survey').click();
-    cy.get('input[name="demographicDataConsent"][value=1]').should('be.checked');
+    cy.get('input[name="deiaDataConsent"][value=1]').should('be.checked');
     
     cy.contains('label', 'Woman').within(() => {
         cy.get('input').should('be.checked');
@@ -150,7 +150,7 @@ describe('DEIA Survey - External contributors data collecting', function() {
         cy.login('ckwantes', null, 'publicknowledge');
 
         cy.contains('a', 'DEIA Survey').click();
-        cy.get('input[name="demographicDataConsent"][value=0]').click();
+        cy.get('input[name="deiaDataConsent"][value=0]').click();
         cy.get('#deiaSurveyForm .submitFormButton').click();
         cy.wait(1000);
         cy.contains('Back to Submissions').click();

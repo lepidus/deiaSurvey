@@ -13,9 +13,9 @@ class OrcidConfigurationTest extends PKPTestCase
     private $orcidAPIPath = 'https://pub.sandbox.orcid.org/';
     private $orcidClientId = 'APP-F1RSTCL1ENT1ID';
     private $orcidClientSecret = 'first-false-secret-33ba178dc2b9';
-    private $demographicAPIPath = 'https://api.sandbox.orcid.org/';
-    private $demographicClientId = 'APP-S3C0NDCL1ENT1D';
-    private $demographicClientSecret = 'second-false-secret-33ba178dc2b9';
+    private $deiaAPIPath = 'https://api.sandbox.orcid.org/';
+    private $deiaClientId = 'APP-S3C0NDCL1ENT1D';
+    private $deiaClientSecret = 'second-false-secret-33ba178dc2b9';
 
     protected function setUp(): void
     {
@@ -68,22 +68,22 @@ class OrcidConfigurationTest extends PKPTestCase
         $this->assertEquals($expectedConfiguration, $orcidConfiguration);
     }
 
-    public function testOrcidConfigurationFromDemographicPlugin(): void
+    public function testOrcidConfigurationFromDeiaPlugin(): void
     {
         $this->insertPluginSettings('orcidprofileplugin', 'orcidProfileAPIPath', $this->orcidAPIPath);
         $this->insertPluginSettings('orcidprofileplugin', 'orcidClientId', $this->orcidClientId);
         $this->insertPluginSettings('orcidprofileplugin', 'orcidClientSecret', $this->orcidClientSecret);
 
-        $this->insertPluginSettings('deiasurveyplugin', 'orcidAPIPath', $this->demographicAPIPath);
-        $this->insertPluginSettings('deiasurveyplugin', 'orcidClientId', $this->demographicClientId);
-        $this->insertPluginSettings('deiasurveyplugin', 'orcidClientSecret', $this->demographicClientSecret);
+        $this->insertPluginSettings('deiasurveyplugin', 'orcidAPIPath', $this->deiaAPIPath);
+        $this->insertPluginSettings('deiasurveyplugin', 'orcidClientId', $this->deiaClientId);
+        $this->insertPluginSettings('deiasurveyplugin', 'orcidClientSecret', $this->deiaClientSecret);
         $orcidConfiguration = $this->orcidConfiguration->getOrcidConfiguration($this->contextId);
 
         $expectedConfiguration = [
             'pluginName' => 'deiasurveyplugin',
-            'apiPath' => $this->demographicAPIPath,
-            'clientId' => $this->demographicClientId,
-            'clientSecret' => $this->demographicClientSecret
+            'apiPath' => $this->deiaAPIPath,
+            'clientId' => $this->deiaClientId,
+            'clientSecret' => $this->deiaClientSecret
         ];
         $this->assertEquals($expectedConfiguration, $orcidConfiguration);
     }

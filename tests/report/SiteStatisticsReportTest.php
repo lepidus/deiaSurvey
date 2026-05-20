@@ -4,6 +4,10 @@ namespace APP\plugins\generic\deiaSurvey\tests\report;
 
 use PKP\tests\PKPTestCase;
 use APP\journal\Journal;
+use APP\core\Application;
+use APP\core\PageRouter;
+use PKP\core\Dispatcher;
+use PKP\core\Registry;
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\report\classes\ContextStatistics;
 use APP\plugins\generic\deiaSurvey\report\classes\QuestionStatistics;
@@ -20,6 +24,7 @@ class SiteStatisticsReportTest extends PKPTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->initializeRequestRouter();
         $this->siteReport = new SiteStatisticsReport($this->locale);
         $this->context  = $this->createTestJournal();
         $this->contextStats = $this->createTestContextStats();
@@ -31,6 +36,22 @@ class SiteStatisticsReportTest extends PKPTestCase
         $plugin = new DeiaSurveyPlugin();
         $plugin->pluginPath = 'plugins/generic/deiaSurvey';
         $plugin->addLocaleData();
+    }
+
+    private function initializeRequestRouter(): void
+    {
+        Registry::delete('request');
+        $application = Application::get();
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['PATH_INFO'] = 'index/test-page/test-op';
+        $request = $application->getRequest();
+
+        $router = new PageRouter();
+        $router->setApplication($application);
+        $dispatcher = new Dispatcher();
+        $dispatcher->setApplication($application);
+        $router->setDispatcher($dispatcher);
+        $request->setRouter($router);
     }
 
     private function createTestJournal(): Journal
