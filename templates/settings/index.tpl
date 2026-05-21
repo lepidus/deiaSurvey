@@ -4,6 +4,7 @@
 		$('#deiaSurveySettingsTabs').tabs('option', 'cache', true);
 	{rdelim});
 </script>
+<script src="{$questionBlockExportFeatureJsUrl|escape}"></script>
 
 <div id="deiaSurveySettingsTabs">
 	<ul>

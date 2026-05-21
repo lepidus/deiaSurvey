@@ -279,7 +279,13 @@ class DeiaSurveyPlugin extends GenericPlugin
                 $method = $request->getUserVar('method') ?? 'display';
 
                 if ($method === 'display') {
-                    $templateMgr->assign('pluginName', $this->getName());
+                    $templateMgr->assign([
+                        'pluginName' => $this->getName(),
+                        'questionBlockExportFeatureJsUrl' => $request->getBaseUrl()
+                            . '/'
+                            . $this->getPluginPath()
+                            . '/js/DeiaQuestionBlockExportFeature.js',
+                    ]);
                     return new JSONMessage(
                         true,
                         $templateMgr->fetch($this->getTemplateResource('settings/index.tpl'))

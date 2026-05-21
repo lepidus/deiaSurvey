@@ -76,6 +76,7 @@ class DeiaQuestionForm extends Form
     {
         $templateMgr = TemplateManager::getManager($request);
         $responseOptionQuestionTypes = $this->getResponseOptionQuestionTypes();
+        $questionType = (int) $this->getData('questionType');
         $templateMgr->assign([
             'deiaQuestionBlockId' => $this->deiaQuestionBlockId,
             'deiaQuestionId' => $this->deiaQuestionId,
@@ -94,6 +95,7 @@ class DeiaQuestionForm extends Form
                     => 'plugins.generic.deiaSurvey.questionBlocks.questions.type.select',
             ],
             'responseOptionQuestionTypesString' => ';' . implode(';', $responseOptionQuestionTypes) . ';',
+            'questionTypeAllowsResponseOptions' => in_array($questionType, $responseOptionQuestionTypes, true),
         ]);
 
         return parent::fetch($request, $template, $display);
