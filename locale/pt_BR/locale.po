@@ -100,50 +100,11 @@ msgid "plugins.generic.deiaSurvey.questionnairePage.onlyWhoAnsweredCanDelete"
 msgstr "Apenas autores que já responderam o Questionário DEIA podem excluir seus dados."
 
 
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPathRequired"
-msgstr "Por favor, informe qual API ORCID deve ser utilizada"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidClientIdError"
-msgstr "ID do cliente inválido"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidClientSecretError"
-msgstr "Segredo do cliente inválido"
-
 msgid "plugins.generic.deiaSurvey.settings.title"
-msgstr "Configurações da API ORCID"
-
-msgid "plugins.generic.deiaSurvey.settings.description"
-msgstr "Por favor, configure o acesso a API do ORCID para recuperar informações da ORCID"
+msgstr "Gerenciar Blocos de Perguntas"
 
 msgid "plugins.generic.deiaSurvey.settings.questionBlocks"
 msgstr "Blocos de Perguntas"
-
-msgid "plugins.generic.deiaSurvey.settings.globallyconfigured"
-msgstr "A API ORCID foi configurada globalmente pelo host. As seguintes credenciais foram salvas."
-
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath"
-msgstr "API ORCID"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidClientId"
-msgstr "ID do Cliente"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidClientSecret"
-msgstr "Segredo do Cliente"
-
-msgid "plugins.generic.deiaSurvey.settings.hidden"
-msgstr "oculto"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.public"
-msgstr "Pública"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.publicSandbox"
-msgstr "Pública Sandbox"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.member"
-msgstr "Membro"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.memberSandbox"
-msgstr "Membro Sandbox"
 
 msgid "plugins.generic.deiaSurvey.settings.encryptionSecretDefined"
 msgstr "Você definiu um segredo no arquivo de configuração do site ('api_key_secret')"
@@ -151,15 +112,6 @@ msgstr "Você definiu um segredo no arquivo de configuração do site ('api_key_
 msgid "plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined"
 msgstr "Você não definiu um segredo no arquivo de configuração do site ('api_key_secret')."
 " O plugin não entrará em funcionamento até que isso seja feito."
-
-msgid "plugins.generic.deiaSurvey.settings.credentialsUsed.orcidProfile"
-msgstr "O plugin está utilizando as credenciais informadas nas configurações do plugin Perfil ORCID. "
-"Caso deseje usar outras credenciais para este plugin, utilize os campos abaixo."
-
-msgid "plugins.generic.deiaSurvey.settings.credentialsUsed.own"
-msgstr "Este plugin está utilizando as credenciais informadas abaixo"
-
-
 
 msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.title"
 msgstr "Gênero"
