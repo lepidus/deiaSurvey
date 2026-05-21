@@ -275,6 +275,7 @@ class DeiaSurveyPlugin extends GenericPlugin
 
                 if ($method === 'display') {
                     $templateMgr->assign([
+                        'encryptionSecretDefined' => (new DataEncryption())->secretConfigExists(),
                         'pluginName' => $this->getName(),
                         'questionBlockExportFeatureJsUrl' => $request->getBaseUrl()
                             . '/'
