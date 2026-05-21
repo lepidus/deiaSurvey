@@ -5,6 +5,7 @@
 		$('#importExportTabs').tabs('option', 'cache', true);
 	{rdelim});
 </script>
+<script src="{$questionBlockExportFeatureJsUrl|escape}"></script>
 <div id="importExportTabs">
 	<ul>
 		<li><a href="#settings-tab">{translate key="manager.plugins.settings"}</a></li>

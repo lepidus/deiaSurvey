@@ -316,7 +316,7 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.defaultTitle"
 msgstr "Preguntas SciELO"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.defaultDescription"
-msgstr ""
+msgstr "Preguntas estándar SciELO para recopilar datos demográficos e identitarios de autores."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.create"
 msgstr "Crear pregunta"
@@ -346,19 +346,52 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.questions.form.questionTypeRequ
 msgstr "El tipo de pregunta es obligatorio."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.smallText"
-msgstr "Campo de texto corto"
+msgstr "Caja de texto de una sola palabra"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.text"
-msgstr "Campo de texto"
+msgstr "Caja de texto de una sola línea"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.textarea"
-msgstr "Área de texto"
+msgstr "Caja de texto extendido"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.checkboxes"
-msgstr "Casillas de verificación"
+msgstr "Casillas de selección (puede elegir una o varias)"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.radioButtons"
-msgstr "Botones de opción"
+msgstr "Botones de opción (solo puede elegir uno)"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.select"
-msgstr "Lista desplegable"
+msgstr "Menú desplegable"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.exportSelected"
+msgstr "Exportar seleccionados"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.exportSelected.description"
+msgstr "Seleccione los bloques de preguntas que se exportarán."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.exportSelected.noneSelected"
+msgstr "Seleccione al menos un bloque de preguntas para exportar."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.export"
+msgstr "Exportar"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.cancelExporting"
+msgstr "Cancelar exportación"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import"
+msgstr "Importar"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.importFile"
+msgstr "Archivo JSON de bloques de preguntas"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.addFile"
+msgstr "Añadir archivo"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.changeFile"
+msgstr "Cambiar archivo"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.uploadError"
+msgstr "No se pudo cargar el archivo de bloques de preguntas."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.description"
+msgstr "Los bloques de preguntas importados se crearán como bloques inactivos."

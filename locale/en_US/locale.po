@@ -314,7 +314,7 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.defaultTitle"
 msgstr "SciELO Questions"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.defaultDescription"
-msgstr ""
+msgstr "Standard SciELO questions for collecting author demographic and identity data."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.create"
 msgstr "Create question"
@@ -344,19 +344,52 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.questions.form.questionTypeRequ
 msgstr "Question type is required."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.smallText"
-msgstr "Small text field"
+msgstr "Single word text box"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.text"
-msgstr "Text field"
+msgstr "Single line text box"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.textarea"
-msgstr "Textarea"
+msgstr "Extended text box"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.checkboxes"
-msgstr "Checkboxes"
+msgstr "Checkboxes (you can choose one or more)"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.radioButtons"
-msgstr "Radio buttons"
+msgstr "Radio buttons (you can only choose one)"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.select"
 msgstr "Drop-down box"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.exportSelected"
+msgstr "Export selected"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.exportSelected.description"
+msgstr "Select the question blocks to export."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.exportSelected.noneSelected"
+msgstr "Select at least one question block to export."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.export"
+msgstr "Export"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.cancelExporting"
+msgstr "Cancel exporting"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import"
+msgstr "Import"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.importFile"
+msgstr "Question blocks JSON file"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.addFile"
+msgstr "Add file"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.changeFile"
+msgstr "Change file"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.uploadError"
+msgstr "The question blocks file could not be uploaded."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.description"
+msgstr "Imported question blocks will be created as inactive blocks."
