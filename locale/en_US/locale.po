@@ -100,50 +100,11 @@ msgid "plugins.generic.deiaSurvey.questionnairePage.onlyWhoAnsweredCanDelete"
 msgstr "Only authors who have already completed the DEIA Survey can delete their data."
 
 
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPathRequired"
-msgstr "Please, inform which ORCID API should be used"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidClientIdError"
-msgstr "Invalid client ID"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidClientSecretError"
-msgstr "Invalid client secret"
-
 msgid "plugins.generic.deiaSurvey.settings.title"
-msgstr "ORCID API Settings"
-
-msgid "plugins.generic.deiaSurvey.settings.description"
-msgstr "Please configure the ORCID API access for use in pulling ORCID profile information"
+msgstr "Manage Question Blocks"
 
 msgid "plugins.generic.deiaSurvey.settings.questionBlocks"
 msgstr "Question Blocks"
-
-msgid "plugins.generic.deiaSurvey.settings.globallyconfigured"
-msgstr "The ORCID API was configured globally by the host. The following credentials have been saved."
-
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath"
-msgstr "ORCID API"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidClientId"
-msgstr "Client ID"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidClientSecret"
-msgstr "Client Secret"
-
-msgid "plugins.generic.deiaSurvey.settings.hidden"
-msgstr "hidden"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.public"
-msgstr "Public"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.publicSandbox"
-msgstr "Public Sandbox"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.member"
-msgstr "Member"
-
-msgid "plugins.generic.deiaSurvey.settings.orcidAPIPath.memberSandbox"
-msgstr "Member Sandbox"
 
 msgid "plugins.generic.deiaSurvey.settings.encryptionSecretDefined"
 msgstr "You have set a secret in the website configuration file ('api_key_secret')"
@@ -151,15 +112,6 @@ msgstr "You have set a secret in the website configuration file ('api_key_secret
 msgid "plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined"
 msgstr "You have not set a secret in the website configuration file ('api_key_secret')."
 " The plugin will not work until this is done."
-
-msgid "plugins.generic.deiaSurvey.settings.credentialsUsed.orcidProfile"
-msgstr "The plugin is using the credentials entered in the ORCID Profile plugin settings. "
-"If you wish to use other credentials for this plugin, use the fields below."
-
-msgid "plugins.generic.deiaSurvey.settings.credentialsUsed.own"
-msgstr "This plugin is using the credentials below"
-
-
 
 msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.title"
 msgstr "Gender"
@@ -314,7 +266,7 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.defaultTitle"
 msgstr "SciELO Questions"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.defaultDescription"
-msgstr ""
+msgstr "Standard SciELO questions for collecting author demographic and identity data."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.create"
 msgstr "Create question"
@@ -344,19 +296,52 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.questions.form.questionTypeRequ
 msgstr "Question type is required."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.smallText"
-msgstr "Small text field"
+msgstr "Single word text box"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.text"
-msgstr "Text field"
+msgstr "Single line text box"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.textarea"
-msgstr "Textarea"
+msgstr "Extended text box"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.checkboxes"
-msgstr "Checkboxes"
+msgstr "Checkboxes (you can choose one or more)"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.radioButtons"
-msgstr "Radio buttons"
+msgstr "Radio buttons (you can only choose one)"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.type.select"
 msgstr "Drop-down box"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.exportSelected"
+msgstr "Export selected"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.exportSelected.description"
+msgstr "Select the question blocks to export."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.exportSelected.noneSelected"
+msgstr "Select at least one question block to export."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.export"
+msgstr "Export"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.cancelExporting"
+msgstr "Cancel exporting"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import"
+msgstr "Import"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.importFile"
+msgstr "Question blocks JSON file"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.addFile"
+msgstr "Add file"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.changeFile"
+msgstr "Change file"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.uploadError"
+msgstr "The question blocks file could not be uploaded."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.import.description"
+msgstr "Imported question blocks will be created as inactive blocks."

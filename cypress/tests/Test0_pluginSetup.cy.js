@@ -45,26 +45,9 @@ describe('DEIA Survey - Plugin setup', function () {
 
 		cy.get('tr#' + pluginRowId + ' a.show_extras').click();
 		cy.get('a[id^=' + pluginRowId + '-settings-button]').click();
-		cy.contains("The plugin is using the credentials entered in the ORCID Profile plugin settings. If you wish to use other credentials for this plugin, use the fields below");
-		cy.contains("You have set a secret in the website configuration file ('api_key_secret')");
-	});
-	it("Adds ORCID credentials to own plugin settings", function() {
-		cy.login('dbarnes', null, 'publicknowledge');
-		cy.contains('a', 'Website').click();
-
-		cy.waitJQuery();
-		cy.get('#plugins-button').click();
-		cy.waitJQuery();
-		cy.get('tr#' + pluginRowId + ' a.show_extras').click();
-		cy.get('a[id^=' + pluginRowId + '-settings-button]').click();
-
-		cy.get('#orcidAPIPath').select('Public Sandbox');
-		cy.get('input[name="orcidClientId"]').clear().type(Cypress.env('orcidClientId'), {delay: 0});
-		cy.get('input[name="orcidClientSecret"]').clear().type(Cypress.env('orcidClientSecret'), {delay: 0});
-		cy.get('#deiaSurveySettingsForm button:contains("OK")').click();
-		cy.wait(1000);
-
-		cy.get('a[id^=' + pluginRowId + '-settings-button]').click();
-		cy.contains("This plugin is using the credentials below");
+		cy.contains('Question Blocks');
+		cy.get('#orcidAPIPath').should('not.exist');
+		cy.get('input[name="orcidClientId"]').should('not.exist');
+		cy.get('input[name="orcidClientSecret"]').should('not.exist');
 	});
 });

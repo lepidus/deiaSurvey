@@ -17,8 +17,16 @@ class DefaultQuestionsCreator
         if ($deiaQuestionsCount === 0) {
             $questionBlock = Repo::deiaQuestionBlock()->newDataObject([
                 'contextId' => $contextId,
-                'title' => ['en_US' => __('plugins.generic.deiaSurvey.questionBlocks.defaultTitle')],
-                'description' => ['en_US' => __('plugins.generic.deiaSurvey.questionBlocks.defaultDescription')],
+                'title' => [
+                    'en_US' => 'SciELO Questions',
+                    'pt_BR' => 'Perguntas SciELO',
+                    'es_ES' => 'Preguntas SciELO',
+                ],
+                'description' => [
+                    'en_US' => 'Standard SciELO questions for collecting author demographic and identity data.',
+                    'pt_BR' => 'Perguntas padrão SciELO para coletar dados demográficos e identitários de autores.',
+                    'es_ES' => 'Preguntas estándar SciELO para recopilar datos demográficos e identitarios de autores.',
+                ],
                 'active' => 1,
                 'sequence' => 1
             ]);

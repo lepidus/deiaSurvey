@@ -7,7 +7,7 @@ use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 
 class QuestionStatisticsFactory
 {
-    private int $deiaQuestionId;
+    private $deiaQuestionId;
 
     public function __construct(int $deiaQuestionId)
     {

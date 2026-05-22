@@ -195,6 +195,11 @@ class RenameDemographicToDeiaMigration extends Migration
             'pt_BR' => 'Perguntas SciELO',
             'es_ES' => 'Preguntas SciELO',
         ];
+        $defaultDescriptions = [
+            'en_US' => 'Standard SciELO questions for collecting author demographic and identity data.',
+            'pt_BR' => 'Perguntas padrão SciELO para coletar dados demográficos e identitários de autores.',
+            'es_ES' => 'Preguntas estándar SciELO para recopilar datos demográficos e identitarios de autores.',
+        ];
 
         foreach ($defaultTitles as $locale => $title) {
             Capsule::table('deia_question_block_settings')->insert([
@@ -207,7 +212,7 @@ class RenameDemographicToDeiaMigration extends Migration
                 'deia_question_block_id' => $questionBlockId,
                 'locale' => $locale,
                 'setting_name' => 'description',
-                'setting_value' => '',
+                'setting_value' => $defaultDescriptions[$locale],
             ]);
         }
     }

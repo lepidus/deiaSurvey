@@ -1,17 +1,34 @@
 <script>
-	function toggleResponseOptions(newValue, responseOptionQuestionTypesString) {ldelim}
-		if (responseOptionQuestionTypesString.indexOf(';' + newValue + ';') !== -1) {ldelim}
-			document.getElementById('deiaQuestionForm').addResponse.disabled = false;
+	function toggleResponseOptions(newValue, responseOptionQuestionTypesString, showWarning) {ldelim}
+		var form = document.getElementById('deiaQuestionForm'),
+			responseOptions = document.getElementById('responseOptions'),
+			allowsResponseOptions = responseOptionQuestionTypesString.indexOf(';' + newValue + ';') !== -1;
+
+		if (responseOptions) {ldelim}
+			responseOptions.style.display = allowsResponseOptions ? '' : 'none';
+		{rdelim}
+
+		if (allowsResponseOptions) {ldelim}
+			if (form.addResponse) {ldelim}
+				form.addResponse.disabled = false;
+			{rdelim}
 		{rdelim} else {ldelim}
-			if (document.getElementById('deiaQuestionForm').addResponse.disabled === false) {ldelim}
+			if (showWarning && form.addResponse && form.addResponse.disabled === false) {ldelim}
 				alert({translate|json_encode key="plugins.generic.deiaSurvey.questionBlocks.questions.changeType"});
 			{rdelim}
-			document.getElementById('deiaQuestionForm').addResponse.disabled = true;
+			if (form.addResponse) {ldelim}
+				form.addResponse.disabled = true;
+			{rdelim}
 		{rdelim}
 	{rdelim}
 
 	$(function() {ldelim}
 		$('#deiaQuestionForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
+		toggleResponseOptions(
+			$('#questionType').val(),
+			'{$responseOptionQuestionTypesString|escape:"javascript"}',
+			false
+		);
 	{rdelim});
 </script>
 
@@ -59,11 +76,11 @@
                 defaultLabel=""
                 size=$fbvStyles.size.MEDIUM
                 required=true
-                onchange="toggleResponseOptions(this.options[this.selectedIndex].value, '{$responseOptionQuestionTypesString|escape:"javascript"}')"
+                onchange="toggleResponseOptions(this.options[this.selectedIndex].value, '{$responseOptionQuestionTypesString|escape:"javascript"}', true)"
             }
         {/fbvFormSection}
 
-        <div id="responseOptions" class="full left">
+        <div id="responseOptions" class="full left"{if !$questionTypeAllowsResponseOptions} style="display: none;"{/if}>
             <div id="responseOptionsContainer" class="full left">
                 {capture assign=responseOptionsUrl}{url router=$smarty.const.ROUTE_COMPONENT component="plugins.generic.deiaSurvey.classes.controllers.listbuilder.deiaQuestion.DeiaQuestionResponseOptionListbuilderHandler" op="fetch" deiaQuestionBlockId=$deiaQuestionBlockId deiaQuestionId=$deiaQuestionId escape=false}{/capture}
                 {load_url_in_div id="responseOptionsListbuilderContainer" url=$responseOptionsUrl}
