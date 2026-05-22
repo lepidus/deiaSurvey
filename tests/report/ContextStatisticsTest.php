@@ -4,6 +4,7 @@ namespace APP\plugins\generic\deiaSurvey\tests\report;
 
 require_once(dirname(__DIR__, 2) . '/autoload.php');
 
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\report\classes\ContextStatistics;
 use APP\plugins\generic\deiaSurvey\report\classes\QuestionStatistics;
 
@@ -50,8 +51,20 @@ class ContextStatisticsTest extends \PKPTestCase
     public function testPrintsStatsAccordingToGuide()
     {
         $contextPrintGuide = [
-            12 => [12, 13, 14],
-            13 => [21, 22],
+            [
+                'questionId' => 12,
+                'questionType' => DeiaQuestion::TYPE_CHECKBOXES,
+                'responseOptions' => [
+                    ['id' => 12],
+                    ['id' => 13],
+                    ['id' => 14],
+                ],
+            ],
+            [
+                'questionId' => 13,
+                'questionType' => DeiaQuestion::TYPE_TEXT_FIELD,
+                'responseOptions' => [],
+            ],
         ];
 
         $firstQuestionStatistics = new QuestionStatistics();
@@ -63,16 +76,15 @@ class ContextStatisticsTest extends \PKPTestCase
         $firstQuestionStatistics->incrementOptionCount(14);
 
         $secondQuestionStatistics = new QuestionStatistics();
-        $secondQuestionStatistics->incrementOptionCount(21);
-        $secondQuestionStatistics->incrementOptionCount(21);
-        $secondQuestionStatistics->incrementOptionCount(22);
+        $secondQuestionStatistics->incrementFilledResponseCount();
+        $secondQuestionStatistics->incrementFilledResponseCount();
 
         $this->contextStatistics->addQuestionStatistics(13, $secondQuestionStatistics);
         $this->contextStatistics->addQuestionStatistics(12, $firstQuestionStatistics);
         $this->contextStatistics->setUsersConsentCount(123);
         $this->contextStatistics->setUsersNoConsentCount(987);
 
-        $expectedPrintedStats = [2, 1, 3, 2, 1, 123, 987];
+        $expectedPrintedStats = [2, 1, 3, 2, 123, 987];
         $this->assertEquals($expectedPrintedStats, $this->contextStatistics->printStatistics($contextPrintGuide));
     }
 }

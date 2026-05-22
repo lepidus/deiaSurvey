@@ -274,6 +274,9 @@ msgstr "Usuarios que consintieron"
 msgid "plugins.generic.deiaSurvey.report.usersWhoDidNotConsent"
 msgstr "Usuarios que no consintieron"
 
+msgid "plugins.generic.deiaSurvey.report.responsesCount"
+msgstr "Respuestas"
+
 
 
 msgid "plugins.generic.deiaSurvey.questionBlocks"
