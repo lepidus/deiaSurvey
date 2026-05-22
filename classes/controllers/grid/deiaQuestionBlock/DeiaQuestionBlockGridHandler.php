@@ -5,12 +5,17 @@ namespace APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBl
 use APP\notification\NotificationManager;
 use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\form\DeiaQuestionBlockForm;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\importExport\DeiaQuestionBlockJsonImporter;
+use APP\plugins\generic\deiaSurvey\classes\importExport\DeiaQuestionBlockJsonSerializer;
 use APP\template\TemplateManager;
 use PKP\controllers\grid\feature\OrderGridItemsFeature;
 use PKP\controllers\grid\GridColumn;
 use PKP\controllers\grid\GridHandler;
 use PKP\core\JSONMessage;
 use PKP\db\DAO;
+use PKP\db\DAORegistry;
+use PKP\file\TemporaryFileDAO;
+use PKP\file\TemporaryFileManager;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
 use PKP\plugins\PluginRegistry;
@@ -38,6 +43,10 @@ class DeiaQuestionBlockGridHandler extends GridHandler
                 'activateDeiaQuestionBlock',
                 'deactivateDeiaQuestionBlock',
                 'deleteDeiaQuestionBlock',
+                'exportSelectedQuestionBlocks',
+                'importQuestionBlocks',
+                'uploadQuestionBlocksFile',
+                'uploadQuestionBlocks',
                 'saveSequence',
             ]
         );
@@ -65,6 +74,19 @@ class DeiaQuestionBlockGridHandler extends GridHandler
         $this->setEmptyRowText('plugins.generic.deiaSurvey.questionBlocks.noneCreated');
 
         $router = $request->getRouter();
+        $this->addAction(
+            new LinkAction(
+                'importQuestionBlocks',
+                new AjaxModal(
+                    $router->url($request, null, null, 'importQuestionBlocks'),
+                    __('plugins.generic.deiaSurvey.questionBlocks.import'),
+                    'modal_add_item',
+                    true
+                ),
+                __('plugins.generic.deiaSurvey.questionBlocks.import'),
+                'add_item'
+            )
+        );
         $this->addAction(
             new LinkAction(
                 'createDeiaQuestionBlock',
@@ -115,7 +137,7 @@ class DeiaQuestionBlockGridHandler extends GridHandler
 
     public function initFeatures($request, $args)
     {
-        return [new OrderGridItemsFeature()];
+        return [new OrderGridItemsFeature(), new DeiaQuestionBlockExportFeature()];
     }
 
     public function getDataElementSequence($gridDataElement)
@@ -246,6 +268,120 @@ class DeiaQuestionBlockGridHandler extends GridHandler
         }
 
         return new JSONMessage(false);
+    }
+
+    public function exportSelectedQuestionBlocks($args, $request): void
+    {
+        if (!$request->checkCSRF()) {
+            exit;
+        }
+
+        $context = $request->getContext();
+        $selectedBlockIds = array_map('intval', (array) $request->getUserVar('selectedDeiaQuestionBlocks'));
+        $blocks = $this->getBlocksForExport($selectedBlockIds, $context->getId());
+
+        if (empty($blocks)) {
+            exit;
+        }
+
+        $serializer = new DeiaQuestionBlockJsonSerializer();
+        $json = json_encode($serializer->serializeBlocks($blocks), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+        header('content-type: application/json');
+        header('content-disposition: attachment; filename=deia-question-blocks-' . date('Ymd') . '.json');
+        echo $json;
+        exit;
+    }
+
+    public function importQuestionBlocks($args, $request)
+    {
+        $templateMgr = TemplateManager::getManager($request);
+        $templateMgr->assign('baseUrl', $request->getBaseUrl());
+
+        return new JSONMessage(
+            true,
+            $templateMgr->fetch($this->plugin->getTemplateResource('deiaQuestionBlocks/importQuestionBlocks.tpl'))
+        );
+    }
+
+    public function uploadQuestionBlocksFile($args, $request)
+    {
+        $temporaryFileManager = new TemporaryFileManager();
+        $temporaryFile = $temporaryFileManager->handleUpload('uploadedFile', $request->getUser()->getId());
+
+        if (!$temporaryFile) {
+            return new JSONMessage(false, __('plugins.generic.deiaSurvey.questionBlocks.import.uploadError'));
+        }
+
+        $json = new JSONMessage(true);
+        $json->setAdditionalAttributes([
+            'temporaryFileId' => $temporaryFile->getId(),
+        ]);
+
+        return $json;
+    }
+
+    public function uploadQuestionBlocks($args, $request)
+    {
+        if (!$request->checkCSRF() || !$request->getUserVar('temporaryFileId')) {
+            return new JSONMessage(false);
+        }
+
+        $temporaryFileDao = DAORegistry::getDAO('TemporaryFileDAO'); /** @var TemporaryFileDAO $temporaryFileDao */
+        $temporaryFile = $temporaryFileDao->getTemporaryFile(
+            $request->getUserVar('temporaryFileId'),
+            $request->getUser()->getId()
+        );
+
+        if (!$temporaryFile) {
+            return new JSONMessage(false, __('plugins.generic.deiaSurvey.questionBlocks.import.uploadError'));
+        }
+
+        $temporaryFileManager = new TemporaryFileManager();
+
+        try {
+            $json = file_get_contents($temporaryFile->getFilePath());
+            (new DeiaQuestionBlockJsonImporter())->import($json, $request->getContext()->getId());
+        } catch (\InvalidArgumentException $exception) {
+            return new JSONMessage(false, $exception->getMessage());
+        } finally {
+            $temporaryFileManager->deleteById($temporaryFile->getId(), $request->getUser()->getId());
+        }
+
+        $notificationMgr = new NotificationManager();
+        $notificationMgr->createTrivialNotification($request->getUser()->getId());
+
+        return DAO::getDataChangedEvent();
+    }
+
+    private function getBlocksForExport(array $blockIds, int $contextId): array
+    {
+        $blocks = [];
+
+        foreach ($blockIds as $blockId) {
+            $block = Repo::deiaQuestionBlock()->get($blockId, $contextId);
+            if (!$block) {
+                continue;
+            }
+
+            $questions = Repo::deiaQuestion()->getCollector()
+                ->filterByContextIds([$contextId])
+                ->filterByQuestionBlockIds([$block->getId()])
+                ->getMany()
+                ->toArray();
+
+            foreach ($questions as $question) {
+                $question->setData('responseOptions', Repo::deiaResponseOption()->getCollector()
+                    ->filterByQuestionIds([$question->getId()])
+                    ->getMany()
+                    ->toArray());
+            }
+
+            $block->setData('questions', $questions);
+            $blocks[] = $block;
+        }
+
+        return $blocks;
     }
 }
 

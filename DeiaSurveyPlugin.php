@@ -11,7 +11,6 @@ use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
 use APP\plugins\generic\deiaSurvey\classes\observers\listeners\MigrateResponsesOnRegistration;
-use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\plugins\generic\deiaSurvey\report\DeiaSurveyReportPlugin;
 use APP\template\TemplateManager;
 use Illuminate\Database\Migrations\Migration;
@@ -259,7 +258,7 @@ class DeiaSurveyPlugin extends GenericPlugin
                         ),
                         $this->getDisplayName()
                     ),
-                    __('manager.plugins.settings'),
+                    __('plugins.generic.deiaSurvey.settings.title'),
                     null
                 ),
             ],
@@ -269,42 +268,25 @@ class DeiaSurveyPlugin extends GenericPlugin
 
     public function manage($args, $request)
     {
-        $context = $request->getContext();
-        $contextId = ($context == null) ? 0 : $context->getId();
-
         switch ($request->getUserVar('verb')) {
             case 'settings':
                 $templateMgr = TemplateManager::getManager();
-                $templateMgr->registerPlugin('function', 'plugin_url', [$this, 'smartyPluginUrl']);
                 $method = $request->getUserVar('method') ?? 'display';
 
                 if ($method === 'display') {
-                    $templateMgr->assign('pluginName', $this->getName());
+                    $templateMgr->assign([
+                        'encryptionSecretDefined' => (new DataEncryption())->secretConfigExists(),
+                        'pluginName' => $this->getName(),
+                        'questionBlockExportFeatureJsUrl' => $request->getBaseUrl()
+                            . '/'
+                            . $this->getPluginPath()
+                            . '/js/DeiaQuestionBlockExportFeature.js',
+                    ]);
                     return new JSONMessage(
                         true,
                         $templateMgr->fetch($this->getTemplateResource('settings/index.tpl'))
                     );
                 }
-
-                $apiOptions = [
-                    OrcidClient::ORCID_API_URL_PUBLIC => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.public',
-                    OrcidClient::ORCID_API_URL_PUBLIC_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.publicSandbox',
-                    OrcidClient::ORCID_API_URL_MEMBER => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.member',
-                    OrcidClient::ORCID_API_URL_MEMBER_SANDBOX => 'plugins.generic.deiaSurvey.settings.orcidAPIPath.memberSandbox'
-                ];
-                $templateMgr->assign('orcidApiUrls', $apiOptions);
-
-                $form = new DeiaSurveySettingsForm($this, $contextId);
-                if ($request->getUserVar('save')) {
-                    $form->readInputData();
-                    if ($form->validate()) {
-                        $form->execute();
-                        return new JSONMessage(true);
-                    }
-                } else {
-                    $form->initData();
-                }
-                return new JSONMessage(true, $form->fetch($request));
         }
         return parent::manage($args, $request);
     }
