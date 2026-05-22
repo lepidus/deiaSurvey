@@ -5,10 +5,12 @@ namespace APP\plugins\generic\deiaSurvey\report\classes;
 class QuestionStatistics
 {
     private array $responseOptionsCounts;
+    private int $filledResponseCount;
 
     public function __construct()
     {
         $this->responseOptionsCounts = [];
+        $this->filledResponseCount = 0;
     }
 
     public function incrementOptionCount(int $responseOptionId): void
@@ -28,5 +30,15 @@ class QuestionStatistics
     public function getAllCounts(): array
     {
         return $this->responseOptionsCounts;
+    }
+
+    public function incrementFilledResponseCount(): void
+    {
+        $this->filledResponseCount++;
+    }
+
+    public function getFilledResponseCount(): int
+    {
+        return $this->filledResponseCount;
     }
 }
