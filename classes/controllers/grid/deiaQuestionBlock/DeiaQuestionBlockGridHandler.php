@@ -137,6 +137,7 @@ class DeiaQuestionBlockGridHandler extends GridHandler
 
     public function initFeatures($request, $args)
     {
+        import('plugins.generic.deiaSurvey.classes.controllers.grid.deiaQuestionBlock.DeiaQuestionBlockExportFeature');
         return [new OrderGridItemsFeature(), new DeiaQuestionBlockExportFeature()];
     }
 

@@ -2,8 +2,8 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\report;
 
-use PKP\tests\PKPTestCase;
 use APP\plugins\generic\deiaSurvey\report\classes\QuestionStatistics;
+use PKP\tests\PKPTestCase;
 
 class QuestionStatisticsTest extends PKPTestCase
 {
@@ -44,5 +44,13 @@ class QuestionStatisticsTest extends PKPTestCase
     {
         $nonExistentResponseOptionId = 123;
         $this->assertEquals(0, $this->questionStatistics->getOptionCount($nonExistentResponseOptionId));
+    }
+
+    public function testCanCountFilledTextResponses(): void
+    {
+        $this->questionStatistics->incrementFilledResponseCount();
+        $this->questionStatistics->incrementFilledResponseCount();
+
+        $this->assertEquals(2, $this->questionStatistics->getFilledResponseCount());
     }
 }
