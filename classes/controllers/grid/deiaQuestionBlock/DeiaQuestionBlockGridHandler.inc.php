@@ -156,6 +156,7 @@ class DeiaQuestionBlockGridHandler extends \GridHandler
     public function initFeatures($request, $args)
     {
         import('lib.pkp.classes.controllers.grid.feature.OrderGridItemsFeature');
+        require_once __DIR__ . '/DeiaQuestionBlockExportFeature.php';
         return array(new \OrderGridItemsFeature(), new DeiaQuestionBlockExportFeature());
     }
 

@@ -176,9 +176,6 @@ describe('DEIA Survey - Question blocks import and export', function () {
     }
 
     function importQuestionBlocks(payload) {
-        cy.get('#deiaQuestionBlockGridContainer').contains('a', 'Import').click({force: true});
-        cy.get('form#deiaQuestionBlocksImportForm').should('be.visible');
-
         cy.window().then((win) => {
             const file = new win.File(
                 [JSON.stringify(payload, null, 2)],

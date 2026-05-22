@@ -226,6 +226,9 @@ msgstr "Usuarios que consintieron"
 msgid "plugins.generic.deiaSurvey.report.usersWhoDidNotConsent"
 msgstr "Usuarios que no consintieron"
 
+msgid "plugins.generic.deiaSurvey.report.responsesCount"
+msgstr "Respuestas"
+
 
 
 msgid "plugins.generic.deiaSurvey.questionBlocks"
@@ -268,7 +271,7 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.defaultTitle"
 msgstr "Preguntas SciELO"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.defaultDescription"
-msgstr "Preguntas estándar SciELO para recopilar datos demográficos e identitarios de autores."
+msgstr "Preguntas estándar SciELO para recopilar datos demográficos e identitarios."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.create"
 msgstr "Crear pregunta"
