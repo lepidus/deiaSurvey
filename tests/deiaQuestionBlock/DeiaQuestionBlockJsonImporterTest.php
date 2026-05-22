@@ -17,7 +17,7 @@ class DeiaQuestionBlockJsonImporterTest extends \DatabaseTestCase
 {
     use TestHelperTrait;
 
-    private int $contextId;
+    private $contextId;
 
     protected function getAffectedTables(): array
     {
