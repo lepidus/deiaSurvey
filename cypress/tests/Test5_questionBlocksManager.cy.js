@@ -27,7 +27,6 @@ describe('DEIA Survey - Question blocks manager', function () {
 
         cy.get('tr#' + pluginRowId + ' a.show_extras').click();
         cy.get('a[id^=' + pluginRowId + '-settings-button]').click();
-        cy.contains('a', 'Question Blocks').click();
         cy.get('#deiaQuestionBlockGridContainer').contains(defaultQuestionBlockTitle);
     }
 
@@ -120,7 +119,7 @@ describe('DEIA Survey - Question blocks manager', function () {
         cy.contains('a', 'Create question').click();
         fillVisibleField('input[name^="questionText["]', question.text);
         fillVisibleField('textarea[name^="questionDescription["]', question.description);
-        cy.get('select[name="questionType"]').invoke('val', type);
+        cy.get('select[name="questionType"]').invoke('val', type).trigger('change', {force: true});
 
         if (optionsWithInputs) {
             optionsWithInputs.forEach((option) => {
@@ -156,7 +155,7 @@ describe('DEIA Survey - Question blocks manager', function () {
     }
 
     function setBlockStatus(title) {
-        rowWithText(title).find('input[type="checkbox"]').click({force: true});
+        rowWithText(title).find('input[type="checkbox"]').filter(':visible').first().click({force: true});
         cy.get('div[aria-label="Confirm"] button:contains("OK")').click();
         cy.waitJQuery();
         cy.wait(500);
