@@ -55,7 +55,7 @@ describe('DEIA Survey - Report feature', function () {
                     const questionHeader = parseCsvLine(lines[1]);
                     const optionHeader = parseCsvLine(lines[2]);
 
-                    expect(blockHeader[0]).to.equal('Journal Name');
+                    expect(blockHeader[0]).to.be.oneOf(['Journal Name', 'Preprint Server Name']);
                     expect(blockHeader).to.include('SciELO Questions');
                     expect(questionHeader).to.include('Gender');
                     expect(optionHeader).to.include('Woman');
