@@ -271,7 +271,7 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.defaultTitle"
 msgstr "Perguntas SciELO"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.defaultDescription"
-msgstr "Perguntas padrão SciELO para coletar dados demográficos e identitários de autores."
+msgstr "Perguntas padrão SciELO para coletar dados demográficos e identitários."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.create"
 msgstr "Criar pergunta"

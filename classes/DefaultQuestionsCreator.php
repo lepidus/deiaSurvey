@@ -23,9 +23,9 @@ class DefaultQuestionsCreator
                     'es_ES' => 'Preguntas SciELO',
                 ],
                 'description' => [
-                    'en_US' => 'Standard SciELO questions for collecting author demographic and identity data.',
-                    'pt_BR' => 'Perguntas padrão SciELO para coletar dados demográficos e identitários de autores.',
-                    'es_ES' => 'Preguntas estándar SciELO para recopilar datos demográficos e identitarios de autores.',
+                    'en_US' => 'Standard SciELO questions for collecting demographic and identity data.',
+                    'pt_BR' => 'Perguntas padrão SciELO para coletar dados demográficos e identitários.',
+                    'es_ES' => 'Preguntas estándar SciELO para recopilar datos demográficos e identitarios.',
                 ],
                 'active' => 1,
                 'sequence' => 1
