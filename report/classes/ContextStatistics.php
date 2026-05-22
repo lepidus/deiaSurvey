@@ -2,7 +2,7 @@
 
 namespace APP\plugins\generic\deiaSurvey\report\classes;
 
-use APP\plugins\generic\deiaSurvey\report\classes\QuestionStatistics;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 
 class ContextStatistics
 {
@@ -51,24 +51,42 @@ class ContextStatistics
     {
         $resultStats = [];
 
-        foreach ($contextPrintGuide as $questionId => $responseOptionIds) {
-            $questionStats = $this->getQuestionStatistics($questionId);
-
-            if (is_null($questionStats)) {
+        foreach ($contextPrintGuide as $questionGuide) {
+            $questionId = $questionGuide['questionId'] ?? null;
+            if (is_null($questionId)) {
+                $resultStats[] = 0;
                 continue;
             }
 
-            foreach ($responseOptionIds as $responseOptionId) {
-                $count = $questionStats->getOptionCount($responseOptionId);
-                if (!is_null($count)) {
-                    $resultStats[] = $count;
-                }
+            $questionStats = $this->getQuestionStatistics($questionId);
+
+            if (is_null($questionStats)) {
+                $resultStats[] = 0;
+                continue;
             }
+
+            if ($this->questionTypeHasResponseOptions($questionGuide['questionType'])) {
+                foreach ($questionGuide['responseOptions'] as $responseOption) {
+                    $resultStats[] = $questionStats->getOptionCount($responseOption['id'] ?? null);
+                }
+                continue;
+            }
+
+            $resultStats[] = $questionStats->getFilledResponseCount();
         }
 
         $resultStats[] = $this->getUsersConsentCount();
         $resultStats[] = $this->getUsersNoConsentCount();
 
         return $resultStats;
+    }
+
+    private function questionTypeHasResponseOptions(int $questionType): bool
+    {
+        return in_array($questionType, [
+            DeiaQuestion::TYPE_CHECKBOXES,
+            DeiaQuestion::TYPE_RADIO_BUTTONS,
+            DeiaQuestion::TYPE_DROP_DOWN_BOX,
+        ]);
     }
 }

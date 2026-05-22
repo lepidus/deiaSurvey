@@ -2,17 +2,17 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\report;
 
-use PKP\tests\PKPTestCase;
-use APP\journal\Journal;
 use APP\core\Application;
 use APP\core\PageRouter;
-use PKP\core\Dispatcher;
-use PKP\core\Registry;
-use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
+use APP\journal\Journal;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
+use APP\plugins\generic\deiaSurvey\DeiaSurveyPlugin;
 use APP\plugins\generic\deiaSurvey\report\classes\ContextStatistics;
 use APP\plugins\generic\deiaSurvey\report\classes\QuestionStatistics;
 use APP\plugins\generic\deiaSurvey\report\classes\SiteStatisticsReport;
-use APP\plugins\generic\deiaSurvey\DeiaSurveyPlugin;
+use PKP\core\Dispatcher;
+use PKP\core\Registry;
+use PKP\tests\PKPTestCase;
 
 class SiteStatisticsReportTest extends PKPTestCase
 {
@@ -26,7 +26,7 @@ class SiteStatisticsReportTest extends PKPTestCase
         parent::setUp();
         $this->initializeRequestRouter();
         $this->siteReport = new SiteStatisticsReport($this->locale);
-        $this->context  = $this->createTestJournal();
+        $this->context = $this->createTestJournal();
         $this->contextStats = $this->createTestContextStats();
         $this->initializePluginLocaleData();
     }
@@ -70,19 +70,12 @@ class SiteStatisticsReportTest extends PKPTestCase
         $questionStats->incrementOptionCount(2);
 
         $secondQuestionStats = new QuestionStatistics();
-        $secondQuestionStats->incrementOptionCount(4);
-        $secondQuestionStats->incrementOptionCount(5);
-        $secondQuestionStats->incrementOptionCount(5);
-
-        $thirdQuestionStats = new QuestionStatistics();
-        $thirdQuestionStats->incrementOptionCount(7);
-        $thirdQuestionStats->incrementOptionCount(8);
-        $thirdQuestionStats->incrementOptionCount(8);
+        $secondQuestionStats->incrementFilledResponseCount();
+        $secondQuestionStats->incrementFilledResponseCount();
 
         $contextStats = new ContextStatistics();
         $contextStats->addQuestionStatistics(1, $questionStats);
         $contextStats->addQuestionStatistics(2, $secondQuestionStats);
-        $contextStats->addQuestionStatistics(3, $thirdQuestionStats);
         $contextStats->setUsersConsentCount(5);
         $contextStats->setUsersNoConsentCount(3);
 
@@ -92,36 +85,55 @@ class SiteStatisticsReportTest extends PKPTestCase
     private function createTestPrintingGuide(): array
     {
         return [
-            1 => [1, 2, 3],
-            2 => [4, 5, 6],
-            3 => [7, 8, 9]
+            [
+                'blockTitle' => 'SciELO Questions',
+                'questionId' => 1,
+                'questionText' => 'Gender',
+                'questionType' => DeiaQuestion::TYPE_RADIO_BUTTONS,
+                'responseOptions' => [
+                    ['id' => 1, 'text' => 'Woman'],
+                    ['id' => 2, 'text' => 'Man'],
+                    ['id' => 3, 'text' => 'Non-binary'],
+                ],
+            ],
+            [
+                'blockTitle' => 'Custom Questions',
+                'questionId' => 2,
+                'questionText' => 'Accessibility needs',
+                'questionType' => DeiaQuestion::TYPE_TEXTAREA,
+                'responseOptions' => [],
+            ],
         ];
     }
 
     private function generateExpectedHeader(): array
     {
-        $defaultQuestionsData = DefaultQuestionsCreator::getDefaultQuestionsData(1);
-
         $firstRow = [__('plugins.generic.deiaSurvey.report.contextName.ojs2', [], $this->locale)];
         $secondRow = [''];
+        $thirdRow = [''];
 
-        foreach ($defaultQuestionsData as $questionData) {
-            $firstRow[] = __($questionData['questionText'], [], $this->locale);
+        $firstRow[] = 'SciELO Questions';
+        $firstRow[] = '';
+        $firstRow[] = '';
+        $secondRow[] = 'Gender';
+        $secondRow[] = '';
+        $secondRow[] = '';
+        $thirdRow[] = 'Woman';
+        $thirdRow[] = 'Man';
+        $thirdRow[] = 'Non-binary';
 
-            foreach ($questionData['responseOptions'] as $index => $optionData) {
-                if ($index > 0) {
-                    $firstRow[] = '';
-                }
-                $secondRow[] = __($optionData['optionText'], [], $this->locale);
-            }
-        }
+        $firstRow[] = 'Custom Questions';
+        $secondRow[] = 'Accessibility needs';
+        $thirdRow[] = __('plugins.generic.deiaSurvey.report.responsesCount', [], $this->locale);
 
         $firstRow[] = __('plugins.generic.deiaSurvey.report.usersWhoConsented', [], $this->locale);
         $secondRow[] = '';
+        $thirdRow[] = '';
         $firstRow[] = __('plugins.generic.deiaSurvey.report.usersWhoDidNotConsent', [], $this->locale);
         $secondRow[] = '';
+        $thirdRow[] = '';
 
-        return [$firstRow, $secondRow];
+        return [$firstRow, $secondRow, $thirdRow];
     }
 
     public function testHasContextsStatistics()
@@ -136,6 +148,7 @@ class SiteStatisticsReportTest extends PKPTestCase
 
     public function testGetReportHeader()
     {
+        $this->siteReport->addContextStatistics($this->context, $this->contextStats, $this->createTestPrintingGuide());
         $expectedHeader = $this->generateExpectedHeader();
         $this->assertEquals($expectedHeader, $this->siteReport->getReportHeader());
     }
@@ -157,8 +170,10 @@ class SiteStatisticsReportTest extends PKPTestCase
         $this->assertEquals($expectedHeader[0], $row);
         $row = fgetcsv($csvFile);
         $this->assertEquals($expectedHeader[1], $row);
+        $row = fgetcsv($csvFile);
+        $this->assertEquals($expectedHeader[2], $row);
 
-        $expectedDataRow = ['Test Journal', '1', '2', '0', '1', '2', '0', '1', '2', '0', '5', '3'];
+        $expectedDataRow = ['Test Journal', '1', '2', '0', '2', '5', '3'];
         $row = fgetcsv($csvFile);
         $this->assertEquals($expectedDataRow, $row);
 
