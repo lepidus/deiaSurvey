@@ -10,7 +10,7 @@ use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 
 class ContextStatisticsFactory
 {
-    private int $contextId;
+    private $contextId;
 
     public function __construct(int $contextId)
     {

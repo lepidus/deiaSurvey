@@ -122,8 +122,9 @@ class DeiaQuestionBlockJsonImporter
     {
         usort(
             $items,
-            fn (array $first, array $second): int => ($first['sequence'] ?? REALLY_BIG_NUMBER)
-                <=> ($second['sequence'] ?? REALLY_BIG_NUMBER)
+            function (array $first, array $second): int {
+                return ($first['sequence'] ?? REALLY_BIG_NUMBER) <=> ($second['sequence'] ?? REALLY_BIG_NUMBER);
+            }
         );
 
         return $items;
