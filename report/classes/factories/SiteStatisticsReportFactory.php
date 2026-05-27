@@ -3,10 +3,9 @@
 namespace APP\plugins\generic\deiaSurvey\report\classes\factories;
 
 use APP\core\Application;
-use PKP\facades\Locale;
-use APP\plugins\generic\deiaSurvey\report\classes\SiteStatisticsReport;
-use APP\plugins\generic\deiaSurvey\report\classes\factories\ContextStatisticsFactory;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\report\classes\SiteStatisticsReport;
+use PKP\facades\Locale;
 
 class SiteStatisticsReportFactory
 {

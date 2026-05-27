@@ -2,9 +2,9 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\deiaQuestion;
 
-use PKP\tests\PKPTestCase;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
+use PKP\tests\PKPTestCase;
 
 class DeiaQuestionTest extends PKPTestCase
 {
@@ -81,7 +81,7 @@ class DeiaQuestionTest extends PKPTestCase
     {
         $this->deiaQuestion->setIsTranslated(true);
 
-        $expectedQuestionText = "What is your ethnicity?";
+        $expectedQuestionText = 'What is your ethnicity?';
         $this->deiaQuestion->setQuestionText($expectedQuestionText, 'en');
         $questionText = $this->deiaQuestion->getLocalizedQuestionText();
         $this->assertEquals($expectedQuestionText, $questionText);
@@ -106,7 +106,7 @@ class DeiaQuestionTest extends PKPTestCase
         $questionText = $this->deiaQuestion->getLocalizedQuestionText();
         $this->assertEquals($expectedQuestionText, $questionText);
 
-        $expectedQuestionText = "What is your ethnicity?";
+        $expectedQuestionText = 'What is your ethnicity?';
         $this->deiaQuestion->setData('questionText', $expectedQuestionText, 'en');
         $questionText = $this->deiaQuestion->getLocalizedQuestionText();
         $this->assertEquals($expectedQuestionText, $questionText);
@@ -116,12 +116,12 @@ class DeiaQuestionTest extends PKPTestCase
     {
         $this->deiaQuestion->setIsTranslated(true);
 
-        $expectedQuestionDescription = "Ethnicity refers to a group of people who share
+        $expectedQuestionDescription = 'Ethnicity refers to a group of people who share
             common cultural, historical, linguistic, or ancestral characteristics.
             These characteristics may include geographic origin, language, religion, customs,
             traditions, and shared history. Ethnicity is often associated with cultural identity
             and can play a significant role in shaping the individual and collective identity
-            of a group of people.";
+            of a group of people.';
 
         $this->deiaQuestion->setQuestionDescription($expectedQuestionDescription, 'en');
         $questionDescription = $this->deiaQuestion->getLocalizedQuestionDescription();
@@ -147,7 +147,7 @@ class DeiaQuestionTest extends PKPTestCase
         $questionDescription = $this->deiaQuestion->getLocalizedQuestionDescription();
         $this->assertEquals($expectedQuestionDescription, $questionDescription);
 
-        $expectedQuestionDescription = "Lorem ipsum dolor sit amet";
+        $expectedQuestionDescription = 'Lorem ipsum dolor sit amet';
         $this->deiaQuestion->setData('questionDescription', $expectedQuestionDescription, 'en');
         $questionDescription = $this->deiaQuestion->getLocalizedQuestionDescription();
         $this->assertEquals($expectedQuestionDescription, $questionDescription);

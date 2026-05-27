@@ -4,8 +4,8 @@ namespace APP\plugins\generic\deiaSurvey\tests\deiaResponse;
 
 use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DeiaResponse;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponse\Repository;
-use PKP\tests\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
+use PKP\tests\DatabaseTestCase;
 
 class RepositoryTest extends DatabaseTestCase
 {

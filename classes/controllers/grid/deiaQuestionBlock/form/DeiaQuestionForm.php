@@ -3,11 +3,11 @@
 namespace APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\form;
 
 use APP\core\Application;
-use APP\i18n\AppLocale;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\template\TemplateManager;
 use PKP\controllers\listbuilder\ListbuilderHandler;
+use PKP\facades\Locale;
 use PKP\form\Form;
 use PKP\form\validation\FormValidator;
 use PKP\form\validation\FormValidatorCSRF;
@@ -182,7 +182,7 @@ class DeiaQuestionForm extends Form
         return true;
     }
 
-    public function getLocaleFieldNames()
+    public function getLocaleFieldNames(): array
     {
         return ['questionText', 'questionDescription'];
     }
@@ -233,7 +233,7 @@ class DeiaQuestionForm extends Form
             return [];
         }
 
-        $locale = AppLocale::getLocale();
+        $locale = Locale::getLocale();
         $responseOptions = [];
 
         foreach ($this->getExistingResponseOptions() as $responseOption) {

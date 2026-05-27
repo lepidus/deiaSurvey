@@ -11,6 +11,7 @@ use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
 use APP\plugins\generic\deiaSurvey\classes\observers\listeners\MigrateResponsesOnRegistration;
+use APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler;
 use APP\plugins\generic\deiaSurvey\report\DeiaSurveyReportPlugin;
 use APP\template\TemplateManager;
 use Illuminate\Database\Migrations\Migration;
@@ -27,7 +28,7 @@ class DeiaSurveyPlugin extends GenericPlugin
 {
     public function register($category, $path, $mainContextId = null): bool
     {
-        $success = parent::register($category, $path);
+        $success = parent::register($category, $path, $mainContextId);
         $encrypter = new DataEncryption();
 
         if ($success && $this->getEnabled() && $encrypter->secretConfigExists()) {
@@ -194,9 +195,10 @@ class DeiaSurveyPlugin extends GenericPlugin
 
     public function addPageHandler($hookName, $params)
     {
-        $page = $params[0];
-        if ($page == 'deiaQuestionnaire') {
-            define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler');
+        $page = &$params[0];
+        $handler = &$params[3];
+        if ($this->getEnabled() && $page === 'deiaQuestionnaire') {
+            $handler = new QuestionnaireHandler();
             return true;
         }
         return false;

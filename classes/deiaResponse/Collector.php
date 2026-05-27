@@ -4,8 +4,8 @@ namespace APP\plugins\generic\deiaSurvey\classes\deiaResponse;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
-use PKP\core\interfaces\CollectorInterface;
 use Illuminate\Support\LazyCollection;
+use PKP\core\interfaces\CollectorInterface;
 
 class Collector implements CollectorInterface
 {

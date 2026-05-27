@@ -2,9 +2,9 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\migrations;
 
+use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
-use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 
 class EncryptResponsesMigration extends Migration
 {

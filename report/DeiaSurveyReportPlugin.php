@@ -2,9 +2,9 @@
 
 namespace APP\plugins\generic\deiaSurvey\report;
 
-use PKP\plugins\ReportPlugin;
-use PKP\config\Config;
 use APP\plugins\generic\deiaSurvey\report\classes\factories\SiteStatisticsReportFactory;
+use PKP\config\Config;
+use PKP\plugins\ReportPlugin;
 
 class DeiaSurveyReportPlugin extends ReportPlugin
 {

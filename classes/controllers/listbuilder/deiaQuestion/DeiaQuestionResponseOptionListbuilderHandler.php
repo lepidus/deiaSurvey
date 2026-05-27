@@ -2,13 +2,13 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\controllers\listbuilder\deiaQuestion;
 
-use APP\i18n\AppLocale;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\template\TemplateManager;
 use PKP\controllers\listbuilder\ListbuilderGridColumn;
 use PKP\controllers\listbuilder\ListbuilderHandler;
 use PKP\controllers\listbuilder\MultilingualListbuilderGridColumn;
 use PKP\controllers\listbuilder\settings\SetupListbuilderHandler;
+use PKP\facades\Locale;
 use PKP\plugins\PluginRegistry;
 
 class DeiaQuestionResponseOptionListbuilderHandler extends SetupListbuilderHandler
@@ -61,7 +61,7 @@ class DeiaQuestionResponseOptionListbuilderHandler extends SetupListbuilderHandl
             return $formattedResponses;
         }
 
-        $locale = AppLocale::getLocale();
+        $locale = Locale::getLocale();
         $responseOptions = Repo::deiaResponseOption()->getCollector()
             ->filterByQuestionIds([$this->deiaQuestionId])
             ->getMany();

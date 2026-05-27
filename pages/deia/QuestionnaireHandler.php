@@ -2,17 +2,16 @@
 
 namespace APP\plugins\generic\deiaSurvey\pages\deia;
 
-use APP\handler\Handler;
 use APP\core\Application;
-use APP\template\TemplateManager;
-use PKP\plugins\PluginRegistry;
-use PKP\config\Config;
-use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\handler\Handler;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
-use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
-use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
+use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
+use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
+use APP\template\TemplateManager;
+use PKP\plugins\PluginRegistry;
 
 class QuestionnaireHandler extends Handler
 {
@@ -130,7 +129,7 @@ class QuestionnaireHandler extends Handler
             $responsesExternalType = 'orcid';
         }
 
-        $deiaDataService  = new DeiaDataService();
+        $deiaDataService = new DeiaDataService();
         $deiaDataService->registerExternalAuthorResponses($responsesExternalId, $responsesExternalType, $responses, $responseOptionsInputs);
 
         $templateMgr->assign([
@@ -156,7 +155,7 @@ class QuestionnaireHandler extends Handler
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
-        $deiaDataService  = new DeiaDataService();
+        $deiaDataService = new DeiaDataService();
         if (!$deiaDataService->authorAlreadyAnsweredQuestionnaire($author)) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.onlyWhoAnsweredCanDelete'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
@@ -224,7 +223,7 @@ class QuestionnaireHandler extends Handler
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
-        $deiaDataService  = new DeiaDataService();
+        $deiaDataService = new DeiaDataService();
         if ($deiaDataService->authorAlreadyAnsweredQuestionnaire($author, $authorOrcidUri)) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.alreadyAnswered'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));

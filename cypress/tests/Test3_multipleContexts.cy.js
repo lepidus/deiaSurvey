@@ -45,7 +45,7 @@ describe('DEIA Survey - Multiple contexts', function () {
         cy.contains('h1', 'Administration');
         cy.contains('a', 'Hosted ' + contextNounUpper + 's').click();
         cy.contains('a', 'Create ' + contextNounUpper).click();
-        cy.wait(1000);
+        cy.wait(500);
 
         cy.get('input[name="name-en"]').type(newContextData.title, {delay: 0});
         cy.get('input[name="acronym-en"]').type(newContextData.initials, {delay: 0});
@@ -63,11 +63,12 @@ describe('DEIA Survey - Multiple contexts', function () {
             cy.get('input[name="enabled"]').check();
         });
         cy.contains('.pkpButton', 'Save').click();
-        cy.wait(10000);
+        cy.wait(500);
 
         cy.contains('h1', 'Settings Wizard');
         cy.get('#context-name-control-en').should('have.value', newContextData.title);
     });
+
     it('Users register to new context', function () {
         let contextNoun = 'journal';
         if (Cypress.env('contextTitles').en == 'Public Knowledge Preprint Server') {
@@ -88,8 +89,8 @@ describe('DEIA Survey - Multiple contexts', function () {
         cy.logout();
 
         cy.login('dsokoloff', null, 'publicknowledge');
-        cy.get('.app__headerActions button').eq(1).click();
-        cy.contains('a', 'Edit Profile').click();
+        cy.get('[data-cy="app-user-nav"] button').click();
+		cy.get('a:contains("Edit Profile")').click();
         cy.contains('h1', 'Profile');
         cy.contains('a', 'Roles').click();
         cy.contains('Register with other ' + contextNoun).click();
@@ -101,22 +102,25 @@ describe('DEIA Survey - Multiple contexts', function () {
         cy.get('button:visible:contains("Save")').click();
         cy.contains('Your changes have been saved');
     });
+
     it('Admin enables DEIA Survey plugin in new context', function () {
 		cy.login('admin', 'admin', newContextData.path);
 
-		cy.contains('a', 'Website').click();
-
-		cy.waitJQuery();
-		cy.get('#plugins-button').click();
+		cy.get('nav').contains('Settings').click();
+        cy.get('nav').contains('Website').click();
+        cy.get('#plugins-button').click();
 
 		cy.get('input[id^=select-cell-deiasurveyplugin]').check();
 		cy.get('input[id^=select-cell-deiasurveyplugin]').should('be.checked');
+
+        cy.logout();
 	});
+
     it('Users who answered the survey can not need answer it on a second context', function () {
         cy.login('dsokoloff', null, newContextData.path);
-        cy.contains('h1', 'Submissions');
-        cy.get('.app__headerActions button').eq(1).click();
-        cy.contains('a', 'Edit Profile').click();
+        cy.contains('h1', 'Active submissions');
+        cy.get('[data-cy="app-user-nav"] button').click();
+		cy.get('a:contains("Edit Profile")').click();
         cy.get('span:contains("We request that you fill in the DEIA survey")').should('not.exist');
         cy.contains('a', 'DEIA Survey').click();
 
@@ -125,6 +129,7 @@ describe('DEIA Survey - Multiple contexts', function () {
         cy.contains('To check your data, access the survey in "' + Cypress.env('contextTitles').en + '"');
         assertDisabledFields();
     });
+
     it('Users can answer the survey in the new context', function () {
         let sberardoAnswers = [
             {'title': 'Gender', 'chosenOption': 'Woman'},

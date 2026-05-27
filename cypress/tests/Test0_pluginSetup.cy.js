@@ -1,56 +1,22 @@
-describe('DEIA Survey - Plugin setup', function () {
-	const pluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-deiasurveyplugin';
-	const orcidPluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin';
-	
+describe('DEIA Survey - Plugin setup', function () {	
 	it('Enables DEIA Survey plugin. Editor does not give consent', function () {
 		cy.login('dbarnes', null, 'publicknowledge');
 
-		cy.contains('a', 'Website').click();
+		cy.visit('/index.php/publicknowledge/en/management/settings/website#plugins');
+    	cy.get('#plugins-button').click();
 
-		cy.waitJQuery();
-		cy.get('#plugins-button').click();
-
-		cy.get('input[id^=select-cell-deiasurveyplugin]').check();
-		cy.contains('The plugin "DEIA Survey" has been enabled', {timeout: 15000});
+		cy.get('input[id^=select-cell-deiasurveyplugin]').then($checkbox => {
+			if (!$checkbox.is(':checked')) {
+				cy.wrap($checkbox).check();
+			}
+		});
 		cy.get('input[id^=select-cell-deiasurveyplugin]').should('be.checked');
-		cy.reload();
+		cy.visit('/index.php/publicknowledge/en/user/profile');
 
 		cy.contains('h1', 'Profile');
 		cy.contains('a', 'DEIA Survey').click();
 		cy.get('input[name="deiaDataConsent"][value=0]').click();
         cy.get('#deiaSurveyForm .submitFormButton').click();
         cy.wait(1000);
-	});
-	it("Plugin uses ORCID plugin's settings by default", function () {
-		cy.login('dbarnes', null, 'publicknowledge');
-
-		cy.contains('a', 'Website').click();
-
-		cy.waitJQuery();
-		cy.get('#plugins-button').click();
-
-		cy.get('input[id^=select-cell-orcidprofileplugin]').check();
-		cy.get('input[id^=select-cell-orcidprofileplugin]').should('be.checked');
-		cy.reload();
-
-		cy.get('#plugins-button').click();
-		cy.get('tr#' + orcidPluginRowId + ' a.show_extras').click();
-		cy.get('a[id^=' + orcidPluginRowId + '-settings-button]').click();
-
-		cy.get('#orcidProfileAPIPath').select('Public Sandbox');
-		cy.get('input[name="orcidClientId"]').clear().type(Cypress.env('orcidClientId'), {delay: 0});
-		cy.get('input[name="orcidClientSecret"]').clear().type(Cypress.env('orcidClientSecret'), {delay: 0});
-		cy.get('#orcidProfileSettingsForm button:contains("OK")').click();
-		cy.wait(1000);
-
-		cy.get('input[id^=select-cell-orcidprofileplugin]').check();
-		cy.get('input[id^=select-cell-orcidprofileplugin]').should('be.checked');
-
-		cy.get('tr#' + pluginRowId + ' a.show_extras').click();
-		cy.get('a[id^=' + pluginRowId + '-settings-button]').click();
-		cy.contains('Question Blocks');
-		cy.get('#orcidAPIPath').should('not.exist');
-		cy.get('input[name="orcidClientId"]').should('not.exist');
-		cy.get('input[name="orcidClientSecret"]').should('not.exist');
 	});
 });

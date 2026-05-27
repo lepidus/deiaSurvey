@@ -2,8 +2,6 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\deiaQuestion;
 
-use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DAO;
-
 class Repository
 {
     public $dao;

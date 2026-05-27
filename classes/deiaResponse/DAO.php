@@ -2,10 +2,10 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\deiaResponse;
 
-use PKP\core\EntityDAO;
-use Illuminate\Support\LazyCollection;
-use PKP\core\traits\EntityWithParent;
 use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
+use Illuminate\Support\LazyCollection;
+use PKP\core\EntityDAO;
+use PKP\core\traits\EntityWithParent;
 
 class DAO extends EntityDAO
 {

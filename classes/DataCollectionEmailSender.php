@@ -3,12 +3,10 @@
 namespace APP\plugins\generic\deiaSurvey\classes;
 
 use APP\core\Application;
-use Illuminate\Support\Facades\Mail;
-use PKP\plugins\PluginRegistry;
-use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
-use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\mail\mailables\RequestCollectionContributorData;
+use Illuminate\Support\Facades\Mail;
+use PKP\plugins\PluginRegistry;
 
 class DataCollectionEmailSender
 {
@@ -18,7 +16,7 @@ class DataCollectionEmailSender
         $nonRegisteredAuthors = $this->getNonRegisteredAuthors($submission);
 
         if (!empty($nonRegisteredAuthors)) {
-            $deiaDataService  = new DeiaDataService();
+            $deiaDataService = new DeiaDataService();
 
             foreach ($nonRegisteredAuthors as $author) {
                 if (!$deiaDataService->authorAlreadyAnsweredQuestionnaire($author)) {
@@ -91,6 +89,9 @@ class DataCollectionEmailSender
             'authorId' => $author->getId(),
             'authorToken' => $authorToken
         ]);
+
+        error_log("Generated questionnaire URL for author {$author->getData('email')}: {$questionnaireUrl}");
+        error_log("Generated ORCID questionnaire URL for author {$author->getData('email')}: {$orcidQuestionnaireUrl}");
 
         return ['questionnaireUrl' => $questionnaireUrl, 'orcidQuestionnaireUrl' => $orcidQuestionnaireUrl];
     }

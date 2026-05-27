@@ -2,8 +2,8 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes;
 
-use PKP\db\DAO;
 use Illuminate\Support\Facades\DB;
+use PKP\db\DAO;
 
 class DeiaDataDAO extends DAO
 {

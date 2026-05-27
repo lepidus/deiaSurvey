@@ -2,9 +2,9 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes;
 
-use PKP\config\Config;
-use Illuminate\Encryption\Encrypter;
 use Exception;
+use Illuminate\Encryption\Encrypter;
+use PKP\config\Config;
 
 class DataEncryption
 {
@@ -24,7 +24,7 @@ class DataEncryption
     private function getSecretFromConfig(): string
     {
         $secret = Config::getVar('security', 'api_key_secret');
-        if ($secret === "") {
+        if ($secret === '') {
             throw new Exception("DEIA Survey - A secret must be set in the config file ('api_key_secret') so that keys can be encrypted and decrypted");
         }
 
@@ -58,7 +58,7 @@ class DataEncryption
         try {
             $encryptedString = $encrypter->encrypt($plainText);
         } catch (Exception $e) {
-            throw new Exception("DEIA Survey - Failed to encrypt string");
+            throw new Exception('DEIA Survey - Failed to encrypt string');
         }
 
         return self::BASE64_PREFIX . base64_encode($encryptedString);
@@ -75,7 +75,7 @@ class DataEncryption
         try {
             $decryptedString = $encrypter->decrypt($payload);
         } catch (Exception $e) {
-            throw new Exception("DEIA Survey - Failed to decrypt string");
+            throw new Exception('DEIA Survey - Failed to decrypt string');
         }
 
         return $decryptedString;

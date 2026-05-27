@@ -27,19 +27,22 @@ describe('DEIA Survey - Report feature', function () {
 
     it('Report should be visible only for admin user', function () {
         cy.login('admin', 'admin', 'publicknowledge');
-        cy.contains('.app__navItem', 'Reports').click();
+        cy.get('nav').contains('Statistics').click();
+        cy.get('nav').contains('Reports').click();
         cy.contains('a', 'DEIA Survey Report');
         cy.logout();
 
         cy.login('dbarnes', null, 'publicknowledge');
-        cy.contains('.app__navItem', 'Reports').click();
+        cy.get('nav').contains('Statistics').click();
+        cy.get('nav').contains('Reports').click();
         cy.contains('a', 'DEIA Survey Report').should('not.exist');
         cy.logout();
     });
 
     it('Report should include question block headers', function () {
         cy.login('admin', 'admin', 'publicknowledge');
-        cy.contains('.app__navItem', 'Reports').click();
+        cy.get('nav').contains('Statistics').click();
+        cy.get('nav').contains('Reports').click();
         cy.contains('a', 'DEIA Survey Report')
             .should('have.attr', 'href')
             .then((reportUrl) => {

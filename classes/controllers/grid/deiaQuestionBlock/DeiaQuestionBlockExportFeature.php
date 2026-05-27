@@ -26,7 +26,7 @@ class DeiaQuestionBlockExportFeature extends GridFeature
         $router = $request->getRouter();
         $this->addOptions([
             'exportUrl' => $router->url($request, null, null, 'exportSelectedQuestionBlocks'),
-            'csrfToken' => $request->getSession()->getCsrfToken(),
+            'csrfToken' => $request->getSession()->token(),
             'selectName' => 'selectedDeiaQuestionBlocks',
             'noSelectionMessage' => __('plugins.generic.deiaSurvey.questionBlocks.exportSelected.noneSelected'),
         ]);

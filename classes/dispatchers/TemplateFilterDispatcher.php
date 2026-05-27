@@ -3,9 +3,8 @@
 namespace APP\plugins\generic\deiaSurvey\classes\dispatchers;
 
 use APP\core\Application;
-use PKP\plugins\Hook;
-use APP\plugins\generic\deiaSurvey\classes\dispatchers\DeiaDataDispatcher;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
+use PKP\plugins\Hook;
 
 class TemplateFilterDispatcher extends DeiaDataDispatcher
 {
