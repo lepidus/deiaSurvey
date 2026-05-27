@@ -124,6 +124,7 @@ describe('DEIA Survey - Question blocks import and export', function () {
 		cy.readFile(downloadedQuestionBlockPath).then(fileContent => {
 			fileContent.blocks[0].title.en = "Imported funding DEIA questions";
 			
+			cy.wait(1000);
 			cy.get('form#deiaQuestionBlocksImportForm input[type=file]').attachFile(
 				{fileContent, filePath: downloadedQuestionBlockPath, mimeType: 'application/json'}
 			);
