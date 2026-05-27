@@ -2,10 +2,10 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\deiaResponse;
 
-use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DeiaResponse;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DAO;
-use PKP\tests\DatabaseTestCase;
+use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DeiaResponse;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
+use PKP\tests\DatabaseTestCase;
 
 class DAOTest extends DatabaseTestCase
 {

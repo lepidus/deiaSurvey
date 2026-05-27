@@ -90,7 +90,7 @@ class DeiaQuestionBlockForm extends Form
         return $this->deiaQuestionBlockId;
     }
 
-    public function getLocaleFieldNames()
+    public function getLocaleFieldNames(): array
     {
         return ['title', 'description'];
     }

@@ -2,10 +2,10 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\migrations;
 
+use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
+use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
-use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
-use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 
 class LocalizeQuestionsTextsMigration extends Migration
 {

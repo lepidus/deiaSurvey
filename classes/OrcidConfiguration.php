@@ -2,39 +2,31 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes;
 
-use PKP\db\DAORegistry;
+use APP\core\Application;
+use PKP\orcid\OrcidManager;
 
 class OrcidConfiguration
 {
-    private const ORCID_PLUGIN_NAME = 'orcidprofileplugin';
+    private const ORCID_INTEGRATION_NAME = 'orcid';
 
     public function getOrcidConfiguration(int $contextId): ?array
     {
-        $orcidProfileConfiguration = $this->getPluginOrcidConfiguration($contextId, self::ORCID_PLUGIN_NAME, ['orcidProfileAPIPath', 'orcidClientId', 'orcidClientSecret']);
-        if (!is_null($orcidProfileConfiguration)) {
-            return $orcidProfileConfiguration;
+        $context = Application::getContextDAO()->getById($contextId);
+        if (!$context || !OrcidManager::isEnabled($context)) {
+            return null;
         }
 
-        return null;
-    }
-
-    private function getPluginOrcidConfiguration($contextId, $pluginName, $settingsNames): ?array
-    {
-        $pluginSettingsDao = DAORegistry::getDAO('PluginSettingsDAO');
-
-        $apiPath = $pluginSettingsDao->getSetting($contextId, $pluginName, $settingsNames[0]);
-        if (!is_null($apiPath)) {
-            $clientId = $pluginSettingsDao->getSetting($contextId, $pluginName, $settingsNames[1]);
-            $clientSecret = $pluginSettingsDao->getSetting($contextId, $pluginName, $settingsNames[2]);
-
-            return [
-                'pluginName' => $pluginName,
-                'apiPath' => $apiPath,
-                'clientId' => $clientId,
-                'clientSecret' => $clientSecret
-            ];
+        $clientId = OrcidManager::getClientId($context);
+        $clientSecret = OrcidManager::getClientSecret($context);
+        if (!$clientId || !$clientSecret) {
+            return null;
         }
 
-        return null;
+        return [
+            'pluginName' => self::ORCID_INTEGRATION_NAME,
+            'apiPath' => OrcidManager::getApiPath($context),
+            'clientId' => $clientId,
+            'clientSecret' => $clientSecret
+        ];
     }
 }

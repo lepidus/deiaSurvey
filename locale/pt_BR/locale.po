@@ -103,14 +103,6 @@ msgstr "Apenas autores que já responderam o Questionário DEIA podem excluir se
 msgid "plugins.generic.deiaSurvey.settings.title"
 msgstr "Gerenciar Blocos de Perguntas"
 
-msgid "plugins.generic.deiaSurvey.settings.encryptionSecretDefined"
-msgstr "Você definiu um segredo no arquivo de configuração do site ('api_key_secret')"
-
-msgid "plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined"
-msgstr "Você não definiu um segredo no arquivo de configuração do site ('api_key_secret')."
-" O plugin não entrará em funcionamento até que isso seja feito."
-
-
 msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.title"
 msgstr "Gênero"
 

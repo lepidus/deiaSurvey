@@ -8,7 +8,7 @@ This plugin allows the collection of DEIA data from users via a questionnaire.
 
 This plugin is compatible with the following PKP applications:
 
-- OJS and OPS versions 3.3 and 3.4.
+- OJS and OPS versions 3.3, 3.4 and 3.5.
 
 Check the latest compatible version for your application on the [Releases page](https://github.com/lepidus/deiaSurvey/releases).
 
@@ -42,4 +42,4 @@ Developed by Lepidus Tecnologia.
 
 __This plugin is licensed under the GNU General Public License v3.0__
 
-__Copyright (c) 2024-2025 Lepidus Tecnologia__
+__Copyright (c) 2024-2026 Lepidus Tecnologia__

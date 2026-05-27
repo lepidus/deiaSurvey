@@ -3,14 +3,16 @@
 namespace APP\plugins\generic\deiaSurvey\tests;
 
 use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
+use Illuminate\Support\Facades\DB;
 use PKP\db\DAORegistry;
+use PKP\orcid\OrcidManager;
 use PKP\tests\PKPTestCase;
 
 class OrcidConfigurationTest extends PKPTestCase
 {
     private $orcidConfiguration;
-    private $contextId = 10;
-    private $orcidAPIPath = 'https://pub.sandbox.orcid.org/';
+    private $contextId;
+    private $orcidAPIPath = OrcidManager::ORCID_API_URL_PUBLIC_SANDBOX;
     private $orcidClientId = 'APP-F1RSTCL1ENT1ID';
     private $orcidClientSecret = 'first-false-secret-33ba178dc2b9';
     private $deiaAPIPath = 'https://api.sandbox.orcid.org/';
@@ -19,6 +21,8 @@ class OrcidConfigurationTest extends PKPTestCase
     {
         $this->orcidConfiguration = new OrcidConfiguration();
         parent::setUp();
+        $this->contextId = DB::table('journals')->value('journal_id');
+        $this->deleteOrcidSettings();
     }
 
     protected function tearDown(): void
@@ -34,6 +38,7 @@ class OrcidConfigurationTest extends PKPTestCase
                 $pluginSettingsDao->deleteSetting($this->contextId, $pluginName, $settingName);
             }
         }
+        $this->deleteOrcidSettings();
 
         parent::tearDown();
     }
@@ -44,21 +49,47 @@ class OrcidConfigurationTest extends PKPTestCase
         $pluginSettingsDao->updateSetting($this->contextId, $pluginName, $settingName, $settingValue);
     }
 
+    private function insertOrcidSetting(string $settingName, string $settingValue): void
+    {
+        DB::table('journal_settings')->updateOrInsert(
+            [
+                'journal_id' => $this->contextId,
+                'locale' => '',
+                'setting_name' => $settingName
+            ],
+            ['setting_value' => $settingValue]
+        );
+    }
+
+    private function deleteOrcidSettings(): void
+    {
+        DB::table('journal_settings')
+            ->where('journal_id', $this->contextId)
+            ->whereIn('setting_name', [
+                OrcidManager::ENABLED,
+                OrcidManager::API_TYPE,
+                OrcidManager::CLIENT_ID,
+                OrcidManager::CLIENT_SECRET
+            ])
+            ->delete();
+    }
+
     public function testNoOrcidConfiguration(): void
     {
         $orcidConfiguration = $this->orcidConfiguration->getOrcidConfiguration($this->contextId);
         $this->assertNull($orcidConfiguration);
     }
 
-    public function testOrcidConfigurationFromOrcidPlugin(): void
+    public function testOrcidConfigurationFromNativeOrcidSettings(): void
     {
-        $this->insertPluginSettings('orcidprofileplugin', 'orcidProfileAPIPath', $this->orcidAPIPath);
-        $this->insertPluginSettings('orcidprofileplugin', 'orcidClientId', $this->orcidClientId);
-        $this->insertPluginSettings('orcidprofileplugin', 'orcidClientSecret', $this->orcidClientSecret);
+        $this->insertOrcidSetting(OrcidManager::ENABLED, '1');
+        $this->insertOrcidSetting(OrcidManager::API_TYPE, OrcidManager::API_PUBLIC_SANDBOX);
+        $this->insertOrcidSetting(OrcidManager::CLIENT_ID, $this->orcidClientId);
+        $this->insertOrcidSetting(OrcidManager::CLIENT_SECRET, $this->orcidClientSecret);
         $orcidConfiguration = $this->orcidConfiguration->getOrcidConfiguration($this->contextId);
 
         $expectedConfiguration = [
-            'pluginName' => 'orcidprofileplugin',
+            'pluginName' => 'orcid',
             'apiPath' => $this->orcidAPIPath,
             'clientId' => $this->orcidClientId,
             'clientSecret' => $this->orcidClientSecret

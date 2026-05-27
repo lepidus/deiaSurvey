@@ -2,13 +2,12 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\dispatchers;
 
-use PKP\plugins\Hook;
 use APP\core\Application;
 use APP\decision\Decision;
-use Illuminate\Support\Facades\Event;
-use APP\plugins\generic\deiaSurvey\classes\dispatchers\DeiaDataDispatcher;
 use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
 use APP\plugins\generic\deiaSurvey\classes\observers\listeners\RequestDataCollectionOnSubmission;
+use Illuminate\Support\Facades\Event;
+use PKP\plugins\Hook;
 
 class DataCollectionDispatcher extends DeiaDataDispatcher
 {

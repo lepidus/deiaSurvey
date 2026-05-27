@@ -2,10 +2,10 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\observers\listeners;
 
-use Illuminate\Events\Dispatcher;
 use APP\core\Application;
-use PKP\observers\events\SubmissionSubmitted;
 use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
+use Illuminate\Events\Dispatcher;
+use PKP\observers\events\SubmissionSubmitted;
 
 class RequestDataCollectionOnSubmission
 {

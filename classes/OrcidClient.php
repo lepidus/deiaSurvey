@@ -3,7 +3,6 @@
 namespace APP\plugins\generic\deiaSurvey\classes;
 
 use APP\core\Application;
-use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 
 class OrcidClient
 {
@@ -84,11 +83,12 @@ class OrcidClient
         );
 
         return $this->getOauthPath() . 'authorize?' . http_build_query(
-            array(
+            [
                 'client_id' => $this->orcidConfiguration['clientId'],
                 'response_type' => 'code',
                 'scope' => $scope,
-                'redirect_uri' => $redirectUrl)
+                'redirect_uri' => $redirectUrl
+            ]
         );
     }
 

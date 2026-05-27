@@ -2,8 +2,8 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\deiaResponse;
 
-use PKP\tests\PKPTestCase;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DeiaResponse;
+use PKP\tests\PKPTestCase;
 
 class DeiaResponseTest extends PKPTestCase
 {
@@ -45,7 +45,7 @@ class DeiaResponseTest extends PKPTestCase
 
     public function testGetDeiaResponseValue(): void
     {
-        $expectedDeiaResponseValue = ["en" => "I'm from Parintins"];
+        $expectedDeiaResponseValue = ['en' => "I'm from Parintins"];
         $this->deiaResponse->setValue(['en' => "I'm from Parintins"]);
         $this->assertEquals($this->deiaResponse->getValue(), $expectedDeiaResponseValue);
     }

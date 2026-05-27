@@ -2,10 +2,9 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\observers\listeners;
 
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use Illuminate\Events\Dispatcher;
 use PKP\observers\events\UserRegisteredContext;
-use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
-use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 
 class MigrateResponsesOnRegistration
 {

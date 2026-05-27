@@ -37,32 +37,43 @@ describe('DEIA Survey - Questions displaying', function () {
             cy.assertDefaultQuestionsDisplay('profilePage');
 
             if (userRole == 'manager') {
-                cy.contains('.app__navItem', 'Submissions').click();
+                cy.get('nav').contains('Editor Dashboard').click();
+		        cy.get('nav').contains('Active submissions').click();
                 cy.contains('h1', 'Profile');
-                cy.contains('.app__navItem', 'Workflow').click();
+                cy.get('nav').contains('Settings').click();
+		        cy.get('nav').contains('Workflow').click();
                 cy.contains('h1', 'Profile');
-                cy.contains('.app__navItem', 'Website').click();
+                cy.get('nav').contains('Settings').click();
+		        cy.get('nav').contains('Website').click();
             } else if (userRole == 'editor/moderator') {
-                cy.contains('.app__navItem', 'Submissions').click();
+                cy.get('nav').contains('Editor Dashboard').click();
+		        cy.get('nav').contains('Active submissions').click();
                 cy.contains('h1', 'Profile');
-                cy.contains('.app__navItem', 'Editorial Activity').click();
+                cy.get('nav').contains('Statistics').click();
+		        cy.get('nav').contains('Editorial Activity').click();
+            } else if (userRole == 'reviewer') {
+                cy.get('nav').contains('My Assignments as Reviewer').click();
+		        cy.get('nav').contains('Action Required by me').click();
             } else {
-                cy.contains('a', 'Back to Submissions').click();
+                cy.get('nav').contains('My Submissions as Author').click();
+		        cy.get('nav').contains('Active submissions').click();
             }
             cy.contains('h1', 'Profile');
             cy.logout();
         }
     });
+
     it('Answering of questions is not mandatory for the site admin', function () {
         cy.login('admin', 'admin', 'publicknowledge');
 
-        cy.contains('h1', 'Submissions');
-        cy.get('.app__headerActions button').eq(1).click();
-        cy.contains('a', 'Edit Profile').click();
+        cy.contains('h1', 'Assigned to me');
+        cy.get('[data-cy="app-user-nav"] button').click();
+		cy.get('a:contains("Edit Profile")').click();
 
         cy.contains('We request that you fill in the DEIA survey on the "DEIA Survey" tab of your profile page');
         cy.assertDefaultQuestionsDisplay('profilePage');
     });
+
     it('User can choose not to answer questions', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
         cy.contains('a', 'DEIA Survey').click();
@@ -84,12 +95,14 @@ describe('DEIA Survey - Questions displaying', function () {
         cy.get('input[name="deiaDataConsent"][value=0]').should('be.checked');
         assertDisabledFields();
     });
+
     it('Request message is not shown anymore. Author can now access other parts of the application.', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
-        cy.get('.app__headerActions button').eq(1).click();
-        cy.contains('a', 'Edit Profile').click();
+        cy.get('[data-cy="app-user-nav"] button').click();
+        cy.get('a:contains("Edit Profile")').click();
         cy.get('span:contains("We request that you fill in the DEIA survey")').should('not.exist');
     });
+
     it('User chooses to answer questions', function () {
         let userAnswers = [
             {'title': 'Gender', 'chosenOption': 'Woman'},
@@ -98,8 +111,8 @@ describe('DEIA Survey - Questions displaying', function () {
         ];
         
         cy.login('dsokoloff', null, 'publicknowledge');
-        cy.get('.app__headerActions button').eq(1).click();
-        cy.contains('a', 'Edit Profile').click();
+        cy.get('[data-cy="app-user-nav"] button').click();
+		cy.get('a:contains("Edit Profile")').click();
         cy.contains('a', 'DEIA Survey').click();
 
         cy.get('input[name="deiaDataConsent"][value=1]').click();
@@ -108,10 +121,11 @@ describe('DEIA Survey - Questions displaying', function () {
         cy.reload();
         cy.assertResponsesToDefaultQuestions(userAnswers);
     });
+
     it('User removes consent, leading to data deletion', function () {
         cy.login('dsokoloff', null, 'publicknowledge');
-        cy.get('.app__headerActions button').eq(1).click();
-        cy.contains('a', 'Edit Profile').click();
+        cy.get('[data-cy="app-user-nav"] button').click();
+		cy.get('a:contains("Edit Profile")').click();
         cy.contains('a', 'DEIA Survey').click();
 
         cy.get('input[name="deiaDataConsent"][value=0]').click();

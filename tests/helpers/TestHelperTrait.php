@@ -81,7 +81,7 @@ trait TestHelperTrait
 
         $journal->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
         $journal->setName('journal-title', 'en');
         $journal->setData('publisherInstitution', 'journal-publisher');
         $journal->setPrimaryLocale('en');
@@ -98,7 +98,7 @@ trait TestHelperTrait
 
         $user->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
 
         return $user->getId();
     }

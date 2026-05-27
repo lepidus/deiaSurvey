@@ -2,9 +2,9 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\deiaResponseOption;
 
-use PKP\tests\PKPTestCase;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\DeiaResponseOption;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
+use PKP\tests\PKPTestCase;
 
 class DeiaResponseOptionTest extends PKPTestCase
 {
@@ -41,7 +41,7 @@ class DeiaResponseOptionTest extends PKPTestCase
     {
         $this->deiaResponseOption->setIsTranslated(true);
 
-        $expectedResponseOptionText = "Less than a minimum wage";
+        $expectedResponseOptionText = 'Less than a minimum wage';
         $this->deiaResponseOption->setOptionText($expectedResponseOptionText, 'en');
         $optionText = $this->deiaResponseOption->getLocalizedOptionText();
 
@@ -68,7 +68,7 @@ class DeiaResponseOptionTest extends PKPTestCase
         $optionText = $this->deiaResponseOption->getLocalizedOptionText();
         $this->assertEquals($expectedResponseOptionText, $optionText);
 
-        $expectedResponseOptionText = "Less than a minimum wage";
+        $expectedResponseOptionText = 'Less than a minimum wage';
         $this->deiaResponseOption->setData('optionText', $expectedResponseOptionText, 'en');
         $optionText = $this->deiaResponseOption->getLocalizedOptionText();
         $this->assertEquals($expectedResponseOptionText, $optionText);

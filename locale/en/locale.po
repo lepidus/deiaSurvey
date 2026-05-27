@@ -103,13 +103,6 @@ msgstr "Only authors who have already completed the DEIA Survey can delete their
 msgid "plugins.generic.deiaSurvey.settings.title"
 msgstr "Manage Question Blocks"
 
-msgid "plugins.generic.deiaSurvey.settings.encryptionSecretDefined"
-msgstr "You have set a secret in the website configuration file ('api_key_secret')"
-
-msgid "plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined"
-msgstr "You have not set a secret in the website configuration file ('api_key_secret')."
-" The plugin will not work until this is done."
-
 msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.title"
 msgstr "Gender"
 

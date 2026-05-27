@@ -3,14 +3,12 @@
 namespace APP\plugins\generic\deiaSurvey;
 
 use APP\core\Application;
-use APP\notification\Notification;
-use APP\notification\NotificationManager;
-use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
 use APP\plugins\generic\deiaSurvey\classes\observers\listeners\MigrateResponsesOnRegistration;
+use APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler;
 use APP\plugins\generic\deiaSurvey\report\DeiaSurveyReportPlugin;
 use APP\template\TemplateManager;
 use Illuminate\Database\Migrations\Migration;
@@ -27,10 +25,9 @@ class DeiaSurveyPlugin extends GenericPlugin
 {
     public function register($category, $path, $mainContextId = null): bool
     {
-        $success = parent::register($category, $path);
-        $encrypter = new DataEncryption();
+        $success = parent::register($category, $path, $mainContextId);
 
-        if ($success && $this->getEnabled() && $encrypter->secretConfigExists()) {
+        if ($success && $this->getEnabled()) {
             Hook::add('Request::redirect', [$this, 'redirectUserAfterLogin']);
             Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
             Hook::add('LoadHandler', [$this, 'addPageHandler']);
@@ -89,14 +86,6 @@ class DeiaSurveyPlugin extends GenericPlugin
 
             $this->registerHooksForCustomSchemas();
             $defaultQuestionsCreator->createDefaultQuestions($contextId);
-
-            $encrypter = new DataEncryption();
-            if (!$encrypter->secretConfigExists()) {
-                $currentUser = Application::get()->getRequest()->getUser();
-                $notificationMgr = new NotificationManager();
-                $notificationMessage = 'plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined';
-                $notificationMgr->createTrivialNotification($currentUser->getId(), Notification::NOTIFICATION_TYPE_WARNING, ['contents' => __($notificationMessage)]);
-            }
         }
 
         parent::setEnabled($enabled);
@@ -194,9 +183,10 @@ class DeiaSurveyPlugin extends GenericPlugin
 
     public function addPageHandler($hookName, $params)
     {
-        $page = $params[0];
-        if ($page == 'deiaQuestionnaire') {
-            define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler');
+        $page = &$params[0];
+        $handler = &$params[3];
+        if ($this->getEnabled() && $page === 'deiaQuestionnaire') {
+            $handler = new QuestionnaireHandler();
             return true;
         }
         return false;
@@ -275,7 +265,6 @@ class DeiaSurveyPlugin extends GenericPlugin
 
                 if ($method === 'display') {
                     $templateMgr->assign([
-                        'encryptionSecretDefined' => (new DataEncryption())->secretConfigExists(),
                         'pluginName' => $this->getName(),
                         'questionBlockExportFeatureJsUrl' => $request->getBaseUrl()
                             . '/'
