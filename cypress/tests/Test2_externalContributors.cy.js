@@ -283,11 +283,10 @@ describe('DEIA Survey - External contributors data collecting', function() {
         }
 
         if (Cypress.env('contextTitles').en == 'Public Knowledge Preprint Server') {
-            cy.get('#publication-button').click();
-            cy.get('#publication button:contains("Post")').click();
-            cy.get('.pkp_modal_panel button:contains("Post")').click();
-            cy.wait(1000);
-            cy.contains('.pkpPublication__statusPublished', 'Posted');
+            cy.get('button:contains("Post the preprint")').click();
+            cy.get('button:contains("Post"):visible').click();
+            cy.get('div:contains("Are you sure you want to post this?")');
+            cy.get('[id^="publish"] button:contains("Post")').click();
         }
     });
 

@@ -3,7 +3,6 @@
 namespace APP\plugins\generic\deiaSurvey;
 
 use APP\core\Application;
-use APP\notification\Notification;
 use APP\notification\NotificationManager;
 use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
@@ -19,6 +18,7 @@ use Illuminate\Support\Facades\Event;
 use PKP\core\JSONMessage;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
+use PKP\notification\Notification;
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
 use PKP\plugins\PluginRegistry;
