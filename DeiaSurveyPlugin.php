@@ -3,8 +3,6 @@
 namespace APP\plugins\generic\deiaSurvey;
 
 use APP\core\Application;
-use APP\notification\NotificationManager;
-use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
@@ -18,7 +16,6 @@ use Illuminate\Support\Facades\Event;
 use PKP\core\JSONMessage;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
-use PKP\notification\Notification;
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
 use PKP\plugins\PluginRegistry;
@@ -29,9 +26,8 @@ class DeiaSurveyPlugin extends GenericPlugin
     public function register($category, $path, $mainContextId = null): bool
     {
         $success = parent::register($category, $path, $mainContextId);
-        $encrypter = new DataEncryption();
 
-        if ($success && $this->getEnabled() && $encrypter->secretConfigExists()) {
+        if ($success && $this->getEnabled()) {
             Hook::add('Request::redirect', [$this, 'redirectUserAfterLogin']);
             Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
             Hook::add('LoadHandler', [$this, 'addPageHandler']);
@@ -90,14 +86,6 @@ class DeiaSurveyPlugin extends GenericPlugin
 
             $this->registerHooksForCustomSchemas();
             $defaultQuestionsCreator->createDefaultQuestions($contextId);
-
-            $encrypter = new DataEncryption();
-            if (!$encrypter->secretConfigExists()) {
-                $currentUser = Application::get()->getRequest()->getUser();
-                $notificationMgr = new NotificationManager();
-                $notificationMessage = 'plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined';
-                $notificationMgr->createTrivialNotification($currentUser->getId(), Notification::NOTIFICATION_TYPE_WARNING, ['contents' => __($notificationMessage)]);
-            }
         }
 
         parent::setEnabled($enabled);
@@ -277,7 +265,6 @@ class DeiaSurveyPlugin extends GenericPlugin
 
                 if ($method === 'display') {
                     $templateMgr->assign([
-                        'encryptionSecretDefined' => (new DataEncryption())->secretConfigExists(),
                         'pluginName' => $this->getName(),
                         'questionBlockExportFeatureJsUrl' => $request->getBaseUrl()
                             . '/'

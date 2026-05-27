@@ -11,9 +11,6 @@ class EncryptResponsesMigration extends Migration
     public function up(): void
     {
         $encrypter = new DataEncryption();
-        if (!$encrypter->secretConfigExists()) {
-            return;
-        }
 
         $result = DB::table('deia_response_settings')->get();
 
@@ -24,6 +21,7 @@ class EncryptResponsesMigration extends Migration
             if (
                 !in_array($row['setting_name'], ['responseValue', 'optionsInputValue'])
                 || $encrypter->textIsEncrypted($settingValue)
+                || str_starts_with($settingValue, 'base64:')
             ) {
                 continue;
             }
