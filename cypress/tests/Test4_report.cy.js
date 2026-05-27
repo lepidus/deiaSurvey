@@ -25,22 +25,27 @@ describe('DEIA Survey - Report feature', function () {
         return values;
     }
 
-    it('Report should be visible only for admin user', function () {
-        cy.login('admin', 'admin', 'publicknowledge');
-        cy.contains('.app__navItem', 'Reports').click();
-        cy.contains('a', 'DEIA Survey Report');
-        cy.logout();
-
-        cy.login('dbarnes', null, 'publicknowledge');
-        cy.contains('.app__navItem', 'Reports').click();
-        cy.contains('a', 'DEIA Survey Report').should('not.exist');
+    afterEach(() => {
         cy.logout();
     });
 
-    it('Report should include question block headers', function () {
+    it('All reports should be visible for admin user', function () {
         cy.login('admin', 'admin', 'publicknowledge');
         cy.contains('.app__navItem', 'Reports').click();
-        cy.contains('a', 'DEIA Survey Report')
+        cy.contains('a', 'DEIA Survey Report').click();
+
+        cy.contains('DEIA Survey Report');
+        cy.contains('Please, select which report you want to generate');
+
+        cy.contains('button', 'Generate Site Report');
+        cy.contains('button', 'Generate Journal Report');
+    });
+    it('Site report should include question block headers', function () {
+        cy.login('admin', 'admin', 'publicknowledge');
+        cy.contains('.app__navItem', 'Reports').click();
+        cy.contains('a', 'DEIA Survey Report').click();
+
+        cy.contains('Generate Site Report')
             .should('have.attr', 'href')
             .then((reportUrl) => {
                 cy.request(reportUrl).then((response) => {
@@ -63,6 +68,15 @@ describe('DEIA Survey - Report feature', function () {
                     expect(optionHeader).to.include('Non-binary or gender diverse');
                 });
             });
-        cy.logout();
+    });
+    it('Editors can only generate context report', function () {
+        cy.login('dbarnes', null, 'publicknowledge');
+        cy.contains('.app__navItem', 'Reports').click();
+        cy.contains('a', 'DEIA Survey Report').click();
+
+        cy.contains('Please, select which report you want to generate').should('not.exist');
+        cy.contains('button', 'Generate Site Report').should('not.exist');
+
+        cy.contains('button', 'Generate Journal Report');
     });
 });
