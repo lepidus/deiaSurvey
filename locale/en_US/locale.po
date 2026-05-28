@@ -277,6 +277,9 @@ msgstr "Create question"
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.noneCreated"
 msgstr "No questions have been created in this block."
 
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.editWarning"
+msgstr "Questions linked to active question blocks or with registered responses cannot be edited."
+
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.text"
 msgstr "Question text"
 
