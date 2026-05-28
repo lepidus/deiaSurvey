@@ -276,6 +276,9 @@ msgstr "Criar pergunta"
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.noneCreated"
 msgstr "Nenhuma pergunta foi criada neste bloco."
 
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.editWarning"
+msgstr "Perguntas vinculadas a blocos ativos ou com respostas registradas não podem ser editadas."
+
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.text"
 msgstr "Texto da pergunta"
 
