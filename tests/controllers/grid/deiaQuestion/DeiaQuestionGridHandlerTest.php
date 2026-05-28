@@ -18,7 +18,11 @@ class DeiaQuestionGridHandlerTest extends \PKPTestCase
             'plugins.generic.deiaSurvey.questionBlocks.questions.editWarning',
             $template
         );
-        self::assertStringContainsString('<p class="deiaQuestionBlockEditWarning"', $template);
+        self::assertStringContainsString('class="deiaQuestionBlockEditWarning"', $template);
+        self::assertStringContainsString(
+            'margin: 0 0 1rem; font-size: .875rem; line-height: 1.5rem; font-weight: 400; color: rgba(0, 0, 0, 0.54);',
+            $template
+        );
         self::assertLessThan(
             strpos($template, 'id="deiaQuestionGridContainer"'),
             strpos($template, 'deiaQuestionBlockEditWarning')
