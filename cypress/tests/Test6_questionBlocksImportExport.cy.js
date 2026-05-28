@@ -100,11 +100,11 @@ describe('DEIA Survey - Question blocks import and export', function () {
 			cy.request(req).then((res) => {
 				expect(res).to.have.property('status', 200);
 				expect(res.headers).to.have.property('content-type', 'application/json');
-				expect(res.body.schemaVersion).to.equal('1.0');
 				expect(res.body.plugin).to.equal('deiaSurvey');
 				expect(res.body.blocks).to.have.length(1);
 				expect(res.body.blocks[0].title.en).to.include(questionBlock.title);
 				expect(res.body.blocks[0].description.en).to.include(questionBlock.description);
+				expect(res.body.blocks[0].questions[0].questionType).to.equal('TYPE_CHECKBOXES');
 				cy.writeFile(downloadedQuestionBlockPath, res.body);
 			});
 		});

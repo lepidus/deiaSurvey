@@ -34,6 +34,74 @@ O e-mail enviado oferece duas maneiras de preencher o questionário. A primeira 
 
 Os usuários podem ver e excluir seus dados a qualquer momento. Para os autores sem cadastro que preencheram o questionário, caso estes criem um usuário no sistema com o mesmo endereço de e-mail ou ORCID utilizado, seus dados serão migrados para este novo usuário.
 
+## Importação e exportação de blocos de perguntas
+
+O plugin pode exportar e importar blocos de perguntas DEIA como arquivos JSON pelo gerenciador de blocos de perguntas nas configurações do plugin. Os blocos importados são criados como inativos, para que possam ser revisados antes de serem exibidos aos usuários.
+
+O arquivo JSON deve usar esta estrutura:
+
+```json
+{
+  "plugin": "deiaSurvey",
+  "blocks": [
+    {
+      "title": {
+        "pt_BR": "Perguntas DEIA sobre financiamento"
+      },
+      "description": {
+        "pt_BR": "Perguntas sobre acesso a oportunidades de financiamento."
+      },
+      "questions": [
+        {
+          "questionType": "TYPE_CHECKBOXES",
+          "questionText": {
+            "pt_BR": "Você recebe alguma bolsa?"
+          },
+          "questionDescription": {
+            "pt_BR": "Selecione todas as fontes de financiamento aplicáveis."
+          },
+          "responseOptions": [
+            {
+              "optionText": {
+                "pt_BR": "Bolsa institucional"
+              },
+              "hasInputField": false
+            },
+            {
+              "optionText": {
+                "pt_BR": "Outro"
+              },
+              "hasInputField": true
+            }
+          ]
+        },
+        {
+          "questionType": "TYPE_TEXT_FIELD",
+          "questionText": {
+            "pt_BR": "De qual apoio você precisa?"
+          },
+          "questionDescription": {
+            "pt_BR": "Descreva o apoio que ajudaria sua participação."
+          },
+          "responseOptions": []
+        }
+      ]
+    }
+  ]
+}
+```
+
+Valores aceitos para `questionType`:
+
+- `TYPE_SMALL_TEXT_FIELD`
+- `TYPE_TEXT_FIELD`
+- `TYPE_TEXTAREA`
+- `TYPE_CHECKBOXES`
+- `TYPE_RADIO_BUTTONS`
+- `TYPE_DROP_DOWN_BOX`
+
+Os campos textuais usam objetos localizados, em que cada chave é um código de idioma, como `en`, `en_US`, `es` ou `pt_BR`. `responseOptions` só é necessário para perguntas de caixas de seleção, botões de opção e lista suspensa; use um array vazio para perguntas textuais.
+
 ## Créditos
 Este plugin foi patrocinado por Lepidus Tecnologia, Scientific Electronic Library Online (SciELO), Revista Encontros Bibli (UFSC) e outros (iremos atualizar em breve).
 
