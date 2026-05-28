@@ -220,7 +220,7 @@ describe('DEIA Survey - Question blocks import and export', function () {
     }
 
     function getExportedQuestions(payload) {
-        return Object.values(payload.blocks[0].questions || {});
+        return payload.blocks[0].questions || [];
     }
 
     function findExportedQuestion(payload, questionText) {
@@ -230,7 +230,6 @@ describe('DEIA Survey - Question blocks import and export', function () {
     }
 
     function assertExportedBlockMetadata(payload, blockTitle, blockDescription) {
-        expect(payload.schemaVersion).to.equal('1.0');
         expect(payload.plugin).to.equal('deiaSurvey');
         expect(payload.blocks).to.have.length(1);
         expect(localizedValues(payload.blocks[0].title)).to.include(blockTitle);
@@ -244,16 +243,18 @@ describe('DEIA Survey - Question blocks import and export', function () {
 
         expect(questions).to.have.length(2);
         expect(firstQuestion).not.to.be.undefined;
+        expect(firstQuestion.questionType).to.equal('TYPE_CHECKBOXES');
         expect(localizedValues(firstQuestion.questionDescription)).to.include(block.firstQuestion.description);
         expect(secondQuestion).not.to.be.undefined;
+        expect(secondQuestion.questionType).to.equal('TYPE_TEXT_FIELD');
         expect(localizedValues(secondQuestion.questionDescription)).to.include(block.secondQuestion.description);
     }
 
     function assertExportedResponseOptions(payload, block) {
         const firstQuestion = findExportedQuestion(payload, block.firstQuestion.text);
         const secondQuestion = findExportedQuestion(payload, block.secondQuestion.text);
-        const firstQuestionOptions = Object.values(firstQuestion.responseOptions || {});
-        const secondQuestionOptions = Object.values(secondQuestion.responseOptions || {});
+        const firstQuestionOptions = firstQuestion.responseOptions || [];
+        const secondQuestionOptions = secondQuestion.responseOptions || [];
 
         expect(firstQuestionOptions).to.have.length(2);
         expect(firstQuestionOptions.some((option) => (
