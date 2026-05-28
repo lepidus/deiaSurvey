@@ -64,8 +64,21 @@ class DeiaQuestionBlockJsonImporterTest extends \DatabaseTestCase
 
         (new DeiaQuestionBlockJsonImporter())->import(
             json_encode([
-                'schemaVersion' => '1.0',
                 'plugin' => 'otherPlugin',
+                'blocks' => [],
+            ]),
+            $this->contextId
+        );
+    }
+
+    public function testRejectsSchemaVersion(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        (new DeiaQuestionBlockJsonImporter())->import(
+            json_encode([
+                'schemaVersion' => '1.0',
+                'plugin' => 'deiaSurvey',
                 'blocks' => [],
             ]),
             $this->contextId
@@ -76,16 +89,12 @@ class DeiaQuestionBlockJsonImporterTest extends \DatabaseTestCase
     {
         $importedIds = (new DeiaQuestionBlockJsonImporter())->import(
             json_encode([
-                'schemaVersion' => '1.0',
                 'plugin' => 'deiaSurvey',
                 'blocks' => [
                     [
-                        'id' => 999,
-                        'contextId' => 999,
                         'title' => ['en' => 'Funding DEIA questions'],
                         'description' => ['en' => 'Questions about funding access.'],
                         'active' => true,
-                        'sequence' => 1,
                         'questions' => [],
                     ],
                 ],
@@ -106,32 +115,24 @@ class DeiaQuestionBlockJsonImporterTest extends \DatabaseTestCase
     {
         $importedIds = (new DeiaQuestionBlockJsonImporter())->import(
             json_encode([
-                'schemaVersion' => '1.0',
                 'plugin' => 'deiaSurvey',
                 'blocks' => [
                     [
                         'title' => ['en' => 'Funding DEIA questions'],
                         'description' => ['en' => 'Questions about funding access.'],
-                        'sequence' => 1,
                         'questions' => [
                             [
-                                'id' => 777,
-                                'questionType' => DeiaQuestion::TYPE_CHECKBOXES,
+                                'questionType' => 'TYPE_CHECKBOXES',
                                 'questionText' => ['en' => 'Which funding sources apply?'],
                                 'questionDescription' => ['en' => 'Select all that apply.'],
-                                'sequence' => 1,
                                 'responseOptions' => [
                                     [
-                                        'id' => 888,
                                         'optionText' => ['en' => 'Grant funding'],
                                         'hasInputField' => false,
-                                        'sequence' => 1,
                                     ],
                                     [
-                                        'id' => 889,
                                         'optionText' => ['en' => 'Other'],
                                         'hasInputField' => true,
-                                        'sequence' => 2,
                                     ],
                                 ],
                             ],
@@ -171,7 +172,6 @@ class DeiaQuestionBlockJsonImporterTest extends \DatabaseTestCase
 
         (new DeiaQuestionBlockJsonImporter())->import(
             json_encode([
-                'schemaVersion' => '1.0',
                 'plugin' => 'deiaSurvey',
                 'blocks' => [
                     [
@@ -190,4 +190,5 @@ class DeiaQuestionBlockJsonImporterTest extends \DatabaseTestCase
             $this->contextId
         );
     }
+
 }

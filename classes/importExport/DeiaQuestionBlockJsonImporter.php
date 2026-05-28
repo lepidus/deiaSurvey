@@ -19,7 +19,7 @@ class DeiaQuestionBlockJsonImporter
         $this->validatePayload($data);
 
         $importedBlockIds = [];
-        foreach ($this->sortBySequence($data['blocks']) as $blockData) {
+        foreach ($data['blocks'] as $blockData) {
             $importedBlockIds[] = $this->importBlock($blockData, $contextId);
         }
 
@@ -30,8 +30,8 @@ class DeiaQuestionBlockJsonImporter
 
     private function validatePayload(array $data): void
     {
-        if (($data['schemaVersion'] ?? null) !== '1.0') {
-            throw new InvalidArgumentException('Unsupported schema version.');
+        if (isset($data['schemaVersion'])) {
+            throw new InvalidArgumentException('Schema version is not supported.');
         }
 
         if (($data['plugin'] ?? null) !== 'deiaSurvey') {
@@ -55,7 +55,7 @@ class DeiaQuestionBlockJsonImporter
 
     private function validateQuestion(array $questionData): void
     {
-        if (!in_array((int) ($questionData['questionType'] ?? 0), DeiaQuestion::getQuestionTypeConstants(), true)) {
+        if ($this->normalizeQuestionType($questionData['questionType'] ?? null) === null) {
             throw new InvalidArgumentException('Unknown question type.');
         }
 
@@ -76,7 +76,7 @@ class DeiaQuestionBlockJsonImporter
 
         $blockId = Repo::deiaQuestionBlock()->add($block);
 
-        foreach ($this->sortBySequence((array) ($blockData['questions'] ?? [])) as $questionData) {
+        foreach ((array) ($blockData['questions'] ?? []) as $questionData) {
             $this->importQuestion($questionData, $contextId, $blockId);
         }
 
@@ -88,7 +88,7 @@ class DeiaQuestionBlockJsonImporter
         $question = Repo::deiaQuestion()->newDataObject([
             'contextId' => $contextId,
             'questionBlockId' => $blockId,
-            'questionType' => (int) $questionData['questionType'],
+            'questionType' => $this->normalizeQuestionType($questionData['questionType']),
             'questionText' => $questionData['questionText'],
             'questionDescription' => $questionData['questionDescription'] ?? [],
             'sequence' => REALLY_BIG_NUMBER,
@@ -98,35 +98,34 @@ class DeiaQuestionBlockJsonImporter
 
         $questionId = Repo::deiaQuestion()->add($question);
 
-        foreach ($this->sortBySequence((array) ($questionData['responseOptions'] ?? [])) as $optionData) {
-            $this->importResponseOption($optionData, $questionId);
+        foreach (array_values((array) ($questionData['responseOptions'] ?? [])) as $sequence => $optionData) {
+            $this->importResponseOption($optionData, $questionId, $sequence + 1);
         }
 
         Repo::deiaQuestion()->dao->resequence($blockId);
     }
 
-    private function importResponseOption(array $optionData, int $questionId): void
+    private function importResponseOption(array $optionData, int $questionId, int $sequence): void
     {
         $responseOption = Repo::deiaResponseOption()->newDataObject([
             'deiaQuestionId' => $questionId,
             'optionText' => $optionData['optionText'] ?? [],
             'hasInputField' => !empty($optionData['hasInputField']),
-            'sequence' => (int) ($optionData['sequence'] ?? REALLY_BIG_NUMBER),
+            'sequence' => $sequence,
             'isTranslated' => true,
         ]);
 
         Repo::deiaResponseOption()->add($responseOption);
     }
 
-    private function sortBySequence(array $items): array
+    private function normalizeQuestionType($questionType): ?int
     {
-        usort(
-            $items,
-            function (array $first, array $second): int {
-                return ($first['sequence'] ?? REALLY_BIG_NUMBER) <=> ($second['sequence'] ?? REALLY_BIG_NUMBER);
-            }
-        );
+        $questionTypeConstants = DeiaQuestion::getQuestionTypeConstants();
 
-        return $items;
+        if (is_string($questionType) && isset($questionTypeConstants[$questionType])) {
+            return $questionTypeConstants[$questionType];
+        }
+
+        return null;
     }
 }

@@ -34,6 +34,74 @@ The e-mail sent offers two ways of filling in the questionnaire. The first requi
 
 Users can view and delete their data at any time. For the authors without registration who answered the questionnaire, if they create an account in the system with the e-mail address or ORCID used, their data will be migrated to this new user.
 
+## Question block import and export
+
+The plugin can export and import DEIA question blocks as JSON files from the question block manager in the plugin settings. Imported question blocks are created as inactive, so they can be reviewed before being displayed to users.
+
+The JSON file must use this structure:
+
+```json
+{
+  "plugin": "deiaSurvey",
+  "blocks": [
+    {
+      "title": {
+        "en": "Funding DEIA questions"
+      },
+      "description": {
+        "en": "Questions about access to funding opportunities."
+      },
+      "questions": [
+        {
+          "questionType": "TYPE_CHECKBOXES",
+          "questionText": {
+            "en": "Are you a scholarship recipient?"
+          },
+          "questionDescription": {
+            "en": "Select all funding sources that apply."
+          },
+          "responseOptions": [
+            {
+              "optionText": {
+                "en": "Institutional scholarship"
+              },
+              "hasInputField": false
+            },
+            {
+              "optionText": {
+                "en": "Other"
+              },
+              "hasInputField": true
+            }
+          ]
+        },
+        {
+          "questionType": "TYPE_TEXT_FIELD",
+          "questionText": {
+            "en": "What support do you need?"
+          },
+          "questionDescription": {
+            "en": "Describe the support that would help your participation."
+          },
+          "responseOptions": []
+        }
+      ]
+    }
+  ]
+}
+```
+
+Accepted `questionType` values:
+
+- `TYPE_SMALL_TEXT_FIELD`
+- `TYPE_TEXT_FIELD`
+- `TYPE_TEXTAREA`
+- `TYPE_CHECKBOXES`
+- `TYPE_RADIO_BUTTONS`
+- `TYPE_DROP_DOWN_BOX`
+
+Text fields use localized objects, where each key is a locale code such as `en`, `en_US`, `es`, or `pt_BR`. `responseOptions` is only needed for checkbox, radio button and drop-down questions; use an empty array for text questions.
+
 ## Credits
 This plugin was sponsored by the Lepidus Tecnologia, Scientific Electronic Library Online (SciELO), Revista Encontros Bibli (UFSC) and others (we'll update soon).
 
