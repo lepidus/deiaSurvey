@@ -34,6 +34,16 @@ The e-mail sent offers two ways of filling in the questionnaire. The first requi
 
 Users can view and delete their data at any time. For the authors without registration who answered the questionnaire, if they create an account in the system with the e-mail address or ORCID used, their data will be migrated to this new user.
 
+## Managing question blocks
+
+Journal and preprint server managers can create and maintain DEIA question blocks from the plugin settings. Go to `Settings` > `Website` > `Plugins`, expand the DEIA Survey plugin row, and open `Settings`.
+
+Use `Create Question Block` to add a block. Each block requires a localized title and may include a localized description. After saving the block, expand its row, select `Edit`, and open the `Questions` tab to create the questions shown inside that block.
+
+Each question requires localized question text and a question type. A localized description can be added to provide instructions to users. Text question types do not use response options. Checkbox, radio button and drop-down questions use response options; add each option in the response options list and enable the input field option when the answer should allow a custom text value, such as "Other" or "Self describe".
+
+Use the checkbox in the question block list to activate or deactivate a block. Only active blocks are displayed to users in the DEIA Survey tab. Use the ordering controls in the block and question managers to define the order in which blocks and questions appear in the questionnaire.
+
 ## Question block import and export
 
 The plugin can export and import DEIA question blocks as JSON files from the question block manager in the plugin settings. Imported question blocks are created as inactive, so they can be reviewed before being displayed to users.
