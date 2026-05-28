@@ -34,6 +34,16 @@ O e-mail enviado oferece duas maneiras de preencher o questionário. A primeira 
 
 Os usuários podem ver e excluir seus dados a qualquer momento. Para os autores sem cadastro que preencheram o questionário, caso estes criem um usuário no sistema com o mesmo endereço de e-mail ou ORCID utilizado, seus dados serão migrados para este novo usuário.
 
+## Gerenciamento de blocos de perguntas
+
+Gerentes de revistas e servidores de preprints podem criar e manter blocos de perguntas DEIA nas configurações do plugin. Acesse `Configurações` > `Website` > `Plugins`, expanda a linha do plugin Questionário DEIA e abra `Configurações`.
+
+Use `Criar Bloco de Perguntas` para adicionar um bloco. Cada bloco exige um título localizado e pode incluir uma descrição localizada. Depois de salvar o bloco, expanda sua linha, selecione `Editar` e abra a aba `Perguntas` para criar as perguntas exibidas dentro desse bloco.
+
+Cada pergunta exige um texto localizado e um tipo de pergunta. Uma descrição localizada pode ser adicionada para orientar os usuários. Tipos de perguntas textuais não usam opções de resposta. Perguntas de caixas de seleção, botões de opção e lista suspensa usam opções de resposta; adicione cada opção na lista de opções de resposta e habilite o campo de entrada quando a resposta deve permitir um valor textual personalizado, como "Outro" ou "Auto-descrição".
+
+Use a caixa de seleção na lista de blocos de perguntas para ativar ou desativar um bloco. Apenas blocos ativos são exibidos aos usuários na aba Questionário DEIA. Use os controles de ordenação nos gerenciadores de blocos e perguntas para definir a ordem em que blocos e perguntas aparecem no questionário.
+
 ## Importação e exportação de blocos de perguntas
 
 O plugin pode exportar e importar blocos de perguntas DEIA como arquivos JSON pelo gerenciador de blocos de perguntas nas configurações do plugin. Os blocos importados são criados como inativos, para que possam ser revisados antes de serem exibidos aos usuários.
