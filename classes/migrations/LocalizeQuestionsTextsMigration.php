@@ -3,7 +3,6 @@
 namespace APP\plugins\generic\deiaSurvey\classes\migrations;
 
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
-use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
@@ -14,32 +13,48 @@ class LocalizeQuestionsTextsMigration extends Migration
 
     public function up(): void
     {
-        $allQuestions = Repo::deiaQuestion()->getCollector()->getMany();
+        $allQuestions = DB::table('deia_questions')->get();
         $defaultQuestionsData = DefaultQuestionsCreator::getDefaultQuestionsData(0);
 
         foreach ($allQuestions as $question) {
-            $isPreviousStandardQuestion = $this->isPreviousStandardQuestion($question);
-            $questionName = $isPreviousStandardQuestion
-                ? $question->getData('questionText')[self::BASE_LOCALE]
-                : __($question->getData('questionText'), [], self::BASE_LOCALE);
-            $questionName = strtolower($questionName);
+            $questionSettings = $this->getQuestionSettings($question->deia_question_id);
+            $isPreviousStandardQuestion = $this->isPreviousStandardQuestion($questionSettings);
+            $questionName = $this->getQuestionName($questionSettings, $isPreviousStandardQuestion);
+
+            if (is_null($questionName)) {
+                continue;
+            }
+
+            if (empty($defaultQuestionsData[$questionName])) {
+                continue;
+            }
+
             $defaultQuestionData = $defaultQuestionsData[$questionName];
 
             if ($isPreviousStandardQuestion) {
-                $this->migrateDeiaQuestion($question, $defaultQuestionData);
+                $this->migrateDeiaQuestion($question->deia_question_id, $defaultQuestionData);
             }
 
-            foreach ($question->getResponseOptions() as $responseOption) {
-                if (!$this->isPreviousStandardResponseOption($responseOption)) {
+            $responseOptions = DB::table('deia_response_options')
+                ->where('deia_question_id', '=', $question->deia_question_id)
+                ->get();
+
+            foreach ($responseOptions as $responseOption) {
+                $responseOptionSettings = $this->getResponseOptionSettings($responseOption->deia_response_option_id);
+
+                if (!$this->isPreviousStandardResponseOption($responseOptionSettings)) {
                     continue;
                 }
 
-                $responseOptionText = $responseOption->getData('optionText')[self::BASE_LOCALE];
+                $responseOptionText = $this->getDataInBaseLocale($responseOptionSettings, 'optionText');
 
                 foreach ($defaultQuestionData['responseOptions'] as $defaultResponseOption) {
                     $defaultResponseOptionText = __($defaultResponseOption['optionText'], [], self::BASE_LOCALE);
                     if (str_contains($responseOptionText, $defaultResponseOptionText)) {
-                        $this->migrateDeiaResponseOption($responseOption, $defaultResponseOption);
+                        $this->migrateDeiaResponseOption(
+                            $responseOption->deia_response_option_id,
+                            $defaultResponseOption
+                        );
                         break;
                     }
                 }
@@ -47,52 +62,155 @@ class LocalizeQuestionsTextsMigration extends Migration
         }
     }
 
-    private function migrateDeiaQuestion($question, $defaultQuestionData)
+    private function getQuestionSettings(int $questionId): array
     {
-        $this->cleanQuestionTextualData($question);
-        Repo::deiaQuestion()->edit($question, [
-            'isTranslated' => $defaultQuestionData['isTranslated'],
-            'isDefaultQuestion' => $defaultQuestionData['isDefaultQuestion'],
-            'questionText' => $defaultQuestionData['questionText'],
-            'questionDescription' => $defaultQuestionData['questionDescription']
-        ]);
+        return $this->getSettings('deia_question_settings', 'deia_question_id', $questionId);
     }
 
-    private function migrateDeiaResponseOption($responseOption, $defaultResponseOption)
+    private function getResponseOptionSettings(int $responseOptionId): array
     {
-        $this->cleanResponseOptionTextualData($responseOption);
-        Repo::deiaResponseOption()->edit($responseOption, [
-            'optionText' => $defaultResponseOption['optionText'],
-            'isTranslated' => $defaultResponseOption['isTranslated']
-        ]);
+        return $this->getSettings(
+            'deia_response_option_settings',
+            'deia_response_option_id',
+            $responseOptionId
+        );
     }
 
-    private function isPreviousStandardQuestion($question): bool
+    private function getSettings(string $tableName, string $primaryKeyColumn, int $primaryKey): array
     {
-        return is_null($question->getData('isTranslated'))
-            && is_null($question->getData('isDefaultQuestion'))
-            && is_array($question->getData('questionText'))
-            && in_array($question->getData('questionText')[self::BASE_LOCALE], self::PREVIOUS_STANDARD_QUESTIONS);
+        $settings = [];
+        $settingRows = DB::table($tableName)
+            ->where($primaryKeyColumn, '=', $primaryKey)
+            ->get();
+
+        foreach ($settingRows as $settingRow) {
+            $value = $this->decodeSettingValue($settingRow->setting_value);
+            if (!empty($settingRow->locale)) {
+                if (!isset($settings[$settingRow->setting_name]) || !is_array($settings[$settingRow->setting_name])) {
+                    $settings[$settingRow->setting_name] = [];
+                }
+                $settings[$settingRow->setting_name][$settingRow->locale] = $value;
+            } else {
+                $settings[$settingRow->setting_name] = $value;
+            }
+        }
+
+        return $settings;
     }
 
-    private function isPreviousStandardResponseOption($responseOption): bool
+    private function decodeSettingValue($settingValue)
     {
-        return is_null($responseOption->getData('isTranslated'))
-            && is_array($responseOption->getData('optionText'));
+        $decodedValue = json_decode($settingValue, true);
+        if (!is_null($decodedValue)) {
+            return $decodedValue;
+        }
+
+        $unserializedValue = @unserialize($settingValue);
+        return $unserializedValue === false && $settingValue !== 'b:0;' ? $settingValue : $unserializedValue;
     }
 
-    private function cleanQuestionTextualData($question)
+    private function getQuestionName(array $questionSettings, bool $isPreviousStandardQuestion): ?string
+    {
+        if (empty($questionSettings['questionText'])) {
+            return null;
+        }
+
+        if ($isPreviousStandardQuestion) {
+            $questionName = $this->getDataInBaseLocale($questionSettings, 'questionText');
+        } elseif (is_string($questionSettings['questionText'])) {
+            $questionName = __($questionSettings['questionText'], [], self::BASE_LOCALE);
+        } else {
+            return null;
+        }
+
+        if (is_null($questionName)) {
+            return null;
+        }
+
+        return strtolower($questionName);
+    }
+
+    private function getDataInBaseLocale(array $data, string $dataName): ?string
+    {
+        $dataValue = $data[$dataName];
+        return $dataValue[self::BASE_LOCALE] ?? $dataValue['en'] ?? null;
+    }
+
+    private function migrateDeiaQuestion(int $questionId, array $defaultQuestionData)
+    {
+        $this->cleanQuestionTextualData($questionId);
+        $this->updateQuestionSetting($questionId, 'isTranslated', (int) $defaultQuestionData['isTranslated']);
+        $this->updateQuestionSetting($questionId, 'isDefaultQuestion', (int) $defaultQuestionData['isDefaultQuestion']);
+        $this->updateQuestionSetting($questionId, 'questionText', $defaultQuestionData['questionText']);
+        $this->updateQuestionSetting($questionId, 'questionDescription', $defaultQuestionData['questionDescription']);
+    }
+
+    private function updateQuestionSetting(int $questionId, string $settingName, $settingValue): void
+    {
+        DB::table('deia_question_settings')->updateOrInsert(
+            [
+                'deia_question_id' => $questionId,
+                'locale' => '',
+                'setting_name' => $settingName,
+            ],
+            ['setting_value' => $settingValue]
+        );
+    }
+
+    private function migrateDeiaResponseOption(int $responseOptionId, array $defaultResponseOption)
+    {
+        $this->cleanResponseOptionTextualData($responseOptionId);
+        $this->updateResponseOptionSetting($responseOptionId, 'optionText', $defaultResponseOption['optionText']);
+        $this->updateResponseOptionSetting(
+            $responseOptionId,
+            'isTranslated',
+            (int) $defaultResponseOption['isTranslated']
+        );
+    }
+
+    private function updateResponseOptionSetting(int $responseOptionId, string $settingName, $settingValue): void
+    {
+        DB::table('deia_response_option_settings')->updateOrInsert(
+            [
+                'deia_response_option_id' => $responseOptionId,
+                'locale' => '',
+                'setting_name' => $settingName,
+            ],
+            ['setting_value' => $settingValue]
+        );
+    }
+
+    private function isPreviousStandardQuestion(array $questionSettings): bool
+    {
+        return !array_key_exists('isTranslated', $questionSettings)
+            && !array_key_exists('isDefaultQuestion', $questionSettings)
+            && !empty($questionSettings['questionText'])
+            && is_array($questionSettings['questionText'])
+            && in_array(
+                $this->getDataInBaseLocale($questionSettings, 'questionText'),
+                self::PREVIOUS_STANDARD_QUESTIONS
+            );
+    }
+
+    private function isPreviousStandardResponseOption(array $responseOptionSettings): bool
+    {
+        return !array_key_exists('isTranslated', $responseOptionSettings)
+            && !empty($responseOptionSettings['optionText'])
+            && is_array($responseOptionSettings['optionText']);
+    }
+
+    private function cleanQuestionTextualData(int $questionId): void
     {
         DB::table('deia_question_settings')
-            ->where('deia_question_id', $question->getId())
+            ->where('deia_question_id', $questionId)
             ->whereIn('setting_name', ['questionText', 'questionDescription'])
             ->delete();
     }
 
-    private function cleanResponseOptionTextualData($responseOption)
+    private function cleanResponseOptionTextualData(int $responseOptionId): void
     {
         DB::table('deia_response_option_settings')
-            ->where('deia_response_option_id', $responseOption->getId())
+            ->where('deia_response_option_id', $responseOptionId)
             ->whereIn('setting_name', ['optionText'])
             ->delete();
     }
