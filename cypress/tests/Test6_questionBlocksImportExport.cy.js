@@ -109,7 +109,17 @@ describe('DEIA Survey - Question blocks import and export', function () {
 				expect(res.body.blocks[0].title.en).to.include(questionBlock.title);
 				expect(res.body.blocks[0].description.en).to.include(questionBlock.description);
 				expect(res.body.blocks[0].questions[0].questionType).to.equal('TYPE_CHECKBOXES');
-				expect(res.body.blocks[0].questions[0].options).to.deep.equal(questionBlock.questions[0].options);
+				expect(res.body.blocks[0].questions[0].questionText.en).to.include(questionBlock.questions[0].text);
+				expect(res.body.blocks[0].questions[0].questionDescription.en).to.include(questionBlock.questions[0].description);
+				console.log('Exported Question Block:', res.body.blocks[0].questions[0]);
+				expect(res.body.blocks[0].questions[0].responseOptions).to.have.length(2);
+				expect(res.body.blocks[0].questions[0].responseOptions[0].optionText.en).to.include(questionBlock.questions[0].options[0].text);
+				expect(res.body.blocks[0].questions[0].responseOptions[0].hasInputField).to.equal(false);
+				expect(res.body.blocks[0].questions[0].responseOptions[1].optionText.en).to.include(questionBlock.questions[0].options[1].text);
+				expect(res.body.blocks[0].questions[0].responseOptions[1].hasInputField).to.equal(true);
+				expect(res.body.blocks[0].questions[1].questionType).to.equal('TYPE_TEXT_FIELD');
+				expect(res.body.blocks[0].questions[1].questionText.en).to.include(questionBlock.questions[1].text);
+				expect(res.body.blocks[0].questions[1].questionDescription.en).to.include(questionBlock.questions[1].description);
 				cy.writeFile(downloadedQuestionBlockPath, res.body);
 			});
 		});
