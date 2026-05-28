@@ -38,6 +38,8 @@ describe('DEIA Survey - Question blocks import and export', function () {
 		cy.get('a[id*="deiasurveyplugin-settings"]').click();
 
 		cy.get('a:contains("Create Question Block")').click();
+		cy.waitJQuery();
+		cy.wait(500);
 		cy.get('form[id^="deiaQuestionBlockForm"] input[id^="title-en-"]').type(questionBlock.title, {delay: 0});
 		cy.get('form[id^="deiaQuestionBlockForm"] textarea[id^="description-en-"]').type(questionBlock.description, {delay: 0});
 
@@ -52,6 +54,8 @@ describe('DEIA Survey - Question blocks import and export', function () {
 
 		questionBlock.questions.forEach((question) => {
 			cy.contains('a', 'Create question').click();
+			cy.waitJQuery();
+			cy.wait(500);
 			cy.get('form[id^="deiaQuestionForm"] input[id^="questionText-en-"]').type(question.text, {delay: 0});
 			cy.get('form[id^="deiaQuestionForm"] textarea[id^="questionDescription-en-"]').type(question.description, {delay: 0});
 
