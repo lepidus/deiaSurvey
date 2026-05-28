@@ -1,225 +1,218 @@
-import '../support/commands.js';
 describe('DEIA Survey - Question blocks manager', function () {
-    const pluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-deiasurveyplugin';
-    const defaultQuestionBlockTitle = 'SciELO Questions';
-    const questionBlock = {
-        title: 'Funding DEIA questions',
-        editedTitle: 'Funding and access DEIA questions',
-        description: 'Questions about access to funding opportunities.',
-        editedDescription: 'Questions about access to funding and participation opportunities.',
-        firstQuestion: {
-            text: 'Are you a scholarship recipient?',
-            description: 'Select all funding sources that apply.',
-            options: ['Institutional scholarship', 'Self describe funding']
-        },
-        secondQuestion: {
-            text: 'What support do you need?',
-            description: 'Describe the support that would help your participation.'
-        }
-    };
+	let questionBlock;
 
-    function openPluginSettings() {
-        cy.contains('a', 'Website').click();
-        cy.waitJQuery();
-        cy.get('#plugins-button').click();
-        cy.waitJQuery();
+	before(function() {
+		questionBlock = {
+			title: 'Funding DEIA questions',
+			editedTitle: 'Funding and access DEIA questions',
+			description: 'Questions about access to funding opportunities.',
+			editedDescription: 'Questions about access to funding and participation opportunities.',
+			questions: [
+				{
+					text: 'Are you a scholarship recipient?',
+					description: 'Select all funding sources that apply.',
+					options: [
+						{
+							text: 'Institutional scholarship',
+							hasInputField: false
+						},
+						{
+							text: 'Self describe funding',
+							hasInputField: true
+						}
+					]
+				},
+				{
+					text: 'What support do you need?',
+					description: 'Describe the support that would help your participation.'
+				}
+			]
+		};
+	});
 
-        cy.get('tr#' + pluginRowId + ' a.show_extras').click();
-        cy.get('a[id^=' + pluginRowId + '-settings-button]').click();
-        cy.get('#deiaQuestionBlockGridContainer').contains(defaultQuestionBlockTitle);
-    }
+	it('Creates DEIA question blocks', function () {
+		cy.login('dbarnes', null, 'publicknowledge');
 
-    function closeModal() {
-        cy.get('.pkp_modal_panel > .close').filter(':visible').last().click();
-        cy.wait(500);
-    }
+		cy.get('nav').contains('Website').click({ force: true });
+		cy.get('button[id="plugins-button"]').click();
+		cy.get('tr[id*="deiasurveyplugin"] a.show_extras').click();
+		cy.get('a[id*="deiasurveyplugin-settings"]').click();
 
-    function saveActiveModalForm(formId) {
-        cy.get(`form#${formId} button[id^="submitFormButton-"]`).click({force: true});
-        cy.contains('Your changes have been saved.');
-        cy.waitJQuery();
-        cy.wait(500);
-    }
+		cy.get('a:contains("Create Question Block")').click();
+		cy.waitJQuery();
+		cy.wait(500);
 
-    function visibleField(selector) {
-        return cy.get(selector).filter(':visible').first();
-    }
+		cy.get('form[id^="deiaQuestionBlockForm"] input[id^="title-en"]').type(questionBlock.title, {delay: 0});
+		cy.get('form[id^="deiaQuestionBlockForm"] textarea[id^="description-en"]').type(questionBlock.description, {delay: 0});
 
-    function fillVisibleField(selector, value) {
-        visibleField(selector)
-            .click({force: true})
-            .type('{selectall}{backspace}', {force: true})
-            .type(value, {force: true});
-    }
+		cy.get('form[id="deiaQuestionBlockForm"] button[id^="submitFormButton-"]').click({force: true});
+		cy.contains('Your changes have been saved.');
+		cy.waitJQuery();
+		cy.wait(500);
 
-    function exactTextPattern(text) {
-        const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return new RegExp('^\\s*' + escapedText.replace(/\s+/g, '\\s+') + '\\s*$');
-    }
+		cy.get('#deiaQuestionBlockGridContainer').contains(questionBlock.title);
 
-    function rowWithText(text) {
-        return cy.contains('tr .label', exactTextPattern(text)).closest('tr');
-    }
+		cy.logout();
+	});
 
-    function showRowActions(title) {
-        rowWithText(title).then(($row) => {
-            if (!$row.next().is(':visible')) {
-                cy.wrap($row).find('a.show_extras').click();
-            }
-        });
-    }
+	it('Edits DEIA question blocks', function () {
+		cy.login('dbarnes', null, 'publicknowledge');
 
-    function openBlockForEditing(title) {
-        showRowActions(title);
-        rowWithText(title).next().should('be.visible').contains('Edit').click();
-    }
+		cy.get('nav').contains('Website').click({ force: true });
+		cy.get('button[id="plugins-button"]').click();
+		cy.get('tr[id*="deiasurveyplugin"] a.show_extras').click();
+		cy.get('a[id*="deiasurveyplugin-settings"]').click();
 
-    function openQuestionsTabForBlock(title) {
-        openBlockForEditing(title);
-        cy.contains('a', 'Questions').click();
-        cy.get('#deiaQuestionGridContainer');
-    }
+		cy.get('span:contains("' + questionBlock.title + '")').prev('a.show_extras').click();
+		cy.get('tr:contains("' + questionBlock.title + '")').next().contains('a', 'Edit').click();
+		cy.waitJQuery();
+		cy.wait(500);
+		cy.get('form[id^="deiaQuestionBlockForm"] input[id^="title-en"]').clear().type(questionBlock.editedTitle, {delay: 0});
+		cy.get('form[id^="deiaQuestionBlockForm"] textarea[id^="description-en"]').clear().type(questionBlock.editedDescription, {delay: 0});
 
-    function createQuestionBlock(block) {
-        cy.contains('a', 'Create Question Block').click();
-        fillVisibleField('input[name^="title["]', block.title);
-        fillVisibleField('textarea[name^="description["]', block.description);
-        saveActiveModalForm('deiaQuestionBlockForm');
-        closeModal();
+		cy.get('form[id="deiaQuestionBlockForm"] button[id^="submitFormButton-"]').click({force: true});
+		cy.contains('Your changes have been saved.');
+		cy.waitJQuery();
+		cy.wait(500);
 
-        openPluginSettings();
-        cy.get('#deiaQuestionBlockGridContainer').contains(block.title);
-        rowWithText(block.title).contains('0');
-    }
+		cy.get('#deiaQuestionBlockGridContainer').contains(questionBlock.editedTitle);
 
-    function editQuestionBlock(block) {
-        openBlockForEditing(block.title);
-        fillVisibleField('input[name^="title["]', block.editedTitle);
-        fillVisibleField('textarea[name^="description["]', block.editedDescription);
-        saveActiveModalForm('deiaQuestionBlockForm');
+		cy.logout();
+	});
 
-        closeModal();
-        openPluginSettings();
-        openQuestionsTabForBlock(block.editedTitle);
-        cy.get('#deiaQuestionGridContainer').contains('No questions have been created in this block.');
-    }
+	it('Creates DEIA question questions', function () {
+		cy.login('dbarnes', null, 'publicknowledge');
 
-    function addResponseOption(option, hasInputField) {
-        cy.contains('a', 'Add Item').click({force: true});
-        cy.wait(500);
-        fillVisibleField('input[name^="newRowId[responseOption]"]', option);
+		cy.get('nav').contains('Website').click({ force: true });
+		cy.get('button[id="plugins-button"]').click();
+		cy.get('tr[id*="deiasurveyplugin"] a.show_extras').click();
+		cy.get('a[id*="deiasurveyplugin-settings"]').click();
 
-        if (hasInputField) {
-            cy.get('input[name="newRowId[hasInputField]"]:last').check({force: true});
-        }
-    }
+		cy.get('span:contains("' + questionBlock.editedTitle + '")').prev('a.show_extras').click();
+		cy.get('tr:contains("' + questionBlock.editedTitle + '")').next().contains('a', 'Edit').click();
+		cy.get('#editDeiaQuestionBlockTabs a:contains("Questions")').click();
 
-    function createQuestion(question, type, optionsWithInputs) {
-        cy.contains('a', 'Create question').click();
-        fillVisibleField('input[name^="questionText["]', question.text);
-        fillVisibleField('textarea[name^="questionDescription["]', question.description);
-        cy.get('select[name="questionType"]').invoke('val', type).trigger('change', {force: true});
+		questionBlock.questions.forEach((question) => {
+			cy.contains('a', 'Create question').click();
+			cy.waitJQuery();
+			cy.wait(500);
+			cy.get('form[id^="deiaQuestionForm"] input[id^="questionText-en"]').type(question.text, {delay: 0});
+			cy.get('form[id^="deiaQuestionForm"] textarea[id^="questionDescription-en"]').type(question.description, {delay: 0});
 
-        if (optionsWithInputs) {
-            optionsWithInputs.forEach((option) => {
-                addResponseOption(option.text, option.hasInputField);
-            });
-        }
+			if (question.options) {
+				cy.get('form[id^="deiaQuestionForm"] select[name="questionType"]').select('Checkboxes (you can choose one or more)', {force: true});
+				question.options.forEach((option, index) => {
+					cy.contains('a', 'Add Item').click({force: true});
+					cy.wait(500);
+					cy.get(`input[id*="newRowId-en"]`).eq(index).type(option.text);
 
-        saveActiveModalForm('deiaQuestionForm');
-        closeModal();
-    }
+					if (option.hasInputField) {
+						cy.get('input[name="newRowId[hasInputField]"]:last').check({force: true});
+					}
+				});
+			} else {
+				cy.get('form[id^="deiaQuestionForm"] select[name="questionType"]').select('Single line text box', {force: true});
+			}
 
-    function moveRowBefore(rowText, beforeRowText) {
-        rowWithText(rowText).then(($rowToMove) => {
-            rowWithText(beforeRowText).then(($beforeRow) => {
-                $rowToMove.insertBefore($beforeRow);
-            });
-        });
-    }
+			cy.get('form[id="deiaQuestionForm"] button[id^="submitFormButton-"]').click({force: true});
+			cy.contains('Your changes have been saved.');
+			cy.waitJQuery();
+			cy.wait(500);
 
-    function saveGridOrder(gridContainerId) {
-        cy.get(`#${gridContainerId} a.pkp_linkaction_orderItems`).click();
-        cy.get(`#${gridContainerId} .order_finish_controls .saveButton`).click();
-        cy.waitJQuery();
-        cy.wait(500);
-    }
+			cy.get('#deiaQuestionGridContainer').contains(question.text);
+		});
 
-    function assertRowOrder(firstText, secondText) {
-        rowWithText(firstText).then(($firstRow) => {
-            rowWithText(secondText).then(($secondRow) => {
-                expect($firstRow.index()).to.be.lessThan($secondRow.index());
-            });
-        });
-    }
+		cy.logout();
+	});
 
-    function setBlockStatus(title) {
-        rowWithText(title).find('input[type="checkbox"]').filter(':visible').first().click({force: true});
-        cy.get('div[aria-label="Confirm"] button:contains("OK")').click();
-        cy.waitJQuery();
-        cy.wait(500);
-    }
+	it('Displays only active DEIA question blocks to users', function () {
+		cy.login('dbarnes', null, 'publicknowledge');
 
-    function assertCreatedQuestionsAreDisplayed(block) {
-        cy.get('#deiaQuestionGridContainer').contains(block.firstQuestion.text);
-        cy.get('#deiaQuestionGridContainer').contains(block.secondQuestion.text);
-    }
+		cy.get('nav').contains('Website').click({ force: true });
+		cy.get('button[id="plugins-button"]').click();
+		cy.get('tr[id*="deiasurveyplugin"] a.show_extras').click();
+		cy.get('a[id*="deiasurveyplugin-settings"]').click();
 
-    function assertCustomQuestionBlockIsDisplayed(block) {
-        cy.contains('legend', block.editedTitle);
-        cy.contains('.description', block.editedDescription);
-        cy.contains('label', block.firstQuestion.text);
-        cy.contains('.description', block.firstQuestion.description);
-        cy.contains('label', block.firstQuestion.options[0]);
-        cy.contains('label', block.firstQuestion.options[1])
-            .parent()
-            .parent()
-            .find('input[type="text"]');
-        cy.contains('label', block.secondQuestion.text);
-        cy.contains('.description', block.secondQuestion.description);
-        cy.contains('label', 'Gender').should('not.exist');
-    }
+		cy.get('tr:contains("SciELO Questions") input[id^="select-cell"]').click();
+		cy.get('button:contains("OK")').click();
+		cy.waitJQuery();
+		cy.wait(500);
 
-    it('Creates, edits, orders and displays DEIA question blocks', function () {
-        cy.login('dbarnes', null, 'publicknowledge');
-        openPluginSettings();
+		cy.get('tr:contains("' + questionBlock.editedTitle + '") input[id^="select-cell"]').click();
+		cy.get('button:contains("OK")').click();
+		cy.waitJQuery();
+		cy.wait(500);
 
-        createQuestionBlock(questionBlock);
-        editQuestionBlock(questionBlock);
+		cy.logout();
 
-        createQuestion(questionBlock.secondQuestion, '2');
-        openQuestionsTabForBlock(questionBlock.editedTitle);
-        createQuestion(questionBlock.firstQuestion, '4', [
-            {text: questionBlock.firstQuestion.options[0], hasInputField: false},
-            {text: questionBlock.firstQuestion.options[1], hasInputField: true}
-        ]);
+		cy.login('ccorino', null, 'publicknowledge');
+		cy.contains('a', 'DEIA Survey').click();
 
-        openQuestionsTabForBlock(questionBlock.editedTitle);
-        assertCreatedQuestionsAreDisplayed(questionBlock);
-        moveRowBefore(questionBlock.firstQuestion.text, questionBlock.secondQuestion.text);
-        saveGridOrder('deiaQuestionGridContainer');
-        assertRowOrder(questionBlock.firstQuestion.text, questionBlock.secondQuestion.text);
+		cy.contains('legend', 'SciELO Questions').should('not.exist');
+		cy.contains('label', 'Gender').should('not.exist');
+		cy.contains('label', 'Race').should('not.exist');
+		cy.contains('label', 'Ethnicity').should('not.exist');
 
-        closeModal();
+		cy.contains('legend', questionBlock.editedTitle);
+		cy.contains('label.description', questionBlock.editedDescription);
+		questionBlock.questions.forEach((question) => {
+			cy.contains('label', question.text);
+			cy.contains('label.description', question.description);
+			if (question.options) {
+				question.options.forEach((option) => {
+					cy.contains('label', option.text);
+					cy.contains('label', option.text).children('input[type="checkbox"]');
+					if (option.hasInputField) {
+						cy.contains('label', option.text).parent().parent().find('input[type="text"]');
+					}
+				});
+			}
+		});
 
-        moveRowBefore(questionBlock.editedTitle, defaultQuestionBlockTitle);
-        saveGridOrder('deiaQuestionBlockGridContainer');
-        assertRowOrder(questionBlock.editedTitle, defaultQuestionBlockTitle);
+		cy.logout();
+	});
 
-        setBlockStatus(questionBlock.editedTitle);
+	it('Orders DEIA question blocks and questions', function () {
+		cy.login('dbarnes', null, 'publicknowledge');
 
-        openBlockForEditing(questionBlock.editedTitle);
-        cy.contains('a', 'Questions').click();
-        cy.get('#deiaQuestionGridContainer').contains('Create question').should('not.exist');
-        rowWithText(questionBlock.firstQuestion.text).find('a.show_extras').should('not.exist');
-        closeModal();
+		cy.get('nav').contains('Website').click({ force: true });
+		cy.get('button[id="plugins-button"]').click();
+		cy.get('tr[id*="deiasurveyplugin"] a.show_extras').click();
+		cy.get('a[id*="deiasurveyplugin-settings"]').click();
 
-        setBlockStatus(defaultQuestionBlockTitle);
-        closeModal();
+		cy.get('tr:contains("SciELO Questions") input[id^="select-cell"]').click();
+		cy.get('button:contains("OK")').click();
+		cy.waitJQuery();
+		cy.wait(500);
 
-        cy.logout();
-        cy.login('ccorino', null, 'publicknowledge');
-        cy.contains('a', 'DEIA Survey').click();
-        assertCustomQuestionBlockIsDisplayed(questionBlock);
-    });
+		cy.get('tr:contains("' + questionBlock.editedTitle + '")').then(($row) => {
+			cy.get('tr:contains("SciELO Questions")').then(($defaultRow) => {
+				$row.insertBefore($defaultRow);
+			});
+		});
+
+		cy.get('#deiaQuestionBlockGridContainer a.pkp_linkaction_orderItems').click();
+		cy.get('#deiaQuestionBlockGridContainer .order_finish_controls .saveButton').click();
+		cy.waitJQuery();
+		cy.wait(500);
+
+		cy.get('tr:contains("' + questionBlock.editedTitle + '")').then(($firstRow) => {
+			cy.get('tr:contains("SciELO Questions")').then(($secondRow) => {
+				expect($firstRow.index()).to.be.lessThan($secondRow.index());
+			});
+		});
+
+		cy.logout();
+
+		cy.login('ccorino', null, 'publicknowledge');
+		cy.contains('a', 'DEIA Survey').click();
+
+		cy.get('fieldset:contains("' + questionBlock.editedTitle + '")').then(($firstRow) => {
+			cy.get('fieldset:contains("SciELO Questions")').then(($secondRow) => {
+				expect($firstRow.index()).to.be.lessThan($secondRow.index());
+			});
+		});
+
+		cy.logout();
+	});
 });
