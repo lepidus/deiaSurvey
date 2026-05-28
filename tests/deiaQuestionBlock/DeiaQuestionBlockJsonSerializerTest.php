@@ -23,14 +23,11 @@ class DeiaQuestionBlockJsonSerializerTest extends PKPTestCase
 
         self::assertEquals(
             [
-                'schemaVersion' => '1.0',
                 'plugin' => 'deiaSurvey',
                 'blocks' => [
                     [
                         'title' => ['en' => 'Funding DEIA questions'],
                         'description' => ['en' => 'Questions about funding access.'],
-                        'active' => true,
-                        'sequence' => 2,
                         'questions' => [],
                     ],
                 ],
@@ -52,7 +49,7 @@ class DeiaQuestionBlockJsonSerializerTest extends PKPTestCase
         $block->setData('description', ['en' => 'Questions about funding access.']);
         $block->setActive(0);
         $block->setSequence(1);
-        $block->setData('questions', [$question]);
+        $block->setData('questions', [777 => $question]);
 
         $serializer = new DeiaQuestionBlockJsonSerializer();
         $serialized = $serializer->serializeBlocks([$block]);
@@ -60,15 +57,15 @@ class DeiaQuestionBlockJsonSerializerTest extends PKPTestCase
         self::assertEquals(
             [
                 [
-                    'questionType' => DeiaQuestion::TYPE_TEXTAREA,
+                    'questionType' => 'TYPE_TEXTAREA',
                     'questionText' => ['en' => 'Describe your funding access'],
                     'questionDescription' => ['en' => 'Use as much detail as needed.'],
-                    'sequence' => 1,
                     'responseOptions' => [],
                 ],
             ],
             $serialized['blocks'][0]['questions']
         );
+        self::assertSame([0], array_keys($serialized['blocks'][0]['questions']));
     }
 
     public function testSerializeQuestionResponseOptions(): void
@@ -88,7 +85,10 @@ class DeiaQuestionBlockJsonSerializerTest extends PKPTestCase
         $question->setData('questionText', ['en' => 'Which funding sources apply?']);
         $question->setData('questionDescription', ['en' => 'Select all that apply.']);
         $question->setSequence(1);
-        $question->setData('responseOptions', [$firstOption, $secondOption]);
+        $question->setData('responseOptions', [
+            888 => $firstOption,
+            889 => $secondOption,
+        ]);
 
         $block = new DeiaQuestionBlock();
         $block->setData('title', ['en' => 'Funding DEIA questions']);
@@ -105,16 +105,15 @@ class DeiaQuestionBlockJsonSerializerTest extends PKPTestCase
                 [
                     'optionText' => ['en' => 'Grant funding'],
                     'hasInputField' => false,
-                    'sequence' => 1,
                 ],
                 [
                     'optionText' => ['en' => 'Other'],
                     'hasInputField' => true,
-                    'sequence' => 2,
                 ],
             ],
             $serialized['blocks'][0]['questions'][0]['responseOptions']
         );
+        self::assertSame([0, 1], array_keys($serialized['blocks'][0]['questions'][0]['responseOptions']));
     }
 
     public function testSerializeQuestionTranslationKeysAsText(): void
