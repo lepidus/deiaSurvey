@@ -186,18 +186,19 @@ class DeiaQuestionBlockGridHandler extends GridHandler
     {
         $templateMgr = TemplateManager::getManager($request);
         $dispatcher = $request->getDispatcher();
+        $templateMgr->assign('deiaQuestionGridUrl', $dispatcher->url(
+            $request,
+            ROUTE_COMPONENT,
+            null,
+            'plugins.generic.deiaSurvey.classes.controllers.grid.deiaQuestion.DeiaQuestionGridHandler',
+            'fetchGrid',
+            null,
+            ['deiaQuestionBlockId' => (int) $request->getUserVar('deiaQuestionBlockId')]
+        ));
 
-        return $templateMgr->fetchAjax(
-            'deiaQuestionGridContainer',
-            $dispatcher->url(
-                $request,
-                ROUTE_COMPONENT,
-                null,
-                'plugins.generic.deiaSurvey.classes.controllers.grid.deiaQuestion.DeiaQuestionGridHandler',
-                'fetchGrid',
-                null,
-                ['deiaQuestionBlockId' => (int) $request->getUserVar('deiaQuestionBlockId')]
-            )
+        return new JSONMessage(
+            true,
+            $templateMgr->fetch($this->plugin->getTemplateResource('deiaQuestionBlocks/deiaQuestionBlockElements.tpl'))
         );
     }
 
