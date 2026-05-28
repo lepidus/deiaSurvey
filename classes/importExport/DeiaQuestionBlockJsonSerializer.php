@@ -2,6 +2,7 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes\importExport;
 
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use PKP\facades\Locale;
 
 class DeiaQuestionBlockJsonSerializer
@@ -9,9 +10,8 @@ class DeiaQuestionBlockJsonSerializer
     public function serializeBlocks(array $blocks): array
     {
         return [
-            'schemaVersion' => '1.0',
             'plugin' => 'deiaSurvey',
-            'blocks' => array_map([$this, 'serializeBlock'], $blocks),
+            'blocks' => array_map([$this, 'serializeBlock'], array_values($blocks)),
         ];
     }
 
@@ -20,9 +20,7 @@ class DeiaQuestionBlockJsonSerializer
         return [
             'title' => $this->serializeTextualData($block->getData('title')),
             'description' => $this->serializeTextualData($block->getData('description')),
-            'active' => (bool) $block->getActive(),
-            'sequence' => $block->getSequence(),
-            'questions' => array_map([$this, 'serializeQuestion'], (array) $block->getData('questions')),
+            'questions' => array_map([$this, 'serializeQuestion'], array_values((array) $block->getData('questions'))),
         ];
     }
 
@@ -32,13 +30,12 @@ class DeiaQuestionBlockJsonSerializer
         $questionDescription = $this->serializeTextualData($question->getData('questionDescription'));
 
         return [
-            'questionType' => $question->getQuestionType(),
+            'questionType' => $this->serializeQuestionType((int) $question->getQuestionType()),
             'questionText' => $questionText,
             'questionDescription' => $questionDescription,
-            'sequence' => $question->getSequence(),
             'responseOptions' => array_map(
                 [$this, 'serializeResponseOption'],
-                (array) $question->getData('responseOptions')
+                array_values((array) $question->getData('responseOptions'))
             ),
         ];
     }
@@ -50,8 +47,14 @@ class DeiaQuestionBlockJsonSerializer
         return [
             'optionText' => $optionText,
             'hasInputField' => $responseOption->hasInputField(),
-            'sequence' => $responseOption->getData('sequence'),
         ];
+    }
+
+    private function serializeQuestionType(int $questionType): string
+    {
+        $questionTypeConstants = array_flip(DeiaQuestion::getQuestionTypeConstants());
+
+        return $questionTypeConstants[$questionType] ?? (string) $questionType;
     }
 
     private function serializeTextualData($textualData): array
