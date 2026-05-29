@@ -34,12 +34,14 @@ class DeiaSurveyReportForm extends Form
         $this->setData('userIsSiteAdmin', $userIsSiteAdmin);
     }
 
-    // public function validateReportGeneration($reportParams) {}
-
     public function display($request = null, $template = null)
     {
         $templateManager = TemplateManager::getManager($request);
-        $templateManager->assign('userIsSiteAdmin', $this->getData('userIsSiteAdmin'));
+        $application = Application::get()->getName();
+        $templateManager->assign([
+            'application' => $application,
+            'userIsSiteAdmin' => $this->getData('userIsSiteAdmin')
+        ]);
         $templateManager->display($this->plugin->getTemplateResource(self::FORM_TEMPLATE));
     }
 }

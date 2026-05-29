@@ -227,6 +227,17 @@ msgstr "Users Who Did Not Consent"
 msgid "plugins.generic.deiaSurvey.report.responsesCount"
 msgstr "Responses"
 
+msgid "plugins.generic.deiaSurvey.report.generateReport.site"
+msgstr "Generate Site Report"
+
+msgid "plugins.generic.deiaSurvey.report.generateReport.context.ojs2"
+msgstr "Generate Journal Report"
+
+msgid "plugins.generic.deiaSurvey.report.generateReport.context.ops"
+msgstr "Generate Preprint Server Report"
+
+
+
 msgid "plugins.generic.deiaSurvey.questionBlocks"
 msgstr "Question Blocks"
 
