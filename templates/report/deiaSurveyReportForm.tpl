@@ -23,11 +23,14 @@
             <h3>{translate key="plugins.generic.deiaSurvey.report.contextReport.{$application}"}</h3>
             <p>{translate key="plugins.generic.deiaSurvey.report.contextReport.description"}</p>
             <div id="actionsButton">
-                <input
+                <button
                     class="pkp_button submitFormButton"
                     type="submit"
-                    value="{translate key="plugins.generic.deiaSurvey.report.generateReport.context.{$application}"}"
-                />
+                    name="reportType"
+                    value="context"
+                >
+                    {translate key="plugins.generic.deiaSurvey.report.generateReport.context.{$application}"}
+                </button>
             </div>
         </div>
 
@@ -36,11 +39,14 @@
                 <h3>{translate key="plugins.generic.deiaSurvey.report.siteReport"}</h3>
                 <p>{translate key="plugins.generic.deiaSurvey.report.siteReport.description"}</p>
                 <div id="actionsButton">
-                    <input
+                    <button
                         class="pkp_button submitFormButton"
                         type="submit"
-                        value="{translate key="plugins.generic.deiaSurvey.report.generateReport.site"}"
-                    />
+                        name="reportType"
+                        value="site"
+                    >
+                        {translate key="plugins.generic.deiaSurvey.report.generateReport.site"}
+                    </button>
                 </div>
             </div>
         {/if}

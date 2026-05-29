@@ -6,13 +6,17 @@ use PKP\form\Form;
 use APP\core\Application;
 use APP\template\TemplateManager;
 use PKP\security\Validation;
+use PKP\core\PKPString;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorPost;
+use APP\plugins\generic\deiaSurvey\report\classes\factories\SiteStatisticsReportFactory;
 
 class DeiaSurveyReportForm extends Form
 {
     private const FORM_TEMPLATE = 'report/deiaSurveyReportForm.tpl';
     private const STYLE_SHEET = 'styles/deiaSurveyReportForm.css';
+    private const REPORT_TYPE_SITE = 'site';
+    private const REPORT_TYPE_CONTEXT = 'context';
 
     private $plugin;
     private $contextId;
@@ -35,25 +39,40 @@ class DeiaSurveyReportForm extends Form
         $this->setData('userIsSiteAdmin', $userIsSiteAdmin);
     }
 
-    // public function validateReportGeneration($reportParams)
-    // {
-    //     header('content-type: text/comma-separated-values');
-    //     header('content-disposition: attachment; filename=site-deia-report-' . date('Ymd') . '.csv');
+    public function validateReportGeneration($reportParams)
+    {
+        $reportType = $reportParams['reportType'] ?? null;
 
-    //     $siteStatsReportFactory = new SiteStatisticsReportFactory();
-    //     $report = $siteStatsReportFactory->createSiteReport();
-    //     $report->writeReport('php://output');
-    // }
+        if ($reportType === 'site') {
+            return Validation::isSiteAdmin();
+        }
 
-    // public function generateReport()
-    // {
-    //     header('content-type: text/comma-separated-values');
-    //     header('content-disposition: attachment; filename=site-deia-report-' . date('Ymd') . '.csv');
+        return $reportType === 'context';
+    }
 
-    //     $siteStatsReportFactory = new SiteStatisticsReportFactory();
-    //     $report = $siteStatsReportFactory->createSiteReport();
-    //     $report->writeReport('php://output');
-    // }
+    private function emitHttpHeaders($request, $reportType)
+    {
+        $context = $request->getContext();
+        $acronym = PKPString::regexp_replace('/[^A-Za-z0-9 ]/', '', $context->getLocalizedAcronym());
+        $fileName = $reportType == self::REPORT_TYPE_SITE
+            ? 'site-deia-report-' . date('YmdHis') . '.csv'
+            : $acronym . '-deia-report-' . date('YmdHis') . '.csv';
+
+        header('content-type: text/comma-separated-values');
+        header("content-disposition: attachment; filename=$fileName");
+    }
+
+    public function generateReport($request, $reportParams)
+    {
+        $reportType = $reportParams['reportType'];
+        $this->emitHttpHeaders($request, $reportType);
+
+        if ($reportType == self::REPORT_TYPE_SITE) {
+            $siteStatsReportFactory = new SiteStatisticsReportFactory();
+            $report = $siteStatsReportFactory->createSiteReport();
+            $report->writeReport('php://output');
+        }
+    }
 
     public function display($request = null, $template = null)
     {

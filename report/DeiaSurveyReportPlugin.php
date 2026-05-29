@@ -39,7 +39,7 @@ class DeiaSurveyReportPlugin extends ReportPlugin
         if ($request->isPost($request)) {
             $reportParams = $request->getUserVars();
             if ($form->validateReportGeneration($reportParams)) {
-                $form->generateReport($request);
+                $form->generateReport($request, $reportParams);
             }
         } else {
             $form->display($request);
