@@ -110,4 +110,4 @@ Developed by Lepidus Tecnologia.
 
 __This plugin is licensed under the GNU General Public License v3.0__
 
-__Copyright (c) 2024-2025 Lepidus Tecnologia__
+__Copyright (c) 2024-2026 Lepidus Tecnologia__
