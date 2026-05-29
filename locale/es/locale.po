@@ -228,6 +228,28 @@ msgstr "Usuarios que no consintieron"
 msgid "plugins.generic.deiaSurvey.report.responsesCount"
 msgstr "Respuestas"
 
+msgid "plugins.generic.deiaSurvey.report.select"
+msgstr "Por favor, seleccione el informe que desea generar:"
+
+msgid "plugins.generic.deiaSurvey.report.contextReport.ojs2"
+msgstr "Informe de la Revista"
+
+msgid "plugins.generic.deiaSurvey.report.contextReport.ops"
+msgstr "Informe del Servidor de Preprints"
+
+msgid "plugins.generic.deiaSurvey.report.contextReport.description"
+msgstr "Este informe incluye los datos de las respuestas de todos los usuarios del contexto actual."
+" Se incluyen las respuestas a las preguntas del bloque estándar, así como las respuestas de los bloques de preguntas personalizados."
+" Cada respuesta es anonimizada, lo que garantiza la privacidad de los usuarios."
+
+msgid "plugins.generic.deiaSurvey.report.siteReport"
+msgstr "Informe del Sitio"
+
+msgid "plugins.generic.deiaSurvey.report.siteReport.description"
+msgstr "Este informe incluye los datos estadísticos de las respuestas a las preguntas del bloque estándar."
+" Para cada revista/servidor del sitio web, se muestra el número de usuarios que seleccionaron cada una de las opciones de las preguntas."
+" También se incluyen las estadísticas sobre el consentimiento y la falta de consentimiento de los usuarios respecto a la recopilación de datos."
+
 msgid "plugins.generic.deiaSurvey.report.generateReport.site"
 msgstr "Generar Informe del Sitio"
 

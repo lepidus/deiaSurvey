@@ -11,24 +11,37 @@
 	</h1>
     <div class="app__contentPanel">
     <form id="scieloSubmissionsReportForm" method="post" action="">
+        {if $userIsSiteAdmin}
+            <p>
+                {translate key="plugins.generic.deiaSurvey.report.select"}
+            </p>
+        {/if}
+
         {include file="common/formErrors.tpl"}
 
-        <div id="actionsButton">
-            <input
-                class="pkp_button submitFormButton"
-                type="submit"
-                value="{translate key="plugins.generic.deiaSurvey.report.generateReport.context.{$application}"}"
-            />
-        </div>
-
-        {if $userIsSiteAdmin}
+        <div class="reportSection">
+            <h3>{translate key="plugins.generic.deiaSurvey.report.contextReport.{$application}"}</h3>
+            <p>{translate key="plugins.generic.deiaSurvey.report.contextReport.description"}</p>
             <div id="actionsButton">
                 <input
                     class="pkp_button submitFormButton"
                     type="submit"
-                    value="{translate key="plugins.generic.deiaSurvey.report.generateReport.site"}"
-                    class="button defaultButton"
+                    value="{translate key="plugins.generic.deiaSurvey.report.generateReport.context.{$application}"}"
                 />
+            </div>
+        </div>
+
+        {if $userIsSiteAdmin}
+            <div class="reportSection">
+                <h3>{translate key="plugins.generic.deiaSurvey.report.siteReport"}</h3>
+                <p>{translate key="plugins.generic.deiaSurvey.report.siteReport.description"}</p>
+                <div id="actionsButton">
+                    <input
+                        class="pkp_button submitFormButton"
+                        type="submit"
+                        value="{translate key="plugins.generic.deiaSurvey.report.generateReport.site"}"
+                    />
+                </div>
             </div>
         {/if}
     </form>
