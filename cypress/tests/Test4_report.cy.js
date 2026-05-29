@@ -1,4 +1,6 @@
 describe('DEIA Survey - Report feature', function () {
+    let contextName;
+    
     function parseCsvLine(line) {
         const values = [];
         let value = '';
@@ -25,6 +27,13 @@ describe('DEIA Survey - Report feature', function () {
         return values;
     }
 
+    before(() => {
+        if (Cypress.env('contextTitles').en === 'Journal of Public Knowledge') {
+        contextName = 'Journal';
+            contextName = 'Preprint Server';
+        }
+    });
+
     afterEach(() => {
         cy.logout();
     });
@@ -38,36 +47,36 @@ describe('DEIA Survey - Report feature', function () {
         cy.contains('Please, select which report you want to generate');
 
         cy.contains('button', 'Generate Site Report');
-        cy.contains('button', 'Generate Journal Report');
+        cy.contains('button', 'Generate ' + contextName + ' Report');
     });
     it('Site report should include question block headers', function () {
         cy.login('admin', 'admin', 'publicknowledge');
         cy.contains('.app__navItem', 'Reports').click();
         cy.contains('a', 'DEIA Survey Report').click();
 
-        cy.contains('Generate Site Report')
-            .should('have.attr', 'href')
-            .then((reportUrl) => {
-                cy.request(reportUrl).then((response) => {
-                    expect(response.headers['content-type']).to.match(/text\/(csv|comma-separated-values)/);
-                    expect(response.headers['content-disposition']).to.contain('site-deia-report');
+        cy.intercept('POST', '**/stats/reports/report?pluginName=deiaSurveyReportPlugin').as('reportRequest');
+        cy.contains('button', 'Generate Site Report').click();
 
-                    const lines = response.body
-                        .replace(/^\uFEFF/, '')
-                        .trim()
-                        .split(/\r?\n/);
-                    const blockHeader = parseCsvLine(lines[0]);
-                    const questionHeader = parseCsvLine(lines[1]);
-                    const optionHeader = parseCsvLine(lines[2]);
+        cy.wait('@reportRequest').then((interception) => {
+            const response = interception.response;
+            expect(response.headers['content-type']).to.match(/text\/(csv|comma-separated-values)/);
+            expect(response.headers['content-disposition']).to.contain('site-deia-report');
 
-                    expect(blockHeader[0]).to.be.oneOf(['Journal Name', 'Preprint Server Name']);
-                    expect(blockHeader).to.include('SciELO Questions');
-                    expect(questionHeader).to.include('Gender');
-                    expect(optionHeader).to.include('Woman');
-                    expect(optionHeader).to.include('Man');
-                    expect(optionHeader).to.include('Non-binary or gender diverse');
-                });
-            });
+            const lines = response.body
+                .replace(/^\uFEFF/, '')
+                .trim()
+                .split(/\r?\n/);
+            const blockHeader = parseCsvLine(lines[0]);
+            const questionHeader = parseCsvLine(lines[1]);
+            const optionHeader = parseCsvLine(lines[2]);
+
+            expect(blockHeader[0]).to.be.oneOf(['Journal Name', 'Preprint Server Name']);
+            expect(blockHeader).to.include('SciELO Questions');
+            expect(questionHeader).to.include('Gender');
+            expect(optionHeader).to.include('Woman');
+            expect(optionHeader).to.include('Man');
+            expect(optionHeader).to.include('Non-binary or gender diverse');
+        });
     });
     it('Editors can only generate context report', function () {
         cy.login('dbarnes', null, 'publicknowledge');
@@ -77,6 +86,6 @@ describe('DEIA Survey - Report feature', function () {
         cy.contains('Please, select which report you want to generate').should('not.exist');
         cy.contains('button', 'Generate Site Report').should('not.exist');
 
-        cy.contains('button', 'Generate Journal Report');
+        cy.contains('button', 'Generate ' + contextName + ' Report');
     });
 });
