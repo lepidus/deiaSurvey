@@ -3,6 +3,8 @@
 namespace APP\plugins\generic\deiaSurvey\tests\report;
 
 use PKP\tests\PKPTestCase;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestionBlock\DeiaQuestionBlock;
+use APP\plugins\generic\deiaSurvey\report\classes\ContextReport;
 
 class ContextReportTest extends PKPTestCase
 {
