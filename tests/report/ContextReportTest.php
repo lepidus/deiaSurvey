@@ -5,6 +5,8 @@ namespace APP\plugins\generic\deiaSurvey\tests\report;
 use PKP\tests\PKPTestCase;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestionBlock\DeiaQuestionBlock;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
+use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DeiaResponse;
+use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\DeiaResponseOption;
 use APP\plugins\generic\deiaSurvey\report\classes\ContextReport;
 
 class ContextReportTest extends PKPTestCase
@@ -66,6 +68,37 @@ class ContextReportTest extends PKPTestCase
         return $questions;
     }
 
+    private function addTestResponsesToReport()
+    {
+        $responseId = 10;
+        $responseOptionId = 123;
+
+        foreach ($this->questions as $question) {
+            $response = new DeiaResponse();
+            $response->setAllData([
+                'id' => $responseId,
+                'userId' => 234,
+                'deiaQuestionId' => $question->getId(),
+                'responseValue' => [$responseOptionId]
+            ]);
+            $this->contextReport->addResponse($response);
+
+            $responseOption = new DeiaResponseOption();
+            $responseOption->setAllData([
+                'id' => $responseOptionId,
+                'deiaQuestionId' => $question->getId(),
+                'isTranslated' => true,
+                'optionText' => [
+                    $this->locale => "Response option $responseOptionId"
+                ]
+            ]);
+            $this->contextReport->addResponseOption($responseOption);
+
+            $responseId++;
+            $responseOptionId++;
+        }
+    }
+
     private function createTestContextReport(): ContextReport
     {
         $contextReport = new ContextReport();
@@ -108,5 +141,54 @@ class ContextReportTest extends PKPTestCase
             'Question number 9'
         ];
         $this->assertEquals($expectedQuestionsHeader, $headers[1]);
+    }
+
+    public function testWritesContextReport()
+    {
+        $csvFilePath = '/tmp/deia_survey_context_report_test.csv';
+
+        $printingGuide = $this->contextReport->getQuestionsPrintingGuide();
+        $this->addTestResponsesToReport();
+        $this->contextReport->writeReport($csvFilePath, $printingGuide);
+
+        $this->assertFileExists($csvFilePath);
+        $csvFile = fopen($csvFilePath, 'r');
+        $UTF8_BOM = chr(0xEF) . chr(0xBB) . chr(0xBF);
+        fread($csvFile, strlen($UTF8_BOM));
+
+        $expectedBlocksHeader = ['Question block number 1', 'Question block number 2', 'Question block number 3'];
+        $row = fgetcsv($csvFile);
+        $this->assertEquals($expectedBlocksHeader, $row);
+
+        $expectedQuestionsHeader = [
+            'Question number 1',
+            'Question number 2',
+            'Question number 3',
+            'Question number 4',
+            'Question number 5',
+            'Question number 6',
+            'Question number 7',
+            'Question number 8',
+            'Question number 9'
+        ];
+        $row = fgetcsv($csvFile);
+        $this->assertEquals($expectedQuestionsHeader, $row);
+
+        $expectedResponses = [
+            'Response option 123',
+            'Response option 124',
+            'Response option 125',
+            'Response option 126',
+            'Response option 127',
+            'Response option 128',
+            'Response option 129',
+            'Response option 130',
+            'Response option 131'
+        ];
+        $row = fgetcsv($csvFile);
+        $this->assertEquals($expectedResponses, $row);
+
+        fclose($csvFile);
+        unlink($csvFilePath);
     }
 }
