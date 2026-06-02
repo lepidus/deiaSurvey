@@ -46,7 +46,7 @@ class ContextReportTest extends PKPTestCase
         $questions = [];
         $questionsPerBlock = 3;
         foreach ($this->questionBlocks as $questionBlock) {
-            for ($sequence = 1; $sequence <= $questionsPerBlock; $sequence++) {
+            for ($sequence = $questionsPerBlock; $sequence > 0; $sequence--) {
                 $questionId = (($questionBlock->getSequence() - 1) * $questionsPerBlock) + $sequence;
                 $question = new DeiaQuestion();
                 $question->setAllData([
@@ -83,7 +83,7 @@ class ContextReportTest extends PKPTestCase
 
     public function testReportGeneratesQuestionsPrintingGuide()
     {
-        $printingGuide = $this->contextReport->getQuestionPrintingGuide();
+        $printingGuide = $this->contextReport->getQuestionsPrintingGuide();
         $expectedPrintingGuide = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
         $this->assertEquals($expectedPrintingGuide, $printingGuide);
