@@ -21,37 +21,21 @@ class ContextReportTest extends PKPTestCase
 
     private function createTestQuestionBlocks(): array
     {
-        $firstQuestionBlock = new DeiaQuestionBlock();
-        $firstQuestionBlock->setAllData([
-            'id' => 1,
-            'title' => [
-                $this->locale => 'First question block'
-            ],
-            'sequence' => 1,
-            'active' => 1
-        ]);
+        $questionBlocks = [];
+        for ($sequence = 3; $sequence > 0; $sequence--) {
+            $questionBlock = new DeiaQuestionBlock();
+            $questionBlock->setAllData([
+                'id' => $sequence,
+                'title' => [
+                    $this->locale => "Question block number $sequence"
+                ],
+                'sequence' => $sequence,
+                'active' => 1
+            ]);
+            $questionBlocks[] = $questionBlock;
+        }
 
-        $secondQuestionBlock = new DeiaQuestionBlock();
-        $secondQuestionBlock->setAllData([
-            'id' => 2,
-            'title' => [
-                $this->locale => 'Second question block'
-            ],
-            'sequence' => 2,
-            'active' => 1
-        ]);
-
-        $thirdQuestionBlock = new DeiaQuestionBlock();
-        $thirdQuestionBlock->setAllData([
-            'id' => 3,
-            'title' => [
-                $this->locale => 'Third question block'
-            ],
-            'sequence' => 3,
-            'active' => 1
-        ]);
-
-        return [$thirdQuestionBlock, $secondQuestionBlock, $firstQuestionBlock];
+        return $questionBlocks;
     }
 
     private function createTestContextReport(): ContextReport
@@ -69,7 +53,7 @@ class ContextReportTest extends PKPTestCase
     {
         $headers = $this->contextReport->getHeaders();
 
-        $expectedBlockHeader = ['First question block', 'Second question block', 'Third question block'];
+        $expectedBlockHeader = ['Question block number 1', 'Question block number 2', 'Question block number 3'];
         $this->assertEquals($expectedBlockHeader, $headers[0]);
     }
 }
