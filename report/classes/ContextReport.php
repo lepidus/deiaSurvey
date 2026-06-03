@@ -102,10 +102,27 @@ class ContextReport
         fputcsv($csvFile, $headers[0]);
         fputcsv($csvFile, $headers[1]);
 
+        $textualQuestionTypes = [DeiaQuestion::TYPE_SMALL_TEXT_FIELD, DeiaQuestion::TYPE_TEXT_FIELD, DeiaQuestion::TYPE_TEXTAREA];
+
         foreach ($this->responses as $responseSet) {
             $responsesLine = [];
             foreach ($printingGuide as $questionId) {
-                $responseForQuestion = $responseSet[$questionId];
+                $question = $this->questions[$questionId];
+                $response = $responseSet[$questionId];
+                $responseValue = '';
+
+                if (in_array($question->getQuestionType(), $textualQuestionTypes)) {
+                    $responseValue = $response->getLocalizedData('responseValue');
+                } else {
+                    $responseOptionsTexts = [];
+                    foreach ($response->getValue() as $selectedResponseOptionId) {
+                        $responseOption = $this->responseOptions[$selectedResponseOptionId];
+                        $responseOptionsTexts[] = $responseOption->getLocalizedOptionText();
+                    }
+                    $responseValue = implode(', ', $responseOptionsTexts);
+                }
+
+                $responsesLine[] = $responseValue;
             }
 
             fputcsv($csvFile, $responsesLine);
