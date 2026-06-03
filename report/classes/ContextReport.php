@@ -4,7 +4,7 @@ namespace APP\plugins\generic\deiaSurvey\report\classes;
 
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestionBlock\DeiaQuestionBlock;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
-use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaResponse;
+use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DeiaResponse;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\DeiaResponseOption;
 
 class ContextReport
@@ -56,10 +56,9 @@ class ContextReport
 
     public function getHeaders(): array
     {
-        $this->getQuestionsPrintingGuide();
-
         $questionBlockHeaders = [];
         $questionHeaders = [];
+
         foreach ($this->questionBlocks as $questionBlock) {
             $questionBlockHeaders[] = $questionBlock->getLocalizedTitle();
 
@@ -78,11 +77,8 @@ class ContextReport
     public function getQuestionsPrintingGuide(): array
     {
         $printingGuide = [];
-        usort($this->questionBlocks, [$this, 'sequenceOrderFunction']);
 
         foreach ($this->questionBlocks as $questionBlock) {
-            usort($this->questions[$questionBlock->getId()], [$this, 'sequenceOrderFunction']);
-
             foreach ($this->questions[$questionBlock->getId()] as $question) {
                 $printingGuide[] = $question->getId();
             }

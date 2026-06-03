@@ -27,7 +27,7 @@ class ContextReportTest extends PKPTestCase
     private function createTestQuestionBlocks(): array
     {
         $questionBlocks = [];
-        for ($sequence = 3; $sequence > 0; $sequence--) {
+        for ($sequence = 1; $sequence <= 3; $sequence++) {
             $questionBlock = new DeiaQuestionBlock();
             $questionBlock->setAllData([
                 'id' => $sequence,
@@ -48,7 +48,7 @@ class ContextReportTest extends PKPTestCase
         $questions = [];
         $questionsPerBlock = 3;
         foreach ($this->questionBlocks as $questionBlock) {
-            for ($sequence = $questionsPerBlock; $sequence > 0; $sequence--) {
+            for ($sequence = 1; $sequence <= $questionsPerBlock; $sequence++) {
                 $questionId = (($questionBlock->getSequence() - 1) * $questionsPerBlock) + $sequence;
                 $question = new DeiaQuestion();
                 $question->setAllData([
