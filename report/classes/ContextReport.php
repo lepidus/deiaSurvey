@@ -13,25 +13,30 @@ class ContextReport
     private array $questions;
     private array $responses;
     private array $responseOptions;
+    private $UTF8_BOM;
 
     public function __construct()
     {
         $this->questionBlocks = $this->questions = [];
         $this->responses = $this->responseOptions = [];
+        $this->UTF8_BOM = chr(0xEF) . chr(0xBB) . chr(0xBF);
     }
 
     public function addQuestionBlock(DeiaQuestionBlock $block)
     {
-        $this->questionBlocks[$block->getId()] = $block;
+        $this->questionBlocks[$block->getId()] = ['block' => $block, 'questionIds' => []];
     }
 
     public function addQuestion(DeiaQuestion $question)
     {
         $questionBlockId = $question->getQuestionBlockId();
+        $questionId = $question->getId();
 
-        $blockQuestions = $this->questions[$questionBlockId] ?? [];
-        $blockQuestions[] = $question;
-        $this->questions[$questionBlockId] = $blockQuestions;
+        $this->questions[$questionId] = $question;
+
+        $blockQuestionIds = $this->questionBlocks[$questionBlockId]['questionIds'];
+        $blockQuestionIds[] = $questionId;
+        $this->questionBlocks[$questionBlockId]['questionIds'] = $blockQuestionIds;
     }
 
     public function addResponse(DeiaResponse $response)
@@ -59,11 +64,13 @@ class ContextReport
         $questionBlockHeaders = [];
         $questionHeaders = [];
 
-        foreach ($this->questionBlocks as $questionBlock) {
+        foreach ($this->questionBlocks as $questionBlockData) {
+            $questionBlock = $questionBlockData['block'];
             $questionBlockHeaders[] = $questionBlock->getLocalizedTitle();
 
-            $blockQuestions = $this->questions[$questionBlock->getId()];
-            foreach ($blockQuestions as $question) {
+            $blockQuestionIds = $questionBlockData['questionIds'];
+            foreach ($blockQuestionIds as $questionId) {
+                $question = $this->questions[$questionId];
                 $questionHeaders[] = $question->getLocalizedQuestionText();
             }
         }
@@ -78,12 +85,32 @@ class ContextReport
     {
         $printingGuide = [];
 
-        foreach ($this->questionBlocks as $questionBlock) {
-            foreach ($this->questions[$questionBlock->getId()] as $question) {
-                $printingGuide[] = $question->getId();
-            }
+        foreach ($this->questionBlocks as $questionBlockData) {
+            $blockQuestionIds = $questionBlockData['questionIds'];
+            $printingGuide = array_merge($printingGuide, $blockQuestionIds);
         }
 
         return $printingGuide;
+    }
+
+    public function writeReport(string $filePath, array $printingGuide)
+    {
+        $csvFile = fopen($filePath, 'wt');
+        fprintf($csvFile, $this->UTF8_BOM);
+
+        $headers = $this->getHeaders();
+        fputcsv($csvFile, $headers[0]);
+        fputcsv($csvFile, $headers[1]);
+
+        foreach ($this->responses as $responseSet) {
+            $responsesLine = [];
+            foreach ($printingGuide as $questionId) {
+                $responseForQuestion = $responseSet[$questionId];
+            }
+
+            fputcsv($csvFile, $responsesLine);
+        }
+
+        fclose($csvFile);
     }
 }
