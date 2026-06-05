@@ -29,7 +29,8 @@ describe('DEIA Survey - Report feature', function () {
 
     before(() => {
         if (Cypress.env('contextTitles').en === 'Journal of Public Knowledge') {
-        contextName = 'Journal';
+            contextName = 'Journal';
+        } else {
             contextName = 'Preprint Server';
         }
     });
