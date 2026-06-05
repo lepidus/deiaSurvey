@@ -118,7 +118,7 @@ class ContextReport
                     $responseOptionsTexts = [];
                     foreach ($response->getValue() as $selectedResponseOptionId) {
                         $responseOption = $this->responseOptions[$selectedResponseOptionId];
-                        $responseOptionsTexts[] = $responseOption->getLocalizedOptionText();
+                        $responseOptionsTexts[] = $responseOption->getLocalizedOptionText(true);
                     }
                     $responseValue = implode(', ', $responseOptionsTexts);
                 }
