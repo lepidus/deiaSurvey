@@ -109,7 +109,7 @@ class ContextReport
             $responsesLine = [];
             foreach ($printingGuide as $questionId) {
                 $question = $this->questions[$questionId];
-                $response = $responseSet[$questionId];
+                $response = $responseSet[$questionId] ?? null;
 
                 if (is_null($response)) {
                     continue;
@@ -119,6 +119,9 @@ class ContextReport
 
                 if (in_array($question->getQuestionType(), $textualQuestionTypes)) {
                     $responseValue = $response->getLocalizedData('responseValue');
+                } elseif ($question->getQuestionType() == DeiaQuestion::TYPE_DROP_DOWN_BOX) {
+                    $responseOption = $this->responseOptions[$response->getValue()];
+                    $responseValue = $responseOption->getLocalizedOptionText(true);
                 } else {
                     $responseOptionsTexts = [];
                     foreach ($response->getValue() as $selectedResponseOptionId) {
