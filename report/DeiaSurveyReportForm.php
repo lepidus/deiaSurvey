@@ -9,7 +9,10 @@ use PKP\security\Validation;
 use PKP\core\PKPString;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorPost;
-use APP\plugins\generic\deiaSurvey\report\classes\factories\SiteStatisticsReportFactory;
+use APP\plugins\generic\deiaSurvey\report\classes\factories\{
+    ContextReportFactory,
+    SiteStatisticsReportFactory
+};
 
 class DeiaSurveyReportForm extends Form
 {
@@ -70,6 +73,11 @@ class DeiaSurveyReportForm extends Form
         if ($reportType == self::REPORT_TYPE_SITE) {
             $siteStatsReportFactory = new SiteStatisticsReportFactory();
             $report = $siteStatsReportFactory->createSiteReport();
+            $report->writeReport('php://output');
+        } elseif ($reportType == self::REPORT_TYPE_CONTEXT) {
+            $contextId = $request->getContext()->getId();
+            $contextReportFactory = new ContextReportFactory();
+            $report = $contextReportFactory->createContextReport($contextId);
             $report->writeReport('php://output');
         }
     }

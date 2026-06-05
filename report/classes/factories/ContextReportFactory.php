@@ -7,7 +7,7 @@ use APP\plugins\generic\deiaSurvey\report\classes\ContextReport;
 
 class ContextReportFactory
 {
-    public function createSiteReport(int $contextId): ContextReport
+    public function createContextReport(int $contextId): ContextReport
     {
         $report = new ContextReport();
 
