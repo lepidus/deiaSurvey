@@ -11,15 +11,13 @@ class ContextReportFactory
     {
         $report = new ContextReport();
 
-        $questionBlocks = Repo::deiaQuestionBlock()
-            ->getCollector()
+        $questionBlocks = Repo::deiaQuestionBlock()->getCollector()
             ->filterByContextIds([$contextId])
             ->filterByActive(true)
             ->getMany();
 
         foreach ($questionBlocks as $questionBlock) {
-            $questions = Repo::deiaQuestion()
-                ->getCollector()
+            $questions = Repo::deiaQuestion()->getCollector()
                 ->filterByContextIds([$contextId])
                 ->filterByQuestionBlockIds([$questionBlock->getId()])
                 ->getMany();
@@ -28,6 +26,21 @@ class ContextReportFactory
                 $report->addQuestionBlock($questionBlock);
                 foreach ($questions as $question) {
                     $report->addQuestion($question);
+
+                    $responseOptions = Repo::deiaResponseOption()->getCollector()
+                        ->filterByQuestionIds([$question->getId()])
+                        ->getMany();
+                    foreach ($responseOptions as $responseOption) {
+                        $report->addResponseOption($responseOption);
+                    }
+
+                    $responses = Repo::deiaResponse()->getCollector()
+                        ->filterByQuestionIds([$question->getId()])
+                        ->filterByContextIds([$contextId])
+                        ->getMany();
+                    foreach ($responses as $response) {
+                        $report->addResponse($response);
+                    }
                 }
             }
         }
