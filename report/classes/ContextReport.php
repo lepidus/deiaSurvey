@@ -93,7 +93,7 @@ class ContextReport
         return $printingGuide;
     }
 
-    public function writeReport(string $filePath, array $printingGuide)
+    public function writeReport(string $filePath)
     {
         $csvFile = fopen($filePath, 'wt');
         fprintf($csvFile, $this->UTF8_BOM);
@@ -102,6 +102,7 @@ class ContextReport
         fputcsv($csvFile, $headers[0]);
         fputcsv($csvFile, $headers[1]);
 
+        $printingGuide = $this->getQuestionsPrintingGuide();
         $textualQuestionTypes = [DeiaQuestion::TYPE_SMALL_TEXT_FIELD, DeiaQuestion::TYPE_TEXT_FIELD, DeiaQuestion::TYPE_TEXTAREA];
 
         foreach ($this->responses as $responseSet) {

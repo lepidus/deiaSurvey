@@ -147,9 +147,8 @@ class ContextReportTest extends PKPTestCase
     {
         $csvFilePath = '/tmp/deia_survey_context_report_test.csv';
 
-        $printingGuide = $this->contextReport->getQuestionsPrintingGuide();
         $this->addTestResponsesToReport();
-        $this->contextReport->writeReport($csvFilePath, $printingGuide);
+        $this->contextReport->writeReport($csvFilePath);
 
         $this->assertFileExists($csvFilePath);
         $csvFile = fopen($csvFilePath, 'r');
