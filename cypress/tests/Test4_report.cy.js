@@ -39,7 +39,7 @@ describe('DEIA Survey - Report feature', function () {
         cy.logout();
     });
 
-    /*it('All reports should be visible for admin user', function () {
+    it('All reports should be visible for admin user', function () {
         cy.login('admin', 'admin', 'publicknowledge');
         cy.contains('.app__navItem', 'Reports').click();
         cy.contains('a', 'DEIA Survey Report').click();
@@ -49,7 +49,7 @@ describe('DEIA Survey - Report feature', function () {
 
         cy.contains('button', 'Generate Site Report');
         cy.contains('button', 'Generate ' + contextName + ' Report');
-    });*/
+    });
     it('Site report should include question block headers', function () {
         cy.login('admin', 'admin', 'publicknowledge');
         cy.contains('.app__navItem', 'Reports').click();
