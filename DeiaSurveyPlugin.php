@@ -61,10 +61,8 @@ class DeiaSurveyPlugin extends GenericPlugin
 
     public function registerReportPlugin()
     {
-        if (Validation::isSiteAdmin()) {
-            $reportPlugin = new DeiaSurveyReportPlugin();
-            PluginRegistry::register('reports', $reportPlugin, $this->getPluginPath());
-        }
+        $reportPlugin = new DeiaSurveyReportPlugin();
+        PluginRegistry::register('reports', $reportPlugin, $this->getPluginPath());
     }
 
     private function registerHooksForCustomSchemas()
