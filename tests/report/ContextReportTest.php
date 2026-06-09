@@ -11,6 +11,8 @@ use APP\plugins\generic\deiaSurvey\report\classes\ContextReport;
 
 class ContextReportTest extends PKPTestCase
 {
+    private const CSV_FILE_PATH = '/tmp/deia_survey_context_report_test.csv';
+
     private $contextReport;
     private $questionBlocks;
     private $questions;
@@ -145,13 +147,11 @@ class ContextReportTest extends PKPTestCase
 
     public function testWritesContextReport()
     {
-        $csvFilePath = '/tmp/deia_survey_context_report_test.csv';
-
         $this->addTestResponsesToReport();
-        $this->contextReport->writeReport($csvFilePath);
+        $this->contextReport->writeReport(self::CSV_FILE_PATH);
 
-        $this->assertFileExists($csvFilePath);
-        $csvFile = fopen($csvFilePath, 'r');
+        $this->assertFileExists(self::CSV_FILE_PATH);
+        $csvFile = fopen(self::CSV_FILE_PATH, 'r');
         $UTF8_BOM = chr(0xEF) . chr(0xBB) . chr(0xBF);
         fread($csvFile, strlen($UTF8_BOM));
 
@@ -188,6 +188,6 @@ class ContextReportTest extends PKPTestCase
         $this->assertEquals($expectedResponses, $row);
 
         fclose($csvFile);
-        unlink($csvFilePath);
+        unlink(self::CSV_FILE_PATH);
     }
 }
