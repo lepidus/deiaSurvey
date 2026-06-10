@@ -8,7 +8,7 @@ use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 
 class EncryptResponsesMigration extends Migration
 {
-    private const CHUNK_SIZE = 500;
+    private const CHUNK_SIZE = 1000;
 
     private DataEncryption $encrypter;
 
@@ -19,13 +19,14 @@ class EncryptResponsesMigration extends Migration
             return;
         }
 
-        DB::transaction(function () {
-            DB::table('deia_response_settings')->chunkById(
+        DB::table('deia_response_settings')
+            ->select(['deia_response_setting_id', 'setting_name', 'setting_value'])
+            ->whereIn('setting_name', ['responseValue', 'optionsInputValue'])
+            ->chunkById(
                 self::CHUNK_SIZE,
                 $this->checkResponsesChunkEncryption(...),
                 'deia_response_setting_id'
             );
-        });
     }
 
     private function checkResponsesChunkEncryption($rows)
@@ -35,10 +36,7 @@ class EncryptResponsesMigration extends Migration
             $row = get_object_vars($row);
             $settingValue = $row['setting_value'];
 
-            if (
-                !in_array($row['setting_name'], ['responseValue', 'optionsInputValue'])
-                || $this->encrypter->textIsEncrypted($settingValue)
-            ) {
+            if ($this->encrypter->textIsEncrypted($settingValue)) {
                 continue;
             }
 
