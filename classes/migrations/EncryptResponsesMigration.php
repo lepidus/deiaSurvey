@@ -8,39 +8,59 @@ use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
 
 class EncryptResponsesMigration extends Migration
 {
+    private const CHUNK_SIZE = 500;
+
+    private DataEncryption $encrypter;
+
     public function up(): void
     {
-        $encrypter = new DataEncryption();
-        if (!$encrypter->secretConfigExists()) {
+        $this->encrypter = new DataEncryption();
+        if (!$this->encrypter->secretConfigExists()) {
             return;
         }
 
-        $result = DB::table('deia_response_settings')->get();
+        DB::transaction(function () {
+            DB::table('deia_response_settings')->chunkById(
+                self::CHUNK_SIZE,
+                $this->checkResponsesChunkEncryption(...),
+                'deia_response_setting_id'
+            );
+        });
+    }
 
-        foreach ($result as $row) {
+    private function checkResponsesChunkEncryption($rows)
+    {
+        $updates = [];
+        foreach ($rows as $row) {
             $row = get_object_vars($row);
             $settingValue = $row['setting_value'];
 
             if (
                 !in_array($row['setting_name'], ['responseValue', 'optionsInputValue'])
-                || $encrypter->textIsEncrypted($settingValue)
+                || $this->encrypter->textIsEncrypted($settingValue)
             ) {
                 continue;
             }
 
-            if ($row['setting_name'] == 'optionsInputValue') {
-                $optionsInputValue = unserialize($settingValue);
+            if ($row['setting_name'] === 'optionsInputValue') {
+                $optionsInputValue = unserialize($settingValue, ['allowed_classes' => false]);
                 if (empty($optionsInputValue)) {
                     continue;
                 }
             }
 
-            $encryptedValue = $encrypter->encryptString($settingValue);
-            DB::table('deia_response_settings')
-                ->where('deia_response_setting_id', $row['deia_response_setting_id'])
-                ->update([
-                    'setting_value' => $encryptedValue
-                ]);
+            $updates[] = [
+                'deia_response_setting_id' => $row['deia_response_setting_id'],
+                'setting_value' => $this->encrypter->encryptString($settingValue),
+            ];
+        }
+
+        if (!empty($updates)) {
+            DB::table('deia_response_settings')->upsert(
+                $updates,
+                ['deia_response_setting_id'],
+                ['setting_value']
+            );
         }
     }
 }
