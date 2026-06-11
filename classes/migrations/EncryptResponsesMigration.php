@@ -19,14 +19,15 @@ class EncryptResponsesMigration extends Migration
             return;
         }
 
-        DB::table('deia_response_settings')
-            ->select(['deia_response_setting_id', 'setting_name', 'setting_value'])
-            ->whereIn('setting_name', ['responseValue', 'optionsInputValue'])
-            ->chunkById(
-                self::CHUNK_SIZE,
-                $this->checkResponsesChunkEncryption(...),
-                'deia_response_setting_id'
-            );
+        DB::transaction(function () {
+            DB::table('deia_response_settings')
+                ->whereIn('setting_name', ['responseValue', 'optionsInputValue'])
+                ->chunkById(
+                    self::CHUNK_SIZE,
+                    $this->checkResponsesChunkEncryption(...),
+                    'deia_response_setting_id'
+                );
+        });
     }
 
     private function checkResponsesChunkEncryption($rows)
@@ -47,10 +48,8 @@ class EncryptResponsesMigration extends Migration
                 }
             }
 
-            $updates[] = [
-                'deia_response_setting_id' => $row['deia_response_setting_id'],
-                'setting_value' => $this->encrypter->encryptString($settingValue),
-            ];
+            $row['setting_value'] = $this->encrypter->encryptString($settingValue);
+            $updates[] = $row;
         }
 
         if (!empty($updates)) {
