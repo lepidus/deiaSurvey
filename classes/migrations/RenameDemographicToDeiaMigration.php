@@ -11,10 +11,12 @@ class RenameDemographicToDeiaMigration extends Migration
 {
     public function up(): void
     {
+        $this->renameTables();
+        $this->renameColumns();
+        $this->addQuestionBlockSchema();
+        $this->addSeqColumns();
+
         DB::transaction(function () {
-            $this->renameTables();
-            $this->renameColumns();
-            $this->renameSettings();
             $this->addQuestionBlocks();
         });
     }
@@ -107,7 +109,7 @@ class RenameDemographicToDeiaMigration extends Migration
         }
     }
 
-    private function addQuestionBlocks(): void
+    private function addQuestionBlockSchema(): void
     {
         if (!Schema::hasTable('deia_question_blocks')) {
             Schema::create('deia_question_blocks', function (Blueprint $table) {
@@ -139,7 +141,10 @@ class RenameDemographicToDeiaMigration extends Migration
                 $table->bigInteger('deia_question_block_id')->nullable()->after('context_id');
             });
         }
+    }
 
+    private function addSeqColumns(): void
+    {
         if (Schema::hasTable('deia_questions') && !Schema::hasColumn('deia_questions', 'seq')) {
             Schema::table('deia_questions', function (Blueprint $table) {
                 $table->float('seq', 8, 2)->nullable()->after('deia_question_block_id');
@@ -151,7 +156,10 @@ class RenameDemographicToDeiaMigration extends Migration
                 $table->float('seq', 8, 2)->nullable()->after('deia_question_id');
             });
         }
+    }
 
+    private function addQuestionBlocks(): void
+    {
         if (!Schema::hasTable('deia_questions')) {
             return;
         }
@@ -177,18 +185,18 @@ class RenameDemographicToDeiaMigration extends Migration
                 $this->insertDefaultQuestionBlockSettings($questionBlockId);
             }
 
-            $questions = DB::table('deia_questions')
+            $questionsResult = DB::table('deia_questions')
                 ->where('context_id', '=', $contextId)
                 ->orderBy('deia_question_id', 'asc')
-                ->pluck('deia_question_id');
+                ->select(['deia_question_id', 'context_id', 'question_type'])
+                ->get();
 
             $sequence = 0;
-            foreach ($questions as $questionId) {
-                $updates[] = [
-                    'deia_question_id' => $questionId,
-                    'deia_question_block_id' => $questionBlockId,
-                    'seq' => ++$sequence,
-                ];
+            foreach ($questionsResult as $questionRow) {
+                $questionRow = get_object_vars($questionRow);
+                $questionRow['deia_question_block_id'] = $questionBlockId;
+                $questionRow['seq'] = ++$sequence;
+                $updates[] = $questionRow;
             }
         }
         if (!empty($updates)) {
@@ -219,6 +227,7 @@ class RenameDemographicToDeiaMigration extends Migration
             foreach ($responseOptionIds as $responseOptionId) {
                 $updates[] = [
                     'deia_response_option_id' => $responseOptionId,
+                    'deia_question_id' => $questionId,
                     'seq' => ++$sequence
                 ];
             }
