@@ -17,6 +17,7 @@ class RenameDemographicToDeiaMigration extends Migration
         $this->addSeqColumns();
 
         DB::transaction(function () {
+            $this->renameSettings();
             $this->addQuestionBlocks();
         });
     }
