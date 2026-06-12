@@ -13,8 +13,13 @@ class RenameDemographicToDeiaMigration extends Migration
     {
         $this->renameTables();
         $this->renameColumns();
-        $this->renameSettings();
-        $this->addQuestionBlocks();
+        $this->addQuestionBlockSchema();
+        $this->addSeqColumns();
+
+        DB::transaction(function () {
+            $this->renameSettings();
+            $this->addQuestionBlocks();
+        });
     }
 
     private function renameTables(): void
@@ -105,7 +110,7 @@ class RenameDemographicToDeiaMigration extends Migration
         }
     }
 
-    private function addQuestionBlocks(): void
+    private function addQuestionBlockSchema(): void
     {
         if (!Schema::hasTable('deia_question_blocks')) {
             Schema::create('deia_question_blocks', function (Blueprint $table) {
@@ -137,7 +142,10 @@ class RenameDemographicToDeiaMigration extends Migration
                 $table->bigInteger('deia_question_block_id')->nullable()->after('context_id');
             });
         }
+    }
 
+    private function addSeqColumns(): void
+    {
         if (Schema::hasTable('deia_questions') && !Schema::hasColumn('deia_questions', 'seq')) {
             Schema::table('deia_questions', function (Blueprint $table) {
                 $table->float('seq', 8, 2)->nullable()->after('deia_question_block_id');
@@ -149,7 +157,10 @@ class RenameDemographicToDeiaMigration extends Migration
                 $table->float('seq', 8, 2)->nullable()->after('deia_question_id');
             });
         }
+    }
 
+    private function addQuestionBlocks(): void
+    {
         if (!Schema::hasTable('deia_questions')) {
             return;
         }
@@ -159,6 +170,7 @@ class RenameDemographicToDeiaMigration extends Migration
             ->distinct()
             ->pluck('context_id');
 
+        $updates = [];
         foreach ($contextIds as $contextId) {
             $questionBlockId = DB::table('deia_question_blocks')
                 ->where('context_id', '=', $contextId)
@@ -174,20 +186,26 @@ class RenameDemographicToDeiaMigration extends Migration
                 $this->insertDefaultQuestionBlockSettings($questionBlockId);
             }
 
-            $questions = DB::table('deia_questions')
+            $questionsResult = DB::table('deia_questions')
                 ->where('context_id', '=', $contextId)
                 ->orderBy('deia_question_id', 'asc')
-                ->pluck('deia_question_id');
+                ->select(['deia_question_id', 'context_id', 'question_type'])
+                ->get();
 
             $sequence = 0;
-            foreach ($questions as $questionId) {
-                DB::table('deia_questions')
-                    ->where('deia_question_id', '=', $questionId)
-                    ->update([
-                        'deia_question_block_id' => $questionBlockId,
-                        'seq' => ++$sequence,
-                    ]);
+            foreach ($questionsResult as $questionRow) {
+                $questionRow = get_object_vars($questionRow);
+                $questionRow['deia_question_block_id'] = $questionBlockId;
+                $questionRow['seq'] = ++$sequence;
+                $updates[] = $questionRow;
             }
+        }
+        if (!empty($updates)) {
+            DB::table('deia_questions')->upsert(
+                $updates,
+                ['deia_question_id'],
+                ['deia_question_block_id', 'seq']
+            );
         }
 
         if (!Schema::hasTable('deia_response_options')) {
@@ -199,6 +217,7 @@ class RenameDemographicToDeiaMigration extends Migration
             ->distinct()
             ->pluck('deia_question_id');
 
+        $updates = [];
         foreach ($questionIds as $questionId) {
             $responseOptionIds = DB::table('deia_response_options')
                 ->where('deia_question_id', '=', $questionId)
@@ -207,10 +226,19 @@ class RenameDemographicToDeiaMigration extends Migration
 
             $sequence = 0;
             foreach ($responseOptionIds as $responseOptionId) {
-                DB::table('deia_response_options')
-                    ->where('deia_response_option_id', '=', $responseOptionId)
-                    ->update(['seq' => ++$sequence]);
+                $updates[] = [
+                    'deia_response_option_id' => $responseOptionId,
+                    'deia_question_id' => $questionId,
+                    'seq' => ++$sequence
+                ];
             }
+        }
+        if (!empty($updates)) {
+            DB::table('deia_response_options')->upsert(
+                $updates,
+                ['deia_response_option_id'],
+                ['seq']
+            );
         }
     }
 
