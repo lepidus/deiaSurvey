@@ -2,14 +2,17 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\report;
 
-use PKP\tests\PKPTestCase;
+require_once(dirname(__DIR__, 2) . '/autoload.php');
+
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestionBlock\DeiaQuestionBlock;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DeiaResponse;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\DeiaResponseOption;
 use APP\plugins\generic\deiaSurvey\report\classes\ContextReport;
 
-class ContextReportTest extends PKPTestCase
+import('lib.pkp.tests.PKPTestCase');
+
+class ContextReportTest extends \PKPTestCase
 {
     private $contextReport;
     private $questionBlocks;
