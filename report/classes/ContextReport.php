@@ -41,12 +41,12 @@ class ContextReport
 
     public function addResponse(DeiaResponse $response)
     {
-        $userId = $response->getUserId();
+        $responseId = $response->getUserId() ?? $response->getExternalId();
         $questionId = $response->getDeiaQuestionId();
 
-        $userResponses = $this->responses[$userId] ?? [];
+        $userResponses = $this->responses[$responseId] ?? [];
         $userResponses[$questionId] = $response;
-        $this->responses[$userId] = $userResponses;
+        $this->responses[$responseId] = $userResponses;
     }
 
     public function addResponseOption(DeiaResponseOption $responseOption)

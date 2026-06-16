@@ -14,6 +14,8 @@ import('lib.pkp.tests.PKPTestCase');
 
 class ContextReportTest extends \PKPTestCase
 {
+    private const CSV_FILE_PATH = '/tmp/deia_survey_context_report_test.csv';
+
     private $contextReport;
     private $questionBlocks;
     private $questions;
@@ -71,7 +73,7 @@ class ContextReportTest extends \PKPTestCase
         return $questions;
     }
 
-    private function addTestResponsesToReport()
+    private function addUserTestResponsesToReport(array $userData)
     {
         $responseId = 10;
         $responseOptionId = 123;
@@ -80,7 +82,8 @@ class ContextReportTest extends \PKPTestCase
             $response = new DeiaResponse();
             $response->setAllData([
                 'id' => $responseId,
-                'userId' => 234,
+                'userId' => $userData['userId'],
+                'externalId' => $userData['externalId'],
                 'deiaQuestionId' => $question->getId(),
                 'responseValue' => [$responseOptionId]
             ]);
@@ -148,19 +151,24 @@ class ContextReportTest extends \PKPTestCase
 
     public function testWritesContextReport()
     {
-        $csvFilePath = '/tmp/deia_survey_context_report_test.csv';
+        $testUsersData = [
+            ['userId' => 234, 'externalId' => null],
+            ['userId' => 235, 'externalId' => null]
+        ];
+        foreach ($testUsersData as $userData) {
+            $this->addUserTestResponsesToReport($userData);
+        }
 
-        $this->addTestResponsesToReport();
-        $this->contextReport->writeReport($csvFilePath);
+        $this->contextReport->writeReport(self::CSV_FILE_PATH);
 
-        $this->assertFileExists($csvFilePath);
-        $csvFile = fopen($csvFilePath, 'r');
+        $this->assertFileExists(self::CSV_FILE_PATH);
+        $csvFile = fopen(self::CSV_FILE_PATH, 'r');
         $UTF8_BOM = chr(0xEF) . chr(0xBB) . chr(0xBF);
         fread($csvFile, strlen($UTF8_BOM));
 
         $expectedBlocksHeader = ['Question block number 1', 'Question block number 2', 'Question block number 3'];
-        $row = fgetcsv($csvFile);
-        $this->assertEquals($expectedBlocksHeader, $row);
+        $blocksHeader = fgetcsv($csvFile);
+        $this->assertEquals($expectedBlocksHeader, $blocksHeader);
 
         $expectedQuestionsHeader = [
             'Question number 1',
@@ -173,8 +181,8 @@ class ContextReportTest extends \PKPTestCase
             'Question number 8',
             'Question number 9'
         ];
-        $row = fgetcsv($csvFile);
-        $this->assertEquals($expectedQuestionsHeader, $row);
+        $questionsHeader = fgetcsv($csvFile);
+        $this->assertEquals($expectedQuestionsHeader, $questionsHeader);
 
         $expectedResponses = [
             'Response option 123',
@@ -187,10 +195,62 @@ class ContextReportTest extends \PKPTestCase
             'Response option 130',
             'Response option 131'
         ];
-        $row = fgetcsv($csvFile);
-        $this->assertEquals($expectedResponses, $row);
+        $firstUserResponses = fgetcsv($csvFile);
+        $this->assertEquals($expectedResponses, $firstUserResponses);
+
+        $secondUserResponses = fgetcsv($csvFile);
+        $this->assertEquals($expectedResponses, $secondUserResponses);
 
         fclose($csvFile);
-        unlink($csvFilePath);
+        unlink(self::CSV_FILE_PATH);
+    }
+
+    public function testWritesContextReportWithExternalAuthorsData()
+    {
+        $testUsersData = [
+            ['userId' => 234, 'externalId' => null],
+            ['userId' => 235, 'externalId' => null],
+            ['userId' => null, 'externalId' => 'john.doe@email.com'],
+            ['userId' => null, 'externalId' => 'jane.doe@email.com']
+        ];
+        foreach ($testUsersData as $userData) {
+            $this->addUserTestResponsesToReport($userData);
+        }
+
+        $this->contextReport->writeReport(self::CSV_FILE_PATH);
+        $this->assertFileExists(self::CSV_FILE_PATH);
+
+        $csvFile = fopen(self::CSV_FILE_PATH, 'r');
+        $UTF8_BOM = chr(0xEF) . chr(0xBB) . chr(0xBF);
+        fread($csvFile, strlen($UTF8_BOM));
+
+        $blocksHeader = fgetcsv($csvFile);
+        $questionsHeader = fgetcsv($csvFile);
+
+        $expectedResponses = [
+            'Response option 123',
+            'Response option 124',
+            'Response option 125',
+            'Response option 126',
+            'Response option 127',
+            'Response option 128',
+            'Response option 129',
+            'Response option 130',
+            'Response option 131'
+        ];
+        $firstUserResponses = fgetcsv($csvFile);
+        $this->assertEquals($expectedResponses, $firstUserResponses);
+
+        $secondUserResponses = fgetcsv($csvFile);
+        $this->assertEquals($expectedResponses, $secondUserResponses);
+
+        $firstExternalAuthorResponses = fgetcsv($csvFile);
+        $this->assertEquals($expectedResponses, $firstExternalAuthorResponses);
+
+        $secondExternalAuthorResponses = fgetcsv($csvFile);
+        $this->assertEquals($expectedResponses, $secondExternalAuthorResponses);
+
+        fclose($csvFile);
+        unlink(self::CSV_FILE_PATH);
     }
 }
