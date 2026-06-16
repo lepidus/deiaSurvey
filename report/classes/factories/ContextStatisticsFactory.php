@@ -80,7 +80,7 @@ class ContextStatisticsFactory
         foreach ($responseOptions as $option) {
             $responseOptionsGuide[] = [
                 'id' => $option->getId(),
-                'text' => $option->getLocalizedOptionText(),
+                'text' => $option->getLocalizedOptionText(true),
             ];
         }
 
