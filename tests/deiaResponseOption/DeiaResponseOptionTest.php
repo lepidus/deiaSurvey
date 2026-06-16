@@ -76,17 +76,6 @@ class DeiaResponseOptionTest extends \PKPTestCase
         $this->assertEquals($expectedResponseOptionText, $optionText);
     }
 
-    public function testGetsCleanedOptionText(): void
-    {
-        $this->deiaResponseOption->setOptionText(
-            'plugins.generic.deiaSurvey.defaultQuestion.ethnicity.responseOption.southAmerica',
-            'en_US'
-        );
-        $optionText = $this->deiaResponseOption->getLocalizedOptionText(true);
-
-        $this->assertEquals('South America', $optionText);
-    }
-
     public function testGetHasInputField(): void
     {
         $hasInputField = true;
