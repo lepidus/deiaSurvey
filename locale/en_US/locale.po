@@ -228,6 +228,38 @@ msgstr "Users Who Did Not Consent"
 msgid "plugins.generic.deiaSurvey.report.responsesCount"
 msgstr "Responses"
 
+msgid "plugins.generic.deiaSurvey.report.select"
+msgstr "Please, select which report you want to generate:"
+
+msgid "plugins.generic.deiaSurvey.report.contextReport.ojs2"
+msgstr "Journal Report"
+
+msgid "plugins.generic.deiaSurvey.report.contextReport.ops"
+msgstr "Preprint Server Report"
+
+msgid "plugins.generic.deiaSurvey.report.contextReport.description"
+msgstr "This report includes data from the responses of all users in the current context."
+" It includes responses to questions in the standard question block, as well as responses from custom question blocks."
+" Each response is anonymized to ensure user privacy."
+
+msgid "plugins.generic.deiaSurvey.report.siteReport"
+msgstr "Site Report"
+
+msgid "plugins.generic.deiaSurvey.report.siteReport.description"
+msgstr "This report includes statistical data on responses to the standard block of questions."
+" For each site's journal/website, the report shows the number of users who selected each of the question options."
+" It also includes statistics on user consent and non-consent regarding data collection."
+
+msgid "plugins.generic.deiaSurvey.report.generateReport.site"
+msgstr "Generate Site Report"
+
+msgid "plugins.generic.deiaSurvey.report.generateReport.context.ojs2"
+msgstr "Generate Journal Report"
+
+msgid "plugins.generic.deiaSurvey.report.generateReport.context.ops"
+msgstr "Generate Preprint Server Report"
+
+
 
 msgid "plugins.generic.deiaSurvey.questionBlocks"
 msgstr "Question Blocks"
