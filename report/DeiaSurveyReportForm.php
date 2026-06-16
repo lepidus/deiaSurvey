@@ -84,7 +84,7 @@ class DeiaSurveyReportForm extends \Form
         $application = \Application::get()->getName();
         $url = $request->getBaseUrl() . '/' . $this->plugin->getPluginPath() . '/' . self::STYLE_SHEET;
         $templateManager->addStyleSheet('deiaSurveyReportStyleSheet', $url, [
-            'priority' => \TemplateManager::STYLE_SEQUENCE_CORE,
+            'priority' => STYLE_SEQUENCE_CORE,
             'contexts' => 'backend',
         ]);
         $templateManager->assign([
