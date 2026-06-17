@@ -19,7 +19,7 @@
 
         {include file="common/formErrors.tpl"}
 
-        <div class="reportSection">
+        <div id="contextReportSection">
             <h3>{translate key="plugins.generic.deiaSurvey.report.contextReport.{$application}"}</h3>
             <p>{translate key="plugins.generic.deiaSurvey.report.contextReport.description"}</p>
             <div id="actionsButton">
@@ -35,7 +35,7 @@
         </div>
 
         {if $userIsSiteAdmin}
-            <div class="reportSection">
+            <div id="siteReportSection">
                 <h3>{translate key="plugins.generic.deiaSurvey.report.siteReport"}</h3>
                 <p>{translate key="plugins.generic.deiaSurvey.report.siteReport.description"}</p>
                 <div id="actionsButton">
