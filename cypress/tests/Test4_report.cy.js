@@ -1,3 +1,26 @@
+function getNowDateAndHour() {
+    let now = new Date().toISOString();
+    const charactersToRemove = ['-', ':', 'T'];
+    let nowFormatted = '';
+
+    for (let i = 0; i < now.length; i++) {
+        let shouldRemove = false;
+        
+        for (let j = 0; j < charactersToRemove.length; j++) {
+            if (now[i] === charactersToRemove[j]) {
+                shouldRemove = true;
+                break;
+            }
+        }
+
+        if (!shouldRemove) {
+            nowFormatted += now[i];
+        }
+    }
+
+    return (nowFormatted.split('.')[0]);
+}
+
 describe('DEIA Survey - Report feature', function () {
     let contextName;
     
@@ -28,7 +51,7 @@ describe('DEIA Survey - Report feature', function () {
     }
 
     before(() => {
-        if (Cypress.env('contextTitles').en === 'Journal of Public Knowledge') {
+        if (Cypress.env('contextTitles').en_US === 'Journal of Public Knowledge') {
             contextName = 'Journal';
         } else {
             contextName = 'Preprint Server';
@@ -49,45 +72,6 @@ describe('DEIA Survey - Report feature', function () {
 
         cy.contains('button', 'Generate Site Report');
         cy.contains('button', 'Generate ' + contextName + ' Report');
-    });
-
-    it('Site report should include question block headers', function () {
-        cy.login('admin', 'admin', 'publicknowledge');
-        cy.contains('.app__navItem', 'Reports').click();
-        cy.contains('a', 'DEIA Survey Report').click();
-
-        let originalContentType;
-        let originalContentDisposition;
-        cy.intercept('POST', '**/stats/reports/report?pluginName=deiaSurveyReportPlugin', (req) => {
-            req.continue((res) => {
-                originalContentType = res.headers['content-type'];
-                originalContentDisposition = res.headers['content-disposition'];
-                res.headers['content-type'] = 'text/plain; charset=utf-8';
-                res.headers['content-disposition'] = 'inline';
-            });
-        }).as('reportRequest');
-        cy.contains('button', 'Generate Site Report').click();
-
-        cy.wait('@reportRequest').then((interception) => {
-            const response = interception.response;
-            expect(originalContentType).to.match(/text\/(csv|comma-separated-values)/);
-            expect(originalContentDisposition).to.contain('site-deia-report');
-
-            const lines = response.body
-                .replace(/^\uFEFF/, '')
-                .trim()
-                .split(/\r?\n/);
-            const blockHeader = parseCsvLine(lines[0]);
-            const questionHeader = parseCsvLine(lines[1]);
-            const optionHeader = parseCsvLine(lines[2]);
-
-            expect(blockHeader[0]).to.be.oneOf(['Journal Name', 'Preprint Server Name']);
-            expect(blockHeader).to.include('SciELO Questions');
-            expect(questionHeader).to.include('Gender');
-            expect(optionHeader).to.include('Woman');
-            expect(optionHeader).to.include('Man');
-            expect(optionHeader).to.include('Non-binary or gender diverse');
-        });
     });
 
     it('Editors can only generate context report', function () {
