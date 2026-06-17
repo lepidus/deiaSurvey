@@ -29,8 +29,8 @@ class QuestionStatisticsFactory
             $responseValue = $response->getValue();
 
             if ($this->questionTypeHasResponseOptions()) {
-                if (!is_array($responseValue)) {
-                    continue;
+                if ($this->questionType == DeiaQuestion::TYPE_DROP_DOWN_BOX) {
+                    $responseValue = [$responseValue];
                 }
 
                 foreach ($responseValue as $selectedOptionId) {

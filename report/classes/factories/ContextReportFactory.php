@@ -1,0 +1,50 @@
+<?php
+
+namespace APP\plugins\generic\deiaSurvey\report\classes\factories;
+
+use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\report\classes\ContextReport;
+
+class ContextReportFactory
+{
+    public function createContextReport(int $contextId): ContextReport
+    {
+        $report = new ContextReport();
+
+        $questionBlocks = Repo::deiaQuestionBlock()->getCollector()
+            ->filterByContextIds([$contextId])
+            ->filterByActive(true)
+            ->getMany();
+
+        foreach ($questionBlocks as $questionBlock) {
+            $questions = Repo::deiaQuestion()->getCollector()
+                ->filterByContextIds([$contextId])
+                ->filterByQuestionBlockIds([$questionBlock->getId()])
+                ->getMany();
+
+            if ($questions->isNotEmpty()) {
+                $report->addQuestionBlock($questionBlock);
+                foreach ($questions as $question) {
+                    $report->addQuestion($question);
+
+                    $responseOptions = Repo::deiaResponseOption()->getCollector()
+                        ->filterByQuestionIds([$question->getId()])
+                        ->getMany();
+                    foreach ($responseOptions as $responseOption) {
+                        $report->addResponseOption($responseOption);
+                    }
+
+                    $responses = Repo::deiaResponse()->getCollector()
+                        ->filterByQuestionIds([$question->getId()])
+                        ->filterByContextIds([$contextId])
+                        ->getMany();
+                    foreach ($responses as $response) {
+                        $report->addResponse($response);
+                    }
+                }
+            }
+        }
+
+        return $report;
+    }
+}
