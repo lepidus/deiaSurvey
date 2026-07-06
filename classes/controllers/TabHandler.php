@@ -3,14 +3,22 @@
 namespace APP\plugins\generic\deiaSurvey\classes\controllers;
 
 use APP\handler\Handler;
-use PKP\core\JSONMessage;
-use APP\plugins\generic\deiaSurvey\classes\form\QuestionsForm;
 use APP\notification\NotificationManager;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
+use APP\plugins\generic\deiaSurvey\classes\form\QuestionsForm;
+use PKP\core\JSONMessage;
 
 class TabHandler extends Handler
 {
     public function deiaSurvey($args, $request)
     {
+        $context = $request->getContext();
+        $deiaDataService = new DeiaDataService();
+
+        if (!$context || !$deiaDataService->hasActiveQuestionBlocks($context->getId())) {
+            return new JSONMessage(false);
+        }
+
         $form = new QuestionsForm($request);
         $form->initData();
         return new JSONMessage(true, $form->fetch($request));
