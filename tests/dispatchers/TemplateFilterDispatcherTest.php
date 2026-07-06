@@ -56,14 +56,14 @@ class TemplateFilterDispatcherTest extends \DatabaseTestCase
 
     private function mockCurrentRequest(): void
     {
-        $context = new class {
+        $context = new class () {
             public function getId(): int
             {
                 return 1;
             }
         };
 
-        $user = new class {
+        $user = new class () {
             public function getId(): int
             {
                 return 1;

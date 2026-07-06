@@ -51,10 +51,10 @@ class DeiaSurveyPluginTest extends \DatabaseTestCase
 
     private function createRequestStub(): object
     {
-        return new class {
+        return new class () {
             public function getContext(): object
             {
-                return new class {
+                return new class () {
                     public function getId(): int
                     {
                         return 1;
@@ -64,7 +64,7 @@ class DeiaSurveyPluginTest extends \DatabaseTestCase
 
             public function getUser(): object
             {
-                return new class {
+                return new class () {
                     public function getId(): int
                     {
                         return 1;
@@ -73,7 +73,7 @@ class DeiaSurveyPluginTest extends \DatabaseTestCase
                     public function getRoles($contextId): array
                     {
                         return [
-                            new class {
+                            new class () {
                                 public function getRoleId(): int
                                 {
                                     return ROLE_ID_MANAGER;

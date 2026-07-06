@@ -115,7 +115,7 @@ class DeiaQuestionBlockGridHandlerTest extends \DatabaseTestCase
 
             public function getUser(): object
             {
-                return new class {
+                return new class () {
                     public function getId(): int
                     {
                         return 1;
