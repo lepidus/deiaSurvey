@@ -41,6 +41,9 @@ msgstr "The data from this questionnaire will be associated with the ORCID: <str
 msgid "plugins.generic.deiaSurvey.questionnairePage.accessDenied"
 msgstr "Only the author can access this page"
 
+msgid "plugins.generic.deiaSurvey.questionnairePage.unavailable"
+msgstr "The DEIA survey is not available at this time."
+
 msgid "plugins.generic.deiaSurvey.questionnairePage.saveSuccess.title"
 msgstr "Questionnaire saved successfully"
 
@@ -287,6 +290,9 @@ msgstr "No question blocks have been created."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.confirmActivate"
 msgstr "Are you sure you wish to activate this question block?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.activateEmptyError"
+msgstr "This question block cannot be activated until at least one question has been created."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.confirmDeactivate"
 msgstr "Are you sure you wish to deactivate this question block?"

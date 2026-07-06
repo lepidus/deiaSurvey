@@ -228,7 +228,15 @@ class DeiaQuestionBlockGridHandler extends \GridHandler
 
         $deiaQuestionBlock = Repo::deiaQuestionBlock()->get($deiaQuestionBlockId, $context->getId());
 
-        if ($request->checkCSRF() && isset($deiaQuestionBlock) && !$deiaQuestionBlock->getActive()) {
+        if (isset($deiaQuestionBlock) && !$this->deiaQuestionBlockHasQuestions($deiaQuestionBlockId, $context->getId())) {
+            return $this->getEmptyQuestionBlockActivationBlockedResponse($request, $deiaQuestionBlockId);
+        }
+
+        if (
+            $request->checkCSRF()
+            && isset($deiaQuestionBlock)
+            && !$deiaQuestionBlock->getActive()
+        ) {
             Repo::deiaQuestionBlock()->edit($deiaQuestionBlock, ['active' => 1]);
 
             $notificationMgr = new NotificationManager();
@@ -239,6 +247,27 @@ class DeiaQuestionBlockGridHandler extends \GridHandler
         }
 
         return new JSONMessage(false);
+    }
+
+    private function getEmptyQuestionBlockActivationBlockedResponse($request, int $deiaQuestionBlockId): JSONMessage
+    {
+        $notificationMgr = new NotificationManager();
+        $notificationMgr->createTrivialNotification(
+            $request->getUser()->getId(),
+            NOTIFICATION_TYPE_ERROR,
+            ['contents' => __('plugins.generic.deiaSurvey.questionBlocks.activateEmptyError')]
+        );
+
+        return DAO::getDataChangedEvent($deiaQuestionBlockId);
+    }
+
+    private function deiaQuestionBlockHasQuestions(int $deiaQuestionBlockId, int $contextId): bool
+    {
+        return Repo::deiaQuestion()
+            ->getCollector()
+            ->filterByContextIds([$contextId])
+            ->filterByQuestionBlockIds([$deiaQuestionBlockId])
+            ->getCount() > 0;
     }
 
 
