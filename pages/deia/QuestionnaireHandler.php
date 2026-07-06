@@ -34,6 +34,14 @@ class QuestionnaireHandler extends Handler
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
+        if (!$deiaDataService->hasActiveQuestionBlocks($context->getId())) {
+            $templateMgr->assign(
+                'messageToDisplay',
+                __('plugins.generic.deiaSurvey.questionnairePage.unavailable')
+            );
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
         $authorExternalId = $author->getData('email');
         $authorExternalType = 'email';
 

@@ -41,6 +41,9 @@ msgstr "Los datos demográficos de este cuestionario se vincularán a ORCID: <st
 msgid "plugins.generic.deiaSurvey.questionnairePage.accessDenied"
 msgstr "Sólo el autor puede acceder a esta página"
 
+msgid "plugins.generic.deiaSurvey.questionnairePage.unavailable"
+msgstr "El cuestionario DEIA no está disponible en este momento."
+
 msgid "plugins.generic.deiaSurvey.questionnairePage.saveSuccess.title"
 msgstr "Cuestionario guardado correctamente"
 

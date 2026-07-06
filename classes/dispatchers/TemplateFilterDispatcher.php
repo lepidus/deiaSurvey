@@ -3,9 +3,10 @@
 namespace APP\plugins\generic\deiaSurvey\classes\dispatchers;
 
 use APP\core\Application;
-use PKP\plugins\Hook;
-use APP\plugins\generic\deiaSurvey\classes\dispatchers\DeiaDataDispatcher;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
+use APP\plugins\generic\deiaSurvey\classes\dispatchers\DeiaDataDispatcher;
+use PKP\plugins\Hook;
 
 class TemplateFilterDispatcher extends DeiaDataDispatcher
 {
@@ -35,9 +36,16 @@ class TemplateFilterDispatcher extends DeiaDataDispatcher
 
     public function addChangesToUserProfilePage($templateMgr)
     {
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        $deiaDataService = new DeiaDataService();
+
+        if (!$context || !$deiaDataService->hasActiveQuestionBlocks($context->getId())) {
+            return;
+        }
+
         $templateMgr->registerFilter('output', [$this, 'deiaSurveyTabFilter']);
 
-        $request = Application::get()->getRequest();
         $userId = $request->getUser()->getId();
         $deiaDataDao = new DeiaDataDAO();
 
