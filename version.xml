@@ -12,8 +12,8 @@
 <version>
 	<application>deiaSurvey</application>
 	<type>plugins.generic</type>
-	<release>0.10.0.0</release>
-	<date>2026-06-17</date>
+	<release>0.10.0.1</release>
+	<date>2026-07-06</date>
   <lazy-load>1</lazy-load>
 	<class>DeiaSurveyPlugin</class>
 </version>
