@@ -54,10 +54,11 @@ class DeiaQuestionBlockGridHandlerTest extends \DatabaseTestCase
         $questionBlockId = $this->createInactiveQuestionBlock();
         $handler = new \DeiaQuestionBlockGridHandler();
 
-        $handler->activateDeiaQuestionBlock([], $this->createActivationRequest($questionBlockId));
+        $response = $handler->activateDeiaQuestionBlock([], $this->createActivationRequest($questionBlockId));
 
         $questionBlock = Repo::deiaQuestionBlock()->get($questionBlockId, $this->contextId);
         self::assertSame(0, $questionBlock->getActive());
+        self::assertTrue($response->getStatus());
     }
 
     private function createInactiveQuestionBlock(): int
