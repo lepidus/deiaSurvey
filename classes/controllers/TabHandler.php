@@ -3,10 +3,10 @@
 namespace APP\plugins\generic\deiaSurvey\classes\controllers;
 
 use APP\handler\Handler;
-use PKP\core\JSONMessage;
+use APP\notification\NotificationManager;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\form\QuestionsForm;
-use APP\notification\NotificationManager;
+use PKP\core\JSONMessage;
 
 class TabHandler extends Handler
 {
