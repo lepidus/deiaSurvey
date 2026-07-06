@@ -2,10 +2,10 @@
 
 namespace APP\plugins\generic\deiaSurvey\tests\dispatchers;
 
+use APP\core\Request;
 use APP\plugins\generic\deiaSurvey\classes\dispatchers\TemplateFilterDispatcher;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 use APP\plugins\generic\deiaSurvey\tests\stubs\RegisteredFiltersTemplateManagerStub;
-use APP\core\Request;
 use Illuminate\Support\Facades\DB;
 use PKP\core\Registry;
 use PKP\tests\DatabaseTestCase;
