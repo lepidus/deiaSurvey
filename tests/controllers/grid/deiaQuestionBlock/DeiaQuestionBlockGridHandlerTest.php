@@ -31,6 +31,7 @@ class DeiaQuestionBlockGridHandlerTest extends DatabaseTestCase
         parent::setUp();
 
         $this->contextId = $this->createJournalMock();
+        $this->initializePluginLocaleData();
         $this->addSchemaFile('deiaQuestionBlock');
         $this->addSchemaFile('deiaQuestion');
         DB::table('deia_question_settings')->delete();
@@ -44,10 +45,11 @@ class DeiaQuestionBlockGridHandlerTest extends DatabaseTestCase
         $questionBlockId = $this->createInactiveQuestionBlock();
         $handler = new DeiaQuestionBlockGridHandler();
 
-        $handler->activateDeiaQuestionBlock([], $this->createActivationRequest($questionBlockId));
+        $response = $handler->activateDeiaQuestionBlock([], $this->createActivationRequest($questionBlockId));
 
         $questionBlock = Repo::deiaQuestionBlock()->get($questionBlockId, $this->contextId);
         self::assertSame(0, $questionBlock->getActive());
+        self::assertTrue($response->getStatus());
     }
 
     private function createInactiveQuestionBlock(): int

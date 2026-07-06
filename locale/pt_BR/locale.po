@@ -250,6 +250,9 @@ msgstr "Não há blocos de perguntas criados."
 msgid "plugins.generic.deiaSurvey.questionBlocks.confirmActivate"
 msgstr "Tem certeza de que deseja ativar este bloco de perguntas?"
 
+msgid "plugins.generic.deiaSurvey.questionBlocks.activateEmptyError"
+msgstr "Este bloco de perguntas não pode ser ativado até que pelo menos uma pergunta seja criada."
+
 msgid "plugins.generic.deiaSurvey.questionBlocks.confirmDeactivate"
 msgstr "Tem certeza de que deseja desativar este bloco de perguntas?"
 
