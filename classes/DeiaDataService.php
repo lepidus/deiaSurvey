@@ -10,6 +10,15 @@ use PKP\facades\Locale;
 
 class DeiaDataService
 {
+    public function hasActiveQuestionBlocks(int $contextId): bool
+    {
+        return Repo::deiaQuestionBlock()
+            ->getCollector()
+            ->filterByContextIds([$contextId])
+            ->filterByActive(true)
+            ->getCount() > 0;
+    }
+
     public function retrieveAllQuestions(int $contextId, bool $shouldRetrieveResponses = false)
     {
         $questionBlocks = $this->retrieveQuestionBlocks($contextId, $shouldRetrieveResponses);
