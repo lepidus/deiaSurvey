@@ -211,6 +211,15 @@ class DeiaSurveyPlugin extends \GenericPlugin
             return false;
         }
 
+        if (is_null($context)) {
+            return false;
+        }
+
+        $deiaDataService = new DeiaDataService();
+        if (!$deiaDataService->hasActiveQuestionBlocks($context->getId())) {
+            return false;
+        }
+
         $deiaDataDao = new DeiaDataDAO();
         $userHasConsent = $deiaDataDao->userHasDeiaConsent($user->getId());
 
