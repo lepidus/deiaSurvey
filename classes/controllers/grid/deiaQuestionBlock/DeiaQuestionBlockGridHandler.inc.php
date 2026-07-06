@@ -228,7 +228,12 @@ class DeiaQuestionBlockGridHandler extends \GridHandler
 
         $deiaQuestionBlock = Repo::deiaQuestionBlock()->get($deiaQuestionBlockId, $context->getId());
 
-        if ($request->checkCSRF() && isset($deiaQuestionBlock) && !$deiaQuestionBlock->getActive()) {
+        if (
+            $request->checkCSRF()
+            && isset($deiaQuestionBlock)
+            && !$deiaQuestionBlock->getActive()
+            && $this->deiaQuestionBlockHasQuestions($deiaQuestionBlockId, $context->getId())
+        ) {
             Repo::deiaQuestionBlock()->edit($deiaQuestionBlock, ['active' => 1]);
 
             $notificationMgr = new NotificationManager();
@@ -239,6 +244,15 @@ class DeiaQuestionBlockGridHandler extends \GridHandler
         }
 
         return new JSONMessage(false);
+    }
+
+    private function deiaQuestionBlockHasQuestions(int $deiaQuestionBlockId, int $contextId): bool
+    {
+        return Repo::deiaQuestion()
+            ->getCollector()
+            ->filterByContextIds([$contextId])
+            ->filterByQuestionBlockIds([$deiaQuestionBlockId])
+            ->getCount() > 0;
     }
 
 
