@@ -18,6 +18,7 @@ use PKP\file\TemporaryFileDAO;
 use PKP\file\TemporaryFileManager;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
+use PKP\notification\Notification;
 use PKP\plugins\PluginRegistry;
 use PKP\security\authorization\PolicySet;
 use PKP\security\authorization\RoleBasedHandlerOperationPolicy;
@@ -241,7 +242,15 @@ class DeiaQuestionBlockGridHandler extends GridHandler
         $context = $request->getContext();
         $deiaQuestionBlock = Repo::deiaQuestionBlock()->get($deiaQuestionBlockId, $context->getId());
 
-        if ($request->checkCSRF() && $deiaQuestionBlock && (bool) $deiaQuestionBlock->getActive() !== $active) {
+        if ($active && $deiaQuestionBlock && !$this->deiaQuestionBlockHasQuestions($deiaQuestionBlockId, $context->getId())) {
+            return $this->getEmptyQuestionBlockActivationBlockedResponse($request, $deiaQuestionBlockId);
+        }
+
+        if (
+            $request->checkCSRF()
+            && $deiaQuestionBlock
+            && (bool) $deiaQuestionBlock->getActive() !== $active
+        ) {
             Repo::deiaQuestionBlock()->edit($deiaQuestionBlock, ['active' => $active ? 1 : 0]);
 
             $notificationMgr = new NotificationManager();
@@ -251,6 +260,27 @@ class DeiaQuestionBlockGridHandler extends GridHandler
         }
 
         return new JSONMessage(false);
+    }
+
+    private function getEmptyQuestionBlockActivationBlockedResponse($request, int $deiaQuestionBlockId): JSONMessage
+    {
+        $notificationMgr = new NotificationManager();
+        $notificationMgr->createTrivialNotification(
+            $request->getUser()->getId(),
+            Notification::NOTIFICATION_TYPE_ERROR,
+            ['contents' => __('plugins.generic.deiaSurvey.questionBlocks.activateEmptyError')]
+        );
+
+        return DAO::getDataChangedEvent($deiaQuestionBlockId);
+    }
+
+    private function deiaQuestionBlockHasQuestions(int $deiaQuestionBlockId, int $contextId): bool
+    {
+        return Repo::deiaQuestion()
+            ->getCollector()
+            ->filterByContextIds([$contextId])
+            ->filterByQuestionBlockIds([$deiaQuestionBlockId])
+            ->getCount() > 0;
     }
 
     public function deleteDeiaQuestionBlock($args, $request)
