@@ -28,10 +28,10 @@ class DeiaResponseOption extends \PKP\core\DataObject
         $this->setData('isTranslated', $isTranslated);
     }
 
-    public function getLocalizedOptionText(bool $cleanEg = false): string
+    public function getLocalizedOptionText(bool $cleanExemplification = false): string
     {
         $text = $this->getLocalizedTextualData('optionText');
-        if ($cleanEg) {
+        if ($cleanExemplification) {
             $text = trim(preg_replace('/\s*\(.*?\)/', '', $text));
         }
         return $text;
