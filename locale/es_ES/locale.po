@@ -109,12 +109,11 @@ msgstr "Gestionar bloques de preguntas"
 msgid "plugins.generic.deiaSurvey.settings.questionBlocks"
 msgstr "Bloques de Preguntas"
 
-msgid "plugins.generic.deiaSurvey.settings.encryptionSecretDefined"
-msgstr "Usted ha definido un secreto en el archivo de configuración del sitio ('api_key_secret')."
-" Lo módulo no funcionará hasta que se haya completado este paso."
+msgid "plugins.generic.deiaSurvey.settings.apiKeySecretMissing"
+msgstr "A su aplicación le falta una configuración de seguridad ('api_key_secret'). Puede ponerse en contacto con su administrador del sistema para configurarlo en el archivo de configuración."
 
-msgid "plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined"
-msgstr "Usted no ha definido un secreto en el archivo de configuración del sitio ('api_key_secret')"
+msgid "plugins.generic.deiaSurvey.settings.apiKeySecretInformation"
+msgstr "El 'api_key_secret' se utiliza para almacenar de forma segura las respuestas del cuestionario DEIA.<br>Más información sobre cómo configurarlo se puede encontrar en <a href=\"https://forum.pkp.sfu.ca/t/how-to-generate-a-api-key-secret-code-in-ojs-3/72008/\" target=\"_blank\">este tema del Foro de la Comunidad PKP</a>."
 
 msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.title"
 msgstr "Género"
