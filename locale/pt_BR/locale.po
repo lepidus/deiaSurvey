@@ -106,12 +106,11 @@ msgstr "Apenas autores que já responderam o Questionário DEIA podem excluir se
 msgid "plugins.generic.deiaSurvey.settings.title"
 msgstr "Gerenciar Blocos de Perguntas"
 
-msgid "plugins.generic.deiaSurvey.settings.encryptionSecretDefined"
-msgstr "Você definiu um segredo no arquivo de configuração do site ('api_key_secret')"
+msgid "plugins.generic.deiaSurvey.settings.apiKeySecretMissing"
+msgstr "Sua aplicação está sem uma configuração de segurança ('api_key_secret'). Você pode contactar o administrador do sistema para defini-la no arquivo de configuração."
 
-msgid "plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined"
-msgstr "Você não definiu um segredo no arquivo de configuração do site ('api_key_secret')."
-" O plugin não entrará em funcionamento até que isso seja feito."
+msgid "plugins.generic.deiaSurvey.settings.apiKeySecretInformation"
+msgstr "A configuração api_key_secret é usada para armazenar as respostas do questionário DEIA com segurança. Mais informações sobre como configurá-la podem ser encontradas <a href=\"https://forum.pkp.sfu.ca/t/how-to-generate-a-api-key-secret-code-in-ojs-3/72008/\" target=\"_blank\">neste tópico do Fórum da Comunidade PKP</a>."
 
 
 msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.title"

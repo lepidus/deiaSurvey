@@ -106,12 +106,11 @@ msgstr "Only authors who have already completed the DEIA Survey can delete their
 msgid "plugins.generic.deiaSurvey.settings.title"
 msgstr "Manage Question Blocks"
 
-msgid "plugins.generic.deiaSurvey.settings.encryptionSecretDefined"
-msgstr "You have set a secret in the website configuration file ('api_key_secret')"
+msgid "plugins.generic.deiaSurvey.settings.apiKeySecretMissing"
+msgstr "Your application is missing a security setting ('api_key_secret'). You may contact your system administrator to set it up in the config file."
 
-msgid "plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined"
-msgstr "You have not set a secret in the website configuration file ('api_key_secret')."
-" The plugin will not work until this is done."
+msgid "plugins.generic.deiaSurvey.settings.apiKeySecretInformation"
+msgstr "The 'api_key_secret' is used to safely store the DEIA survey responses.<br>More information on how to set it up can be found in <a href=\"https://forum.pkp.sfu.ca/t/how-to-generate-a-api-key-secret-code-in-ojs-3/72008/\" target=\"_blank\">this PKP Community Forum thread</a>."
 
 msgid "plugins.generic.deiaSurvey.defaultQuestion.gender.title"
 msgstr "Gender"

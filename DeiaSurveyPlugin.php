@@ -92,7 +92,7 @@ class DeiaSurveyPlugin extends GenericPlugin
             if (!$encrypter->secretConfigExists()) {
                 $currentUser = Application::get()->getRequest()->getUser();
                 $notificationMgr = new NotificationManager();
-                $notificationMessage = 'plugins.generic.deiaSurvey.settings.encryptionSecretNotDefined';
+                $notificationMessage = 'plugins.generic.deiaSurvey.settings.apiKeySecretMissing';
                 $notificationMgr->createTrivialNotification($currentUser->getId(), Notification::NOTIFICATION_TYPE_WARNING, ['contents' => __($notificationMessage)]);
             }
         }
@@ -281,8 +281,11 @@ class DeiaSurveyPlugin extends GenericPlugin
                 $method = $request->getUserVar('method') ?? 'display';
 
                 if ($method === 'display') {
+                    $encryptionSecretDefined = (new DataEncryption())->secretConfigExists();
+                    $settingsTemplate = $encryptionSecretDefined
+                        ? 'settings/index.tpl'
+                        : 'settings/missingSecretConfigWarning.tpl';
                     $templateMgr->assign([
-                        'encryptionSecretDefined' => (new DataEncryption())->secretConfigExists(),
                         'pluginName' => $this->getName(),
                         'questionBlockExportFeatureJsUrl' => $request->getBaseUrl()
                             . '/'
@@ -291,7 +294,7 @@ class DeiaSurveyPlugin extends GenericPlugin
                     ]);
                     return new JSONMessage(
                         true,
-                        $templateMgr->fetch($this->getTemplateResource('settings/index.tpl'))
+                        $templateMgr->fetch($this->getTemplateResource($settingsTemplate))
                     );
                 }
         }
