@@ -96,6 +96,10 @@ class QuestionsForm extends \Form
 
     public function validate($callHooks = true)
     {
+        if (!parent::validate($callHooks)) {
+            return false;
+        }
+
         $dataConsentOption = $this->getData('deiaDataConsent');
 
         $deiaDataDao = new DeiaDataDAO();

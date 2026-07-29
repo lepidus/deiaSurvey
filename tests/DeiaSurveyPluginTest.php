@@ -65,6 +65,17 @@ class DeiaSurveyPluginTest extends \DatabaseTestCase
         self::assertArrayHasKey('deiaToken', $errors);
     }
 
+    public function testQuestionsFormPreservesParentValidationContract(): void
+    {
+        $source = file_get_contents(__DIR__ . '/../classes/form/QuestionsForm.php');
+
+        self::assertStringContainsString('parent::validate($callHooks)', $source);
+        self::assertMatchesRegularExpression(
+            '/if \(!parent::validate\(\$callHooks\)\) \{\s+return false;\s+\}/',
+            $source
+        );
+    }
+
     private function createRequestStub(): object
     {
         return new class () {
