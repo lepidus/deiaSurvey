@@ -20,4 +20,20 @@ class SecurityContractsTest extends TestCase
         self::assertStringContainsString('$request->isPost()', $source);
         self::assertStringContainsString('$request->checkCSRF()', $source);
     }
+
+    public function testDeleteConfirmationPostsWithCsrf(): void
+    {
+        $template = file_get_contents(dirname(__DIR__, 2) . '/templates/questionnairePage/deleteData.tpl');
+
+        self::assertStringContainsString('method="post"', $template);
+        self::assertStringContainsString('{csrf}', $template);
+        self::assertStringNotContainsString('save=true', $template);
+    }
+
+    public function testHandlerScopesAuthorsToTheCurrentContext(): void
+    {
+        $source = file_get_contents(dirname(__DIR__, 2) . '/pages/deia/QuestionnaireHandler.php');
+
+        self::assertStringContainsString('authorBelongsToContext', $source);
+    }
 }

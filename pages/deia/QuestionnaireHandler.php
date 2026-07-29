@@ -3,11 +3,11 @@
 namespace APP\plugins\generic\deiaSurvey\pages\deia;
 
 use APP\core\Application;
+use APP\facades\Repo as ApplicationRepo;
 use APP\handler\Handler;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
-use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 use APP\template\TemplateManager;
@@ -23,7 +23,7 @@ class QuestionnaireHandler extends Handler
         $context = $request->getContext();
 
         $queryParams = $request->getQueryArray();
-        $author = Repo::author()->get((int) $queryParams['authorId']);
+        $author = ApplicationRepo::author()->get((int) $queryParams['authorId']);
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
         $deiaDataService = new DeiaDataService();
@@ -86,7 +86,16 @@ class QuestionnaireHandler extends Handler
 
     private function authorTokenIsValid($author, $token): bool
     {
-        return $author->getData('deiaToken') === $token;
+        if (is_null($author) || !is_string($token) || $token === '') {
+            return false;
+        }
+
+        $storedToken = $author->getData('deiaToken');
+        if (!is_string($storedToken) || $storedToken === '') {
+            return false;
+        }
+
+        return hash_equals($storedToken, $token);
     }
 
     public function authorize($request, &$args, $roleAssignments)
@@ -97,8 +106,9 @@ class QuestionnaireHandler extends Handler
             return false;
         }
 
-        $author = Repo::author()->get((int) $queryParams['authorId']);
-        if (is_null($author)) {
+        $author = ApplicationRepo::author()->get((int) $queryParams['authorId']);
+        $context = $request->getContext();
+        if (is_null($author) || is_null($context) || !$this->authorBelongsToContext($author, $context->getId())) {
             return false;
         }
 
@@ -109,7 +119,7 @@ class QuestionnaireHandler extends Handler
     {
         $authorId = $request->getUserVar('authorId');
         $authorToken = $request->getUserVar('authorToken');
-        $author = Repo::author()->get($authorId);
+        $author = ApplicationRepo::author()->get($authorId);
         $plugin = PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $templateMgr = TemplateManager::getManager($request);
 
@@ -187,7 +197,7 @@ class QuestionnaireHandler extends Handler
     {
         $authorId = $request->getUserVar('authorId');
         $authorToken = $request->getUserVar('authorToken');
-        $author = Repo::author()->get($authorId);
+        $author = ApplicationRepo::author()->get($authorId);
         $plugin = PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $templateMgr = TemplateManager::getManager($request);
 
@@ -204,7 +214,12 @@ class QuestionnaireHandler extends Handler
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
-        if ($request->getUserVar('save')) {
+        if ($request->isPost()) {
+            if (!$request->checkCSRF() || $request->getUserVar('confirm') !== '1') {
+                $templateMgr->assign('messageToDisplay', __('form.csrfInvalid'));
+                return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+            }
+
             $contextId = $request->getContext()->getId();
             $authorExternalId = $author->getData('email');
             $authorExternalType = 'email';
@@ -218,6 +233,11 @@ class QuestionnaireHandler extends Handler
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/deleteSuccess.tpl'));
         }
 
+        if (!$request->isGet()) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
         $templateMgr->assign([
             'authorId' => $author->getId(),
             'authorToken' => $author->getData('deiaToken')
@@ -228,7 +248,7 @@ class QuestionnaireHandler extends Handler
 
     public function orcidVerify($args, $request)
     {
-        $author = Repo::author()->get($request->getUserVar('authorId'));
+        $author = ApplicationRepo::author()->get($request->getUserVar('authorId'));
         $plugin = PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $templateMgr = TemplateManager::getManager($request);
         $contextId = $request->getContext()->getId();
@@ -272,7 +292,7 @@ class QuestionnaireHandler extends Handler
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
-        Repo::author()->edit($author, ['deiaOrcid' => $authorOrcidUri]);
+        ApplicationRepo::author()->edit($author, ['deiaOrcid' => $authorOrcidUri]);
 
         $request->redirect(null, null, 'index', null, ['authorId' => $author->getId(), 'authorToken' => $request->getUserVar('authorToken')]);
     }
@@ -288,5 +308,16 @@ class QuestionnaireHandler extends Handler
                 'inline' => false,
             ]
         );
+    }
+
+    private function authorBelongsToContext($author, int $contextId): bool
+    {
+        $publication = ApplicationRepo::publication()->get((int) $author->getData('publicationId'));
+        if (is_null($publication)) {
+            return false;
+        }
+
+        $submission = ApplicationRepo::submission()->get((int) $publication->getData('submissionId'));
+        return !is_null($submission) && (int) $submission->getData('contextId') === $contextId;
     }
 }
