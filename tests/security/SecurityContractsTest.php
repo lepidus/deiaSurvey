@@ -36,4 +36,15 @@ class SecurityContractsTest extends TestCase
 
         self::assertStringContainsString('authorBelongsToContext', $source);
     }
+
+    public function testPublicQuestionnaireEscapesTextAndAttributes(): void
+    {
+        $question = file_get_contents(dirname(__DIR__, 2) . '/templates/questionnairePage/question.tpl');
+        $responses = file_get_contents(dirname(__DIR__, 2) . '/templates/questionnairePage/responses.tpl');
+
+        self::assertStringContainsString('{$question[\'title\']|escape}', $question);
+        self::assertStringContainsString('{$question[\'description\']|escape}', $question);
+        self::assertStringContainsString('getLocalizedOptionText()|escape', $question);
+        self::assertStringContainsString('{$responses[$question[\'questionId\']]|escape}', $responses);
+    }
 }
