@@ -11,6 +11,7 @@ use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 use APP\template\TemplateManager;
+use Illuminate\Support\Facades\DB;
 use PKP\plugins\PluginRegistry;
 
 class QuestionnaireHandler extends Handler
@@ -97,7 +98,8 @@ class QuestionnaireHandler extends Handler
         }
 
         $author = Repo::author()->get((int) $queryParams['authorId']);
-        if (is_null($author)) {
+        $context = $request->getContext();
+        if (is_null($author) || is_null($context) || !$this->authorBelongsToContext($author, $context->getId())) {
             return false;
         }
 
@@ -113,6 +115,11 @@ class QuestionnaireHandler extends Handler
         $templateMgr = TemplateManager::getManager($request);
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
+
+        if (!$request->isPost() || !$request->checkCSRF()) {
+            $templateMgr->assign('messageToDisplay', __('form.csrfInvalid'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
 
         if (!$this->authorTokenIsValid($author, $authorToken)) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
@@ -138,7 +145,38 @@ class QuestionnaireHandler extends Handler
         }
 
         $deiaDataService = new DeiaDataService();
-        $deiaDataService->registerExternalAuthorResponses($responsesExternalId, $responsesExternalType, $responses, $responseOptionsInputs);
+        try {
+            [$responses, $responseOptionsInputs] = $deiaDataService->validateResponsesForContext(
+                $request->getContext()->getId(),
+                $responses,
+                $responseOptionsInputs,
+                false
+            );
+        } catch (\InvalidArgumentException $exception) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
+        DB::transaction(function () use (
+            $deiaDataService,
+            $request,
+            $responsesExternalId,
+            $responsesExternalType,
+            $responses,
+            $responseOptionsInputs
+        ) {
+            $deiaDataService->deleteAuthorResponses(
+                $request->getContext()->getId(),
+                $responsesExternalId,
+                $responsesExternalType
+            );
+            $deiaDataService->registerExternalAuthorResponses(
+                $responsesExternalId,
+                $responsesExternalType,
+                $responses,
+                $responseOptionsInputs
+            );
+        });
 
         $templateMgr->assign([
             'authorId' => $author->getId(),
