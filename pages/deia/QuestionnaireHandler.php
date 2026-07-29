@@ -114,6 +114,11 @@ class QuestionnaireHandler extends Handler
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
 
+        if (!$request->isPost() || !$request->checkCSRF()) {
+            $templateMgr->assign('messageToDisplay', __('form.csrfInvalid'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
         if (!$this->authorTokenIsValid($author, $authorToken)) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));

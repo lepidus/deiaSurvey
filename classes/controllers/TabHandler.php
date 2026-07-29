@@ -32,8 +32,10 @@ class TabHandler extends Handler
             $notificationMgr = new NotificationManager();
             $user = $request->getUser();
             $notificationMgr->createTrivialNotification($user->getId());
+            return new JSONMessage(true);
         }
-        return new JSONMessage(true);
+
+        return new JSONMessage(false);
     }
 }
 
