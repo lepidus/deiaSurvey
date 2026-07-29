@@ -11,9 +11,13 @@
         {translate key="plugins.generic.deiaSurvey.questionnairePage.deleteData.message"}
     </p>
 
-    <a id="deleteDeiaData" href="{url op="deleteData" authorId=$authorId authorToken=$authorToken save=true}">
-        {translate key="plugins.generic.deiaSurvey.questionnairePage.deleteMyData"}
-    </a>
+    <form method="post" action="{url op="deleteData" authorId=$authorId authorToken=$authorToken}">
+        {csrf}
+        <input type="hidden" name="save" value="1">
+        <button id="deleteDeiaData" type="submit">
+            {translate key="plugins.generic.deiaSurvey.questionnairePage.deleteMyData"}
+        </button>
+    </form>
 </div>
 
 {include file="frontend/components/footer.tpl"}

@@ -76,6 +76,21 @@ class DeiaSurveyPluginTest extends \DatabaseTestCase
         );
     }
 
+    public function testExternalDeletionUsesPostAndCsrf(): void
+    {
+        $handler = file_get_contents(__DIR__ . '/../pages/deia/QuestionnaireHandler.php');
+        $template = file_get_contents(__DIR__ . '/../templates/questionnairePage/deleteData.tpl');
+
+        self::assertStringContainsString('$request->isPost()', $handler);
+        self::assertStringContainsString('$request->checkCSRF()', $handler);
+        self::assertStringContainsString("\$storedToken !== ''", $handler);
+        self::assertStringContainsString('authorBelongsToContext($author, $request->getContext())', $handler);
+        self::assertStringContainsString('<form', $template);
+        self::assertStringContainsString('method="post"', $template);
+        self::assertStringContainsString('{csrf}', $template);
+        self::assertStringNotContainsString('save=true', $template);
+    }
+
     private function createRequestStub(): object
     {
         return new class () {
