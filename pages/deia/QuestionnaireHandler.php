@@ -86,7 +86,27 @@ class QuestionnaireHandler extends Handler
 
     private function authorTokenIsValid($author, $token): bool
     {
-        return $author->getData('deiaToken') === $token;
+        if (!$author || !is_string($token)) {
+            return false;
+        }
+
+        $storedToken = $author->getData('deiaToken');
+        return is_string($storedToken) && $storedToken !== '' && hash_equals($storedToken, $token);
+    }
+
+    private function authorBelongsToContext($author, int $contextId): bool
+    {
+        if (!$author) {
+            return false;
+        }
+
+        $publication = Repo::publication()->get((int) $author->getData('publicationId'));
+        if (!$publication) {
+            return false;
+        }
+
+        $submission = Repo::submission()->get((int) $publication->getData('submissionId'));
+        return $submission && (int) $submission->getData('contextId') === $contextId;
     }
 
     public function authorize($request, &$args, $roleAssignments)
@@ -122,6 +142,11 @@ class QuestionnaireHandler extends Handler
         }
 
         if (!$this->authorTokenIsValid($author, $authorToken)) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
+        if (!$this->authorBelongsToContext($author, $request->getContext()->getId())) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
@@ -201,13 +226,26 @@ class QuestionnaireHandler extends Handler
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
+        if (!$this->authorBelongsToContext($author, $request->getContext()->getId())) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
         $deiaDataService = new DeiaDataService();
         if (!$deiaDataService->authorAlreadyAnsweredQuestionnaire($author)) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.onlyWhoAnsweredCanDelete'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
-        if ($request->getUserVar('save')) {
+        if ($request->isPost()) {
+            if (!$request->checkCSRF() || $request->getUserVar('confirm') !== '1') {
+                $templateMgr->assign(
+                    'messageToDisplay',
+                    __('plugins.generic.deiaSurvey.questionnairePage.accessDenied')
+                );
+                return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+            }
+
             $contextId = $request->getContext()->getId();
             $authorExternalId = $author->getData('email');
             $authorExternalType = 'email';
@@ -219,6 +257,11 @@ class QuestionnaireHandler extends Handler
 
             $deiaDataService->deleteAuthorResponses($contextId, $authorExternalId, $authorExternalType);
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/deleteSuccess.tpl'));
+        }
+
+        if (!$request->isGet()) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
         $templateMgr->assign([
