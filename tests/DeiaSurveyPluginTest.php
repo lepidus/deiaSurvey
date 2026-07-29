@@ -38,6 +38,22 @@ class DeiaSurveyPluginTest extends DatabaseTestCase
         self::assertFalse($plugin->userShouldBeRedirected($this->createRequestStub()));
     }
 
+    public function testDeiaTokenIsNeverSerializedOrAcceptedFromApiInput(): void
+    {
+        $schema = (object) ['properties' => (object) []];
+        $plugin = new DeiaSurveyPlugin();
+
+        $plugin->editAuthorSchema('Schema::get::author', [&$schema]);
+
+        self::assertTrue($schema->properties->deiaToken->writeOnly);
+        self::assertFalse(property_exists($schema->properties->deiaToken, 'readOnly'));
+        self::assertFalse($schema->properties->deiaToken->apiSummary);
+
+        $errors = [];
+        $plugin->preventDeiaTokenApiWrite('Author::validate', [&$errors, null, ['deiaToken' => 'attacker']]);
+        self::assertArrayHasKey('deiaToken', $errors);
+    }
+
     private function createRequestStub(): object
     {
         return new class () {

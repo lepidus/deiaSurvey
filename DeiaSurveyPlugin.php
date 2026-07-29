@@ -32,6 +32,7 @@ class DeiaSurveyPlugin extends GenericPlugin
             Hook::add('LoadComponentHandler', [$this, 'setupTabHandler']);
             Hook::add('LoadHandler', [$this, 'addPageHandler']);
             Hook::add('Schema::get::author', [$this, 'editAuthorSchema']);
+            Hook::add('Author::validate', [$this, 'preventDeiaTokenApiWrite']);
             Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
             $this->registerHooksForCustomSchemas();
 
@@ -122,7 +123,8 @@ class DeiaSurveyPlugin extends GenericPlugin
 
         $schema->properties->{'deiaToken'} = (object) [
             'type' => 'string',
-            'apiSummary' => true,
+            'apiSummary' => false,
+            'writeOnly' => true,
             'validation' => ['nullable'],
         ];
         $schema->properties->{'deiaOrcid'} = (object) [
@@ -130,6 +132,17 @@ class DeiaSurveyPlugin extends GenericPlugin
             'apiSummary' => true,
             'validation' => ['nullable'],
         ];
+
+        return false;
+    }
+
+    public function preventDeiaTokenApiWrite(string $hookName, array $params): bool
+    {
+        $errors = &$params[0];
+        $props = $params[2];
+        if (array_key_exists('deiaToken', $props)) {
+            $errors['deiaToken'] = [__('api.403.unauthorized')];
+        }
 
         return false;
     }
