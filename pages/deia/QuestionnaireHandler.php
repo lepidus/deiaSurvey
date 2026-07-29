@@ -12,6 +12,7 @@ use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 use APP\template\TemplateManager;
 use PKP\plugins\PluginRegistry;
+use Illuminate\Support\Facades\DB;
 
 class QuestionnaireHandler extends Handler
 {
@@ -143,7 +144,36 @@ class QuestionnaireHandler extends Handler
         }
 
         $deiaDataService = new DeiaDataService();
-        $deiaDataService->registerExternalAuthorResponses($responsesExternalId, $responsesExternalType, $responses, $responseOptionsInputs);
+        try {
+            $normalized = $deiaDataService->normalizeResponsesForContext(
+                $request->getContext()->getId(),
+                $responses,
+                $responseOptionsInputs
+            );
+        } catch (\DomainException $exception) {
+            $templateMgr->assign('messageToDisplay', __('form.errorsOccurred'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
+        DB::transaction(function () use (
+            $deiaDataService,
+            $request,
+            $responsesExternalId,
+            $responsesExternalType,
+            $normalized
+        ) {
+            $deiaDataService->deleteAuthorResponses(
+                $request->getContext()->getId(),
+                $responsesExternalId,
+                $responsesExternalType
+            );
+            $deiaDataService->registerExternalAuthorResponses(
+                $responsesExternalId,
+                $responsesExternalType,
+                $normalized['responses'],
+                $normalized['responseOptionsInputs']
+            );
+        });
 
         $templateMgr->assign([
             'authorId' => $author->getId(),

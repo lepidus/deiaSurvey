@@ -10,6 +10,7 @@ use APP\template\TemplateManager;
 use PKP\db\DAORegistry;
 use PKP\form\Form;
 use PKP\plugins\PluginRegistry;
+use Illuminate\Support\Facades\DB;
 
 class QuestionsForm extends Form
 {
@@ -112,6 +113,18 @@ class QuestionsForm extends Form
 
 
         if ($dataConsentOption) {
+            try {
+                $normalized = (new DeiaDataService())->normalizeResponsesForContext(
+                    $context->getId(),
+                    $this->getData('responses') ?? [],
+                    $this->getData('responseOptionsInputs') ?? []
+                );
+                $this->setData('responses', $normalized['responses']);
+                $this->setData('responseOptionsInputs', $normalized['responseOptionsInputs']);
+            } catch (\DomainException $exception) {
+                return false;
+            }
+
             $locale = $this->defaultLocale;
 
             foreach ($this->getData('responses') as $questionId => $response) {
@@ -135,13 +148,19 @@ class QuestionsForm extends Form
         $previousConsent = $deiaDataDao->getDeiaConsentOption($context->getId(), $user->getId());
         $newConsent = $this->getData('deiaDataConsent');
 
-        $deiaDataDao->updateDeiaConsent($context->getId(), $user->getId(), $newConsent);
+        DB::transaction(function () use ($deiaDataDao, $deiaDataService, $context, $user, $newConsent, $previousConsent) {
+            $deiaDataDao->updateDeiaConsent($context->getId(), $user->getId(), $newConsent);
 
-        if ($newConsent == '1') {
-            $deiaDataService->registerUserResponses($user->getId(), $this->getData('responses'), $this->getData('responseOptionsInputs'));
-        } elseif ($newConsent == '0' && $previousConsent) {
-            $deiaDataService->deleteUserResponses($user->getId(), $context->getId());
-        }
+            if ($newConsent == '1') {
+                $deiaDataService->registerUserResponses(
+                    $user->getId(),
+                    $this->getData('responses'),
+                    $this->getData('responseOptionsInputs')
+                );
+            } elseif ($newConsent == '0' && $previousConsent) {
+                $deiaDataService->deleteUserResponses($user->getId(), $context->getId());
+            }
+        });
 
         parent::execute(...$functionArgs);
     }
