@@ -10,6 +10,7 @@ use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\template\TemplateManager;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use PKP\config\Config;
 use PKP\plugins\PluginRegistry;
 
@@ -144,7 +145,30 @@ class QuestionnaireHandler extends \Handler
         }
 
         $deiaDataService  = new DeiaDataService();
-        $deiaDataService->registerExternalAuthorResponses($responsesExternalId, $responsesExternalType, $responses, $responseOptionsInputs);
+        try {
+            Capsule::connection()->transaction(function () use (
+                $deiaDataService,
+                $request,
+                $responsesExternalId,
+                $responsesExternalType,
+                $responses,
+                $responseOptionsInputs
+            ) {
+                $deiaDataService->registerExternalAuthorResponses(
+                    $request->getContext()->getId(),
+                    $responsesExternalId,
+                    $responsesExternalType,
+                    $responses,
+                    $responseOptionsInputs
+                );
+            });
+        } catch (\InvalidArgumentException $exception) {
+            $templateMgr->assign(
+                'messageToDisplay',
+                __('plugins.generic.deiaSurvey.questionnairePage.accessDenied')
+            );
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
 
         $templateMgr->assign([
             'authorId' => $author->getId(),
