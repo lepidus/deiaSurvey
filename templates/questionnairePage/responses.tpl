@@ -14,8 +14,8 @@
     <fieldset class="fields">
         {foreach $questions as $question}
             <div class="authorResponse">
-                <span class="questionTitle">{$question['title']}</span>
-                <span class="responseValue">{$responses[$question['id']]}</span>
+                <span class="questionTitle">{$question['title']|escape}</span>
+                <span class="responseValue">{$responses[$question['id']]|escape}</span>
             </div>
         {/foreach}
     </fieldset>

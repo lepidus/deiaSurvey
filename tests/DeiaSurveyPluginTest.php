@@ -91,6 +91,19 @@ class DeiaSurveyPluginTest extends \DatabaseTestCase
         self::assertStringNotContainsString('save=true', $template);
     }
 
+    public function testPublicQuestionnaireEscapesPlainTextContent(): void
+    {
+        $question = file_get_contents(__DIR__ . '/../templates/questionnairePage/question.tpl');
+        $responses = file_get_contents(__DIR__ . '/../templates/questionnairePage/responses.tpl');
+        $index = file_get_contents(__DIR__ . '/../templates/questionnairePage/index.tpl');
+
+        self::assertStringContainsString("{\$question['title']|escape}", $question);
+        self::assertStringContainsString("{\$question['description']|escape}", $question);
+        self::assertStringContainsString('{$responseOption->getLocalizedOptionText()|escape}', $question);
+        self::assertStringContainsString("{\$responses[\$question['id']]|escape}", $responses);
+        self::assertStringContainsString("{\$questionBlock['description']|escape}", $index);
+    }
+
     private function createRequestStub(): object
     {
         return new class () {
