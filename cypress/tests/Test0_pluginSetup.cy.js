@@ -40,10 +40,30 @@ describe('DEIA Survey - Plugin setup', function () {
 		cy.get('#orcidProfileAPIPath').select('Public Sandbox');
 		cy.get('input[name="orcidClientId"]').clear().type(Cypress.env('orcidClientId'), {delay: 0});
 		cy.get('input[name="orcidClientSecret"]').clear().type(Cypress.env('orcidClientSecret'), {delay: 0});
+		cy.get('#orcidProfileSettingsForm').then(($form) => {
+			const saveUrl = $form.attr('action');
+			expect(saveUrl).to.contain('orcidprofileplugin');
+			cy.intercept('POST', saveUrl).as('saveOrcidSettings');
+		});
 		cy.get('#orcidProfileSettingsForm button:contains("OK")').click();
-		cy.wait(1000);
+		cy.wait('@saveOrcidSettings').then(({response}) => {
+			expect(response.statusCode).to.equal(200);
+			expect(response.body.status).to.equal(true);
+			expect(response.body.content).to.equal('');
+		});
+		cy.get('body').then(($body) => {
+			const $close = $body.find('.pkp_modal:has(#orcidProfileSettingsForm) .pkpModalCloseButton');
+			if ($close.length) {
+				cy.wrap($close).scrollIntoView().should('be.visible').click();
+			}
+		});
+		cy.get('#orcidProfileSettingsForm').should('not.exist');
+		cy.get('.pkp_modal:has(#orcidProfileSettingsForm)').should('not.exist');
 
-		cy.get('input[id^=select-cell-orcidprofileplugin]').check();
+		cy.get('input[id^=select-cell-orcidprofileplugin]')
+			.scrollIntoView()
+			.should('be.visible')
+			.check();
 		cy.get('input[id^=select-cell-orcidprofileplugin]').should('be.checked');
 
 		cy.get('tr#' + pluginRowId + ' a.show_extras').click();
