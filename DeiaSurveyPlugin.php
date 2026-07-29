@@ -23,6 +23,7 @@ class DeiaSurveyPlugin extends \GenericPlugin
             HookRegistry::register('LoadComponentHandler', [$this, 'setupHandlers']);
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
             HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
+            HookRegistry::register('Author::validate', [$this, 'preventDeiaTokenApiWrite']);
             HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
             HookRegistry::register(
                 'userroleform::execute',
@@ -121,7 +122,7 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
         $schema->properties->{'deiaToken'} = (object) [
             'type' => 'string',
-            'apiSummary' => true,
+            'writeOnly' => true,
             'validation' => ['nullable'],
         ];
         $schema->properties->{'deiaOrcid'} = (object) [
@@ -129,6 +130,17 @@ class DeiaSurveyPlugin extends \GenericPlugin
             'apiSummary' => true,
             'validation' => ['nullable'],
         ];
+
+        return false;
+    }
+
+    public function preventDeiaTokenApiWrite($hookName, $params)
+    {
+        $errors = &$params[0];
+        $props = $params[2];
+        if (array_key_exists('deiaToken', $props)) {
+            $errors['deiaToken'] = [__('api.403.unauthorized')];
+        }
 
         return false;
     }

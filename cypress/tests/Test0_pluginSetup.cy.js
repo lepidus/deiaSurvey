@@ -1,3 +1,8 @@
+function assertTokenIsAbsent(response) {
+	expect(response.status).to.eq(200);
+	expect(JSON.stringify(response.body)).not.to.include('"deiaToken"');
+}
+
 describe('DEIA Survey - Plugin setup', function () {
 	const pluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-deiasurveyplugin';
 	const orcidPluginRowId = 'component-grid-settings-plugins-settingsplugingrid-category-generic-row-orcidprofileplugin';
@@ -15,6 +20,8 @@ describe('DEIA Survey - Plugin setup', function () {
 		cy.contains('The plugin "DEIA Survey" has been enabled', {timeout: 15000});
 		cy.get('input[id^=select-cell-deiasurveyplugin]').should('be.checked');
 		cy.reload();
+		cy.request('/index.php/publicknowledge/api/v1/_submissions?offset=0&count=20').then(assertTokenIsAbsent);
+		cy.request('/index.php/publicknowledge/api/v1/submissions?offset=0&count=20').then(assertTokenIsAbsent);
 
 		cy.contains('h1', 'Profile');
 		cy.contains('a', 'DEIA Survey').click();
