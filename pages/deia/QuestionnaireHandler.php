@@ -10,6 +10,7 @@ use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\template\TemplateManager;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use PKP\config\Config;
 use PKP\plugins\PluginRegistry;
 
@@ -29,7 +30,9 @@ class QuestionnaireHandler extends \Handler
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
         $deiaDataService = new DeiaDataService();
 
-        if (!$this->authorTokenIsValid($author, $authorToken)) {
+        if (!$this->authorTokenIsValid($author, $authorToken)
+            || !$this->authorBelongsToContext($author, $request->getContext())
+        ) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
@@ -90,7 +93,31 @@ class QuestionnaireHandler extends \Handler
 
     private function authorTokenIsValid($author, $token): bool
     {
-        return $author->getData('deiaToken') === $token;
+        if (is_null($author)) {
+            return false;
+        }
+
+        $storedToken = $author->getData('deiaToken');
+        return is_string($storedToken)
+            && $storedToken !== ''
+            && is_string($token)
+            && $token !== ''
+            && hash_equals($storedToken, $token);
+    }
+
+    private function authorBelongsToContext($author, $context): bool
+    {
+        if (is_null($author) || is_null($context)) {
+            return false;
+        }
+
+        $publication = \Services::get('publication')->get((int) $author->getData('publicationId'));
+        if (is_null($publication)) {
+            return false;
+        }
+
+        $submission = \Services::get('submission')->get((int) $publication->getData('submissionId'));
+        return !is_null($submission) && (int) $submission->getContextId() === (int) $context->getId();
     }
 
     public function authorize($request, &$args, $roleAssignments)
@@ -103,7 +130,7 @@ class QuestionnaireHandler extends \Handler
         }
 
         $author = \Services::get('author')->get((int) $authorId);
-        if (is_null($author)) {
+        if (!$this->authorBelongsToContext($author, $request->getContext())) {
             return false;
         }
 
@@ -120,7 +147,9 @@ class QuestionnaireHandler extends \Handler
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
 
-        if (!$this->authorTokenIsValid($author, $authorToken)) {
+        if (!$this->authorTokenIsValid($author, $authorToken)
+            || !$this->authorBelongsToContext($author, $request->getContext())
+        ) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
@@ -144,7 +173,30 @@ class QuestionnaireHandler extends \Handler
         }
 
         $deiaDataService  = new DeiaDataService();
-        $deiaDataService->registerExternalAuthorResponses($responsesExternalId, $responsesExternalType, $responses, $responseOptionsInputs);
+        try {
+            Capsule::connection()->transaction(function () use (
+                $deiaDataService,
+                $request,
+                $responsesExternalId,
+                $responsesExternalType,
+                $responses,
+                $responseOptionsInputs
+            ) {
+                $deiaDataService->registerExternalAuthorResponses(
+                    $request->getContext()->getId(),
+                    $responsesExternalId,
+                    $responsesExternalType,
+                    $responses,
+                    $responseOptionsInputs
+                );
+            });
+        } catch (\InvalidArgumentException $exception) {
+            $templateMgr->assign(
+                'messageToDisplay',
+                __('plugins.generic.deiaSurvey.questionnairePage.accessDenied')
+            );
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
 
         $templateMgr->assign([
             'authorId' => $author->getId(),
@@ -164,7 +216,9 @@ class QuestionnaireHandler extends \Handler
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
 
-        if (!$this->authorTokenIsValid($author, $authorToken)) {
+        if (!$this->authorTokenIsValid($author, $authorToken)
+            || !$this->authorBelongsToContext($author, $request->getContext())
+        ) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
@@ -176,6 +230,14 @@ class QuestionnaireHandler extends \Handler
         }
 
         if ($request->getUserVar('save')) {
+            if (!$request->isPost() || !$request->checkCSRF()) {
+                $templateMgr->assign(
+                    'messageToDisplay',
+                    __('plugins.generic.deiaSurvey.questionnairePage.accessDenied')
+                );
+                return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+            }
+
             $contextId = $request->getContext()->getId();
             $authorExternalId = $author->getData('email');
             $authorExternalType = 'email';

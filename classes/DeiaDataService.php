@@ -10,6 +10,128 @@ use PKP\facades\Locale;
 
 class DeiaDataService
 {
+    public function normalizeResponses(
+        int $contextId,
+        array $responses,
+        array $responseOptionsInputs,
+        bool $localizedText
+    ): array {
+        $allowedQuestions = [];
+        foreach ($this->retrieveAllQuestions($contextId) as $question) {
+            $allowedQuestions[(int) $question['id']] = $question;
+        }
+
+        if (count($responses) !== count($allowedQuestions)) {
+            throw new \InvalidArgumentException('Every active question must have exactly one response.');
+        }
+
+        $normalizedResponses = [];
+        $selectedOptionIds = [];
+        $optionsAllowingInput = [];
+        foreach ($responses as $fieldName => $responseInput) {
+            if (!is_string($fieldName)
+                || !preg_match('/^question-([1-9][0-9]*)-(text|textarea|checkbox|radio|select)$/D', $fieldName, $matches)
+            ) {
+                throw new \InvalidArgumentException('Malformed question field.');
+            }
+
+            $questionId = (int) $matches[1];
+            if (!isset($allowedQuestions[$questionId])) {
+                throw new \InvalidArgumentException('Question does not belong to the active context.');
+            }
+
+            $question = $allowedQuestions[$questionId];
+            if ($matches[2] !== $question['inputType'] || isset($normalizedResponses[$questionId])) {
+                throw new \InvalidArgumentException('Question type or identifier is invalid.');
+            }
+
+            if (in_array($question['type'], [
+                DeiaQuestion::TYPE_SMALL_TEXT_FIELD,
+                DeiaQuestion::TYPE_TEXT_FIELD,
+                DeiaQuestion::TYPE_TEXTAREA,
+            ], true)) {
+                if ($localizedText) {
+                    if (!is_array($responseInput) || empty($responseInput)) {
+                        throw new \InvalidArgumentException('Localized text response is malformed.');
+                    }
+                    foreach ($responseInput as $locale => $value) {
+                        if (!is_string($locale) || !is_scalar($value)) {
+                            throw new \InvalidArgumentException('Localized text response is malformed.');
+                        }
+                    }
+                } elseif (!is_scalar($responseInput)) {
+                    throw new \InvalidArgumentException('Text response is malformed.');
+                }
+            } else {
+                $allowedOptions = [];
+                foreach ($question['responseOptions'] as $optionId => $option) {
+                    if (is_object($option)) {
+                        $optionId = $option->getId();
+                        if ($option->hasInputField()) {
+                            $optionsAllowingInput[(int) $optionId] = true;
+                        }
+                    }
+                    $allowedOptions[(int) $optionId] = true;
+                }
+
+                $submittedOptions = is_array($responseInput) ? $responseInput : [$responseInput];
+                if ($question['type'] !== DeiaQuestion::TYPE_CHECKBOXES && count($submittedOptions) !== 1) {
+                    throw new \InvalidArgumentException('Question accepts exactly one option.');
+                }
+                if (empty($submittedOptions)) {
+                    throw new \InvalidArgumentException('Question response is empty.');
+                }
+
+                $normalizedOptions = [];
+                foreach ($submittedOptions as $optionId) {
+                    if (!is_scalar($optionId) || !ctype_digit((string) $optionId)) {
+                        throw new \InvalidArgumentException('Response option is malformed.');
+                    }
+                    $optionId = (int) $optionId;
+                    if (!isset($allowedOptions[$optionId]) || isset($normalizedOptions[$optionId])) {
+                        throw new \InvalidArgumentException('Response option does not belong to the question.');
+                    }
+                    $normalizedOptions[$optionId] = $optionId;
+                    $selectedOptionIds[$optionId] = true;
+                }
+                $responseInput = $question['type'] === DeiaQuestion::TYPE_DROP_DOWN_BOX
+                    ? reset($normalizedOptions)
+                    : array_values($normalizedOptions);
+            }
+
+            $normalizedResponses[$questionId] = $responseInput;
+        }
+
+        $normalizedOptionInputs = [];
+        foreach ($responseOptionsInputs as $fieldName => $value) {
+            if (!is_string($fieldName)
+                || !preg_match('/^responseOptionInput-([1-9][0-9]*)$/D', $fieldName, $matches)
+                || !is_scalar($value)
+            ) {
+                throw new \InvalidArgumentException('Response option input is malformed.');
+            }
+            $optionId = (int) $matches[1];
+            if (!isset($optionsAllowingInput[$optionId])) {
+                throw new \InvalidArgumentException('Response option input is not allowed.');
+            }
+            if (!isset($selectedOptionIds[$optionId])) {
+                if ((string) $value === '') {
+                    continue;
+                }
+                throw new \InvalidArgumentException('Response option input is not selected.');
+            }
+            $normalizedOptionInputs[$fieldName] = (string) $value;
+        }
+
+        $canonicalResponses = [];
+        foreach ($allowedQuestions as $questionId => $question) {
+            $canonicalResponses['question-' . $questionId . '-' . $question['inputType']] =
+                $normalizedResponses[$questionId];
+        }
+
+        return [$canonicalResponses, $normalizedOptionInputs];
+    }
+
     public function hasActiveQuestionBlocks(int $contextId): bool
     {
         return Repo::deiaQuestionBlock()
@@ -123,8 +245,19 @@ class DeiaDataService
         return trim(preg_replace('/\s+/', ' ', $text));
     }
 
-    public function registerUserResponses(int $userId, array $responses, array $responseOptionsInputs)
-    {
+    public function registerUserResponses(
+        int $contextId,
+        int $userId,
+        array $responses,
+        array $responseOptionsInputs
+    ) {
+        [$responses, $responseOptionsInputs] = $this->normalizeResponses(
+            $contextId,
+            $responses,
+            $responseOptionsInputs,
+            true
+        );
+
         foreach ($responses as $question => $responseInput) {
             $questionId = explode("-", $question)[1];
             $deiaResponses = Repo::deiaResponse()
@@ -174,9 +307,20 @@ class DeiaDataService
         return null;
     }
 
-    public function registerExternalAuthorResponses(string $externalId, string $externalType, array $responses, array $responseOptionsInputs)
-    {
+    public function registerExternalAuthorResponses(
+        int $contextId,
+        string $externalId,
+        string $externalType,
+        array $responses,
+        array $responseOptionsInputs
+    ) {
         $locale = \AppLocale::getLocale();
+        [$responses, $responseOptionsInputs] = $this->normalizeResponses(
+            $contextId,
+            $responses,
+            $responseOptionsInputs,
+            false
+        );
 
         foreach ($responses as $question => $responseInput) {
             $questionParts = explode("-", $question);

@@ -19,7 +19,7 @@
                 <section class="questionBlock">
                     <h2>{$questionBlock['title']|escape}</h2>
                     {if $questionBlock['description']}
-                        <p>{$questionBlock['description']|strip_unsafe_html}</p>
+                        <p>{$questionBlock['description']|escape}</p>
                     {/if}
                     {foreach $questionBlock['questions'] as $question}
                         {include file="../../../plugins/generic/deiaSurvey/templates/questionnairePage/question.tpl" question=$question}
