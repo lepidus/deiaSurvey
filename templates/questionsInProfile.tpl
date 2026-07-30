@@ -11,7 +11,7 @@
 {if is_null($deiaDataConsent) && $userConsentSetting}
 	<div id="deiaAlreadyAnsweredMessage" class="pkp_notification">
 		{capture assign="content"}
-			{translate key="plugins.generic.deiaSurvey.alreadyAnswered.{$applicationName}" contextName=$userConsentSetting[0]['contextName']}
+			{translate key="plugins.generic.deiaSurvey.alreadyAnswered.{$applicationName}" contextName=$userConsentSetting[0]['contextName']|escape}
 		{/capture}
 		{include
 			file="controllers/notification/inPlaceNotificationContent.tpl"

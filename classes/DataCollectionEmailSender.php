@@ -90,9 +90,6 @@ class DataCollectionEmailSender
             'authorToken' => $authorToken
         ]);
 
-        error_log("Generated questionnaire URL for author {$author->getData('email')}: {$questionnaireUrl}");
-        error_log("Generated ORCID questionnaire URL for author {$author->getData('email')}: {$orcidQuestionnaireUrl}");
-
         return ['questionnaireUrl' => $questionnaireUrl, 'orcidQuestionnaireUrl' => $orcidQuestionnaireUrl];
     }
 }

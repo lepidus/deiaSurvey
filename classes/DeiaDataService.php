@@ -9,6 +9,20 @@ use PKP\facades\Locale;
 
 class DeiaDataService
 {
+    public function validateResponsesForContext(
+        int $contextId,
+        array $responses,
+        array $responseOptionsInputs,
+        bool $multilingualText
+    ): array {
+        return (new QuestionnaireResponseValidator())->validate(
+            $this->retrieveAllQuestions($contextId),
+            $responses,
+            $responseOptionsInputs,
+            $multilingualText
+        );
+    }
+
     public function hasActiveQuestionBlocks(int $contextId): bool
     {
         return Repo::deiaQuestionBlock()

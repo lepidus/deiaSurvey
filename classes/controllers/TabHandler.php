@@ -26,6 +26,10 @@ class TabHandler extends Handler
 
     public function saveDeiaData($args, $request)
     {
+        if (!$request->isPost()) {
+            return new JSONMessage(false);
+        }
+
         $form = new QuestionsForm($request, $args);
         if ($form->validate()) {
             $form->execute();
