@@ -7,7 +7,7 @@
 <div class="page">
     <h1>{$pageTitle|escape}</h1>
 
-    <p>{$messageToDisplay}</p>
+    <p>{$messageToDisplay|escape}</p>
 </div>
 
 {include file="frontend/components/footer.tpl"}

@@ -9,6 +9,15 @@ use PKP\facades\Locale;
 
 class DeiaDataService
 {
+    public function normalizeResponsesForContext(
+        int $contextId,
+        array $responses,
+        array $responseOptionsInputs
+    ): array {
+        $questions = $this->retrieveAllQuestions($contextId);
+        return (new QuestionnaireResponseValidator())->normalize($questions, $responses, $responseOptionsInputs);
+    }
+
     public function hasActiveQuestionBlocks(int $contextId): bool
     {
         return Repo::deiaQuestionBlock()
