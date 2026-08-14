@@ -5,6 +5,8 @@ use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\De
 use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\DeiaQuestionBlockExportFeature;
 use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\DeiaQuestionBlockGridRow;
 use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\form\DeiaQuestionBlockForm;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\importExport\DeiaQuestionBlockJsonImporter;
 use APP\plugins\generic\deiaSurvey\classes\importExport\DeiaQuestionBlockJsonSerializer;
@@ -29,6 +31,7 @@ class DeiaQuestionBlockGridHandler extends \GridHandler
                 'deactivateDeiaQuestionBlock',
                 'deleteDeiaQuestionBlock',
                 'deiaQuestionBlockElements',
+                'previewDeiaQuestionBlock',
                 'exportSelectedQuestionBlocks',
                 'importQuestionBlocks',
                 'uploadQuestionBlocksFile',
@@ -448,6 +451,41 @@ class DeiaQuestionBlockGridHandler extends \GridHandler
         return new JSONMessage(
             true,
             $templateMgr->fetch($this->plugin->getTemplateResource('deiaQuestionBlocks/deiaQuestionBlockElements.tpl'))
+        );
+    }
+
+    public function previewDeiaQuestionBlock($args, $request)
+    {
+        $context = $request->getContext();
+        $questionBlock = (new DeiaDataService())->retrieveQuestionBlock(
+            $context->getId(),
+            (int) $request->getUserVar('deiaQuestionBlockId')
+        );
+
+        if (!$questionBlock) {
+            return new JSONMessage(false);
+        }
+
+        foreach ($questionBlock['questions'] as &$question) {
+            $question['response'] = in_array(
+                $question['type'],
+                [DeiaQuestion::TYPE_CHECKBOXES, DeiaQuestion::TYPE_RADIO_BUTTONS],
+                true
+            ) ? ['value' => [], 'optionsInputValue' => []] : ['value' => null];
+        }
+        unset($question);
+
+        $templateMgr = \TemplateManager::getManager($request);
+        $templateMgr->assign([
+            'questionBlock' => $questionBlock,
+            'questionTypeConsts' => DeiaQuestion::getQuestionTypeConstants()
+        ]);
+
+        return new JSONMessage(
+            true,
+            $templateMgr->fetch(
+                $this->plugin->getTemplateResource('deiaQuestionBlocks/previewDeiaQuestionBlock.tpl')
+            )
         );
     }
 }
