@@ -43,7 +43,6 @@ class DeiaDataService
 
     public function retrieveQuestionBlocks(int $contextId, bool $shouldRetrieveResponses = false): array
     {
-        $request = Application::get()->getRequest();
         $questionBlocks = [];
         $deiaQuestionBlocks = Repo::deiaQuestionBlock()
             ->getCollector()
@@ -52,49 +51,61 @@ class DeiaDataService
             ->getMany();
 
         foreach ($deiaQuestionBlocks as $deiaQuestionBlock) {
-            $questionBlockData = [
-                'id' => $deiaQuestionBlock->getId(),
-                'title' => $deiaQuestionBlock->getLocalizedTitle(),
-                'description' => $deiaQuestionBlock->getLocalizedDescription(),
-                'questions' => []
-            ];
-
-            $deiaQuestions = Repo::deiaQuestion()
-                ->getCollector()
-                ->filterByContextIds([$contextId])
-                ->filterByQuestionBlockIds([$deiaQuestionBlock->getId()])
-                ->getMany();
-
-            foreach ($deiaQuestions as $deiaQuestion) {
-                $questionData = [
-                    'questionId' => $deiaQuestion->getId(),
-                    'type' => $deiaQuestion->getQuestionType(),
-                    'inputType' => $deiaQuestion->getQuestionInputType(),
-                    'title' => $deiaQuestion->getLocalizedQuestionText(),
-                    'description' => $this->getCleanText($deiaQuestion->getLocalizedQuestionDescription()),
-                    'responseOptions' => $deiaQuestion->getResponseOptions()
-                ];
-
-                if ($deiaQuestion->getQuestionType() == DeiaQuestion::TYPE_DROP_DOWN_BOX) {
-                    $questionData['responseOptions'] = [];
-                    foreach ($deiaQuestion->getResponseOptions() as $responseOption) {
-                        $questionData['responseOptions'][$responseOption->getId()] =
-                            $responseOption->getLocalizedOptionText();
-                    }
-                }
-
-                if ($shouldRetrieveResponses) {
-                    $user = $request->getUser();
-                    $questionData['response'] = $this->getUserResponse($deiaQuestion, $user->getId());
-                }
-
-                $questionBlockData['questions'][] = $questionData;
-            }
-
-            $questionBlocks[] = $questionBlockData;
+            $questionBlocks[] = $this->getQuestionBlockData($deiaQuestionBlock, $shouldRetrieveResponses);
         }
 
         return $questionBlocks;
+    }
+
+    public function retrieveQuestionBlock(int $contextId, int $questionBlockId): ?array
+    {
+        $deiaQuestionBlock = Repo::deiaQuestionBlock()->get($questionBlockId, $contextId);
+
+        return $deiaQuestionBlock ? $this->getQuestionBlockData($deiaQuestionBlock, false) : null;
+    }
+
+    private function getQuestionBlockData($deiaQuestionBlock, bool $shouldRetrieveResponses): array
+    {
+        $questionBlockData = [
+            'id' => $deiaQuestionBlock->getId(),
+            'title' => $deiaQuestionBlock->getLocalizedTitle(),
+            'description' => $deiaQuestionBlock->getLocalizedDescription(),
+            'questions' => []
+        ];
+
+        $deiaQuestions = Repo::deiaQuestion()
+            ->getCollector()
+            ->filterByContextIds([$deiaQuestionBlock->getContextId()])
+            ->filterByQuestionBlockIds([$deiaQuestionBlock->getId()])
+            ->getMany();
+
+        foreach ($deiaQuestions as $deiaQuestion) {
+            $questionData = [
+                'questionId' => $deiaQuestion->getId(),
+                'type' => $deiaQuestion->getQuestionType(),
+                'inputType' => $deiaQuestion->getQuestionInputType(),
+                'title' => $deiaQuestion->getLocalizedQuestionText(),
+                'description' => $this->getCleanText($deiaQuestion->getLocalizedQuestionDescription()),
+                'responseOptions' => $deiaQuestion->getResponseOptions()
+            ];
+
+            if ($deiaQuestion->getQuestionType() == DeiaQuestion::TYPE_DROP_DOWN_BOX) {
+                $questionData['responseOptions'] = [];
+                foreach ($deiaQuestion->getResponseOptions() as $responseOption) {
+                    $questionData['responseOptions'][$responseOption->getId()] =
+                        $responseOption->getLocalizedOptionText();
+                }
+            }
+
+            if ($shouldRetrieveResponses) {
+                $user = Application::get()->getRequest()->getUser();
+                $questionData['response'] = $this->getUserResponse($deiaQuestion, $user->getId());
+            }
+
+            $questionBlockData['questions'][] = $questionData;
+        }
+
+        return $questionBlockData;
     }
 
     private function getCleanText(?string $text): string
