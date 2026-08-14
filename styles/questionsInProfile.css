@@ -2,11 +2,11 @@
     margin-top: 0;
 }
 
-#deiaSurveyForm .pkp_formArea > .section > .description {
+.deiaQuestionnaire .pkp_formArea > .section > .description {
     margin-bottom: 1rem;
 }
 
-#deiaSurveyForm .pkp_formArea > .section > .description + .section {
+.deiaQuestionnaire .pkp_formArea > .section > .description + .section {
     margin-top: 0;
     margin-bottom: 1rem;
 }

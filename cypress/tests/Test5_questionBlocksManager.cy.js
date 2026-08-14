@@ -160,6 +160,28 @@ describe('DEIA Survey - Question blocks manager', function () {
 		cy.logout();
 	});
 
+	it('Previews the complete questionnaire with active blocks only', function () {
+		cy.login('dbarnes', null, 'publicknowledge');
+
+		cy.get('nav').contains('Settings').click();
+		cy.get('nav').contains('Website').click({ force: true });
+		cy.get('button[id="plugins-button"]').click();
+		cy.get('tr[id*="deiasurveyplugin"] a.show_extras').click();
+		cy.get('a[id*="deiasurveyplugin-settings"]').click();
+
+		cy.get('#deiaQuestionBlockGridContainer').contains('a', 'Preview').click();
+
+		cy.get('#deiaQuestionnairePreview').within(() => {
+			cy.contains('legend', 'SciELO Questions');
+			cy.contains('label', 'Gender');
+			cy.get('input[type="radio"]').should('exist');
+			cy.get('input[type="text"], textarea, select, input[type="checkbox"]').should('exist');
+			cy.contains(questionBlock.editedTitle).should('not.exist');
+		});
+
+		cy.logout();
+	});
+
 	it('Displays only active DEIA question blocks to users', function () {
 		cy.login('dbarnes', null, 'publicknowledge');
 

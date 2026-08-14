@@ -21,7 +21,7 @@
 		}
 	</div>
 {/if}
-<form class="pkp_form" id="deiaSurveyForm" method="post" action="{url op="saveDeiaData"}" enctype="multipart/form-data">
+<form class="pkp_form deiaQuestionnaire" id="deiaSurveyForm" method="post" action="{url op="saveDeiaData"}" enctype="multipart/form-data">
 	{csrf}
 
 	{fbvFormSection list="false" label='plugins.generic.deiaSurvey.consent' description='plugins.generic.deiaSurvey.consent.description' required=true}
@@ -36,15 +36,7 @@
 		{fbvElement type="radio" id="deiaDataConsentNo" name="deiaDataConsent" value=0 checked=$checkedConsentNo required=true label="plugins.generic.deiaSurvey.consent.no"}
 	{/fbvFormSection}
 
-	{foreach $questionBlocks as $questionBlock}
-		{fbvFormArea id="questionBlock_"|concat:$questionBlock['id'] title=$questionBlock['title'] translate=false}
-			{fbvFormSection	description=$questionBlock['description'] translate=false}
-				{foreach $questionBlock['questions'] as $question}
-					{include file="../../../plugins/generic/deiaSurvey/templates/question.tpl" question=$question}
-				{/foreach}
-			{/fbvFormSection}
-		{/fbvFormArea}
-	{/foreach}
+	{include file="../../../plugins/generic/deiaSurvey/templates/questionBlocks.tpl"}
 
 	<p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 
