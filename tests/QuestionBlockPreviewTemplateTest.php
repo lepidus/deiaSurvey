@@ -15,6 +15,7 @@ class QuestionBlockPreviewTemplateTest extends TestCase
 
         self::assertStringContainsString('op="previewDeiaQuestionBlock"', $editTemplate);
         self::assertStringContainsString('{translate key="common.preview"}', $editTemplate);
+        self::assertStringContainsString('selected: {if $preview}2{else}0{/if}', $editTemplate);
         self::assertFileExists($previewTemplate);
 
         $preview = file_get_contents($previewTemplate);

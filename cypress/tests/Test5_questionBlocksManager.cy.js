@@ -131,8 +131,7 @@ describe('DEIA Survey - Question blocks manager', function () {
 		cy.get('a[id*="deiasurveyplugin-settings"]').click();
 
 		cy.get('span:contains("' + questionBlock.editedTitle + '")').prev('a.show_extras').click();
-		cy.get('tr:contains("' + questionBlock.editedTitle + '")').next().contains('a', 'Edit').click();
-		cy.contains('a', 'Preview').click();
+		cy.get('tr:contains("' + questionBlock.editedTitle + '")').next().contains('a', 'Preview').click();
 
 		cy.get('#deiaQuestionBlockPreview').within(() => {
 			cy.contains('h3', questionBlock.editedTitle);

@@ -168,6 +168,7 @@ class DeiaQuestionBlockGridHandler extends GridHandler
 
         $templateMgr = TemplateManager::getManager($request);
         $templateMgr->assign([
+            'preview' => $request->getUserVar('preview'),
             'deiaQuestionBlockId' => $deiaQuestionBlock->getId(),
             'canEdit' => true,
         ]);

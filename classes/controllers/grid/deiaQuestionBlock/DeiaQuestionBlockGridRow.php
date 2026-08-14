@@ -36,6 +36,27 @@ class DeiaQuestionBlockGridRow extends GridRow
             )
         );
 
+        $this->addAction(
+            new LinkAction(
+                'preview',
+                new AjaxModal(
+                    $router->url(
+                        $request,
+                        null,
+                        null,
+                        'editDeiaQuestionBlock',
+                        null,
+                        ['rowId' => $rowId, 'preview' => 1]
+                    ),
+                    __('grid.action.preview'),
+                    null,
+                    true
+                ),
+                __('grid.action.preview'),
+                'preview'
+            )
+        );
+
         if (!$element->getActive()) {
             $this->addAction(
                 new LinkAction(
