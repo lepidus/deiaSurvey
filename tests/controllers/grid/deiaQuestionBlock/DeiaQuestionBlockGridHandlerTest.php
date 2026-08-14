@@ -6,6 +6,7 @@ require_once(dirname(__DIR__, 4) . '/autoload.php');
 require_once(dirname(__DIR__, 3) . '/helpers/TestHelperTrait.php');
 require_once(dirname(__DIR__, 4) . '/classes/DeiaDataService.php');
 
+use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\DeiaQuestionBlockGridRow;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
@@ -86,6 +87,28 @@ class DeiaQuestionBlockGridHandlerTest extends \DatabaseTestCase
         self::assertCount(1, $preview['questions']);
         self::assertSame($questionId, $preview['questions'][0]['id']);
         self::assertSame(DeiaQuestion::TYPE_TEXT_FIELD, $preview['questions'][0]['type']);
+    }
+
+    public function testQuestionBlockRowOpensPreviewTab(): void
+    {
+        $this->initializeRequestRouter();
+        $questionBlockId = $this->createInactiveQuestionBlock();
+        $questionBlock = Repo::deiaQuestionBlock()->get($questionBlockId, $this->contextId);
+        $questionBlock->setData('active', 1);
+        $row = new DeiaQuestionBlockGridRow();
+        $row->setId($questionBlockId);
+        $row->setData($questionBlock);
+
+        $row->initialize(\Application::get()->getRequest());
+
+        $actions = $row->getActions();
+        self::assertArrayHasKey('preview', $actions);
+        self::assertInstanceOf(\AjaxModal::class, $actions['preview']->getActionRequest());
+        self::assertStringContainsString(
+            'rowId=' . $questionBlockId,
+            $actions['preview']->getActionRequest()->getUrl()
+        );
+        self::assertStringContainsString('preview=1', $actions['preview']->getActionRequest()->getUrl());
     }
 
     private function initializeRequestRouter(): void
