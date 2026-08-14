@@ -111,6 +111,40 @@ class DeiaQuestionBlockGridHandlerTest extends \DatabaseTestCase
         self::assertStringContainsString('preview=1', $actions['preview']->getActionRequest()->getUrl());
     }
 
+    public function testQuestionnairePreviewActionFollowsExportAndImportActions(): void
+    {
+        $this->initializeRequestRouter();
+        $handler = new \DeiaQuestionBlockGridHandler();
+
+        $handler->initialize(\Application::get()->getRequest());
+
+        $actions = $handler->getActions();
+        self::assertSame(
+            [
+                'orderItems',
+                'exportQuestionBlocks',
+                'importQuestionBlocks',
+                'previewQuestionnaire',
+                'createDeiaQuestionBlock',
+            ],
+            array_keys($actions)
+        );
+        self::assertInstanceOf(\AjaxModal::class, $actions['previewQuestionnaire']->getActionRequest());
+    }
+
+    public function testQuestionnairePreviewRetrievesOnlyActiveBlocks(): void
+    {
+        $inactiveBlockId = $this->createInactiveQuestionBlock();
+        $activeBlockId = $this->createInactiveQuestionBlock();
+        $activeBlock = Repo::deiaQuestionBlock()->get($activeBlockId, $this->contextId);
+        Repo::deiaQuestionBlock()->edit($activeBlock, ['active' => 1]);
+
+        $questionBlocks = (new DeiaDataService())->retrieveQuestionBlocks($this->contextId);
+
+        self::assertSame([$activeBlockId], array_column($questionBlocks, 'id'));
+        self::assertNotContains($inactiveBlockId, array_column($questionBlocks, 'id'));
+    }
+
     private function initializeRequestRouter(): void
     {
         $application = \Application::get();

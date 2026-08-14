@@ -26,4 +26,23 @@ class QuestionBlockPreviewTemplateTest extends TestCase
         self::assertStringContainsString("{\$questionBlock['description']|escape}", $preview);
         self::assertStringContainsString('templates/question.tpl" question=$question', $preview);
     }
+
+    public function testPreviewHandlersAssignLocalesRequiredByMultilingualFields(): void
+    {
+        $handler = file_get_contents(
+            dirname(__DIR__) . '/classes/controllers/grid/deiaQuestionBlock/DeiaQuestionBlockGridHandler.inc.php'
+        );
+
+        self::assertMatchesRegularExpression(
+            '/function previewDeiaQuestionBlock.*?\$this->assignPreviewFormLocales\(\$templateMgr\);/s',
+            $handler
+        );
+        self::assertMatchesRegularExpression(
+            '/function previewQuestionnaire.*?\$this->assignPreviewFormLocales\(\$templateMgr\);/s',
+            $handler
+        );
+        self::assertStringNotContainsString('use PKP\\facades\\Locale;', $handler);
+        self::assertStringContainsString("'formLocales' => AppLocale::getSupportedFormLocales()", $handler);
+        self::assertStringContainsString("'formLocale' => AppLocale::getPrimaryLocale()", $handler);
+    }
 }
