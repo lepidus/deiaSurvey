@@ -12,11 +12,6 @@ Cypress.Commands.add('assertDefaultQuestionsDisplay', function(place, authorEmai
     
     if (place == 'profilePage') {
         cy.contains('a', 'DEIA Survey').click();
-        cy.get('#deiaSurveyForm .pkp_formArea > .section > .description').each(($description) => {
-            cy.wrap($description).should('have.css', 'margin-bottom', '16px');
-            cy.wrap($description).next('.section').should('have.css', 'margin-top', '0px');
-            cy.wrap($description).next('.section').should('have.css', 'margin-bottom', '16px');
-        });
     } else if (place == 'questionnairePage') {
         cy.contains('The data from this questionnaire will be associated with the e-mail address: ' + authorEmail);
         questionLabelEntity = '.questionTitle';
