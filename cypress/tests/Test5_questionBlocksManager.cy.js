@@ -121,6 +121,39 @@ describe('DEIA Survey - Question blocks manager', function () {
 		cy.logout();
 	});
 
+	it('Previews questions from an inactive DEIA question block', function () {
+		cy.login('dbarnes', null, 'publicknowledge');
+
+		cy.get('nav').contains('Settings').click();
+		cy.get('nav').contains('Website').click({ force: true });
+		cy.get('button[id="plugins-button"]').click();
+		cy.get('tr[id*="deiasurveyplugin"] a.show_extras').click();
+		cy.get('a[id*="deiasurveyplugin-settings"]').click();
+
+		cy.get('span:contains("' + questionBlock.editedTitle + '")').prev('a.show_extras').click();
+		cy.get('tr:contains("' + questionBlock.editedTitle + '")').next().contains('a', 'Edit').click();
+		cy.contains('a', 'Preview').click();
+
+		cy.get('#deiaQuestionBlockPreview').within(() => {
+			cy.contains('h3', questionBlock.editedTitle);
+			cy.contains('p', questionBlock.editedDescription);
+			questionBlock.questions.forEach((question) => {
+				cy.contains('label', question.text);
+				cy.contains('label.description', question.description);
+				if (question.options) {
+					question.options.forEach((option) => {
+						cy.contains('label', option.text);
+						cy.contains('label', option.text).find('input[type="checkbox"]');
+					});
+				} else {
+					cy.contains('label', question.text).parent().find('input[type="text"]');
+				}
+			});
+		});
+
+		cy.logout();
+	});
+
 	it('Displays only active DEIA question blocks to users', function () {
 		cy.login('dbarnes', null, 'publicknowledge');
 

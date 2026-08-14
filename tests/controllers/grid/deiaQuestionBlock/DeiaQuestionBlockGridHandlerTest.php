@@ -3,6 +3,8 @@
 namespace APP\plugins\generic\deiaSurvey\tests\controllers\grid\deiaQuestionBlock;
 
 use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\DeiaQuestionBlockGridHandler;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +52,30 @@ class DeiaQuestionBlockGridHandlerTest extends DatabaseTestCase
         $questionBlock = Repo::deiaQuestionBlock()->get($questionBlockId, $this->contextId);
         self::assertSame(0, $questionBlock->getActive());
         self::assertTrue($response->getStatus());
+    }
+
+    public function testRetrievesQuestionsFromInactiveBlockForPreview(): void
+    {
+        $this->initializeRequestRouter();
+        $questionBlockId = $this->createInactiveQuestionBlock();
+        $question = Repo::deiaQuestion()->newDataObject([
+            'contextId' => $this->contextId,
+            'questionBlockId' => $questionBlockId,
+            'questionText' => ['en' => 'Funding question'],
+            'questionDescription' => ['en' => 'Funding description'],
+            'questionType' => DeiaQuestion::TYPE_TEXT_FIELD,
+            'sequence' => 1,
+            'isTranslated' => true,
+        ]);
+        $questionId = Repo::deiaQuestion()->add($question);
+
+        $preview = (new DeiaDataService())->retrieveQuestionBlock($this->contextId, $questionBlockId);
+
+        self::assertSame($questionBlockId, $preview['id']);
+        self::assertSame('Empty block', $preview['title']);
+        self::assertCount(1, $preview['questions']);
+        self::assertSame($questionId, $preview['questions'][0]['questionId']);
+        self::assertSame(DeiaQuestion::TYPE_TEXT_FIELD, $preview['questions'][0]['type']);
     }
 
     private function createInactiveQuestionBlock(): int

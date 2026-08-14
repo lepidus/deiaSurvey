@@ -21,5 +21,10 @@
 				{translate key="plugins.generic.deiaSurvey.questionBlocks.deiaQuestions"}
 			</a>
 		</li>
+		<li>
+			<a href="{url router=$smarty.const.ROUTE_COMPONENT op="previewDeiaQuestionBlock" deiaQuestionBlockId=$deiaQuestionBlockId}">
+				{translate key="common.preview"}
+			</a>
+		</li>
 	</ul>
 </div>
