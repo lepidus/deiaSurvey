@@ -3,7 +3,8 @@
 		$('#editDeiaQuestionBlockTabs').pkpHandler(
 			'$.pkp.controllers.TabHandler',
 			{ldelim}
-				{if !$canEdit}disabled: [0, 1]{/if}
+				{if !$canEdit}disabled: [0, 1],{/if}
+				selected: {if $preview}2{else}0{/if}
 			{rdelim}
 		);
 	{rdelim});
