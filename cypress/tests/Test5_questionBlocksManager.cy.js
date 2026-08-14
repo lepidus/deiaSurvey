@@ -139,7 +139,8 @@ describe('DEIA Survey - Question blocks manager', function () {
 
 		cy.get('#deiaQuestionBlockPreview').within(() => {
 			cy.contains('h3', questionBlock.editedTitle);
-			cy.contains('p', questionBlock.editedDescription);
+			cy.contains('p.questionBlockDescription', questionBlock.editedDescription)
+				.should('have.css', 'margin-bottom', '16px');
 			questionBlock.questions.forEach((question) => {
 				cy.contains('label', question.text);
 				cy.contains('label.description', question.description);
@@ -147,6 +148,12 @@ describe('DEIA Survey - Question blocks manager', function () {
 					question.options.forEach((option) => {
 						cy.contains('label', option.text);
 						cy.contains('label', option.text).find('input[type="checkbox"]');
+						if (option.hasInputField) {
+							cy.contains('label', option.text)
+								.closest('.responseOption')
+								.should('have.css', 'display', 'flex')
+								.find('input[type="text"]');
+						}
 					});
 				} else {
 					cy.contains('label', question.text).parent().find('input[type="text"]');
