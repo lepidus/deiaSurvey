@@ -2,6 +2,23 @@
     margin-top: 0;
 }
 
+.deiaQuestionnaire .pkp_formArea > .section > .description {
+    margin-bottom: 1rem;
+}
+
+.deiaQuestionnaire .pkp_formArea > .section > .description + .section {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+#deiaQuestionBlockPreview > h3 {
+    margin: 0;
+}
+
+#deiaQuestionBlockPreview > .questionBlockDescription {
+    margin: 0 0 1rem;
+}
+
 .responseOption {
     display: flex;
 }

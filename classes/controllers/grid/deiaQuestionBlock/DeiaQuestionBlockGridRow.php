@@ -3,6 +3,7 @@
 namespace APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock;
 
 import('lib.pkp.classes.controllers.grid.GridRow');
+import('lib.pkp.classes.linkAction.request.AjaxModal');
 import('lib.pkp.classes.linkAction.request.RemoteActionConfirmationModal');
 
 class DeiaQuestionBlockGridRow extends \GridRow
@@ -36,6 +37,27 @@ class DeiaQuestionBlockGridRow extends \GridRow
                     ),
                     __('grid.action.edit'),
                     'edit'
+                )
+            );
+
+            $this->addAction(
+                new \LinkAction(
+                    'preview',
+                    new \AjaxModal(
+                        $router->url(
+                            $request,
+                            null,
+                            null,
+                            'editDeiaQuestionBlock',
+                            null,
+                            ['rowId' => $rowId, 'preview' => 1]
+                        ),
+                        __('grid.action.preview'),
+                        'preview',
+                        true
+                    ),
+                    __('grid.action.preview'),
+                    'preview'
                 )
             );
 

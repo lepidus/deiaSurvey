@@ -4,7 +4,8 @@
 		$('#editDeiaQuestionBlockTabs').pkpHandler(
 				'$.pkp.controllers.TabHandler',
 				{ldelim}
-					{if !$canEdit}disabled: [0, 1]{/if}
+					{if !$canEdit}disabled: [0, 1],{/if}
+					selected: {if $preview}2{else}0{/if}
 				{rdelim}
 		);
 	{rdelim});
@@ -19,6 +20,11 @@
 		<li>
             <a href="{url router=$smarty.const.ROUTE_COMPONENT op="deiaQuestionBlockElements" deiaQuestionBlockId=$deiaQuestionBlockId}">
                 {translate key="plugins.generic.deiaSurvey.questionBlocks.deiaQuestions"}
+            </a>
+        </li>
+		<li>
+            <a href="{url router=$smarty.const.ROUTE_COMPONENT op="previewDeiaQuestionBlock" deiaQuestionBlockId=$deiaQuestionBlockId}">
+                {translate key="common.preview"}
             </a>
         </li>
 	</ul>
