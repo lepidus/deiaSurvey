@@ -4,6 +4,8 @@ namespace APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBl
 
 use APP\notification\NotificationManager;
 use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\form\DeiaQuestionBlockForm;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\importExport\DeiaQuestionBlockJsonImporter;
 use APP\plugins\generic\deiaSurvey\classes\importExport\DeiaQuestionBlockJsonSerializer;
@@ -14,6 +16,7 @@ use PKP\controllers\grid\GridHandler;
 use PKP\core\JSONMessage;
 use PKP\db\DAO;
 use PKP\db\DAORegistry;
+use PKP\facades\Locale;
 use PKP\file\TemporaryFileDAO;
 use PKP\file\TemporaryFileManager;
 use PKP\linkAction\LinkAction;
@@ -41,6 +44,8 @@ class DeiaQuestionBlockGridHandler extends GridHandler
                 'updateDeiaQuestionBlock',
                 'deiaQuestionBlockBasics',
                 'deiaQuestionBlockElements',
+                'previewDeiaQuestionBlock',
+                'previewQuestionnaire',
                 'activateDeiaQuestionBlock',
                 'deactivateDeiaQuestionBlock',
                 'deleteDeiaQuestionBlock',
@@ -86,6 +91,19 @@ class DeiaQuestionBlockGridHandler extends GridHandler
                 ),
                 __('plugins.generic.deiaSurvey.questionBlocks.import'),
                 'add_item'
+            )
+        );
+        $this->addAction(
+            new LinkAction(
+                'previewQuestionnaire',
+                new AjaxModal(
+                    $router->url($request, null, null, 'previewQuestionnaire'),
+                    __('plugins.generic.deiaSurvey.questionnairePage.index.title'),
+                    'preview',
+                    true
+                ),
+                __('grid.action.preview'),
+                'preview'
             )
         );
         $this->addAction(
@@ -165,6 +183,7 @@ class DeiaQuestionBlockGridHandler extends GridHandler
 
         $templateMgr = TemplateManager::getManager($request);
         $templateMgr->assign([
+            'preview' => $request->getUserVar('preview'),
             'deiaQuestionBlockId' => $deiaQuestionBlock->getId(),
             'canEdit' => true,
         ]);
@@ -200,6 +219,79 @@ class DeiaQuestionBlockGridHandler extends GridHandler
             true,
             $templateMgr->fetch($this->plugin->getTemplateResource('deiaQuestionBlocks/deiaQuestionBlockElements.tpl'))
         );
+    }
+
+    public function previewDeiaQuestionBlock($args, $request)
+    {
+        $context = $request->getContext();
+        $questionBlock = (new DeiaDataService())->retrieveQuestionBlock(
+            $context->getId(),
+            (int) $request->getUserVar('deiaQuestionBlockId')
+        );
+
+        if (!$questionBlock) {
+            return new JSONMessage(false);
+        }
+
+        $questionBlocks = [$questionBlock];
+        $this->initializePreviewResponses($questionBlocks);
+
+        $templateMgr = TemplateManager::getManager($request);
+        $this->assignPreviewFormLocales($templateMgr);
+        $templateMgr->assign([
+            'questionBlock' => $questionBlocks[0],
+            'questionTypeConsts' => DeiaQuestion::getQuestionTypeConstants(),
+        ]);
+
+        return new JSONMessage(
+            true,
+            $templateMgr->fetch(
+                $this->plugin->getTemplateResource('deiaQuestionBlocks/previewDeiaQuestionBlock.tpl')
+            )
+        );
+    }
+
+    public function previewQuestionnaire($args, $request)
+    {
+        $questionBlocks = (new DeiaDataService())->retrieveQuestionBlocks($request->getContext()->getId());
+        $this->initializePreviewResponses($questionBlocks);
+
+        $templateMgr = TemplateManager::getManager($request);
+        $this->assignPreviewFormLocales($templateMgr);
+        $templateMgr->assign([
+            'questionBlocks' => $questionBlocks,
+            'questionTypeConsts' => DeiaQuestion::getQuestionTypeConstants(),
+        ]);
+
+        return new JSONMessage(
+            true,
+            $templateMgr->fetch(
+                $this->plugin->getTemplateResource('deiaQuestionBlocks/previewQuestionnaire.tpl')
+            )
+        );
+    }
+
+    private function initializePreviewResponses(array &$questionBlocks): void
+    {
+        foreach ($questionBlocks as &$questionBlock) {
+            foreach ($questionBlock['questions'] as &$question) {
+                $question['response'] = in_array(
+                    $question['type'],
+                    [DeiaQuestion::TYPE_CHECKBOXES, DeiaQuestion::TYPE_RADIO_BUTTONS],
+                    true
+                ) ? ['value' => [], 'optionsInputValue' => []] : ['value' => null];
+            }
+            unset($question);
+        }
+        unset($questionBlock);
+    }
+
+    private function assignPreviewFormLocales($templateMgr): void
+    {
+        $templateMgr->assign([
+            'formLocales' => Locale::getSupportedFormLocales(),
+            'formLocale' => Locale::getPrimaryLocale(),
+        ]);
     }
 
     public function updateDeiaQuestionBlock($args, $request)
