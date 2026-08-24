@@ -29,7 +29,7 @@ que preserva apenas os relatórios Markdown.
 | SEC-03 | alta, condicionada à política | 3.3/3.4 | subeditor pode exportar respostas DEIA individuais |
 | SEC-04 | média | 3.3/3.4 | respostas controláveis em CSV não são neutralizadas |
 | SC-01 | alta potencial; lacuna de garantia | 3.3–3.5 | publicação por tag não depende dos gates de teste/segurança observados |
-| COMP-01 | alta operacional | 3.3 | `str_starts_with()` quebra PHP 7.3/7.4 suportado |
+| COMP-01 | refutado após revisão do runtime | 3.3 | o core fornece `str_starts_with()` por polyfill no PHP 7.3/7.4 |
 | AUTH-03 | candidato médio | 3.3–3.5 | possível resposta em outro contexto; requer teste HTTP e requisito de produto |
 | LOGIC-01 | média | 3.3 | replay sequencial cria respostas externas duplicadas |
 | AUTH-04 | baixa | 3.3–3.5 | gerente pode consultar opções de pergunta de outro contexto pelo ID |
@@ -128,18 +128,20 @@ do mesmo artefato e proteção de tags.
 Também devem ser fixados por SHA os includes GitLab e actions GitHub hoje
 referenciados por versões/ramos mutáveis. Não há evidência de adulteração.
 
-### COMP-01 — PHP 7.x declarado, mas uso de API PHP 8
+### COMP-01 — dependência do polyfill PHP 8 no ramo 3.3
 
 O ramo 3.3 chama `str_starts_with()` em
 `classes/DataEncryption.php:38-45`, alcançado pela leitura em
 `classes/deiaResponse/DAO.php:87-104` e pela migração em
-`classes/migrations/EncryptResponsesMigration.inc.php:18-36`. O plano cobre
-PHP 7.3/7.4/8.1 e o README inglês declara PHP 7.3+, mas a função só existe no
-PHP 8. Em PHP 7.3/7.4 isso causa `Error`, não capturado pelo `catch (Exception)`.
+`classes/migrations/EncryptResponsesMigration.inc.php:18-36`. A revisão
+posterior confirmou que OJS e OPS 3.3 carregam `symfony/polyfill-php80` pelo
+autoload do core, inclusive em PHP 7.3/7.4. A matriz também passou 98 testes
+nesses runtimes. Portanto, a alegação de erro fatal foi refutada.
 
-É uma incompatibilidade operacional, não uma vulnerabilidade por si só.
-Substituir a comparação por implementação compatível e testar leitura e
-migração em toda a matriz 3.3.
+Permanece apenas uma dependência implícita do plugin em uma dependência
+transitiva do core. O código proposto troca a comparação por `strncmp()` e
+adiciona teste comportamental, como hardening de compatibilidade, sem apresentar
+a mudança como correção de vulnerabilidade.
 
 ## Achados médios e baixos
 

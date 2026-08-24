@@ -19,7 +19,7 @@ remoto.
 | fórmula CSV | confirmado como vetor de respondente em 3.3/3.4, severidade média; em 3.5 resta somente metadado privilegiado |
 | usuário autenticado sem vínculo responde noutro contexto | candidato estático em todos os ramos/apps; faltam teste HTTP e requisito do produto |
 | publicação por tag sem gates | dependência entre jobs ausente nos três ramos; impacto condicionado às políticas externas não observadas |
-| `str_starts_with()` no PHP 7.3/7.4 | incompatibilidade confirmada no 3.3, não vulnerabilidade |
+| `str_starts_with()` no PHP 7.3/7.4 | alegação refutada: o core 3.3 carrega `symfony/polyfill-php80`; resta dependência transitiva |
 
 O revisor observou que o relatório 3.5 não repete o defeito 3.3/3.4 porque
 `DeiaSurveyPlugin.php:60-65` só registra o report plugin quando
