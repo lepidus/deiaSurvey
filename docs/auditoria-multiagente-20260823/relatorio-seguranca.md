@@ -15,10 +15,11 @@ Auditoria estática somente leitura de OJS e OPS nos snapshots:
 | PKP 3.5 | `main` | `0faa02348b53a52900a8416605bb322696380fe1` |
 
 Os três revisores especializados inspecionaram os mesmos snapshots. Um quarto
-revisor independente tentou refutar achados altos e conflitos. Nenhum agente
-editou o plugin. Os detalhes completos de proveniência, inventário, JSON e
-planos permanecem no projeto experimental local e não fazem parte desta MR,
-que preserva apenas os relatórios Markdown.
+revisor independente tentou refutar achados altos e conflitos. Durante essa
+fase de auditoria, nenhum agente editou o plugin. Os detalhes completos de
+proveniência, inventário, JSON e planos permanecem no projeto experimental
+local e não fazem parte deste Draft; somente os relatórios Markdown selecionados
+foram transportados antes das correções de código descritas adiante.
 
 ## Resumo
 
@@ -201,6 +202,7 @@ Os detalhes e contagens estão na
 [matriz dinâmica corrigida](matriz-dinamica.md). Não houve reprodução do ORCID,
 autorização HTTP ou CSV em planilha, nem publicação de release.
 
-O relatório é um diagnóstico para triagem e correção posterior. A MR documental
-interna foi autorizada separadamente; ela não autoriza alterar ramos de suporte,
-corrigir achados, divulgar publicamente ou fazer release.
+O relatório é um diagnóstico para triagem e correção posterior. Este Draft
+interno, autorizado separadamente, acrescenta a correção de SEC-04 e o hardening
+de COMP-01 no ramo 3.3; ele não autoriza merge, correções dos demais achados,
+alterações nos outros ramos, divulgação pública ou release.
