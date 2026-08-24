@@ -253,4 +253,44 @@ class ContextReportTest extends \PKPTestCase
         fclose($csvFile);
         unlink(self::CSV_FILE_PATH);
     }
+
+    public function testNeutralizesFormulaCellsInHeadersAndResponses()
+    {
+        $report = new ContextReport();
+        $block = new DeiaQuestionBlock();
+        $block->setAllData([
+            'id' => 99,
+            'title' => [$this->locale => '=FORMULA'],
+            'sequence' => 1,
+            'active' => 1,
+        ]);
+        $question = new DeiaQuestion();
+        $question->setAllData([
+            'id' => 99,
+            'questionBlockId' => 99,
+            'sequence' => 1,
+            'questionType' => DeiaQuestion::TYPE_TEXTAREA,
+            'questionText' => [$this->locale => '+FORMULA'],
+        ]);
+        $response = new DeiaResponse();
+        $response->setAllData([
+            'id' => 99,
+            'externalId' => 'external@example.invalid',
+            'deiaQuestionId' => 99,
+            'responseValue' => [$this->locale => '@FORMULA'],
+        ]);
+
+        $report->addQuestionBlock($block);
+        $report->addQuestion($question);
+        $report->addResponse($response);
+        $report->writeReport(self::CSV_FILE_PATH);
+
+        $csvFile = fopen(self::CSV_FILE_PATH, 'r');
+        fread($csvFile, 3);
+        $this->assertSame(["'=FORMULA"], fgetcsv($csvFile));
+        $this->assertSame(["'+FORMULA"], fgetcsv($csvFile));
+        $this->assertSame(["'@FORMULA"], fgetcsv($csvFile));
+        fclose($csvFile);
+        unlink(self::CSV_FILE_PATH);
+    }
 }
