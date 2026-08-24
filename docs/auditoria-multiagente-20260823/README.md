@@ -1,7 +1,7 @@
 # Experimento de auditoria multiagente — 2026-08-23
 
-> **Uso interno — contém achados de segurança ainda não corrigidos.** Esta MR
-> documental foi autorizada para avaliação pela equipe de desenvolvimento.
+> **Uso interno — contém achados de segurança.** O Draft do ramo 3.3 também
+> contém correções propostas para avaliação pela equipe de desenvolvimento.
 
 Documentação provisória do experimento de auditoria de segurança e
 compatibilidade do plugin `deiaSurvey` em OJS e OPS 3.3, 3.4 e 3.5.
@@ -11,6 +11,7 @@ compatibilidade do plugin `deiaSurvey` em OJS e OPS 3.3, 3.4 e 3.5.
 - [Relatório estático de segurança](relatorio-seguranca.md)
 - [Revisão independente](revisao-independente.md)
 - [Matriz dinâmica corrigida](matriz-dinamica.md)
+- [Correções propostas para PKP 3.3](correcoes-propostas-3.3.md)
 
 O relatório da matriz dinâmica é a referência atual para a execução em VM. Ele
 substitui as conclusões ambientais da baseline e da avaliação inicial: o
@@ -35,4 +36,4 @@ estado final da matriz.
 - Os achados dependentes de política permanecem condicionais.
 - Logs brutos, clones, credenciais sintéticas, discos de VM e caminhos locais
   não fazem parte desta documentação.
-- Esta documentação não autoriza correção, release ou divulgação pública.
+- Este Draft não autoriza merge, release, implantação ou divulgação pública.

@@ -118,6 +118,6 @@ comprovante de descarte.
    usadas nessa matriz.
 
 O relatório estático de segurança e seus achados continuam em
-`relatorio-seguranca.md`. A execução original não alterou o plugin nem publicou
-resultados; esta MR documental interna foi autorizada posteriormente e não
-contém correções do plugin.
+`relatorio-seguranca.md`. A execução original não alterou o plugin. O Draft
+posterior para PKP 3.3 acrescenta correções identificadas separadamente em
+`correcoes-propostas-3.3.md`; isso não altera a proveniência da matriz acima.
