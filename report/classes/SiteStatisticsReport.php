@@ -2,7 +2,7 @@
 
 namespace APP\plugins\generic\deiaSurvey\report\classes;
 
-use APP\plugins\generic\deiaSurvey\classes\CsvCellSanitizer;
+use APP\plugins\generic\deiaSurvey\classes\CsvRowWriter;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\report\classes\ContextStatistics;
 
@@ -68,9 +68,9 @@ class SiteStatisticsReport
         fprintf($csvFile, $this->UTF8_BOM);
 
         $reportHeader = $this->getReportHeader();
-        fputcsv($csvFile, CsvCellSanitizer::sanitizeRow($reportHeader[0]));
-        fputcsv($csvFile, CsvCellSanitizer::sanitizeRow($reportHeader[1]));
-        fputcsv($csvFile, CsvCellSanitizer::sanitizeRow($reportHeader[2]));
+        CsvRowWriter::write($csvFile, $reportHeader[0]);
+        CsvRowWriter::write($csvFile, $reportHeader[1]);
+        CsvRowWriter::write($csvFile, $reportHeader[2]);
         $reportColumns = $this->getReportColumns();
 
         foreach ($this->contextsStatistics as $contextData) {
@@ -82,7 +82,7 @@ class SiteStatisticsReport
                 $row,
                 $contextStats->printStatistics($this->getContextReportColumns($reportColumns, $contextData['printingGuide']))
             );
-            fputcsv($csvFile, CsvCellSanitizer::sanitizeRow($row));
+            CsvRowWriter::write($csvFile, $row);
         }
 
         fclose($csvFile);

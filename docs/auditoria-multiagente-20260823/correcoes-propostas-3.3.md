@@ -22,7 +22,7 @@ correção implementada, proposta ainda sem código e decisão humana pendente.
 | SEC-01 | a confirmar | proposta, sem código | bearer validado antes do callback, `state` expirável e callback sem segredo na URL |
 | SEC-02 | a confirmar | proposta, sem código | token CSPRNG com hash/TTL, resgate único por POST e sessão curta |
 | SEC-03 | a confirmar | decisão humana | definir se subeditor pode exportar respostas individuais |
-| SEC-04 | CWE-1236 | corrigido | neutralização central em todas as células CSV e testes de relatório |
+| SEC-04 | CWE-1236 | corrigido para revisão | neutralização de prefixos e preservação dos limites das células CSV |
 | AUTH-03 | a confirmar | candidato | reproduzir HTTP e definir se participação entre contextos é admitida |
 | AUTH-04 | a confirmar | confirmado, sem código | teste negativo de leitura de opções entre contextos |
 | LOGIC-01 | sem CWE precisa | confirmado, sem código | teste de banco e decisão entre rejeitar replay ou substituir respostas |
@@ -35,15 +35,40 @@ Comportamento anterior: respostas textuais e metadados configuráveis chegavam
 diretamente a `fputcsv()`. Uma planilha podia interpretar células iniciadas por
 `=`, `+`, `-`, `@` ou controles como fórmulas.
 
-Correção: `CsvCellSanitizer` prefixa apóstrofo em células perigosas antes de
-todos os sinks CSV dos relatórios individual e agregado. Valores comuns e tipos
-não textuais são preservados. O teste cobre prefixos diretos, whitespace,
-caracteres de controle e o CSV produzido por `ContextReport`.
+O commit inicial `6a6ab7e144be63c7980e24977aad20e3f810f737` neutralizou
+prefixos, mas a revisão de 2026-09-07 demonstrou um contorno: aspas precedidas
+de barra invertida podiam encerrar uma célula em leitores de planilha e expor
+uma fórmula na célula seguinte. O leitor PHP usado no teste não detectava essa
+diferença de interpretação.
 
-Commit: `6a6ab7e144be63c7980e24977aad20e3f810f737`.
+A correção complementar usa `CsvRowWriter` nos sete pontos de escrita dos
+relatórios individual e agregado. Ele aplica `CsvCellSanitizer`, envolve cada
+campo em aspas e duplica todas as aspas internas; a barra invertida permanece
+literal. Isso preserva os limites das células sem exigir o parâmetro
+`escape=''`, disponível em `fputcsv()` somente a partir do PHP 7.4. A CI deste
+ramo continua incluindo PHP 7.3. O BOM, a ordem das colunas e os valores
+exportados são preservados, exceto pelo apóstrofo de neutralização já previsto.
 
-Risco residual: a neutralização reduz interpretação de fórmulas em leitores de
-planilha; não controla importadores que removam deliberadamente o apóstrofo.
+Provas focalizadas no OJS 3.3/PHP 7.4:
+
+- antes da correção: o caso `cell-boundaries` falhou na comparação dos bytes
+  do CSV, mostrando aspas internas não duplicadas;
+- depois: 28 testes e 50 asserções passaram, cobrindo o escritor, o sanitizador
+  e os dois relatórios; os novos casos verificam bytes esperados, sem depender
+  do escape proprietário de `fgetcsv()`;
+- leitura independente por `csv.reader` do Python preservou nove linhas com
+  duas células cada, incluindo vírgulas, aspas, barras invertidas e quebras de
+  linha;
+- LibreOffice 24.2, isolado e sem rede, com avaliação de fórmulas habilitada:
+  uma fórmula aritmética no CSV anterior e nenhuma no CSV corrigido.
+
+Referências: [CWE-1236](https://cwe.mitre.org/data/definitions/1236.html) e
+[contrato de escape de fputcsv](https://www.php.net/manual/en/function.fputcsv.php).
+
+Risco residual: importadores que alterem o dialeto ou removam deliberadamente
+o apóstrofo exigem validação própria. A prova não demonstra execução de comandos
+nem exfiltração. Esta correção limita-se ao ramo 3.3; não constitui backport
+automático para 3.4/3.5.
 
 ## SEC-01 e SEC-02 — desenho coordenado para a próxima rodada
 

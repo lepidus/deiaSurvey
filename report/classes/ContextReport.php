@@ -2,7 +2,7 @@
 
 namespace APP\plugins\generic\deiaSurvey\report\classes;
 
-use APP\plugins\generic\deiaSurvey\classes\CsvCellSanitizer;
+use APP\plugins\generic\deiaSurvey\classes\CsvRowWriter;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestionBlock\DeiaQuestionBlock;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DeiaResponse;
@@ -100,8 +100,8 @@ class ContextReport
         fprintf($csvFile, $this->UTF8_BOM);
 
         $headers = $this->getHeaders();
-        fputcsv($csvFile, CsvCellSanitizer::sanitizeRow($headers[0]));
-        fputcsv($csvFile, CsvCellSanitizer::sanitizeRow($headers[1]));
+        CsvRowWriter::write($csvFile, $headers[0]);
+        CsvRowWriter::write($csvFile, $headers[1]);
 
         $printingGuide = $this->getQuestionsPrintingGuide();
         $textualQuestionTypes = [DeiaQuestion::TYPE_SMALL_TEXT_FIELD, DeiaQuestion::TYPE_TEXT_FIELD, DeiaQuestion::TYPE_TEXTAREA];
@@ -135,7 +135,7 @@ class ContextReport
                 $responsesLine[] = $responseValue;
             }
 
-            fputcsv($csvFile, CsvCellSanitizer::sanitizeRow($responsesLine));
+            CsvRowWriter::write($csvFile, $responsesLine);
         }
 
         fclose($csvFile);

@@ -254,13 +254,20 @@ class ContextReportTest extends \PKPTestCase
         unlink(self::CSV_FILE_PATH);
     }
 
-    public function testNeutralizesFormulaCellsInHeadersAndResponses()
-    {
+    /**
+     * @dataProvider spreadsheetCells
+     */
+    public function testNeutralizesFormulaCellsInHeadersAndResponses(
+        string $blockTitle,
+        string $questionText,
+        string $responseValue,
+        string $expectedCsv
+    ) {
         $report = new ContextReport();
         $block = new DeiaQuestionBlock();
         $block->setAllData([
             'id' => 99,
-            'title' => [$this->locale => '=FORMULA'],
+            'title' => [$this->locale => $blockTitle],
             'sequence' => 1,
             'active' => 1,
         ]);
@@ -270,14 +277,14 @@ class ContextReportTest extends \PKPTestCase
             'questionBlockId' => 99,
             'sequence' => 1,
             'questionType' => DeiaQuestion::TYPE_TEXTAREA,
-            'questionText' => [$this->locale => '+FORMULA'],
+            'questionText' => [$this->locale => $questionText],
         ]);
         $response = new DeiaResponse();
         $response->setAllData([
             'id' => 99,
             'externalId' => 'external@example.invalid',
             'deiaQuestionId' => 99,
-            'responseValue' => [$this->locale => '@FORMULA'],
+            'responseValue' => [$this->locale => $responseValue],
         ]);
 
         $report->addQuestionBlock($block);
@@ -285,12 +292,25 @@ class ContextReportTest extends \PKPTestCase
         $report->addResponse($response);
         $report->writeReport(self::CSV_FILE_PATH);
 
-        $csvFile = fopen(self::CSV_FILE_PATH, 'r');
-        fread($csvFile, 3);
-        $this->assertSame(["'=FORMULA"], fgetcsv($csvFile));
-        $this->assertSame(["'+FORMULA"], fgetcsv($csvFile));
-        $this->assertSame(["'@FORMULA"], fgetcsv($csvFile));
-        fclose($csvFile);
-        unlink(self::CSV_FILE_PATH);
+        try {
+            // Check the CSV bytes, not PHP's matching proprietary escape parser.
+            $this->assertSame("\xEF\xBB\xBF" . $expectedCsv, file_get_contents(self::CSV_FILE_PATH));
+        } finally {
+            unlink(self::CSV_FILE_PATH);
+        }
+    }
+
+    public function spreadsheetCells(): array
+    {
+        return [
+            'formula-prefixes' => [
+                '=FORMULA', '+FORMULA', '@FORMULA',
+                "\"'=FORMULA\"\n\"'+FORMULA\"\n\"'@FORMULA\"\n",
+            ],
+            'cell-boundaries' => [
+                'a\\",=1+1,', 'a\\",=1+1,', 'a\\",=1+1,',
+                "\"a\\\"\",=1+1,\"\n\"a\\\"\",=1+1,\"\n\"a\\\"\",=1+1,\"\n",
+            ],
+        ];
     }
 }
