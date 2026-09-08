@@ -27,7 +27,7 @@ foram transportados antes das correções de código descritas adiante.
 |---|---|---|---|
 | SEC-01 | alta | 3.3–3.5 | callback ORCID não valida o bearer do autor e não usa `state` |
 | SEC-02 | alta se exposto; adivinhação inconclusiva | 3.3–3.5 | bearer persistente, reutilizável e transportado na URL |
-| SEC-03 | alta, condicionada à política | 3.3/3.4 | subeditor pode exportar respostas DEIA individuais |
+| SEC-03 | dependente de política ainda não definida | 3.3/3.4 | o nível `ROLE_ID_SUB_EDITOR` é admitido na exportação individual; falta definir a autorização organizacional |
 | SEC-04 | média | 3.3/3.4 | respostas controláveis em CSV não são neutralizadas |
 | SC-01 | alta potencial; lacuna de garantia | 3.3–3.5 | publicação por tag não depende dos gates de teste/segurança observados |
 | COMP-01 | refutado após revisão do runtime | 3.3 | o core fornece `str_starts_with()` por polyfill no PHP 7.3/7.4 |
@@ -80,7 +80,7 @@ sessão curta. É controle positivo relevante que o token atual está `writeOnly
 não aparece no resumo da API 3.5, não pode ser escrito pela API e é comparado
 com `hash_equals`; a antiga exposição pela API não foi reproduzida.
 
-### SEC-03 — relatório individual disponível a subeditor em 3.3/3.4
+### SEC-03 — relatório individual admite o nível `ROLE_ID_SUB_EDITOR` em 3.3/3.4
 
 O core autoriza operações de relatório a `ROLE_ID_SUB_EDITOR`; o plugin não
 aplica gate adicional no relatório de contexto e exporta uma linha por pessoa,
@@ -91,11 +91,26 @@ inclusive texto livre, embora sem uma coluna direta de identidade.
 - plugin: `report/DeiaSurveyReportForm.php:41-82` e
   `report/classes/ContextReport.php:42-49,96-138`.
 
-Ator e precondições: subeditor autenticado no contexto, plugin e respostas
-existentes. Impacto: reidentificação e divulgação de atributos sensíveis. A
-classificação de segurança pressupõe que subeditores não tenham autorização
-organizacional para dados DEIA individuais; essa matriz de negócio precisa ser
-confirmada. Recomenda-se autorização dedicada e agregação com limiar mínimo.
+`role_id`/`ROLE_ID_*` identifica o nível de permissões; o papel configurável na
+interface é o `user_group`, identificado por `user_group_id`. Vários grupos
+podem compartilhar um nível: no OJS 3.3, Editor de Seção e Editor Convidado
+usam `0x11` (`registry/userGroups.xml:22,25`); no OPS 3.3, esse nível é usado
+pelo grupo traduzido como Moderator (`registry/userGroups.xml:20`). Esses nomes
+são exemplos, não identidades estáveis para autorização.
+
+Ator e precondições: usuário autenticado, vinculado no contexto a um grupo com
+nível `ROLE_ID_SUB_EDITOR`, com plugin e respostas existentes. O acesso técnico
+está confirmado; a ausência de gate adicional no plugin não demonstra, por si
+só, violação da autorização do core. A possibilidade de reidentificação e
+divulgação de atributos sensíveis exige definir quem pode acessar dados DEIA
+individuais antes de concluir sobre violação ou severidade.
+
+A decisão deve explicitar ação, contexto, níveis de permissão e, se houver
+distinção entre papéis do mesmo nível, os `user_group_id` ou configuração
+estável equivalente. Preservar a autorização do core por padrão. Qualquer
+restrição adicional precisa de requisito aprovado e testes dos grupos que
+ganham ou perdem acesso; agregação com limiar mínimo é uma alternativa de
+produto a avaliar. Este MR não altera a autorização.
 
 ### SEC-04 — injeção de fórmula em CSV
 
@@ -111,7 +126,7 @@ configuráveis chegam a cabeçalhos/relatórios.
 Ator e precondições: participante com bearer em 3.3/3.4, seguido de abertura em
 uma planilha que interpreta fórmula. Recomenda-se uma função central de
 neutralização e testes com todos os prefixos perigosos. Em 3.5 não existe o
-relatório individual; resta apenas metadado administrável por papel privilegiado
+relatório individual; resta apenas metadado administrável por usuários com permissões de configuração
 e ele não foi promovido como o mesmo vetor.
 
 ### SC-01 — lacuna de garantia na release por tag
@@ -164,10 +179,10 @@ a mudança como correção de vulnerabilidade.
 
 - **Relatório site-wide 3.5:** refutado pela revisão independente para o ciclo
   PHP convencional. Embora o core
-  permita papéis de contexto na rota genérica, `DeiaSurveyPlugin.php:60-65`
+  admita níveis de permissão do contexto na rota genérica, `DeiaSurveyPlugin.php:60-65`
   registra o report plugin somente quando `Validation::isSiteAdmin()` é
   verdadeiro. O relatório percorre todos os contextos, mas não ficou acessível
-  a subeditor/gerente nos snapshots auditados. Defesa adicional no `display()`
+  somente com `ROLE_ID_SUB_EDITOR`/`ROLE_ID_MANAGER` nos snapshots auditados. Defesa adicional no `display()`
   e teste HTTP negativo continuam recomendados para runtimes persistentes.
 - **“Já respondeu” sem filtro de contexto:** o collector realmente não filtra
   contexto, mas há testes e comportamento de reutilização entre contextos. Sem

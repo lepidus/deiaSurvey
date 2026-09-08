@@ -8,14 +8,18 @@ Revisor: `gpt-5.6-sol`, esforço alto, somente leitura. O revisor consultou os
 três snapshots e cores OJS/OPS locais, sem executar o plugin nem acessar o
 remoto.
 
+Terminologia de permissões esclarecida em 2026-09-07: `ROLE_ID_*` representa
+níveis de permissão; os papéis configuráveis são `user_group`. Esse ajuste
+documental não representa nova execução da revisão estática original.
+
 ## Contestação
 
 | Alegação | Parecer |
 |---|---|
 | callback ORCID sem correlação com bearer/`state` | validado estaticamente, alto, em 3.3–3.5 e OJS/OPS; exploração não reproduzida |
 | geração e ciclo de vida do bearer | geração/URL/ausência de expiração confirmadas; facilidade prática de adivinhação inconclusiva |
-| relatório individual a subeditor | acesso técnico confirmado em 3.3/3.4 e OJS/OPS; severidade condicionada à política organizacional |
-| relatório site-wide 3.5 a papéis do contexto | refutado no ciclo PHP convencional; registro depende de site admin |
+| relatório individual a usuário com nível `ROLE_ID_SUB_EDITOR` no contexto | acesso técnico confirmado em 3.3/3.4 e OJS/OPS; violação e severidade dependem de política organizacional ainda não definida, sem equiparar nível a grupo |
+| relatório site-wide 3.5 a usuário com permissões somente no contexto | refutado no ciclo PHP convencional; registro depende de site admin |
 | fórmula CSV | confirmado como vetor de respondente em 3.3/3.4, severidade média; em 3.5 resta somente metadado privilegiado |
 | usuário autenticado sem vínculo responde noutro contexto | candidato estático em todos os ramos/apps; faltam teste HTTP e requisito do produto |
 | publicação por tag sem gates | dependência entre jobs ausente nos três ramos; impacto condicionado às políticas externas não observadas |

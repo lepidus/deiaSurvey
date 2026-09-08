@@ -21,7 +21,7 @@ correção implementada, proposta ainda sem código e decisão humana pendente.
 |---|---|---|---|
 | SEC-01 | a confirmar | proposta, sem código | bearer validado antes do callback, `state` expirável e callback sem segredo na URL |
 | SEC-02 | a confirmar | proposta, sem código | token CSPRNG com hash/TTL, resgate único por POST e sessão curta |
-| SEC-03 | a confirmar | decisão humana | definir se subeditor pode exportar respostas individuais |
+| SEC-03 | a confirmar | decisão humana | definir acesso por ação, contexto, nível de permissão e, quando necessário, `user_group_id` |
 | SEC-04 | CWE-1236 | corrigido para revisão | neutralização de prefixos e preservação dos limites das células CSV |
 | AUTH-03 | a confirmar | candidato | reproduzir HTTP e definir se participação entre contextos é admitida |
 | AUTH-04 | a confirmar | confirmado, sem código | teste negativo de leitura de opções entre contextos |
@@ -94,7 +94,11 @@ implementação ser apresentada como pronta para merge.
 
 1. Autorizar a invalidação e reemissão dos links legados?
 2. Qual deve ser o prazo do link inicial e da sessão curta?
-3. Subeditores podem acessar CSV individual com respostas DEIA?
+3. Quais níveis de permissão e grupos (`user_group_id`), em cada contexto,
+   devem acessar CSV individual com respostas DEIA? `ROLE_ID_SUB_EDITOR` é um
+   nível compartilhável por vários papéis, não um papel único. Uma restrição
+   além da autorização do core exige requisito explícito e testes de paridade
+   ou da divergência aprovada.
 4. Um usuário registrado pode responder em qualquer contexto ou somente onde
    possui vínculo?
 5. Em replay sequencial, a última resposta deve substituir a anterior ou a
