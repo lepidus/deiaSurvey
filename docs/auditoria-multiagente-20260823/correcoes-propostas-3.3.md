@@ -19,8 +19,8 @@ correção implementada, proposta ainda sem código e decisão humana pendente.
 
 | ID | CWE | Estado neste Draft | Evidência ou próximo gate |
 |---|---|---|---|
-| SEC-01 | a confirmar | proposta, sem código | bearer validado antes do callback, `state` expirável e callback sem segredo na URL |
-| SEC-02 | a confirmar | proposta, sem código | token CSPRNG com hash/TTL, resgate único por POST e sessão curta |
+| SEC-01 | a confirmar | proposta, sem código | bearer validado antes do callback, `state` expirável, callback sem segredo e identidade preservada na recuperação |
+| SEC-02 | a confirmar | proposta, sem código | token CSPRNG com hash/TTL, resgate único por POST, sessão curta e recuperação também para respondentes |
 | SEC-03 | a confirmar | decisão humana | definir acesso por ação, contexto, nível de permissão e, quando necessário, `user_group_id` |
 | SEC-04 | CWE-1236 | corrigido para revisão | neutralização de prefixos e preservação dos limites das células CSV |
 | AUTH-03 | a confirmar | candidato | reproduzir HTTP e definir se participação entre contextos é admitida |
@@ -84,16 +84,49 @@ proposto é:
 5. trocar o link por concessão curta de sessão e redirecionar para URL limpa;
 6. iniciar ORCID somente dentro dessa sessão, com `state` aleatório e expirável;
 7. remover autor e bearer do `redirect_uri` e revalidar autor/contexto antes de
-   gravar o ORCID.
+   gravar o ORCID;
+8. oferecer recuperação/reemissão tanto para autores pendentes quanto para
+   autores sem cadastro que já responderam, mediante comprovação de
+   titularidade pelo canal de e-mail associado à identidade existente. O novo
+   acesso deve permanecer vinculado ao autor e contexto corretos, sem aceitar
+   um endereço arbitrário enviado pelo solicitante nem trocar silenciosamente
+   a identidade externa usada nas respostas.
 
 Esse desenho invalida links antigos e exige reemissão controlada para autores
-pendentes. O fluxo de reenvio e o prazo do link precisam de decisão antes de a
-implementação ser apresentada como pronta para merge.
+pendentes **e para quem já respondeu**. O remetente atual
+(`classes/DataCollectionEmailSender.php:24-25`) não envia convite a quem já
+respondeu; portanto, não basta reutilizar o fluxo de convite para recuperar
+acesso. Hoje, consulta e exclusão pelo autor externo dependem do mesmo bearer
+em `pages/deia/QuestionnaireHandler.php`, e a documentação pública
+(`docs/README-pt_BR.md:36`) prevê acesso posterior aos próprios dados.
+
+Após expirar o link ou a sessão, o respondente deve poder recuperar acesso,
+consultar e excluir as respostas existentes, sem ser obrigado a responder de
+novo ou criar uma conta. A recuperação não deve gravar novo consentimento,
+duplicar respostas nem mudar sua associação a e-mail/ORCID. Respostas públicas
+genéricas e limites de envio/tentativas precisam evitar enumeração e abuso do
+canal; os valores desses limites e os prazos ainda dependem de decisão.
+
+Antes de apresentar a implementação como pronta para merge, demonstrar:
+
+- recuperação após invalidação de link legado, expiração e consumo, tanto para
+  pendentes quanto para respondentes, inclusive quem já respondeu antes da
+  migração;
+- consulta e exclusão após recuperação, preservando a identidade e o contexto
+  originais e sem recriar respostas ou consentimento;
+- negação para autor/contexto incorretos, falta de comprovação de titularidade
+  e reuso do token consumido, com controles de abuso e CSRF preservados.
+
+Esta rodada corrige somente a proposta documental; SEC-01/02 continuam sem
+implementação de segurança no runtime. O fluxo de recuperação/reenvio, sua
+migração e os prazos precisam de decisão e testes próprios.
 
 ## Decisões solicitadas
 
-1. Autorizar a invalidação e reemissão dos links legados?
-2. Qual deve ser o prazo do link inicial e da sessão curta?
+1. Autorizar a invalidação e reemissão dos links legados, incluindo a recuperação
+   de acesso dos autores sem cadastro que já responderam?
+2. Quais devem ser os prazos dos links e da sessão curta, o fluxo de recuperação
+   e os limites de envio/tentativas?
 3. Quais níveis de permissão e grupos (`user_group_id`), em cada contexto,
    devem acessar CSV individual com respostas DEIA? `ROLE_ID_SUB_EDITOR` é um
    nível compartilhável por vários papéis, não um papel único. Uma restrição
