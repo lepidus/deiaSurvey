@@ -112,7 +112,7 @@ Accepted `questionType` values:
 Text fields use localized objects, where each key is a locale code such as `en`, `en_US`, `es`, or `pt_BR`. `responseOptions` is only needed for checkbox, radio button and drop-down questions; use an empty array for text questions.
 
 ## Credits
-This plugin was sponsored by Lepidus Tecnologia, Scientific Electronic Library Online (SciELO), Revista Encontros Bibli (UFSC) and others (we'll update soon).
+This plugin was sponsored by Lepidus Tecnologia, Scientific Electronic Library Online (SciELO), Revista Encontros Bibli (UFSC) and Associação Brasileira de Saúde Coletiva (ABRASCO).
 
 Developed by Lepidus Tecnologia.
 
