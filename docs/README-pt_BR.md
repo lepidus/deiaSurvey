@@ -36,13 +36,33 @@ Os usuários podem ver e excluir seus dados a qualquer momento. Para os autores 
 
 ## Gerenciamento de blocos de perguntas
 
-Gerentes de revistas e servidores de preprints podem criar e manter blocos de perguntas DEIA nas configurações do plugin. Acesse `Configurações` > `Website` > `Plugins`, expanda a linha do plugin Questionário DEIA e abra `Configurações`.
+Gerentes de revistas e servidores de preprints podem criar e manter blocos de perguntas DEIA. Ative o plugin na revista ou no servidor de preprints, acesse `Configurações` > `Website` > `Plugins`, expanda a linha do plugin Questionário DEIA e selecione `Gerenciar Blocos de Perguntas`.
 
-Use `Criar Bloco de Perguntas` para adicionar um bloco. Cada bloco exige um título localizado e pode incluir uma descrição localizada. Depois de salvar o bloco, expanda sua linha, selecione `Editar` e abra a aba `Perguntas` para criar as perguntas exibidas dentro desse bloco.
+Ao ser ativado em um contexto sem perguntas, o plugin cria o bloco `Perguntas SciELO` já ativo. Expanda a linha de um bloco para acessar as ações de edição e pré-visualização.
 
-Cada pergunta exige um texto localizado e um tipo de pergunta. Uma descrição localizada pode ser adicionada para orientar os usuários. Tipos de perguntas textuais não usam opções de resposta. Perguntas de caixas de seleção, botões de opção e lista suspensa usam opções de resposta; adicione cada opção na lista de opções de resposta e habilite o campo de entrada quando a resposta deve permitir um valor textual personalizado, como "Outro" ou "Auto-descrição".
+![Gerenciador de blocos com o bloco Perguntas SciELO e suas ações](screenshots/QuestionBlocks-pt_BR.png)
 
-Use a caixa de seleção na lista de blocos de perguntas para ativar ou desativar um bloco. Apenas blocos ativos são exibidos aos usuários na aba Questionário DEIA. Use os controles de ordenação nos gerenciadores de blocos e perguntas para definir a ordem em que blocos e perguntas aparecem no questionário.
+*Gerenciador de blocos de perguntas no OJS 3.5.*
+
+Use `Criar Bloco de Perguntas` para adicionar um bloco. Preencha o título e, opcionalmente, a descrição nos idiomas disponíveis e clique em `Salvar`. Novos blocos começam inativos.
+
+![Exemplo de título e descrição no formulário de criação de bloco](screenshots/CreateQuestionBlock-pt_BR.png)
+
+*Criação de um bloco de perguntas.*
+
+Depois de salvar o bloco, expanda sua linha, selecione `Editar` e abra a aba `Perguntas`. Use `Criar pergunta` para adicionar uma pergunta. Mantenha o bloco inativo enquanto cria, edita ou ordena suas perguntas. Perguntas com respostas registradas não podem ser editadas mesmo após a desativação do bloco.
+
+![Aba Perguntas com os controles Ordenar e Criar pergunta](screenshots/BlockQuestions-pt_BR.png)
+
+*Gerenciamento das perguntas de um bloco inativo.*
+
+Cada pergunta exige um texto e um tipo. Uma descrição opcional pode orientar os usuários. Preencha os textos nos idiomas disponíveis. Tipos de perguntas textuais não usam opções de resposta. Perguntas de caixas de seleção, botões de opção e lista suspensa usam opções de resposta: selecione `Incluir Item` e preencha o texto da opção. Para perguntas de caixas de seleção e botões de opção, marque `Inclui campo de texto` quando a resposta deve permitir um valor personalizado, como “Outro”. Perguntas de lista suspensa não exibem esse campo adicional. Clique fora da linha da opção para encerrar sua edição e, depois, em `Salvar` para salvar a pergunta.
+
+![Pergunta de caixas de seleção com a opção Outro e campo de texto habilitado](screenshots/CreateQuestion-pt_BR.png)
+
+*Configuração de uma pergunta e de suas opções de resposta.*
+
+Após cadastrar pelo menos uma pergunta, use a caixa de seleção na lista de blocos para ativar o bloco e confirme a ação. Blocos vazios não podem ser ativados. Apenas blocos ativos são exibidos aos usuários na aba Questionário DEIA. Use os controles de ordenação nos gerenciadores de blocos e perguntas para definir a ordem do questionário.
 
 ## Importação e exportação de blocos de perguntas
 

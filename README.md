@@ -35,13 +35,33 @@ Users can view and delete their data at any time. For the authors without regist
 
 ## Managing question blocks
 
-Journal and preprint server managers can create and maintain DEIA question blocks from the plugin settings. Go to `Settings` > `Website` > `Plugins`, expand the DEIA Survey plugin row, and open `Settings`.
+Journal and preprint server managers can create and maintain DEIA question blocks. Enable the plugin in the journal or preprint server, go to `Settings` > `Website` > `Plugins`, expand the DEIA Survey plugin row, and select `Manage Question Blocks`.
 
-Use `Create Question Block` to add a block. Each block requires a localized title and may include a localized description. After saving the block, expand its row, select `Edit`, and open the `Questions` tab to create the questions shown inside that block.
+When the plugin is enabled in a context without questions, it creates an active `SciELO Questions` block. Expand a block row to access its editing and preview actions.
 
-Each question requires localized question text and a question type. A localized description can be added to provide instructions to users. Text question types do not use response options. Checkbox, radio button and drop-down questions use response options; add each option in the response options list and enable the input field option when the answer should allow a custom text value, such as "Other" or "Self describe".
+![Question block manager with the SciELO block and its actions](docs/screenshots/QuestionBlocks-en.png)
 
-Use the checkbox in the question block list to activate or deactivate a block. Only active blocks are displayed to users in the DEIA Survey tab. Use the ordering controls in the block and question managers to define the order in which blocks and questions appear in the questionnaire.
+*Question block manager in OJS 3.5.*
+
+Use `Create Question Block` to add a block. Enter a title and, optionally, a description in the available languages, then click `Save`. New blocks start inactive.
+
+![Example title and description in the question block creation form](docs/screenshots/CreateQuestionBlock-en.png)
+
+*Creating a question block.*
+
+After saving the block, expand its row, select `Edit`, and open the `Questions` tab. Select `Create question` to add a question. Keep the block inactive while creating, editing or ordering its questions. Questions with registered responses cannot be edited even after the block is deactivated.
+
+![Questions tab with the Order and Create question controls](docs/screenshots/BlockQuestions-en.png)
+
+*Managing questions in an inactive block.*
+
+Each question requires question text and a question type. An optional description can provide instructions to users. Fill in the text in the available languages. Text question types do not use response options. Checkbox, radio button and drop-down questions use response options: select `Add Item` and enter the option text. For checkbox and radio button questions, enable `Includes an input field` when the answer should allow a custom text value, such as “Other”. Drop-down questions do not display this additional text field. Click outside the option row to finish editing it, then click `Save` to save the question.
+
+![Checkbox question with an Other response option that includes an input field](docs/screenshots/CreateQuestion-en.png)
+
+*Configuring a question and its response options.*
+
+After adding at least one question, use the checkbox in the block list to activate the block and confirm the action. Empty blocks cannot be activated. Only active blocks are displayed to users in the DEIA Survey tab. Use the ordering controls in the block and question managers to define the questionnaire order.
 
 ## Question block import and export
 
