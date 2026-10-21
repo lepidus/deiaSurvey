@@ -3,7 +3,7 @@
     {assign var="isListSection" value=true}
 {/if}
 
-{fbvFormSection title=$question['title'] required=true translate=false}
+{fbvFormSection class="deiaQuestion" title=$question['title'] required=true translate=false}
     {fbvFormSection for=$questionId description=$question['description'] translate=false list=$isListSection}
         {if $question['type'] == $questionTypeConsts['TYPE_SMALL_TEXT_FIELD']}
             {fbvElement type="text" multilingual="true" name=$questionId id="deiaResponses" value=$question['response']['value'] required=true size=$fbvStyles.size.SMALL}
