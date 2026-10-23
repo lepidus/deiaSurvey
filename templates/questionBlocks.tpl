@@ -1,5 +1,6 @@
 {foreach $questionBlocks as $questionBlock}
-	{fbvFormArea id="questionBlock_"|concat:$questionBlock['id'] title=$questionBlock['title'] translate=false}
+	<div class="deiaQuestionBlockSeparator"></div>
+	{fbvFormArea id="questionBlock_"|concat:$questionBlock['id'] class="deiaQuestionBlock" title=$questionBlock['title'] translate=false}
 		{fbvFormSection description=$questionBlock['description'] translate=false}
 			{foreach $questionBlock['questions'] as $question}
 				{include
