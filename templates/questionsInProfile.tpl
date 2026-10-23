@@ -5,9 +5,9 @@
 </script>
 <link rel="stylesheet" type="text/css" href="/plugins/generic/deiaSurvey/styles/questionsInProfile.css">
 
-<h3 id="deiaSurveyTitle">
+<h2 id="deiaSurveyTitle">
 	{translate key="plugins.generic.deiaSurvey.questionnairePage.index.title"}
-</h3>
+</h2>
 {if is_null($deiaDataConsent) && $userConsentSetting}
 	<div id="deiaAlreadyAnsweredMessage" class="pkp_notification">
 		{capture assign="content"}
@@ -24,7 +24,7 @@
 <form class="pkp_form deiaQuestionnaire" id="deiaSurveyForm" method="post" action="{url op="saveDeiaData"}" enctype="multipart/form-data">
 	{csrf}
 
-	{fbvFormSection list="false" label='plugins.generic.deiaSurvey.consent' description='plugins.generic.deiaSurvey.consent.description' required=true}
+	{fbvFormSection id="deiaConsentSection" list="false" label='plugins.generic.deiaSurvey.consent' description='plugins.generic.deiaSurvey.consent.description' required=true}
 		{if is_null($deiaDataConsent)}
 			{assign var=checkedConsentYes value=false}
 			{assign var=checkedConsentNo value=false}
