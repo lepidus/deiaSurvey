@@ -146,17 +146,18 @@ class QuestionsForm extends Form
         $deiaDataService = new DeiaDataService();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
-        $previousConsent = $deiaDataDao->getDeiaConsentOption($context->getId(), $user->getId());
         $newConsent = $this->getData('deiaDataConsent');
 
         DB::transaction(function () use (
             $context,
             $user,
             $newConsent,
-            $previousConsent,
             $deiaDataDao,
             $deiaDataService
         ) {
+            // Use the same account lock as the native email association to avoid concurrent sets of answers.
+            DB::table('users')->where('user_id', $user->getId())->lockForUpdate()->first();
+            $previousConsent = $deiaDataDao->getDeiaConsentOption($context->getId(), $user->getId());
             $deiaDataDao->updateDeiaConsent($context->getId(), $user->getId(), $newConsent);
 
             if ($newConsent == '1') {

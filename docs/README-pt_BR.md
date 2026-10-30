@@ -32,7 +32,9 @@ Para autores que não estiverem registrados no sistema, um e-mail será enviado 
 
 O e-mail enviado oferece duas maneiras de preencher o questionário. A primeira requere que um registro ORCID seja autenticado, de forma que os dados fiquem associados a esse registro. A segunda utiliza o endereço de e-mail do(a) autor(a) e é recomendada apenas para aqueles que não possuem um registro ORCID.
 
-Os usuários podem ver e excluir seus dados a qualquer momento. Para os autores sem cadastro que preencheram o questionário, caso estes criem um usuário no sistema com o mesmo endereço de e-mail ou ORCID utilizado, seus dados serão migrados para este novo usuário.
+Os usuários podem ver e excluir seus dados a qualquer momento. Respostas associadas a um ORCID podem ser migradas quando esse ORCID é vinculado à conta.
+
+Para respostas associadas a um email, a migração automática exige uma conta habilitada cujo email tenha sido validado pela aplicação (`dateValidated`). Após entrar na conta, abrir a aba Questionário DEIA migra as respostas do email atual naquela revista ou servidor de preprints, desde que a conta não tenha respostas nem uma escolha de consentimento registrada ali. Isso também se aplica a contas validadas anteriormente. Sem uma data de validação, as respostas permanecem associadas ao colaborador externo.
 
 ## Gerenciamento de blocos de perguntas
 

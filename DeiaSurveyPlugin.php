@@ -7,12 +7,10 @@ use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
-use APP\plugins\generic\deiaSurvey\classes\observers\listeners\MigrateResponsesOnRegistration;
 use APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler;
 use APP\plugins\generic\deiaSurvey\report\DeiaSurveyReportPlugin;
 use APP\template\TemplateManager;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\Event;
 use PKP\core\JSONMessage;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
@@ -35,8 +33,6 @@ class DeiaSurveyPlugin extends GenericPlugin
             Hook::add('Author::validate', [$this, 'preventDeiaTokenApiWrite']);
             Hook::add('User::edit', [$this, 'checkMigrateResponsesOrcid']);
             $this->registerHooksForCustomSchemas();
-
-            Event::subscribe(new MigrateResponsesOnRegistration());
 
             $context = Application::get()->getRequest()->getContext();
             if (!is_null($context)) {
