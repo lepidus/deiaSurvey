@@ -5,10 +5,10 @@ namespace APP\plugins\generic\deiaSurvey\tests\deiaQuestionBlock;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\importExport\DeiaQuestionBlockJsonImporter;
+use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 use InvalidArgumentException;
 use PKP\facades\Locale;
-use PKP\tests\DatabaseTestCase;
 
 class DeiaQuestionBlockJsonImporterTest extends DatabaseTestCase
 {
@@ -16,23 +16,10 @@ class DeiaQuestionBlockJsonImporterTest extends DatabaseTestCase
 
     private int $contextId;
 
-    protected function getAffectedTables(): array
-    {
-        return [
-            ...parent::getAffectedTables(),
-            'deia_question_blocks',
-            'deia_question_block_settings',
-            'deia_questions',
-            'deia_question_settings',
-            'deia_response_options',
-            'deia_response_option_settings',
-        ];
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
-        $this->contextId = $this->createJournalMock();
+        $this->contextId = $this->createTestContext();
         $this->addSchemaFile('deiaQuestionBlock');
         $this->addSchemaFile('deiaQuestion');
         $this->addSchemaFile('deiaResponseOption');

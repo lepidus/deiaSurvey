@@ -4,17 +4,20 @@ namespace APP\plugins\generic\deiaSurvey\tests\helpers;
 
 use APP\core\Application;
 use APP\core\PageRouter;
-use APP\journal\Journal;
+use APP\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\Repository as DeiaQuestionRepository;
 use APP\plugins\generic\deiaSurvey\DeiaSurveyPlugin;
+use Illuminate\Support\Facades\DB;
 use PKP\core\Dispatcher;
 use PKP\core\Registry;
 use PKP\plugins\Hook;
-use PKP\user\User;
 
 trait TestHelperTrait
 {
+    private ?int $testContextId = null;
+    private ?int $testUserId = null;
+
     private const DEFAULT_LOCALE = 'en';
     private const TEST_QUESTION_TEXT = 'plugins.generic.deiaSurvey.defaultQuestion.gender.title';
     private const TEST_QUESTION_DESCRIPTION = 'plugins.generic.deiaSurvey.defaultQuestion.gender.description';
@@ -26,7 +29,7 @@ trait TestHelperTrait
     private function createDeiaQuestion()
     {
         $questionData = [
-            'contextId' => $this->createJournalMock(),
+            'contextId' => $this->createTestContext(),
             'questionText' => self::TEST_QUESTION_TEXT,
             'questionDescription' => self::TEST_QUESTION_DESCRIPTION,
             'questionType' => DeiaQuestion::TYPE_TEXTAREA,
@@ -67,40 +70,54 @@ trait TestHelperTrait
             $deiaResponse->setExternalId('external.author@lepidus.com.br');
             $deiaResponse->setExternalType('email');
         } else {
-            $deiaResponse->setUserId($this->createUserMock());
+            $deiaResponse->setUserId($this->createTestUser());
         }
 
         return $deiaResponse;
     }
 
-    private function createJournalMock()
+    private function createTestContext(): int
     {
-        $journal = $this->getMockBuilder(Journal::class)
-            ->onlyMethods(['getId'])
-            ->getMock();
-
-        $journal->expects($this->any())
-            ->method('getId')
-            ->willReturn(1);
-        $journal->setName('journal-title', 'en');
-        $journal->setData('publisherInstitution', 'journal-publisher');
-        $journal->setPrimaryLocale('en');
-        $journal->setPath('journal-path');
-        $journal->setId(1);
-
-        return $journal->getId();
+        if ($this->testContextId === null) {
+            self::assertGreaterThan(0, DB::transactionLevel(), 'Database fixtures require a rollback transaction.');
+            $dao = Application::getContextDAO();
+            $context = $dao->newDataObject();
+            $context->setAllData([
+                'name' => ['en' => 'DEIA test journal'],
+                'publisherInstitution' => 'Test publisher',
+                'primaryLocale' => 'en',
+                'urlPath' => 'deia-test-' . bin2hex(random_bytes(8)),
+                'enabled' => true,
+                'supportedLocales' => ['en'],
+                'supportedFormLocales' => ['en'],
+                'supportedSubmissionLocales' => ['en'],
+                'contactName' => 'Test contact',
+                'contactEmail' => 'contact@example.org',
+                'supportName' => 'Test support',
+                'supportEmail' => 'support@example.org',
+            ]);
+            $this->testContextId = (int) $dao->insertObject($context);
+        }
+        return $this->testContextId;
     }
-    private function createUserMock()
+
+    private function createTestUser(): int
     {
-        $user = $this->getMockBuilder(User::class)
-            ->onlyMethods(['getId'])
-            ->getMock();
-
-        $user->expects($this->any())
-            ->method('getId')
-            ->willReturn(1);
-
-        return $user->getId();
+        if ($this->testUserId === null) {
+            self::assertGreaterThan(0, DB::transactionLevel(), 'Database fixtures require a rollback transaction.');
+            $identifier = 'deia-test-' . bin2hex(random_bytes(8));
+            $user = Repo::user()->newDataObject();
+            $user->setAllData([
+                'userName' => $identifier,
+                'email' => $identifier . '@example.org',
+                'password' => 'unused',
+                'givenName' => ['en' => 'Test'],
+                'familyName' => ['en' => 'User'],
+                'dateRegistered' => date('Y-m-d H:i:s'),
+            ]);
+            $this->testUserId = Repo::user()->add($user);
+        }
+        return $this->testUserId;
     }
 
     private function addSchemaFile(string $schemaName): void

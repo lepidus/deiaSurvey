@@ -3,15 +3,15 @@
 namespace APP\plugins\generic\deiaSurvey\tests\controllers\grid\deiaQuestionBlock;
 
 use APP\core\Application;
+use APP\core\Request;
 use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\DeiaQuestionBlockGridHandler;
 use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\DeiaQuestionBlockGridRow;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
-use Illuminate\Support\Facades\DB;
 use PKP\linkAction\request\AjaxModal;
-use PKP\tests\DatabaseTestCase;
 
 class DeiaQuestionBlockGridHandlerTest extends DatabaseTestCase
 {
@@ -19,30 +19,15 @@ class DeiaQuestionBlockGridHandlerTest extends DatabaseTestCase
 
     private int $contextId;
 
-    protected function getAffectedTables(): array
-    {
-        return [
-            ...parent::getAffectedTables(),
-            'deia_question_blocks',
-            'deia_question_block_settings',
-            'deia_questions',
-            'deia_question_settings',
-            'notifications',
-        ];
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->contextId = $this->createJournalMock();
+        $this->initializeRequestRouter();
+        $this->contextId = $this->createTestContext();
         $this->initializePluginLocaleData();
         $this->addSchemaFile('deiaQuestionBlock');
         $this->addSchemaFile('deiaQuestion');
-        DB::table('deia_question_settings')->delete();
-        DB::table('deia_questions')->delete();
-        DB::table('deia_question_block_settings')->delete();
-        DB::table('deia_question_blocks')->delete();
     }
 
     public function testDoesNotActivateQuestionBlockWithoutQuestions(): void
@@ -156,44 +141,12 @@ class DeiaQuestionBlockGridHandlerTest extends DatabaseTestCase
 
     private function createActivationRequest(int $questionBlockId): object
     {
-        return new class ($this->contextId, $questionBlockId) {
-            public function __construct(private int $contextId, private int $questionBlockId)
-            {
-            }
-
-            public function getUserVar(string $key): ?int
-            {
-                return $key === 'deiaQuestionBlockId' ? $this->questionBlockId : null;
-            }
-
-            public function getContext(): object
-            {
-                return new class ($this->contextId) {
-                    public function __construct(private int $contextId)
-                    {
-                    }
-
-                    public function getId(): int
-                    {
-                        return $this->contextId;
-                    }
-                };
-            }
-
-            public function checkCSRF(): bool
-            {
-                return true;
-            }
-
-            public function getUser(): object
-            {
-                return new class () {
-                    public function getId(): int
-                    {
-                        return 1;
-                    }
-                };
-            }
-        };
+        $request = $this->getMockBuilder(Request::class)
+            ->onlyMethods(['getUserVar', 'getContext', 'checkCSRF', 'getUser'])->getMock();
+        $request->method('getUserVar')->with('deiaQuestionBlockId')->willReturn($questionBlockId);
+        $request->method('getContext')->willReturn(Application::getContextDAO()->getById($this->contextId));
+        $request->method('checkCSRF')->willReturn(true);
+        $request->method('getUser')->willReturn(\APP\facades\Repo::user()->get($this->createTestUser()));
+        return $request;
     }
 }

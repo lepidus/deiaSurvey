@@ -4,8 +4,8 @@ namespace APP\plugins\generic\deiaSurvey\tests\deiaResponseOption;
 
 use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\DeiaResponseOption;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponseOption\Repository;
+use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
-use PKP\tests\DatabaseTestCase;
 
 class RepositoryTest extends DatabaseTestCase
 {
@@ -13,17 +13,6 @@ class RepositoryTest extends DatabaseTestCase
 
     private $params;
     private $deiaQuestionId;
-
-    protected function getAffectedTables(): array
-    {
-        return [
-            ...parent::getAffectedTables(),
-            'deia_questions',
-            'deia_question_settings',
-            'deia_response_options',
-            'deia_response_option_settings'
-        ];
-    }
 
     protected function setUp(): void
     {

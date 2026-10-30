@@ -3,13 +3,16 @@
 namespace APP\plugins\generic\deiaSurvey\tests;
 
 use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
+use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
+use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 use Illuminate\Support\Facades\DB;
 use PKP\db\DAORegistry;
 use PKP\orcid\OrcidManager;
-use PKP\tests\PKPTestCase;
 
-class OrcidConfigurationTest extends PKPTestCase
+class OrcidConfigurationTest extends DatabaseTestCase
 {
+    use TestHelperTrait;
+
     private $orcidConfiguration;
     private $contextId;
     private $orcidAPIPath = OrcidManager::ORCID_API_URL_PUBLIC_SANDBOX;
@@ -21,26 +24,7 @@ class OrcidConfigurationTest extends PKPTestCase
     {
         $this->orcidConfiguration = new OrcidConfiguration();
         parent::setUp();
-        $this->contextId = DB::table('journals')->value('journal_id');
-        $this->deleteOrcidSettings();
-    }
-
-    protected function tearDown(): void
-    {
-        $pluginSettingsToClean = [
-            'deiasurveyplugin' => ['orcidAPIPath', 'orcidClientId', 'orcidClientSecret'],
-            'orcidprofileplugin' => ['orcidProfileAPIPath', 'orcidClientId', 'orcidClientSecret']
-        ];
-        $pluginSettingsDao = DAORegistry::getDAO('PluginSettingsDAO');
-
-        foreach ($pluginSettingsToClean as $pluginName => $settings) {
-            foreach ($settings as $settingName) {
-                $pluginSettingsDao->deleteSetting($this->contextId, $pluginName, $settingName);
-            }
-        }
-        $this->deleteOrcidSettings();
-
-        parent::tearDown();
+        $this->contextId = $this->createTestContext();
     }
 
     private function insertPluginSettings($pluginName, $settingName, $settingValue)
@@ -59,19 +43,6 @@ class OrcidConfigurationTest extends PKPTestCase
             ],
             ['setting_value' => $settingValue]
         );
-    }
-
-    private function deleteOrcidSettings(): void
-    {
-        DB::table('journal_settings')
-            ->where('journal_id', $this->contextId)
-            ->whereIn('setting_name', [
-                OrcidManager::ENABLED,
-                OrcidManager::API_TYPE,
-                OrcidManager::CLIENT_ID,
-                OrcidManager::CLIENT_SECRET
-            ])
-            ->delete();
     }
 
     public function testNoOrcidConfiguration(): void

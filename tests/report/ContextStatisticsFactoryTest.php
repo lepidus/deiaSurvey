@@ -5,9 +5,8 @@ namespace APP\plugins\generic\deiaSurvey\tests\report;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\report\classes\factories\ContextStatisticsFactory;
+use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
-use Illuminate\Support\Facades\DB;
-use PKP\tests\DatabaseTestCase;
 
 class ContextStatisticsFactoryTest extends DatabaseTestCase
 {
@@ -15,25 +14,11 @@ class ContextStatisticsFactoryTest extends DatabaseTestCase
 
     private int $contextId;
 
-    protected function getAffectedTables(): array
-    {
-        return [
-            ...parent::getAffectedTables(),
-            'deia_question_blocks',
-            'deia_question_block_settings',
-            'deia_questions',
-            'deia_question_settings',
-            'deia_response_options',
-            'deia_response_option_settings',
-        ];
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
         $this->initializeRequestRouter();
-        $this->clearDeiaTables();
-        $this->contextId = $this->createJournalMock();
+        $this->contextId = $this->createTestContext();
         $this->addSchemaFile('deiaQuestionBlock');
         $this->addSchemaFile('deiaQuestion');
         $this->addSchemaFile('deiaResponseOption');
@@ -116,15 +101,5 @@ class ContextStatisticsFactoryTest extends DatabaseTestCase
         ]);
 
         return Repo::deiaResponseOption()->add($responseOption);
-    }
-
-    private function clearDeiaTables(): void
-    {
-        DB::table('deia_response_option_settings')->delete();
-        DB::table('deia_response_options')->delete();
-        DB::table('deia_question_settings')->delete();
-        DB::table('deia_questions')->delete();
-        DB::table('deia_question_block_settings')->delete();
-        DB::table('deia_question_blocks')->delete();
     }
 }

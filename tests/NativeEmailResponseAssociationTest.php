@@ -10,6 +10,7 @@ use APP\plugins\generic\deiaSurvey\classes\controllers\TabHandler;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\DeiaSurveyPlugin;
+use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 use APP\template\TemplateManager;
 use Illuminate\Events\Dispatcher;
@@ -24,10 +25,9 @@ use PKP\observers\events\UserRegisteredContext;
 use PKP\observers\listeners\ValidateRegisteredEmail;
 use PKP\plugins\PluginRegistry;
 use PKP\template\PKPTemplateResource;
-use PKP\tests\PKPTestCase;
 use PKP\user\User;
 
-class NativeEmailResponseAssociationTest extends PKPTestCase
+class NativeEmailResponseAssociationTest extends DatabaseTestCase
 {
     use TestHelperTrait;
 
@@ -35,28 +35,19 @@ class NativeEmailResponseAssociationTest extends PKPTestCase
     private Journal $context;
     private int $responseId;
     private RegistrationAccessInvite $invite;
-    private $originalRequireValidation;
     private $originalMailer;
-
-    protected function getMockedRegistryKeys(): array
-    {
-        return [...parent::getMockedRegistryKeys(), 'request', 'plugins', 'hooks'];
-    }
 
     protected function setUp(): void
     {
         parent::setUp();
-        DB::beginTransaction();
         $this->originalMailer = Mail::getFacadeRoot();
         $this->addSchemaFile('deiaQuestion');
         $this->addSchemaFile('deiaResponse');
         $this->addSchemaFile('deiaResponseOption');
-        $this->originalRequireValidation = Config::getVar('email', 'require_validation');
         $config = &Config::getData();
         $config['email']['require_validation'] = true;
 
-        $this->context = new Journal();
-        $this->context->setId(1);
+        $this->context = Application::getContextDAO()->getById($this->createTestContext());
         $userId = DB::table('users')->insertGetId([
             'username' => 'deia_native_validation_test',
             'email' => 'native-validation@example.org',
@@ -91,10 +82,7 @@ class NativeEmailResponseAssociationTest extends PKPTestCase
 
     protected function tearDown(): void
     {
-        DB::rollBack();
         Mail::swap($this->originalMailer);
-        $config = &Config::getData();
-        $config['email']['require_validation'] = $this->originalRequireValidation;
         parent::tearDown();
     }
 
@@ -163,7 +151,10 @@ class NativeEmailResponseAssociationTest extends PKPTestCase
     {
         $this->invite->finalize();
         $otherContext = new Journal();
-        $otherContext->setId(2);
+        $otherContext->setId((int) DB::table('journals')->insertGetId([
+            'path' => 'deia-native-empty-context',
+            'primary_locale' => 'en',
+        ]));
         $service = new DeiaDataService();
         self::assertFalse($service->migrateResponsesByUserIdentifier($otherContext, $this->user, 'email'));
         $this->assertResponseRemainsExternal();
@@ -211,7 +202,7 @@ class NativeEmailResponseAssociationTest extends PKPTestCase
             [$otherQuestionId, null, $this->user->getEmail(), 'email'],
             [$questionId, null, 'different@example.org', 'email'],
             [$questionId, null, $this->user->getEmail(), 'orcid'],
-            [$questionId, 1, $this->user->getEmail(), 'email'],
+            [$questionId, $this->createTestUser(), $this->user->getEmail(), 'email'],
         ] as [$question, $owner, $identifier, $type]) {
             $otherResponseIds[] = DB::table('deia_responses')->insertGetId([
                 'deia_question_id' => $question,
@@ -278,7 +269,7 @@ class NativeEmailResponseAssociationTest extends PKPTestCase
             $plugin->getTemplateResource(),
             new PKPTemplateResource($plugin->getTemplatePath())
         );
-        $blockId = DB::table('deia_question_blocks')->insertGetId(['context_id' => 1, 'is_active' => 1]);
+        $blockId = DB::table('deia_question_blocks')->insertGetId(['context_id' => $this->context->getId(), 'is_active' => 1]);
         $questionId = DB::table('deia_responses')->where('deia_response_id', $this->responseId)
             ->value('deia_question_id');
         DB::table('deia_questions')->where('deia_question_id', $questionId)->update([
