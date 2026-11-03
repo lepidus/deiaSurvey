@@ -3,6 +3,13 @@
 
 <emails>
     <email
+        key="CONFIRM_DEIA_EMAIL"
+        name="emails.confirmDeiaEmail.name"
+        description="emails.confirmDeiaEmail.description"
+        subject="emails.confirmDeiaEmail.subject"
+        body="emails.confirmDeiaEmail.body"
+    />
+    <email
         key="REQUEST_COLLECTION_CONTRIBUTOR_DATA"
         name="emails.requestCollectionContributorData.name"
         description="emails.requestCollectionContributorData.description"

@@ -4,12 +4,40 @@ namespace APP\plugins\generic\deiaSurvey\classes\controllers;
 
 use APP\handler\Handler;
 use APP\notification\NotificationManager;
+use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\form\QuestionsForm;
+use APP\template\TemplateManager;
 use PKP\core\JSONMessage;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class TabHandler extends Handler
 {
+    public function requestEmailValidation($args, $request)
+    {
+        if (!$request->isPost() || !$request->checkCSRF() || !$request->getUser() || !$request->getContext()) {
+            return new JSONMessage(false);
+        }
+
+        try {
+            $sent = (new DataCollectionEmailSender())->sendEmailValidation($request->getContext(), $request->getUser());
+        } catch (TransportExceptionInterface $exception) {
+            return new JSONMessage(false, __('email.compose.error'));
+        }
+        $message = $sent
+            ? __('plugins.generic.deiaSurvey.emailValidation.sent')
+            : __('plugins.generic.deiaSurvey.emailValidation.unavailable');
+        $templateMgr = TemplateManager::getManager($request);
+        $templateMgr->assign([
+            'notificationId' => 'deiaEmailValidationResult',
+            'notificationStyleClass' => $sent ? 'notifySuccess' : 'notifyWarning',
+            'notificationTitle' => '',
+            'notificationContents' => htmlspecialchars($message, ENT_QUOTES, 'UTF-8'),
+        ]);
+        return new JSONMessage(true, '<div class="pkp_notification" role="status">'
+            . $templateMgr->fetch('controllers/notification/inPlaceNotificationContent.tpl') . '</div>');
+    }
+
     public function deiaSurvey($args, $request)
     {
         $context = $request->getContext();

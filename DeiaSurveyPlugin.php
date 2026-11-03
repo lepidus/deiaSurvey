@@ -7,6 +7,7 @@ use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
+use APP\plugins\generic\deiaSurvey\pages\deia\EmailAssociationHandler;
 use APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler;
 use APP\plugins\generic\deiaSurvey\report\DeiaSurveyReportPlugin;
 use APP\template\TemplateManager;
@@ -194,6 +195,10 @@ class DeiaSurveyPlugin extends GenericPlugin
     {
         $page = &$params[0];
         $handler = &$params[3];
+        if ($this->getEnabled() && $page === 'deiaAssociation') {
+            $handler = new EmailAssociationHandler();
+            return true;
+        }
         if ($this->getEnabled() && $page === 'deiaQuestionnaire') {
             $handler = new QuestionnaireHandler();
             return true;

@@ -34,7 +34,9 @@ O e-mail enviado oferece duas maneiras de preencher o questionário. A primeira 
 
 Os usuários podem ver e excluir seus dados a qualquer momento. Respostas associadas a um ORCID podem ser migradas quando esse ORCID é vinculado à conta.
 
-Para respostas associadas a um email, a migração automática exige uma conta habilitada cujo email tenha sido validado pela aplicação (`dateValidated`). Após entrar na conta, abrir a aba Questionário DEIA migra as respostas do email atual naquela revista ou servidor de preprints, desde que a conta não tenha respostas nem uma escolha de consentimento registrada ali. Isso também se aplica a contas validadas anteriormente. Sem uma data de validação, as respostas permanecem associadas ao colaborador externo.
+Para respostas associadas a um email, a migração automática exige uma conta habilitada cujo email tenha sido validado pela aplicação (`dateValidated`). Após entrar na conta, abrir a aba Questionário DEIA migra as respostas do email atual naquela revista ou servidor de preprints, desde que a conta não tenha respostas nem uma escolha de consentimento registrada ali. Isso também se aplica a contas validadas anteriormente. Sem uma data de validação, a migração automática não ocorre.
+
+Quando existem respostas externas vinculadas ao email na revista ou servidor de preprints atual, usuários cujo email ainda não foi validado veem uma notificação na aba Questionário DEIA com a ação `Solicitar associação`. O plugin envia um email de confirmação com um link válido por 24 horas. Com a conta solicitante autenticada, a confirmação nessa página associa as respostas diretamente, sem ativar a conta nem alterar a data de validação do email na aplicação. O link é de uso único e vinculado à conta, ao email atual e ao contexto. Uma nova confirmação pode ser solicitada após um minuto e invalida o link anterior. Esse fluxo também funciona quando a validação de email não é obrigatória no cadastro.
 
 ## Gerenciamento de blocos de perguntas
 

@@ -33,7 +33,9 @@ The e-mail sent offers two ways of filling in the questionnaire. The first requi
 
 Users can view and delete their data at any time. Responses associated with an ORCID can be migrated when that ORCID is linked to the account.
 
-For responses associated with an email address, automatic migration requires an enabled account whose email has been validated by the application (`dateValidated`). After signing in, opening the DEIA Survey tab migrates responses for the account's current email in that journal or preprint server, provided the account has no responses or recorded consent choice there. This also applies to previously validated accounts. Without a validation date, responses remain associated with the external contributor.
+For responses associated with an email address, automatic migration requires an enabled account whose email has been validated by the application (`dateValidated`). After signing in, opening the DEIA Survey tab migrates responses for the account's current email in that journal or preprint server, provided the account has no responses or recorded consent choice there. This also applies to previously validated accounts. Without a validation date, automatic migration does not occur.
+
+When external email-based responses exist in the current journal or preprint server, users whose email has not been validated see a notification in the DEIA Survey tab with the `Request association` action. The plugin sends a confirmation email with a link valid for 24 hours. While signed in to the requesting account, confirming on that page associates the responses directly, without activating the account or changing the application's email validation date. The link is single-use and bound to the account, current email address and context. A new confirmation can be requested after one minute and invalidates the previous link. This flow also works when email validation is not required for registration.
 
 ## Managing question blocks
 
