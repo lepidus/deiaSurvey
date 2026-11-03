@@ -7,10 +7,10 @@ use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\template\TemplateManager;
+use Illuminate\Support\Facades\DB;
 use PKP\db\DAORegistry;
 use PKP\form\Form;
 use PKP\plugins\PluginRegistry;
-use Illuminate\Support\Facades\DB;
 
 class QuestionsForm extends Form
 {
@@ -145,10 +145,11 @@ class QuestionsForm extends Form
         $deiaDataService = new DeiaDataService();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
-        $previousConsent = $deiaDataDao->getDeiaConsentOption($context->getId(), $user->getId());
         $newConsent = $this->getData('deiaDataConsent');
 
-        DB::transaction(function () use ($deiaDataDao, $deiaDataService, $context, $user, $newConsent, $previousConsent) {
+        DB::transaction(function () use ($deiaDataDao, $deiaDataService, $context, $user, $newConsent) {
+            DB::table('users')->where('user_id', $user->getId())->lockForUpdate()->first();
+            $previousConsent = $deiaDataDao->getDeiaConsentOption($context->getId(), $user->getId());
             $deiaDataDao->updateDeiaConsent($context->getId(), $user->getId(), $newConsent);
 
             if ($newConsent == '1') {
