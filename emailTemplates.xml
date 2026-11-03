@@ -2,6 +2,10 @@
 <!DOCTYPE emails SYSTEM "../../../lib/pkp/dtd/emailTemplates.dtd">
 
 <emails>
+    <email key="CONFIRM_DEIA_EMAIL" name="emails.confirmDeiaEmail.name"
+        subject="emails.confirmDeiaEmail.subject" description="emails.confirmDeiaEmail.description"
+        body="emails.confirmDeiaEmail.body" />
+
     <email
         key="REQUEST_COLLECTION_CONTRIBUTOR_DATA"
         name="emails.requestCollectionContributorData.name"

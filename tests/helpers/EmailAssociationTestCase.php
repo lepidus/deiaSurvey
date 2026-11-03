@@ -14,17 +14,20 @@ abstract class EmailAssociationTestCase extends PKPTestCase
     protected int $responseId;
     protected string $ciphertext;
     private array $originalConfig;
+    private $originalEvents;
     private int $initialTransactionLevel;
     private array $temporaryTables = [];
 
     protected function getMockedRegistryKeys(): array
     {
-        return array_merge(parent::getMockedRegistryKeys(), ['hooks', 'request', 'plugins', 'templateManager', 'sessionManager']);
+        return array_merge(parent::getMockedRegistryKeys(), ['hooks', 'request', 'plugins', 'templateManager', 'sessionManager', 'localeFiles', 'dispatcher']);
     }
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->originalEvents = \Illuminate\Support\Facades\Event::getFacadeRoot();
+        \Illuminate\Support\Facades\Event::swap(clone $this->originalEvents);
         $this->originalConfig = \PKP\config\Config::getData();
         $config = &\PKP\config\Config::getData();
         $config['security']['api_key_secret'] = 'isolated-deia980-test-secret';
@@ -54,6 +57,9 @@ abstract class EmailAssociationTestCase extends PKPTestCase
         }
         $identifier = 'deia980-' . bin2hex(random_bytes(8));
         $contextId = DB::table('journals')->insertGetId(['path' => $identifier, 'primary_locale' => 'en']);
+        DB::table('journal_settings')->insert([
+            'journal_id' => $contextId, 'locale' => '', 'setting_name' => 'supportedLocales', 'setting_value' => json_encode(['en']),
+        ]);
         $this->context = Application::getContextDAO()->getById($contextId);
         $this->context->setName('DEIA test journal', 'en');
         $this->context->setData('contactName', 'Test contact');
@@ -93,6 +99,7 @@ abstract class EmailAssociationTestCase extends PKPTestCase
             } finally {
                 $config = &\PKP\config\Config::getData();
                 $config = $this->originalConfig;
+                \Illuminate\Support\Facades\Event::swap($this->originalEvents);
                 parent::tearDown();
             }
         }

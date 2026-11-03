@@ -33,6 +33,8 @@ The e-mail sent offers two ways of filling in the questionnaire. The first requi
 
 Automatic association of external email-based responses requires an enabled account whose email has been validated by OJS (`dateValidated`). Opening the DEIA Survey profile tab associates responses for the current email and context only if the account has no existing responses or consent choice there. Encrypted response values are preserved. Without native email validation, responses remain external. These OJS versions retain the old validation date when an email changes. Automatic association therefore also requires the current email to match the registration email observed by the plugin. Existing accounts without this record require explicit DEIA confirmation.
 
+Users without reliable native email validation can request association from the notification in the DEIA Survey profile tab. The confirmation email includes a single-use link valid for 24 hours; signing in to the requesting account and confirming on that page associates the responses directly. This does not activate the account, change dateValidated or consume native activation links. Resending is allowed after one minute and invalidates the previous link.
+
 ## Managing question blocks
 
 Journal and preprint server managers can create and maintain DEIA question blocks from the plugin settings. Go to `Settings` > `Website` > `Plugins`, expand the DEIA Survey plugin row, and open `Settings`.
@@ -121,3 +123,10 @@ Developed by Lepidus Tecnologia.
 __This plugin is licensed under the GNU General Public License v3.0__
 
 __Copyright (c) 2024-2026 Lepidus Tecnologia__
+
+
+Run the isolated email association tests from the OJS root:
+
+```sh
+php lib/pkp/lib/vendor/bin/phpunit -c plugins/generic/deiaSurvey/tests/phpunit-email-association.xml --no-coverage
+```
