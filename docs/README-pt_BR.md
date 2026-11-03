@@ -33,7 +33,7 @@ Para autores que não estiverem registrados no sistema, um e-mail será enviado 
 
 O e-mail enviado oferece duas maneiras de preencher o questionário. A primeira requere que um registro ORCID seja autenticado, de forma que os dados fiquem associados a esse registro. A segunda utiliza o endereço de e-mail do(a) autor(a) e é recomendada apenas para aqueles que não possuem um registro ORCID.
 
-Os usuários podem ver e excluir seus dados a qualquer momento. Para os autores sem cadastro que preencheram o questionário, caso estes criem um usuário no sistema com o mesmo endereço de e-mail ou ORCID utilizado, seus dados serão migrados para este novo usuário.
+A associação automática de respostas externas por email exige uma conta habilitada cujo email tenha sido validado pelo OJS (`dateValidated`). Ao abrir a aba Questionário DEIA do perfil, as respostas do email atual naquele contexto são associadas somente se a conta não tiver respostas nem uma escolha de consentimento registrada ali. Os valores criptografados são preservados. Sem a validação nativa, as respostas permanecem externas. Essas versões do OJS preservam a data de validação anterior quando o email muda. Por isso, a associação automática também exige que o email atual corresponda ao email de cadastro observado pelo plugin. Contas existentes sem esse registro exigem confirmação explícita DEIA.
 
 ## Gerenciamento de blocos de perguntas
 

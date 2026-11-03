@@ -11,11 +11,14 @@ class TabHandler extends \Handler
     public function deiaData($args, $request)
     {
         $context = $request->getContext();
+        $user = $request->getUser();
         $deiaDataService = new DeiaDataService();
 
-        if (!$context || !$deiaDataService->hasActiveQuestionBlocks($context->getId())) {
+        if (!$user || !$context || !$deiaDataService->hasActiveQuestionBlocks($context->getId())) {
             return new \JSONMessage(false);
         }
+
+        $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'email');
 
         $form = new QuestionsForm($request);
         $form->initData();
