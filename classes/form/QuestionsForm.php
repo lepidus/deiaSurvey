@@ -65,6 +65,15 @@ class QuestionsForm extends \Form
         $this->setData('applicationName', \Application::get()->getName());
 
         $context = $this->request->getContext();
+        $user = $this->request->getUser();
+        $this->setData('canValidateEmail', !$user->getDisabled() && (new DeiaDataService())->emailNeedsAssociationConfirmation($user)
+            && Capsule::table('deia_responses as responses')
+                ->join('deia_questions as questions', 'questions.deia_question_id', '=', 'responses.deia_question_id')
+                ->where('questions.context_id', $context->getId())
+                ->whereNull('responses.user_id')
+                ->where('responses.external_type', 'email')
+                ->where('responses.external_id', $user->getEmail())
+                ->exists());
         $this->initConsentData($context);
 
         $deiaDataService  = new DeiaDataService();

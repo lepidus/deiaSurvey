@@ -19,7 +19,7 @@ abstract class EmailAssociationTestCase extends \PKPTestCase
 
     protected function getMockedRegistryKeys(): array
     {
-        return array_merge(parent::getMockedRegistryKeys(), ['hooks', 'request', 'plugins', 'templateManager', 'sessionManager']);
+        return array_merge(parent::getMockedRegistryKeys(), ['hooks', 'request', 'plugins', 'templateManager', 'sessionManager', 'localeFiles', 'dispatcher']);
     }
 
     protected function setUp(): void

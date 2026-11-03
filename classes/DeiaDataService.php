@@ -508,7 +508,7 @@ class DeiaDataService
     public function migrateResponsesByUserIdentifier($context, $user, $idName)
     {
         if ($idName === 'email') {
-            return $this->migrateResponsesByValidatedEmail($context, $user);
+            return $this->migrateResponsesByEmail($context, $user);
         }
 
         $contextQuestions = Repo::deiaQuestion()->getCollector()
@@ -545,12 +545,20 @@ class DeiaDataService
         }
     }
 
-    private function migrateResponsesByValidatedEmail(\Context $context, \User $user): bool
+    /** Call only after EmailAssociationService has verified the email token. */
+    public function migrateResponsesByConfirmedEmail(\Context $context, \User $user, string $email): bool
     {
-        return DB::connection()->transaction(function () use ($context, $user): bool {
+        return $this->migrateResponsesByEmail($context, $user, $email);
+    }
+
+    private function migrateResponsesByEmail(\Context $context, \User $user, ?string $confirmedEmail = null): bool
+    {
+        return DB::connection()->transaction(function () use ($context, $user, $confirmedEmail): bool {
             // Re-read the account under the same lock used when saving the profile questionnaire.
             $account = DB::table('users')->where('user_id', $user->getId())->lockForUpdate()->first();
-            if (!$account || $account->disabled || !$account->date_validated || !$this->hasRegistrationEmail($user->getId(), $account->email)) {
+            if (!$account || $account->disabled
+                || ($confirmedEmail === null && (!$account->date_validated || !$this->hasRegistrationEmail($user->getId(), $account->email)))
+                || ($confirmedEmail !== null && $confirmedEmail !== $account->email)) {
                 return false;
             }
 

@@ -26,3 +26,23 @@ ojs_integration_tests:
 ops_integration_tests:
   rules:
     - when: never
+
+# The regular env2 suite mocks AppLocale. Run the email flow with the real locale separately.
+.execute_phpunit_tests:
+  - TESTS=$(find -L $plugin_dir/$PLUGIN_NAME -maxdepth 1 -name tests -type d)
+  - php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --log-junit $CI_PROJECT_DIR/phpunit-report.xml --configuration lib/pkp/tests/phpunit-env2.xml $TESTS
+  - php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --log-junit $CI_PROJECT_DIR/phpunit-email-association-report.xml --configuration $plugin_dir/$PLUGIN_NAME/tests/phpunit-email-association.xml
+
+plugin_unit_tests_ojs:
+  parallel:
+    matrix:
+      - PHP_VERSION: ["8.1", "7.4"]
+  artifacts:
+    paths:
+      - phpunit-report.xml
+      - phpunit-email-association-report.xml
+    when: always
+    reports:
+      junit:
+        - phpunit-report.xml
+        - phpunit-email-association-report.xml

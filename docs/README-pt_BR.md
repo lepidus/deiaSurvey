@@ -35,6 +35,8 @@ O e-mail enviado oferece duas maneiras de preencher o questionário. A primeira 
 
 A associação automática de respostas externas por email exige uma conta habilitada cujo email tenha sido validado pelo OJS (`dateValidated`). Ao abrir a aba Questionário DEIA do perfil, as respostas do email atual naquele contexto são associadas somente se a conta não tiver respostas nem uma escolha de consentimento registrada ali. Os valores criptografados são preservados. Sem a validação nativa, as respostas permanecem externas. Essas versões do OJS preservam a data de validação anterior quando o email muda. Por isso, a associação automática também exige que o email atual corresponda ao email de cadastro observado pelo plugin. Contas existentes sem esse registro exigem confirmação explícita DEIA.
 
+Usuários sem validação nativa confiável podem solicitar a associação pela notificação na aba Questionário DEIA do perfil. O email de confirmação inclui um link de uso único válido por 24 horas; após entrar na conta solicitante e confirmar nessa página, as respostas são associadas diretamente. Isso não ativa a conta, não altera dateValidated nem consome links nativos de ativação. O reenvio é permitido após um minuto e invalida o link anterior.
+
 ## Gerenciamento de blocos de perguntas
 
 Gerentes de revistas e servidores de preprints podem criar e manter blocos de perguntas DEIA nas configurações do plugin. Acesse `Configurações` > `Website` > `Plugins`, expanda a linha do plugin Questionário DEIA e abra `Configurações`.
@@ -123,3 +125,10 @@ Desenvolvido por Lepidus Tecnologia.
 __Este plugin é licenciado sob a GNU General Public License v3.0__
 
 __Copyright (c) 2024 Lepidus Tecnologia__
+
+
+Execute os testes isolados de associação por email a partir da raiz do OJS:
+
+```sh
+php lib/pkp/lib/vendor/bin/phpunit -c plugins/generic/deiaSurvey/tests/phpunit-email-association.xml --no-coverage
+```

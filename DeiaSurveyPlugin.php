@@ -194,6 +194,10 @@ class DeiaSurveyPlugin extends \GenericPlugin
         $page = $params[0];
         $op = $params[1];
 
+        if ($page === 'deiaAssociation') {
+            define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\deia\EmailAssociationHandler');
+            return true;
+        }
         if ($page == 'deiaQuestionnaire') {
             define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler');
             return true;
