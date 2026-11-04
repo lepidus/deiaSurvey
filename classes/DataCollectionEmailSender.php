@@ -38,7 +38,7 @@ class DataCollectionEmailSender
             $email->setFrom($context->getData('contactEmail'), $context->getData('contactName'));
             $email->setRecipients([['email' => $user->getEmail(), 'name' => $user->getFullName()]]);
             $sent = $email->sendWithParams([
-                'associationUrl' => $request->getDispatcher()->url(
+                'associationUrl' => htmlspecialchars($request->getDispatcher()->url(
                     $request,
                     ROUTE_PAGE,
                     $context->getPath(),
@@ -46,7 +46,7 @@ class DataCollectionEmailSender
                     'index',
                     null,
                     ['userId' => $user->getId(), 'token' => $token]
-                ),
+                ), ENT_QUOTES, 'UTF-8'),
                 'recipientName' => htmlspecialchars($user->getFullName(), ENT_QUOTES, 'UTF-8'),
                 'contactName' => htmlspecialchars($context->getData('contactName'), ENT_QUOTES, 'UTF-8'),
                 'contextName' => htmlspecialchars($context->getLocalizedName(), ENT_QUOTES, 'UTF-8'),

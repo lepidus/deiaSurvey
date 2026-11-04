@@ -73,6 +73,12 @@ class EmailValidationTest extends EmailAssociationTestCase
         }
     }
 
+    public function testAssociationLinkEscapesHtmlWithoutChangingItsToken(): void
+    {
+        $this->sendAndGetLink();
+        self::assertStringContainsString('&amp;token=', $this->messageBody());
+    }
+
     public function testConfirmationAssociatesResponsesWithoutActivatingTheAccount(): void
     {
         [$id, $token] = $this->sendAndGetLink();
