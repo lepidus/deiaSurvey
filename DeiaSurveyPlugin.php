@@ -308,8 +308,11 @@ class DeiaSurveyPlugin extends GenericPlugin
         $user = $params[0];
         $userOrcid = $user->getOrcid();
 
-        if ($userOrcid) {
+        if ($userOrcid && $user->hasVerifiedOrcid()) {
             $context = Application::get()->getRequest()->getContext();
+            if (!$context) {
+                return;
+            }
             $deiaDataService = new DeiaDataService();
             $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
         }

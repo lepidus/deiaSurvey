@@ -341,6 +341,10 @@ class DeiaDataService
             return $this->migrateResponsesByEmail($context, $user);
         }
 
+        if ($idName !== 'orcid' || !$context || !$user->getOrcid() || !$user->hasVerifiedOrcid()) {
+            return false;
+        }
+
         $contextQuestions = Repo::deiaQuestion()->getCollector()
             ->filterByContextIds([$context->getId()])
             ->getMany()
