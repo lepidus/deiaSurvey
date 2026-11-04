@@ -113,3 +113,11 @@
 		{/if}
 	{rdelim});
 </script>
+
+{if $canAssociateOrcid}
+    <form method="post" action="{url router=ROUTE_PAGE page="deiaOrcidAssociation" op="index"}">
+        {csrf}
+        <p>{translate key="plugins.generic.deiaSurvey.orcidAssociation.description"}</p>
+        <button type="submit">{translate key="plugins.generic.deiaSurvey.orcidAssociation.request"}</button>
+    </form>
+{/if}

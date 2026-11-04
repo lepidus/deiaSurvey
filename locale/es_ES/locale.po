@@ -425,3 +425,15 @@ msgstr "No fue posible asociar las respuestas. El enlace puede haber caducado, y
 
 msgid "plugins.generic.deiaSurvey.emailValidation.urlDescription"
 msgstr "Enlace para confirmar la asociación de las respuestas DEIA."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.description"
+msgstr "Autentique su ORCID para asociar respuestas DEIA anteriores con su cuenta."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.request"
+msgstr "Autenticar ORCID y asociar respuestas"
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.associated"
+msgstr "Las respuestas anteriores del ORCID se asociaron con su cuenta."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.unavailable"
+msgstr "No se pudieron asociar las respuestas. Autentique el ORCID indicado en su perfil e inténtelo de nuevo."

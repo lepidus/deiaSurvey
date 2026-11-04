@@ -25,11 +25,6 @@ class DeiaSurveyPlugin extends \GenericPlugin
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
             HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
             HookRegistry::register('Author::validate', [$this, 'preventDeiaTokenApiWrite']);
-            HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
-            HookRegistry::register(
-                'userroleform::execute',
-                [$this, 'checkMigrateResponsesOrcidAfterUserCreation']
-            );
             $this->registerHooksForCustomSchemas();
 
             $context = Application::get()->getRequest()->getContext();
@@ -194,6 +189,10 @@ class DeiaSurveyPlugin extends \GenericPlugin
         $page = $params[0];
         $op = $params[1];
 
+        if ($page === 'deiaOrcidAssociation') {
+            define('HANDLER_CLASS', 'APP\\plugins\\generic\\deiaSurvey\\pages\\deia\\OrcidAssociationHandler');
+            return true;
+        }
         if ($page === 'deiaAssociation') {
             define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\deia\EmailAssociationHandler');
             return true;
@@ -320,49 +319,4 @@ class DeiaSurveyPlugin extends \GenericPlugin
         return parent::manage($args, $request);
     }
 
-    public function checkMigrateResponsesOrcid(string $hookName, array $params)
-    {
-        $form = $params[0];
-        $user = $form->user;
-
-        if (!$user || !$user->getId()) {
-            return;
-        }
-
-        $this->migrateResponsesOrcid($user);
-    }
-
-    public function checkMigrateResponsesOrcidAfterUserCreation(string $hookName, array $params)
-    {
-        $form = $params[0];
-        $user = $this->getUserById($form->userId);
-
-        if (!$user) {
-            return;
-        }
-
-        $this->migrateResponsesOrcid($user);
-    }
-
-    protected function getUserById($userId)
-    {
-        $userDao = DAORegistry::getDAO('UserDAO');
-        return $userDao->getById($userId);
-    }
-
-    protected function getCurrentContext()
-    {
-        return \Application::get()->getRequest()->getContext();
-    }
-
-    protected function migrateResponsesOrcid($user): void
-    {
-        $userOrcid = $user->getOrcid();
-
-        if ($userOrcid) {
-            $context = $this->getCurrentContext();
-            $deiaDataService = new DeiaDataService();
-            $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
-        }
-    }
 }

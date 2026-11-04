@@ -505,44 +505,40 @@ class DeiaDataService
         return ($countAuthorResponses > 0);
     }
 
-    public function migrateResponsesByUserIdentifier($context, $user, $idName)
+    public function migrateResponsesByUserIdentifier($context, $user, $idName, bool $orcidAuthenticated = false)
     {
         if ($idName === 'email') {
             return $this->migrateResponsesByEmail($context, $user);
         }
 
-        $contextQuestions = Repo::deiaQuestion()->getCollector()
-            ->filterByContextIds([$context->getId()])
-            ->getMany()
-            ->toArray();
-
-        if (empty($contextQuestions)) {
-            return;
+        if ($idName !== 'orcid' || !$context || !$orcidAuthenticated || !$user->getOrcid()) {
+            return false;
         }
 
-        $questionsIds = array_map(function ($question) {
-            return $question->getId();
-        }, $contextQuestions);
-
-        $userResponses = Repo::deiaResponse()->getCollector()
-            ->filterByExternalIds([$user->getData($idName)])
-            ->filterByExternalTypes([$idName])
-            ->filterByQuestionIds($questionsIds)
-            ->getMany()
-            ->toArray();
-
-        if (!empty($userResponses)) {
-            foreach ($userResponses as $response) {
-                Repo::deiaResponse()->edit($response, [
-                    'userId' => $user->getId(),
-                    'externalId' => null,
-                    'externalType' => null
-                ]);
+        return DB::connection()->transaction(function () use ($context, $user): bool {
+            $account = DB::table('users')->where('user_id', $user->getId())->lockForUpdate()->first();
+            if (!$account || $account->disabled) {
+                return false;
             }
-
-            $deiaDataDao = new DeiaDataDAO();
-            $deiaDataDao->updateDeiaConsent($context->getId(), $user->getId(), true);
-        }
+            $questionIds = DB::table('deia_questions')->select('deia_question_id')
+                ->where('context_id', $context->getId());
+            $responses = DB::table('deia_responses')->whereIn('deia_question_id', $questionIds);
+            $dao = new DeiaDataDAO();
+            if ((clone $responses)->where('user_id', $user->getId())->exists()
+                || $dao->getDeiaConsentOption($context->getId(), $user->getId()) !== null) {
+                return false;
+            }
+            $ids = $responses->whereNull('user_id')->where('external_type', 'orcid')
+                ->where('external_id', $user->getOrcid())->lockForUpdate()->pluck('deia_response_id');
+            if ($ids->isEmpty()) {
+                return false;
+            }
+            DB::table('deia_responses')->whereIn('deia_response_id', $ids)->update([
+                'user_id' => $user->getId(), 'external_id' => null, 'external_type' => null,
+            ]);
+            $dao->updateDeiaConsent($context->getId(), $user->getId(), true);
+            return true;
+        });
     }
 
     /** Call only after EmailAssociationService has verified the email token. */

@@ -426,3 +426,15 @@ msgstr "Não foi possível associar as respostas. O link pode ter expirado, já 
 
 msgid "plugins.generic.deiaSurvey.emailValidation.urlDescription"
 msgstr "Link para confirmar a associação das respostas DEIA."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.description"
+msgstr "Autentique seu ORCID para associar respostas DEIA anteriores à sua conta."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.request"
+msgstr "Autenticar ORCID e associar respostas"
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.associated"
+msgstr "As respostas anteriores do ORCID foram associadas à sua conta."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.unavailable"
+msgstr "Não foi possível associar as respostas. Autentique o ORCID informado no seu perfil e tente novamente."

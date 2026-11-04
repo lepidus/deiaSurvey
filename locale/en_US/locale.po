@@ -424,3 +424,15 @@ msgstr "The responses could not be associated. The link may have expired, alread
 
 msgid "plugins.generic.deiaSurvey.emailValidation.urlDescription"
 msgstr "Link to confirm the association of DEIA responses."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.description"
+msgstr "Authenticate your ORCID to associate previous DEIA responses with your account."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.request"
+msgstr "Authenticate ORCID and associate responses"
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.associated"
+msgstr "Previous ORCID responses have been associated with your account."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.unavailable"
+msgstr "The responses could not be associated. Authenticate the ORCID entered in your profile and try again."
