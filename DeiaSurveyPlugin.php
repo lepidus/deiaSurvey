@@ -150,8 +150,10 @@ class DeiaSurveyPlugin extends GenericPlugin
     {
         $errors = &$params[0];
         $props = $params[2];
-        if (array_key_exists('deiaToken', $props)) {
-            $errors['deiaToken'] = [__('api.403.unauthorized')];
+        foreach (['deiaToken', 'deiaOrcid'] as $name) {
+            if (array_key_exists($name, $props)) {
+                $errors[$name] = [__('api.403.unauthorized')];
+            }
         }
 
         return false;
