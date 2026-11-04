@@ -4,8 +4,8 @@ namespace APP\plugins\generic\deiaSurvey\tests\deiaQuestion;
 
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DAO;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
+use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
-use PKP\tests\DatabaseTestCase;
 
 class DAOTest extends DatabaseTestCase
 {
@@ -14,22 +14,11 @@ class DAOTest extends DatabaseTestCase
     private $contextId;
     private $deiaQuestionDAO;
 
-    protected function getAffectedTables(): array
-    {
-        return [
-            ...parent::getAffectedTables(),
-            'deia_questions',
-            'deia_question_settings',
-            'deia_responses',
-            'deia_response_settings'
-        ];
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
         $this->deiaQuestionDAO = app(DAO::class);
-        $this->contextId = $this->createJournalMock();
+        $this->contextId = $this->createTestContext();
         $this->addSchemaFile('deiaQuestion');
     }
 

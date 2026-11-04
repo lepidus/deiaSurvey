@@ -1,3 +1,11 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: deiaSurvey\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
 msgid "plugins.generic.deiaSurvey.displayName"
 msgstr "Cuestionario DEIA"
 
@@ -351,3 +359,31 @@ msgstr "No se pudo cargar el archivo de bloques de preguntas."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.import.description"
 msgstr "Los bloques de preguntas importados se crearán como bloques inactivos."
+
+
+msgid "plugins.generic.deiaSurvey.emailValidation.description"
+msgstr "Hay respuestas anteriores del Cuestionario DEIA vinculadas a este correo electrónico."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.send"
+msgstr "Solicitar asociación"
+
+msgid "plugins.generic.deiaSurvey.emailValidation.sent"
+msgstr "Enviamos un enlace a su correo electrónico. Acceda a él y confirme la asociación de las respuestas a su cuenta."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.unavailable"
+msgstr "No se pudo solicitar la asociación. Si acaba de enviar una solicitud, espere un minuto e inténtelo de nuevo."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.confirm"
+msgstr "Confirmar y asociar respuestas"
+
+msgid "plugins.generic.deiaSurvey.emailValidation.confirmDescription"
+msgstr "Confirme la asociación de las respuestas anteriores del Cuestionario DEIA a su cuenta."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.associated"
+msgstr "Las respuestas anteriores del Cuestionario DEIA se han asociado a su cuenta."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.invalid"
+msgstr "No fue posible asociar las respuestas. El enlace puede haber caducado, ya haber sido utilizado o no haber respuestas disponibles para asociar. Solicite un nuevo enlace en la pestaña Cuestionario DEIA de su perfil."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.urlDescription"
+msgstr "Enlace para confirmar la asociación de las respuestas DEIA."

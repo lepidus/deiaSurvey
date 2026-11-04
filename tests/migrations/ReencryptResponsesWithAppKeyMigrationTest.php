@@ -3,48 +3,34 @@
 namespace APP\plugins\generic\deiaSurvey\tests\migrations;
 
 use APP\plugins\generic\deiaSurvey\classes\migrations\ReencryptResponsesWithAppKeyMigration;
+use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
+use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use PKP\config\Config;
-use PKP\tests\DatabaseTestCase;
 
 class ReencryptResponsesWithAppKeyMigrationTest extends DatabaseTestCase
 {
+    use TestHelperTrait;
+
     private const LEGACY_SECRET = 'legacy-secret';
     private const LEGACY_SECRET_SETTING = 'api_key_' . 'secret';
-    private const QUESTION_ID_ONE = 990001;
-    private const QUESTION_ID_TWO = 990002;
-    private const RESPONSE_ID_ONE = 990001;
-    private const RESPONSE_ID_TWO = 990002;
-    private const SETTING_ID_ONE = 990001;
-    private const SETTING_ID_TWO = 990002;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->deleteFixtureRows();
-    }
-
-    protected function getAffectedTables(): array
-    {
-        return [
-            ...parent::getAffectedTables(),
-            'deia_questions',
-            'deia_responses',
-            'deia_response_settings',
-        ];
+        $this->isolateDeiaTables();
     }
 
     public function testReencryptsLegacyResponseValueWithApplicationKey(): void
     {
         $this->setLegacySecret();
         $legacyPayload = $this->encryptWithLegacySecret(serialize(['en' => 'Test text']));
-        $this->createResponseRow(self::QUESTION_ID_ONE, self::RESPONSE_ID_ONE);
+        $responseId = $this->createResponseRow();
 
         DB::table('deia_response_settings')->insert([
-            'deia_response_setting_id' => self::SETTING_ID_ONE,
-            'deia_response_id' => self::RESPONSE_ID_ONE,
+            'deia_response_id' => $responseId,
             'locale' => '',
             'setting_name' => 'responseValue',
             'setting_value' => $legacyPayload,
@@ -53,7 +39,7 @@ class ReencryptResponsesWithAppKeyMigrationTest extends DatabaseTestCase
         (new ReencryptResponsesWithAppKeyMigration())->up();
 
         $updatedValue = DB::table('deia_response_settings')
-            ->where('deia_response_setting_id', self::SETTING_ID_ONE)
+            ->where('deia_response_id', $responseId)
             ->value('setting_value');
 
         self::assertSame(serialize(['en' => 'Test text']), Crypt::decryptString($updatedValue));
@@ -62,11 +48,10 @@ class ReencryptResponsesWithAppKeyMigrationTest extends DatabaseTestCase
     public function testDoesNotReencryptApplicationKeyEncryptedResponses(): void
     {
         $encryptedValue = Crypt::encryptString(serialize(['en' => 'Test text']));
-        $this->createResponseRow(self::QUESTION_ID_TWO, self::RESPONSE_ID_TWO);
+        $responseId = $this->createResponseRow();
 
         DB::table('deia_response_settings')->insert([
-            'deia_response_setting_id' => self::SETTING_ID_TWO,
-            'deia_response_id' => self::RESPONSE_ID_TWO,
+            'deia_response_id' => $responseId,
             'locale' => '',
             'setting_name' => 'responseValue',
             'setting_value' => $encryptedValue,
@@ -75,7 +60,7 @@ class ReencryptResponsesWithAppKeyMigrationTest extends DatabaseTestCase
         (new ReencryptResponsesWithAppKeyMigration())->up();
 
         $updatedValue = DB::table('deia_response_settings')
-            ->where('deia_response_setting_id', self::SETTING_ID_TWO)
+            ->where('deia_response_id', $responseId)
             ->value('setting_value');
 
         self::assertSame($encryptedValue, $updatedValue);
@@ -95,18 +80,16 @@ class ReencryptResponsesWithAppKeyMigrationTest extends DatabaseTestCase
         return 'base64:' . base64_encode($encrypter->encrypt($plainText));
     }
 
-    private function createResponseRow(int $questionId, int $responseId): void
+    private function createResponseRow(): int
     {
-        DB::table('deia_questions')->insert([
-            'deia_question_id' => $questionId,
-            'context_id' => 1,
+        $questionId = DB::table('deia_questions')->insertGetId([
+            'context_id' => $this->createTestContext(),
             'deia_question_block_id' => null,
             'seq' => null,
             'question_type' => 1,
         ]);
 
-        DB::table('deia_responses')->insert([
-            'deia_response_id' => $responseId,
+        return (int) DB::table('deia_responses')->insertGetId([
             'deia_question_id' => $questionId,
             'user_id' => null,
             'external_id' => null,
@@ -114,16 +97,4 @@ class ReencryptResponsesWithAppKeyMigrationTest extends DatabaseTestCase
         ]);
     }
 
-    private function deleteFixtureRows(): void
-    {
-        DB::table('deia_response_settings')
-            ->whereIn('deia_response_setting_id', [self::SETTING_ID_ONE, self::SETTING_ID_TWO])
-            ->delete();
-        DB::table('deia_responses')
-            ->whereIn('deia_response_id', [self::RESPONSE_ID_ONE, self::RESPONSE_ID_TWO])
-            ->delete();
-        DB::table('deia_questions')
-            ->whereIn('deia_question_id', [self::QUESTION_ID_ONE, self::QUESTION_ID_TWO])
-            ->delete();
-    }
 }

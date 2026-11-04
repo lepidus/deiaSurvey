@@ -4,8 +4,8 @@ namespace APP\plugins\generic\deiaSurvey\tests\deiaResponse;
 
 use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DAO;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DeiaResponse;
+use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
-use PKP\tests\DatabaseTestCase;
 
 class DAOTest extends DatabaseTestCase
 {
@@ -16,26 +16,15 @@ class DAOTest extends DatabaseTestCase
     private $contextId;
     private $userId;
 
-    protected function getAffectedTables(): array
-    {
-        return [
-            ...parent::getAffectedTables(),
-            'deia_questions',
-            'deia_question_settings',
-            'deia_responses',
-            'deia_response_settings'
-        ];
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
         $this->deiaResponseDAO = app(DAO::class);
         $this->addSchemaFile('deiaQuestion');
         $this->addSchemaFile('deiaResponse');
-        $this->contextId = $this->createJournalMock();
+        $this->contextId = $this->createTestContext();
         $this->deiaQuestionId = $this->createDeiaQuestion();
-        $this->userId = $this->createUserMock();
+        $this->userId = $this->createTestUser();
     }
 
     public function testNewDataObjectIsInstanceOfDeiaResponse(): void

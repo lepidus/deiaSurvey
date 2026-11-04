@@ -57,7 +57,7 @@ function detailsStep(submissionData) {
     cy.setTinyMceContent('titleAbstract-abstract-control-en', submissionData.abstract);
     submissionData.keywords.forEach(keyword => {
         cy.get('#titleAbstract-keywords-control-en').type(keyword, {delay: 0});
-        cy.wait(500);
+        cy.waitJQuery();
         cy.get('#titleAbstract-keywords-control-en').type('{enter}', {delay: 0});
     });
     cy.contains('button', 'Continue').click();
@@ -102,10 +102,10 @@ function createNewSubmission(submissionData) {
     cy.contains('button', 'Continue').click();
     contributorsStep(submissionData);
     cy.contains('button', 'Continue').click();
-    cy.wait(1000);
+    cy.waitJQuery();
 
     cy.get('button:contains("Submit")').click();
-    cy.wait(500);
+    cy.waitJQuery();
     cy.get('div[role="dialog"] button:contains("Submit")').click();
     cy.get('h1:contains("Submission complete")');
 }
@@ -114,7 +114,7 @@ describe('DEIA Survey - External contributors data collecting', function() {
     let firstSubmissionData;
     let secondSubmissionData;
 
-    before(function() {
+    it('Associates external responses only after the registered author confirms the email', function () {
         firstSubmissionData = {
             title: "Test scenarios to automobile vehicles",
 			abstract: 'Description of test scenarios for cars, motorcycles and other vehicles',
@@ -142,15 +142,15 @@ describe('DEIA Survey - External contributors data collecting', function() {
                 }
             ]
 		};
-    });
 
-    it('Creates new submission for collection of DEIA data from external authors', function() {
+        // Create and accept a submission with an external contributor.
+        cy.logout();
         cy.login('ckwantes', null, 'publicknowledge');
 
         cy.contains('a', 'DEIA Survey').click();
         cy.get('input[name="deiaDataConsent"][value=0]').click();
         cy.get('#deiaSurveyForm .submitFormButton').click();
-        cy.wait(1000);
+        cy.waitJQuery();
         cy.get('nav').contains('My Submissions as Author').click();
         cy.get('nav').contains('Active submissions').click();
 
@@ -168,10 +168,9 @@ describe('DEIA Survey - External contributors data collecting', function() {
             cy.clickDecision('Accept Submission');
             cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
         }
-    });
-    
-    it('Access email to collect data from contributors without registration', function () {
-        cy.visit('localhost:8025');
+
+        // Access email to collect data from contributors without registration.
+        cy.visit(Cypress.env('mailpitUrl') || 'http://localhost:8025');
         
         cy.get('b:contains("Request for DEIA data collection")').should('have.length', 1);
         cy.contains('b', 'Request for DEIA data collection')
@@ -199,10 +198,9 @@ describe('DEIA Survey - External contributors data collecting', function() {
         });
         cy.contains('DEIA Survey');
         cy.contains('Only the author can access this page');
-    });
-    
-    it('Contributor without registration answers DEIA survey', function () {
-        cy.visit('localhost:8025');
+
+        // Contributor without registration answers DEIA survey.
+        cy.visit(Cypress.env('mailpitUrl') || 'http://localhost:8025');
         cy.get('b:contains("Request for DEIA data collection")').click();
 
         cy.get('#nav-tab button:contains("Text")').click();
@@ -220,9 +218,8 @@ describe('DEIA Survey - External contributors data collecting', function() {
         assertResponsesOfExternalAuthor('susy.almeida@outlook.com');
 
         cy.logout();
-    });
 
-    it('New submission is created and accepted with same contributor', function () {
+        // New submission is created and accepted with same contributor.
         cy.login('ckwantes', null, 'publicknowledge');
         
         createNewSubmission(secondSubmissionData);
@@ -240,15 +237,13 @@ describe('DEIA Survey - External contributors data collecting', function() {
             cy.clickDecision('Accept Submission');
             cy.recordDecisionAcceptSubmission(['Catherine Kwantes'], [], []);
         }
-    });
 
-    it('E-mail for DEIA data collection is not sent again', function () {
-        cy.visit('localhost:8025');
+        // E-mail for DEIA data collection is not sent again.
+        cy.visit(Cypress.env('mailpitUrl') || 'http://localhost:8025');
         cy.get('b:contains("Request for DEIA data collection")').should('have.length', 1);
-    });
 
-    it('Contributor without registration deletes his own DEIA data', function () {
-        cy.visit('localhost:8025');
+        // Contributor without registration deletes his own DEIA data.
+        cy.visit(Cypress.env('mailpitUrl') || 'http://localhost:8025');
         cy.get('b:contains("Request for DEIA data collection")').click();
 
         cy.get('#nav-tab button:contains("Text")').click();
@@ -267,9 +262,8 @@ describe('DEIA Survey - External contributors data collecting', function() {
         cy.contains('Your data has been deleted');
 
         cy.logout();
-    });
 
-    it('Editor reaccepts/posts new submission', function () {
+        // Editor reaccepts/posts new submission.
         cy.findSubmissionAsEditor('dbarnes', null, 'Kwantes');
 
         if (Cypress.env('contextTitles').en == 'Journal of Public Knowledge') {
@@ -288,10 +282,9 @@ describe('DEIA Survey - External contributors data collecting', function() {
             cy.get('div:contains("Are you sure you want to post this?")');
             cy.get('[id^="publish"] button:contains("Post")').click();
         }
-    });
 
-    it('Contributor answers DEIA survey on new submission', function () {
-        cy.visit('localhost:8025');
+        // Contributor answers DEIA survey on new submission.
+        cy.visit(Cypress.env('mailpitUrl') || 'http://localhost:8025');
         cy.get('b:contains("Request for DEIA data collection")').eq(0).click();
 
         cy.get('#nav-tab button:contains("Text")').click();
@@ -303,9 +296,9 @@ describe('DEIA Survey - External contributors data collecting', function() {
 
         answerDefaultQuestions();
         cy.contains('Thanks for answering our DEIA Survey');
-    });
 
-    it('Responses reference is migrated when author registers', function () {
+        // Register the contributor and confirm ownership before associating responses.
+        cy.logout();
         cy.register({
             'username': 'susyalmeida',
             'givenName': 'Susanna',
@@ -318,6 +311,31 @@ describe('DEIA Survey - External contributors data collecting', function() {
         cy.contains('a', 'Edit My Profile').click();
         cy.contains('a', 'DEIA Survey').click();
 
+        cy.get('input[name="deiaDataConsent"][value=1]').should('not.be.checked');
+        cy.contains('label', 'Woman').find('input').should('not.be.checked');
+
+        // Request proof of email ownership and follow the actual message link.
+        cy.get('#deiaEmailValidationForm').contains('button', 'Request association').click();
+        cy.contains('We sent a link to your email.').should('be.visible');
+        const mailpitUrl = Cypress.env('mailpitUrl') || 'http://localhost:8025';
+        cy.request({
+            url: mailpitUrl + '/api/v1/search',
+            qs: {query: 'to:susy.almeida@outlook.com subject:"Confirm the association"'},
+            log: false
+        }).then(({body}) => {
+            expect(body.messages).to.have.length(1);
+            return cy.request({url: mailpitUrl + '/api/v1/message/' + body.messages[0].ID, log: false});
+        }).then(({body}) => {
+            const email = new DOMParser().parseFromString(body.HTML, 'text/html');
+            const confirmationLink = email.querySelector('a[href*="deiaAssociation"]');
+            expect(confirmationLink, 'email association link').not.to.equal(null);
+            cy.visit(confirmationLink.getAttribute('href'), {log: false});
+        });
+
+        // Opening the link displays a confirmation; association happens on submit.
+        cy.contains('button', 'Confirm and associate responses').click();
+        cy.contains('Previous DEIA Survey responses have been associated with your account.').should('be.visible');
+        cy.visit('/index.php/publicknowledge/en/user/profile');
         assertResponsesOfRegisteredUser();
     });
 });

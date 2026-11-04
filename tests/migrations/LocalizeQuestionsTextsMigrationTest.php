@@ -3,23 +3,18 @@
 namespace APP\plugins\generic\deiaSurvey\tests\migrations;
 
 use APP\plugins\generic\deiaSurvey\classes\migrations\LocalizeQuestionsTextsMigration;
+use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 use Illuminate\Support\Facades\DB;
-use PKP\tests\DatabaseTestCase;
 
 class LocalizeQuestionsTextsMigrationTest extends DatabaseTestCase
 {
     use TestHelperTrait;
 
-    protected function getAffectedTables(): array
+    protected function setUp(): void
     {
-        return [
-            ...parent::getAffectedTables(),
-            'deia_questions',
-            'deia_question_settings',
-            'deia_response_options',
-            'deia_response_option_settings',
-        ];
+        parent::setUp();
+        $this->isolateDeiaTables();
     }
 
     public function testLocalizesQuestionsWithoutSchemaHooks(): void
@@ -52,7 +47,7 @@ class LocalizeQuestionsTextsMigrationTest extends DatabaseTestCase
     private function createPreviousStandardQuestion(): int
     {
         $questionId = DB::table('deia_questions')->insertGetId([
-            'context_id' => 1,
+            'context_id' => $this->createTestContext(),
             'deia_question_block_id' => null,
             'seq' => 1,
             'question_type' => 1,

@@ -4,8 +4,8 @@ namespace APP\plugins\generic\deiaSurvey\tests\deiaResponse;
 
 use APP\plugins\generic\deiaSurvey\classes\deiaResponse\DeiaResponse;
 use APP\plugins\generic\deiaSurvey\classes\deiaResponse\Repository;
+use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
-use PKP\tests\DatabaseTestCase;
 
 class RepositoryTest extends DatabaseTestCase
 {
@@ -15,24 +15,13 @@ class RepositoryTest extends DatabaseTestCase
     private $deiaQuestionId;
     private $userId;
 
-    protected function getAffectedTables(): array
-    {
-        return [
-            ...parent::getAffectedTables(),
-            'deia_questions',
-            'deia_question_settings',
-            'deia_responses',
-            'deia_response_settings'
-        ];
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
         $this->addSchemaFile('deiaQuestion');
         $this->addSchemaFile('deiaResponse');
         $this->deiaQuestionId = $this->createDeiaQuestion();
-        $this->userId = $this->createUserMock();
+        $this->userId = $this->createTestUser();
         $this->params = [
             'deiaQuestionId' => $this->deiaQuestionId,
             'userId' => $this->userId,
@@ -89,7 +78,7 @@ class RepositoryTest extends DatabaseTestCase
 
     public function testCollectorFilterByContext(): void
     {
-        $contextId = 1;
+        $contextId = $this->createTestContext();
         $repository = app(Repository::class);
         $newParams = [
             'deiaQuestionId' => $this->deiaQuestionId,

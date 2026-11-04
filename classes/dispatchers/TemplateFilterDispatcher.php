@@ -27,6 +27,10 @@ class TemplateFilterDispatcher extends DeiaDataDispatcher
         $backendMenuState = $templateMgr->getState('menu');
         if (!empty($backendMenuState)) {
             $request = Application::get()->getRequest();
+            // Invitations may display a backend menu before the user has confirmed their email.
+            if ($request->getRequestedPage() === 'invitation') {
+                return Hook::CONTINUE;
+            }
             if ($this->plugin->userShouldBeRedirected($request)) {
                 $request->redirect(null, 'user', 'profile');
             }
