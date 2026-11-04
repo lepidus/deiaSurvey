@@ -117,8 +117,7 @@ class DataCollectionEmailSender
     private function getQuestionnaireUrls($request, $author): array
     {
         $authorToken = md5(microtime() . $author->getData('email'));
-
-        $author = \Services::get('author')->edit($author, ['deiaToken' => $authorToken], $request);
+        \Services::get('author')->edit($author, ['deiaToken' => $authorToken], \Application::get()->getRequest());
 
         $questionnaireUrl = $request->getDispatcher()->url(
             $request,
@@ -130,14 +129,18 @@ class DataCollectionEmailSender
             ['authorId' => $author->getId(), 'authorToken' => $authorToken]
         );
 
-        $plugin = \PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $contextId = $request->getContext()->getId();
-        $orcidClient = new OrcidClient($plugin, $contextId);
-
-        $orcidQuestionnaireUrl = $orcidClient->buildOAuthUrl([
-            'authorId' => $author->getId(),
-            'authorToken' => $authorToken
-        ]);
+        // Start OAuth in the contributor's browser so state belongs to their session.
+        $orcidQuestionnaireUrl = (new OrcidConfiguration())->getOrcidConfiguration($contextId)
+            ? $request->getDispatcher()->url(
+                $request,
+                ROUTE_PAGE,
+                null,
+                'deiaQuestionnaire',
+                'orcidAuthorize',
+                null,
+                ['authorId' => $author->getId(), 'authorToken' => $authorToken]
+            ) : '';
 
         return ['questionnaireUrl' => $questionnaireUrl, 'orcidQuestionnaireUrl' => $orcidQuestionnaireUrl];
     }
