@@ -33,9 +33,7 @@ Para autores que não estiverem registrados no sistema, um e-mail será enviado 
 
 O e-mail enviado oferece duas maneiras de preencher o questionário. A primeira requere que um registro ORCID seja autenticado, de forma que os dados fiquem associados a esse registro. A segunda utiliza o endereço de e-mail do(a) autor(a) e é recomendada apenas para aqueles que não possuem um registro ORCID.
 
-Os links do questionário externo expiram após sete dias. Um novo convite invalida o link anterior. Links emitidos antes da introdução dos tokens com expiração são recusados e precisam ser reenviados. Durante a validade do link, o colaborador pode consultar, atualizar e excluir suas respostas. Apenas o hash do token do questionário é armazenado. O token fica vinculado ao e-mail do autor no momento da emissão; alterar esse e-mail invalida o acesso e a recuperação pelo convite anterior. Associações ORCID legadas exigem nova autenticação ORCID quando um convite substituto é emitido.
-
-A página do link vencido oferece a ação `Solicitar novo link`, inclusive para colaboradores que já responderam. O segredo do convite vencido só autoriza o envio de outro convite para o e-mail cadastrado do autor; ele não permite acessar respostas. O novo convite invalida o link anterior. Se o envio falhar, é possível abrir o link vencido e tentar novamente. O colaborador também pode recuperar o acesso criando uma conta e confirmando o endereço de e-mail ou autenticando o ORCID associado às respostas.
+Os links do questionário expiram após sete dias. Na página do link vencido, o colaborador pode solicitar outro para o e-mail cadastrado, mesmo após responder. Novos convites e alterações de e-mail invalidam os links anteriores. Links antigos precisam ser substituídos, e associações ORCID legadas exigem nova autenticação.
 
 A associação automática de respostas externas por email exige uma conta habilitada cujo email tenha sido validado pelo OJS (`dateValidated`). Ao abrir a aba Questionário DEIA do perfil, as respostas do email atual naquele contexto são associadas somente se a conta não tiver respostas nem uma escolha de consentimento registrada ali. Os valores criptografados são preservados. Sem a validação nativa, as respostas permanecem externas. Essas versões do OJS preservam a data de validação anterior quando o email muda. Por isso, a associação automática também exige que o email atual corresponda ao email de cadastro observado pelo plugin. Contas existentes sem esse registro exigem confirmação explícita DEIA.
 
@@ -137,9 +135,9 @@ Execute os testes isolados de associação por email a partir da raiz do OJS:
 php lib/pkp/lib/vendor/bin/phpunit -c plugins/generic/deiaSurvey/tests/phpunit-email-association.xml --no-coverage
 ```
 
-A associação de respostas ORCID no PKP 3.3 exige confirmação OAuth explícita na aba DEIA do perfil. Informe o ORCID no perfil e use `Autenticar ORCID e associar respostas`. A edição administrativa de usuários não transfere mais respostas. Adicione o callback `https://SEU-OJS/index.php/REVISTA/deiaOrcidAssociation/verify` aos redirecionamentos permitidos do cliente configurado no ORCID Profile. Use a URL e o caminho reais da revista.
+Informe o ORCID no perfil e use `Autenticar ORCID e associar respostas` na aba DEIA. No cliente configurado no ORCID Profile, permita o callback `https://SEU-OJS/index.php/REVISTA/deiaOrcidAssociation/verify`, com a URL real da revista, no sandbox ou em produção conforme o ambiente utilizado.
 
-Execute os testes isolados de segurança e regressão de e-mail a partir da raiz do OJS:
+Na raiz do OJS, execute os testes de segurança e regressão de e-mail:
 
 ```sh
 php lib/pkp/lib/vendor/bin/phpunit -c plugins/generic/deiaSurvey/tests/phpunit-questionnaire-security.xml --no-coverage
