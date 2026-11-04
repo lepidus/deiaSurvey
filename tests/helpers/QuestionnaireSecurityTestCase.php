@@ -12,14 +12,28 @@ use PKP\core\Registry;
 
 abstract class QuestionnaireSecurityTestCase extends EmailAssociationTestCase
 {
+    private array $originalSession;
+
     protected function setUp(): void
     {
+        $this->originalSession = $_SESSION ?? [];
         parent::setUp();
+        $config = &\PKP\config\Config::getData();
+        $config['general']['allowed_hosts'] = '["localhost"]';
         // Parent creates connection-local DEIA tables: never clear the application's tables.
         foreach (['deia_response_settings', 'deia_responses', 'deia_question_settings', 'deia_questions'] as $table) {
             DB::table($table)->delete();
         }
         $_SESSION = [];
+    }
+
+    protected function tearDown(): void
+    {
+        try {
+            parent::tearDown();
+        } finally {
+            $_SESSION = $this->originalSession;
+        }
     }
 
     protected function createTestContext(): int

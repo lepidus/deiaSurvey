@@ -29,9 +29,10 @@ class QuestionnaireHandlerTest extends TestCase
         ];
     }
 
-    public function testAcceptsEqualNonEmptyTokens(): void
+    public function testAcceptsUnexpiredTokenMatchingItsStoredHash(): void
     {
-        self::assertTrue($this->tokenIsValid($this->author('stored-token'), 'stored-token'));
+        $token = str_repeat('a', 64);
+        self::assertTrue($this->tokenIsValid($this->author($token), $token));
     }
 
     private function tokenIsValid($author, $requestToken): bool
@@ -41,20 +42,13 @@ class QuestionnaireHandlerTest extends TestCase
         return $method->invoke(new QuestionnaireHandler(), $author, $requestToken);
     }
 
-    private function author($storedToken): object
+    private function author($storedToken): \APP\author\Author
     {
-        return new class ($storedToken) {
-            private $storedToken;
-
-            public function __construct($storedToken)
-            {
-                $this->storedToken = $storedToken;
-            }
-
-            public function getData(string $settingName)
-            {
-                return $settingName === 'deiaToken' ? $this->storedToken : null;
-            }
-        };
+        $author = new \APP\author\Author();
+        $author->setEmail('token-test@example.org');
+        $author->setData('deiaToken', is_string($storedToken) ? hash('sha256', $storedToken) : null);
+        $author->setData('deiaTokenExpiresAt', \Carbon\Carbon::now()->addDay()->timestamp);
+        $author->setData('deiaTokenEmail', $author->getEmail());
+        return $author;
     }
 }

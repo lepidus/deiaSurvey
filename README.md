@@ -31,6 +31,10 @@ For authors who are not registered in the system, an e-mail is sent when the sub
 
 The e-mail sent offers two ways of filling in the questionnaire. The first requires an ORCID record to be authenticated, so that the data is associated with this record. The second uses the author's e-mail address and is recommended only for those who do not have an ORCID record.
 
+External questionnaire links expire after seven days. Sending a new invitation invalidates the previous link. Links issued before the introduction of expiring tokens are rejected and must be reissued. A valid link allows the contributor to view, update and delete responses during its validity period. Only a hash of the questionnaire token is stored. Tokens are bound to the author’s email at issuance; changing that email invalidates access and recovery with the old invitation. Legacy ORCID associations require fresh ORCID authentication when a replacement invitation is issued.
+
+The expired link page offers a `Request a new link` action, including for contributors who have already answered. The expired invitation secret only authorizes sending a replacement to the author’s registered email address; it does not grant access to responses. The replacement invalidates the old link. If sending fails, the expired link can be used to retry. Contributors can also recover access by creating an account and confirming the email address or authenticating the ORCID associated with their responses.
+
 Automatic association of external email-based responses requires an enabled account whose email has been validated by OJS (`dateValidated`). Opening the DEIA Survey profile tab associates responses for the current email and context only if the account has no existing responses or consent choice there. Encrypted response values are preserved. Without native email validation, responses remain external. These OJS versions retain the old validation date when an email changes. Automatic association therefore also requires the current email to match the registration email observed by the plugin. Existing accounts without this record require explicit DEIA confirmation.
 
 Users without reliable native email validation can request association from the notification in the DEIA Survey profile tab. The confirmation email includes a single-use link valid for 24 hours; signing in to the requesting account and confirming on that page associates the responses directly. This does not activate the account, change dateValidated or consume native activation links. Resending is allowed after one minute and invalidates the previous link.
@@ -129,4 +133,12 @@ Run the isolated email association tests from the OJS root:
 
 ```sh
 php lib/pkp/lib/vendor/bin/phpunit -c plugins/generic/deiaSurvey/tests/phpunit-email-association.xml --no-coverage
+```
+
+ORCID response association requires a fresh authentication through ORCID Profile. Manually entering an ORCID, even when an older access token exists, does not transfer responses.
+
+Run the isolated questionnaire security and email regression tests from the OJS root:
+
+```sh
+php lib/pkp/lib/vendor/bin/phpunit -c plugins/generic/deiaSurvey/tests/phpunit-questionnaire-security.xml --no-coverage
 ```

@@ -3,19 +3,36 @@
 namespace APP\plugins\generic\deiaSurvey\classes;
 
 use APP\core\Application;
-use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
-use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\mail\mailables\ConfirmDeiaEmail;
 use APP\plugins\generic\deiaSurvey\classes\mail\mailables\RequestCollectionContributorData;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use PKP\context\Context;
-use PKP\plugins\PluginRegistry;
 use PKP\user\User;
 
 class DataCollectionEmailSender
 {
+    public function renewQuestionnaireLink(Context $context, int $authorId, string $expiredToken): bool
+    {
+        return DB::transaction(function () use ($context, $authorId, $expiredToken): bool {
+            if (!DB::table('authors')->where('author_id', $authorId)->lockForUpdate()->first()) {
+                return false;
+            }
+            $author = Repo::author()->get($authorId);
+            if (!(new QuestionnaireTokenService())->canRenew($author, $expiredToken)) {
+                return false;
+            }
+            $publication = Repo::publication()->get($author->getData('publicationId'));
+            $submission = $publication ? Repo::submission()->get($publication->getData('submissionId')) : null;
+            if (!$submission || (int) $submission->getData('contextId') !== $context->getId()) {
+                return false;
+            }
+            // Sending inside this transaction preserves the expired secret if delivery fails.
+            return $this->sendEmailToAuthor($submission, $author);
+        });
+    }
+
     public function sendEmailValidation(Context $context, User $user): bool
     {
         return DB::transaction(function () use ($context, $user): bool {
@@ -57,7 +74,7 @@ class DataCollectionEmailSender
         $nonRegisteredAuthors = $this->getNonRegisteredAuthors($submission);
 
         if (!empty($nonRegisteredAuthors)) {
-            $deiaDataService  = new DeiaDataService();
+            $deiaDataService = new DeiaDataService();
 
             foreach ($nonRegisteredAuthors as $author) {
                 if (!$deiaDataService->authorAlreadyAnsweredQuestionnaire($author)) {
@@ -84,33 +101,44 @@ class DataCollectionEmailSender
         return $nonRegisteredAuthors;
     }
 
-    private function sendEmailToAuthor($submission, $author)
+    private function sendEmailToAuthor($submission, $author): bool
     {
-        $request = Application::get()->getRequest();
-        $context = $request->getContext();
+        return DB::transaction(function () use ($submission, $author): bool {
+            if (!DB::table('authors')->where('author_id', $author->getId())->lockForUpdate()->first()) {
+                return false;
+            }
+            $author = Repo::author()->get($author->getId());
+            $request = Application::get()->getRequest();
+            $context = $request->getContext();
+            $publication = Repo::publication()->get($author->getData('publicationId'));
+            if (!$publication || (int) $publication->getData('submissionId') !== $submission->getId()
+                || (int) $submission->getData('contextId') !== $context->getId()) {
+                return false;
+            }
 
-        $emailTemplate = Repo::emailTemplate()->getByKey(
-            $context->getId(),
-            'REQUEST_COLLECTION_CONTRIBUTOR_DATA'
-        );
-        $authorName = $author->getFullName();
-        $authorEmail = $author->getData('email');
+            $emailTemplate = Repo::emailTemplate()->getByKey(
+                $context->getId(),
+                'REQUEST_COLLECTION_CONTRIBUTOR_DATA'
+            );
+            $authorName = $author->getFullName();
+            $authorEmail = $author->getData('email');
 
-        $emailQuestionnaireUrls = $this->getQuestionnaireUrls($request, $author);
+            $emailQuestionnaireUrls = $this->getQuestionnaireUrls($request, $author);
 
-        $email = new RequestCollectionContributorData($context, $submission, $emailQuestionnaireUrls);
-        $email->from($context->getData('contactEmail'), $context->getData('contactName'));
-        $email->to([['name' => $authorName, 'email' => $authorEmail]]);
-        $email->subject($emailTemplate->getLocalizedData('subject'));
-        $email->body($emailTemplate->getLocalizedData('body'));
+            $email = new RequestCollectionContributorData($context, $submission, $emailQuestionnaireUrls);
+            $email->from($context->getData('contactEmail'), $context->getData('contactName'));
+            $email->to([['name' => $authorName, 'email' => $authorEmail]]);
+            $email->subject($emailTemplate->getLocalizedData('subject'));
+            $email->body($emailTemplate->getLocalizedData('body'));
 
-        Mail::send($email);
+            Mail::send($email);
+            return true;
+        });
     }
 
     private function getQuestionnaireUrls($request, $author): array
     {
-        $authorToken = md5(microtime() . $author->getData('email'));
-        Repo::author()->edit($author, ['deiaToken' => $authorToken]);
+        $authorToken = (new QuestionnaireTokenService())->create($author);
 
         $questionnaireUrl = $request->getDispatcher()->url(
             $request,

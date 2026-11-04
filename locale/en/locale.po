@@ -426,3 +426,15 @@ msgstr "The responses could not be associated. The link may have expired, alread
 
 msgid "plugins.generic.deiaSurvey.emailValidation.urlDescription"
 msgstr "Link to confirm the association of DEIA responses."
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.expiredLink"
+msgstr "This questionnaire link has expired. Request a new link to be sent to the author’s registered email address."
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.requestNewLink"
+msgstr "Request a new link"
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.renewalSent"
+msgstr "We sent a new questionnaire link to the author’s registered email address. The link is valid for seven days."
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.renewalUnavailable"
+msgstr "The request could not be completed. If you already requested a new link, check your email. Otherwise, reopen the expired link and try again."
