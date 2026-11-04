@@ -32,9 +32,7 @@ Para autores que não estiverem registrados no sistema, um e-mail será enviado 
 
 O e-mail enviado oferece duas maneiras de preencher o questionário. A primeira requere que um registro ORCID seja autenticado, de forma que os dados fiquem associados a esse registro. A segunda utiliza o endereço de e-mail do(a) autor(a) e é recomendada apenas para aqueles que não possuem um registro ORCID.
 
-Os links do questionário externo expiram após sete dias. Um novo convite invalida o link anterior. Links emitidos antes da introdução dos tokens com expiração são recusados e precisam ser reenviados. Durante a validade do link, o colaborador pode consultar, atualizar e excluir suas respostas. Apenas o hash do token do questionário é armazenado. O token fica vinculado ao e-mail do autor no momento da emissão; alterar esse e-mail invalida o acesso e a recuperação pelo convite anterior. Associações ORCID legadas exigem nova autenticação ORCID quando um convite substituto é emitido.
-
-A página do link vencido oferece a ação `Solicitar novo link`, inclusive para colaboradores que já responderam. O segredo do convite vencido só autoriza o envio de outro convite para o e-mail cadastrado do autor; ele não permite acessar respostas. O novo convite invalida o link anterior. Se o envio falhar, é possível abrir o link vencido e tentar novamente. O colaborador também pode recuperar o acesso criando uma conta e confirmando o endereço de e-mail ou autenticando o ORCID associado às respostas.
+Os links do questionário expiram após sete dias. Na página do link vencido, o colaborador pode solicitar outro para o e-mail cadastrado, mesmo após responder. Novos convites e alterações de e-mail invalidam os links anteriores. Links antigos precisam ser substituídos, e associações ORCID legadas exigem nova autenticação.
 
 Os usuários registrados podem ver e excluir seus dados a qualquer momento. Respostas associadas a um ORCID só podem ser migradas quando esse ORCID foi autenticado na conta.
 
