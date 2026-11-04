@@ -324,10 +324,19 @@ class DeiaSurveyPlugin extends GenericPlugin
         $user = $params[0];
         $userOrcid = $user->getOrcid();
 
-        if ($userOrcid) {
+        $props = $params[2] ?? [];
+        // ORCID Profile supplies this internal field list after exchanging an OAuth code.
+        // A manual PublicProfileForm edit supplies no such attestation, even with an old access token.
+        $nativeOAuth = in_array('orcidAccessToken', $props, true)
+            && in_array('orcidRefreshToken', $props, true)
+            && in_array('orcidAccessExpiresOn', $props, true);
+        if ($userOrcid && $nativeOAuth && $user->getData('orcidAccessToken')) {
             $context = Application::get()->getRequest()->getContext();
+            if (!$context) {
+                return;
+            }
             $deiaDataService = new DeiaDataService();
-            $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
+            $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid', true);
         }
     }
 }
