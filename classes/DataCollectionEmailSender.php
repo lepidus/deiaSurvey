@@ -29,7 +29,7 @@ class DataCollectionEmailSender
             $email = new ConfirmDeiaEmail($context, [
                 'contextName' => htmlspecialchars($context->getLocalizedName(), ENT_QUOTES, 'UTF-8'),
                 'contextUrl' => $request->getDispatcher()->url($request, Application::ROUTE_PAGE, $context->getPath()),
-                'associationUrl' => $request->getDispatcher()->url(
+                'associationUrl' => htmlspecialchars($request->getDispatcher()->url(
                     $request,
                     Application::ROUTE_PAGE,
                     $context->getPath(),
@@ -37,7 +37,7 @@ class DataCollectionEmailSender
                     'index',
                     null,
                     ['userId' => $user->getId(), 'token' => $token]
-                ),
+                ), ENT_QUOTES, 'UTF-8'),
             ]);
 
             $template = Repo::emailTemplate()->getByKey($context->getId(), $email::getEmailTemplateKey());
