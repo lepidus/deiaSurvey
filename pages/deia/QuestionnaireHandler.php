@@ -119,7 +119,8 @@ class QuestionnaireHandler extends Handler
 
         $author = Repo::author()->get((int) $queryParams['authorId']);
         $context = $request->getContext();
-        if (is_null($author) || is_null($context) || !$this->authorBelongsToContext($author, $context->getId())) {
+        if (is_null($author) || is_null($context) || !$this->authorBelongsToContext($author, $context->getId())
+            || !$this->authorTokenIsValid($author, $queryParams['authorToken'])) {
             return false;
         }
 
@@ -272,6 +273,25 @@ class QuestionnaireHandler extends Handler
         return $templateMgr->display($plugin->getTemplateResource('questionnairePage/deleteData.tpl'));
     }
 
+    public function orcidAuthorize($args, $request)
+    {
+        $author = Repo::author()->get((int) $request->getUserVar('authorId'));
+        $token = $request->getUserVar('authorToken');
+        $context = $request->getContext();
+        if (!$context || !$this->authorTokenIsValid($author, $token)
+            || !$this->authorBelongsToContext($author, $context->getId())) {
+            return false;
+        }
+
+        $plugin = PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
+        $client = new OrcidClient($plugin, $context->getId());
+        $url = $client->buildOAuthUrl(['authorId' => $author->getId(), 'authorToken' => $token]);
+        if ($url === '') {
+            return false;
+        }
+        $request->redirectUrl($url);
+    }
+
     public function orcidVerify($args, $request)
     {
         $author = Repo::author()->get($request->getUserVar('authorId'));
@@ -281,6 +301,15 @@ class QuestionnaireHandler extends Handler
 
         $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
 
+        $authorToken = $request->getUserVar('authorToken');
+        $orcidClient = new OrcidClient($plugin, $contextId);
+        if (!$this->authorTokenIsValid($author, $authorToken)
+            || !$this->authorBelongsToContext($author, $contextId)
+            || !$orcidClient->consumeOAuthState($request->getUserVar('state'), $author->getId(), $authorToken)) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
+            return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
+        }
+
         if ($request->getUserVar('error') == 'access_denied') {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.orcidAccessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
@@ -288,14 +317,18 @@ class QuestionnaireHandler extends Handler
 
         try {
             $code = $request->getUserVar('code');
-            $orcidClient = new OrcidClient($plugin, $contextId);
-            $authorOrcid = $orcidClient->requestOrcid($code);
+            if (!is_string($code) || $code === '') {
+                return false;
+            }
+            $authorOrcid = $orcidClient->requestOrcid($code, [
+                'authorId' => $author->getId(), 'authorToken' => $authorToken,
+            ]);
         } catch (\GuzzleHttp\Exception\RequestException $exception) {
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.orcidAuthError'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
-        if (strlen($authorOrcid) == 0) {
+        if (!is_string($authorOrcid) || !preg_match('/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/D', $authorOrcid)) {
             return;
         }
 

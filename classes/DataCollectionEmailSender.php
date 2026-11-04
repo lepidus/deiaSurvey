@@ -9,7 +9,6 @@ use APP\plugins\generic\deiaSurvey\classes\mail\mailables\RequestCollectionContr
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use PKP\context\Context;
-use PKP\plugins\PluginRegistry;
 use PKP\user\User;
 
 class DataCollectionEmailSender
@@ -118,14 +117,18 @@ class DataCollectionEmailSender
             ['authorId' => $author->getId(), 'authorToken' => $authorToken]
         );
 
-        $plugin = PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $contextId = $request->getContext()->getId();
-        $orcidClient = new OrcidClient($plugin, $contextId);
-
-        $orcidQuestionnaireUrl = $orcidClient->buildOAuthUrl([
-            'authorId' => $author->getId(),
-            'authorToken' => $authorToken
-        ]);
+        // Start OAuth in the contributor's browser so state belongs to their session.
+        $orcidQuestionnaireUrl = (new OrcidConfiguration())->getOrcidConfiguration($contextId)
+            ? $request->getDispatcher()->url(
+                $request,
+                Application::ROUTE_PAGE,
+                null,
+                'deiaQuestionnaire',
+                'orcidAuthorize',
+                null,
+                ['authorId' => $author->getId(), 'authorToken' => $authorToken]
+            ) : '';
 
         return ['questionnaireUrl' => $questionnaireUrl, 'orcidQuestionnaireUrl' => $orcidQuestionnaireUrl];
     }
