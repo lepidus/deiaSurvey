@@ -118,6 +118,7 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
         $schema->properties->{'deiaToken'} = (object) [
             'type' => 'string',
+            'apiSummary' => false,
             'writeOnly' => true,
             'validation' => ['nullable'],
         ];
@@ -126,17 +127,29 @@ class DeiaSurveyPlugin extends \GenericPlugin
             'apiSummary' => true,
             'validation' => ['nullable'],
         ];
+        $schema->properties->{'deiaTokenExpiresAt'} = (object) [
+            'type' => 'integer',
+            'apiSummary' => false,
+            'writeOnly' => true,
+            'validation' => ['nullable'],
+        ];
+        $schema->properties->{'deiaTokenEmail'} = (object) [
+            'type' => 'string',
+            'apiSummary' => false,
+            'writeOnly' => true,
+            'validation' => ['nullable'],
+        ];
 
         return false;
     }
 
-    public function preventDeiaTokenApiWrite($hookName, $params)
+    public function preventDeiaTokenApiWrite(string $hookName, array $params): bool
     {
         $errors = &$params[0];
         $props = $params[2];
-        foreach (['deiaToken', 'deiaOrcid'] as $field) {
-            if (array_key_exists($field, $props)) {
-                $errors[$field] = [__('api.403.unauthorized')];
+        foreach (['deiaToken', 'deiaTokenExpiresAt', 'deiaTokenEmail', 'deiaOrcid'] as $name) {
+            if (array_key_exists($name, $props)) {
+                $errors[$name] = [__('api.403.unauthorized')];
             }
         }
 

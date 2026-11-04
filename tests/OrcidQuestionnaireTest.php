@@ -9,34 +9,29 @@ require_once dirname(__DIR__) . '/DeiaSurveyPlugin.php';
 
 use Application;
 use Request;
-
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
+use APP\plugins\generic\deiaSurvey\classes\QuestionnaireTokenService;
 use DeiaSurveyPlugin;
 use APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler;
-require_once __DIR__ . '/helpers/QuestionnaireSecurityTestCase.php';
 use APP\plugins\generic\deiaSurvey\tests\helpers\QuestionnaireSecurityTestCase;
-
 use TemplateManager;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-
 use Session;
 use Illuminate\Database\Capsule\Manager as DB;
 use Registry;
-
 use HookRegistry;
 use PluginRegistry;
 
 class OrcidQuestionnaireTest extends QuestionnaireSecurityTestCase
 {
-
-
     private Request $request;
     private $handler;
     private $httpClient;
     private array $input = [];
     private int $authorId;
+    private string $token;
     private Session $session;
 
     protected function setUp(): void
@@ -62,7 +57,7 @@ class OrcidQuestionnaireTest extends QuestionnaireSecurityTestCase
         $plugin->pluginPath = 'plugins/generic/deiaSurvey';
         $plugin->addLocaleData();
         HookRegistry::register('Schema::get::author', [$plugin, 'editAuthorSchema']);
-        \Services::get('author')->edit(\Services::get('author')->get($this->authorId), ['deiaToken' => 'correct-token'], \Application::get()->getRequest());
+        $this->token = (new QuestionnaireTokenService())->create(\Services::get('author')->get($this->authorId));
         $plugins = &PluginRegistry::getPlugins('generic');
         $plugins['deiasurveyplugin'] = $plugin;
         $template = $this->getMockBuilder(TemplateManager::class)->disableOriginalConstructor()
@@ -85,7 +80,7 @@ class OrcidQuestionnaireTest extends QuestionnaireSecurityTestCase
         $this->handler->method('createOrcidClient')->willReturnCallback(function ($plugin, $contextId) {
             return new OrcidClient($plugin, $contextId, $this->httpClient);
         });
-        $this->input = ['authorId' => $this->authorId, 'authorToken' => 'correct-token', 'code' => 'oauth-code'];
+        $this->input = ['authorId' => $this->authorId, 'authorToken' => $this->token, 'code' => 'oauth-code'];
     }
 
     public function testCallbackRejectsWrongTokenBeforeContactingOrcid(): void
@@ -152,7 +147,7 @@ class OrcidQuestionnaireTest extends QuestionnaireSecurityTestCase
         $otherId = DB::table('authors')->insertGetId([
             'email' => 'other@example.org', 'publication_id' => $publicationId,
         ]);
-        \Services::get('author')->edit(\Services::get('author')->get($otherId), ['deiaToken' => 'correct-token'], \Application::get()->getRequest());
+        \Services::get('author')->edit(\Services::get('author')->get($otherId), ['deiaToken' => hash('sha256', $this->token), 'deiaTokenExpiresAt' => Carbon::now()->addDay()->timestamp, 'deiaTokenEmail' => 'other@example.org'], \Application::get()->getRequest());
         $this->input['authorId'] = $otherId;
         $this->assertCallbackDoesNotContactOrcid();
         self::assertNull(\Services::get('author')->get($otherId)->getData('deiaOrcid'));
@@ -163,13 +158,13 @@ class OrcidQuestionnaireTest extends QuestionnaireSecurityTestCase
         $this->startOAuth();
         $client = new OrcidClient(new DeiaSurveyPlugin(), $this->createTestContext());
         self::assertFalse($client->consumeOAuthState($this->input['state'], $this->authorId, 'another-token'));
-        self::assertFalse($client->consumeOAuthState($this->input['state'], $this->authorId, 'correct-token'));
+        self::assertFalse($client->consumeOAuthState($this->input['state'], $this->authorId, $this->token));
         $this->startOAuthWithoutRedirect();
         $otherContextClient = new OrcidClient(new DeiaSurveyPlugin(), $this->createTestContext() + 100000);
         self::assertFalse($otherContextClient->consumeOAuthState(
             $this->input['state'],
             $this->authorId,
-            'correct-token'
+            $this->token
         ));
     }
 
@@ -204,8 +199,12 @@ class OrcidQuestionnaireTest extends QuestionnaireSecurityTestCase
         $submission->setData('locale', 'en_US');
         $this->request->getContext()->setData('supportedSubmissionMetadataLocales', ['en_US']);
         $this->request->getContext()->setData('supportedSubmissionLocales', ['en_US']);
-        $errors = \Services::get('author')->validate(VALIDATE_ACTION_EDIT,
-            ['deiaOrcid' => 'https://orcid.org/0000-0002-1825-0097'], ['en_US'], 'en_US');
+        $errors = \Services::get('author')->validate(
+            VALIDATE_ACTION_EDIT,
+            ['deiaOrcid' => 'https://orcid.org/0000-0002-1825-0097'],
+            ['en_US'],
+            'en_US'
+        );
         self::assertArrayHasKey('deiaOrcid', $errors);
     }
 
@@ -222,7 +221,9 @@ class OrcidQuestionnaireTest extends QuestionnaireSecurityTestCase
     {
         $url = '';
         $this->request->expects(self::once())->method('redirectUrl')
-            ->willReturnCallback(function ($value) use (&$url) { $url = $value; });
+            ->willReturnCallback(function ($value) use (&$url) {
+                $url = $value;
+            });
         $this->handler->orcidAuthorize([], $this->request);
         parse_str(parse_url($url, PHP_URL_QUERY), $query);
         self::assertMatchesRegularExpression('/^[a-f0-9]{64}$/D', $query['state']);
@@ -233,7 +234,7 @@ class OrcidQuestionnaireTest extends QuestionnaireSecurityTestCase
     private function startOAuthWithoutRedirect(): void
     {
         $url = (new OrcidClient(new DeiaSurveyPlugin(), $this->createTestContext()))->buildOAuthUrl([
-            'authorId' => $this->authorId, 'authorToken' => 'correct-token',
+            'authorId' => $this->authorId, 'authorToken' => $this->token,
         ]);
         parse_str(parse_url($url, PHP_URL_QUERY), $query);
         $this->input['state'] = $query['state'];
