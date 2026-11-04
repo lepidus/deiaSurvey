@@ -4,15 +4,18 @@ namespace APP\plugins\generic\deiaSurvey\pages\deia;
 
 use APP\core\Application;
 use APP\handler\Handler;
+use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
+use APP\plugins\generic\deiaSurvey\classes\QuestionnaireTokenService;
 use APP\template\TemplateManager;
 use Illuminate\Support\Facades\DB;
 use PKP\plugins\PluginRegistry;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class QuestionnaireHandler extends Handler
 {
@@ -30,6 +33,10 @@ class QuestionnaireHandler extends Handler
 
         $authorToken = $queryParams['authorToken'];
         if (!$this->authorTokenIsValid($author, $authorToken)) {
+            if ((new QuestionnaireTokenService())->canRenew($author, $authorToken)) {
+                $templateMgr->assign(['authorId' => $author->getId(), 'authorToken' => $authorToken]);
+                return $templateMgr->display($plugin->getTemplateResource('questionnairePage/expiredLink.tpl'));
+            }
             $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
@@ -86,12 +93,7 @@ class QuestionnaireHandler extends Handler
 
     private function authorTokenIsValid($author, $token): bool
     {
-        if (!$author || !is_string($token)) {
-            return false;
-        }
-
-        $storedToken = $author->getData('deiaToken');
-        return is_string($storedToken) && $storedToken !== '' && hash_equals($storedToken, $token);
+        return (new QuestionnaireTokenService())->isValid($author, $token);
     }
 
     private function authorBelongsToContext($author, int $contextId): bool
@@ -119,12 +121,43 @@ class QuestionnaireHandler extends Handler
 
         $author = Repo::author()->get((int) $queryParams['authorId']);
         $context = $request->getContext();
-        if (is_null($author) || is_null($context) || !$this->authorBelongsToContext($author, $context->getId())
-            || !$this->authorTokenIsValid($author, $queryParams['authorToken'])) {
+        if (is_null($author) || is_null($context) || !$this->authorBelongsToContext($author, $context->getId())) {
+            return false;
+        }
+        $validToken = $this->authorTokenIsValid($author, $queryParams['authorToken']);
+        $recoveryOnly = !$validToken
+            && in_array($request->getRequestedOp(), ['index', 'orcidAuthorize', 'requestNewLink'], true)
+            && (new QuestionnaireTokenService())->canRenew($author, $queryParams['authorToken']);
+        if (!$validToken && !$recoveryOnly) {
             return false;
         }
 
         return parent::authorize($request, $args, $roleAssignments);
+    }
+
+    public function requestNewLink($args, $request)
+    {
+        $sent = false;
+        $context = $request->getContext();
+        $token = $request->getUserVar('authorToken');
+        if ($request->isPost() && $request->checkCSRF() && $context && is_string($token)) {
+            try {
+                $sent = (new DataCollectionEmailSender())->renewQuestionnaireLink(
+                    $context,
+                    (int) $request->getUserVar('authorId'),
+                    $token
+                );
+            } catch (TransportExceptionInterface $exception) {
+                $sent = false;
+            }
+        }
+        $plugin = PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
+        $templateMgr = TemplateManager::getManager($request);
+        $this->addQuestionnairePageStyleSheet($plugin, $request, $templateMgr);
+        $templateMgr->assign('messageToDisplay', $sent
+            ? __('plugins.generic.deiaSurvey.questionnairePage.renewalSent')
+            : __('plugins.generic.deiaSurvey.questionnairePage.renewalUnavailable'));
+        return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
     }
 
     public function saveQuestionnaire($args, $request)
@@ -206,7 +239,7 @@ class QuestionnaireHandler extends Handler
 
         $templateMgr->assign([
             'authorId' => $author->getId(),
-            'authorToken' => $author->getData('deiaToken')
+            'authorToken' => $authorToken
         ]);
 
         return $templateMgr->display($plugin->getTemplateResource('questionnairePage/saveSuccess.tpl'));
@@ -267,7 +300,7 @@ class QuestionnaireHandler extends Handler
 
         $templateMgr->assign([
             'authorId' => $author->getId(),
-            'authorToken' => $author->getData('deiaToken')
+            'authorToken' => $authorToken
         ]);
 
         return $templateMgr->display($plugin->getTemplateResource('questionnairePage/deleteData.tpl'));
@@ -278,6 +311,10 @@ class QuestionnaireHandler extends Handler
         $author = Repo::author()->get((int) $request->getUserVar('authorId'));
         $token = $request->getUserVar('authorToken');
         $context = $request->getContext();
+        if ($context && $this->authorBelongsToContext($author, $context->getId())
+            && (new QuestionnaireTokenService())->canRenew($author, $token)) {
+            return $this->index($args, $request);
+        }
         if (!$context || !$this->authorTokenIsValid($author, $token)
             || !$this->authorBelongsToContext($author, $context->getId())) {
             return false;
@@ -345,13 +382,21 @@ class QuestionnaireHandler extends Handler
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
-        $deiaDataService = new DeiaDataService();
-        if ($deiaDataService->authorAlreadyAnsweredQuestionnaire($author, $authorOrcidUri)) {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.alreadyAnswered'));
+        // OAuth proves ownership even when this ORCID already has external responses.
+        $linked = DB::transaction(function () use ($author, $authorToken, $authorOrcidUri, $contextId): bool {
+            DB::table('authors')->where('author_id', $author->getId())->lockForUpdate()->first();
+            $currentAuthor = Repo::author()->get($author->getId());
+            if (!$this->authorTokenIsValid($currentAuthor, $authorToken)
+                || !$this->authorBelongsToContext($currentAuthor, $contextId)) {
+                return false;
+            }
+            Repo::author()->edit($currentAuthor, ['deiaOrcid' => $authorOrcidUri]);
+            return true;
+        });
+        if (!$linked) {
+            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
-
-        Repo::author()->edit($author, ['deiaOrcid' => $authorOrcidUri]);
 
         $request->redirect(null, null, 'index', null, ['authorId' => $author->getId(), 'authorToken' => $request->getUserVar('authorToken')]);
     }

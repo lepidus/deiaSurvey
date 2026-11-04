@@ -387,3 +387,15 @@ msgstr "No fue posible asociar las respuestas. El enlace puede haber caducado, y
 
 msgid "plugins.generic.deiaSurvey.emailValidation.urlDescription"
 msgstr "Enlace para confirmar la asociación de las respuestas DEIA."
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.expiredLink"
+msgstr "Este enlace del cuestionario ha caducado. Solicite un nuevo enlace para el correo electrónico registrado del autor."
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.requestNewLink"
+msgstr "Solicitar un nuevo enlace"
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.renewalSent"
+msgstr "Enviamos un nuevo enlace del cuestionario al correo electrónico registrado del autor. El enlace es válido durante siete días."
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.renewalUnavailable"
+msgstr "No se pudo completar la solicitud. Si ya solicitó un nuevo enlace, revise su correo electrónico. De lo contrario, abra de nuevo el enlace caducado e inténtelo otra vez."

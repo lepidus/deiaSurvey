@@ -129,6 +129,18 @@ class DeiaSurveyPlugin extends GenericPlugin
             'apiSummary' => true,
             'validation' => ['nullable'],
         ];
+        $schema->properties->{'deiaTokenExpiresAt'} = (object) [
+            'type' => 'integer',
+            'apiSummary' => false,
+            'writeOnly' => true,
+            'validation' => ['nullable'],
+        ];
+        $schema->properties->{'deiaTokenEmail'} = (object) [
+            'type' => 'string',
+            'apiSummary' => false,
+            'writeOnly' => true,
+            'validation' => ['nullable'],
+        ];
 
         return false;
     }
@@ -137,7 +149,7 @@ class DeiaSurveyPlugin extends GenericPlugin
     {
         $errors = &$params[0];
         $props = $params[2];
-        foreach (['deiaToken', 'deiaOrcid'] as $name) {
+        foreach (['deiaToken', 'deiaTokenExpiresAt', 'deiaTokenEmail', 'deiaOrcid'] as $name) {
             if (array_key_exists($name, $props)) {
                 $errors[$name] = [__('api.403.unauthorized')];
             }

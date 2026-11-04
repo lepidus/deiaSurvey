@@ -31,7 +31,11 @@ For authors who are not registered in the system, an e-mail is sent when the sub
 
 The e-mail sent offers two ways of filling in the questionnaire. The first requires an ORCID record to be authenticated, so that the data is associated with this record. The second uses the author's e-mail address and is recommended only for those who do not have an ORCID record.
 
-Users can view and delete their data at any time. Responses associated with an ORCID can be migrated when that ORCID is linked to the account.
+External questionnaire links expire after seven days. Sending a new invitation invalidates the previous link. Links issued before the introduction of expiring tokens are rejected and must be reissued. A valid link allows the contributor to view, update and delete responses during its validity period. Only a hash of the questionnaire token is stored. Tokens are bound to the author’s email at issuance; changing that email invalidates access and recovery with the old invitation. Legacy ORCID associations require fresh ORCID authentication when a replacement invitation is issued.
+
+The expired link page offers a `Request a new link` action, including for contributors who have already answered. The expired invitation secret only authorizes sending a replacement to the author’s registered email address; it does not grant access to responses. The replacement invalidates the old link. If sending fails, the expired link can be used to retry. Contributors can also recover access by creating an account and confirming the email address or authenticating the ORCID associated with their responses.
+
+Registered users can view and delete their data at any time. Responses associated with an ORCID can be migrated only when that ORCID has been authenticated on the account.
 
 For responses associated with an email address, automatic migration requires an enabled account whose email has been validated by the application (`dateValidated`). After signing in, opening the DEIA Survey tab migrates responses for the account's current email in that journal or preprint server, provided the account has no responses or recorded consent choice there. This also applies to previously validated accounts. Without a validation date, automatic migration does not occur.
 

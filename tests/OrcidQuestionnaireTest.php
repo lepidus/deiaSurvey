@@ -5,7 +5,10 @@ namespace APP\plugins\generic\deiaSurvey\tests;
 use APP\core\Application;
 use APP\core\Request;
 use APP\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
+use APP\plugins\generic\deiaSurvey\classes\mail\mailables\RequestCollectionContributorData;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
+use APP\plugins\generic\deiaSurvey\classes\QuestionnaireTokenService;
 use APP\plugins\generic\deiaSurvey\DeiaSurveyPlugin;
 use APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler;
 use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
@@ -14,9 +17,11 @@ use APP\template\TemplateManager;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use PKP\core\Registry;
 use PKP\orcid\OrcidManager;
 use PKP\plugins\Hook;
@@ -30,6 +35,7 @@ class OrcidQuestionnaireTest extends DatabaseTestCase
     private array $input = [];
     private int $authorId;
     private Store $session;
+    private string $token;
 
     protected function setUp(): void
     {
@@ -59,7 +65,7 @@ class OrcidQuestionnaireTest extends DatabaseTestCase
         $plugin = new DeiaSurveyPlugin();
         $plugin->pluginPath = 'plugins/generic/deiaSurvey';
         Hook::add('Schema::get::author', [$plugin, 'editAuthorSchema']);
-        Repo::author()->edit(Repo::author()->get($this->authorId), ['deiaToken' => 'correct-token']);
+        $this->token = (new QuestionnaireTokenService())->create(Repo::author()->get($this->authorId));
         $plugins = &PluginRegistry::getPlugins('generic');
         $plugins['deiasurveyplugin'] = $plugin;
         $template = $this->getMockBuilder(TemplateManager::class)->disableOriginalConstructor()
@@ -77,7 +83,7 @@ class OrcidQuestionnaireTest extends DatabaseTestCase
         $this->request->method('getUserVar')->willReturnCallback(fn ($name) => $this->input[$name] ?? null);
         $this->request->method('getQueryArray')->willReturnCallback(fn () => $this->input);
         Registry::set('request', $this->request);
-        $this->input = ['authorId' => $this->authorId, 'authorToken' => 'correct-token', 'code' => 'oauth-code'];
+        $this->input = ['authorId' => $this->authorId, 'authorToken' => $this->token, 'code' => 'oauth-code'];
     }
 
     public function testCallbackRejectsWrongTokenBeforeContactingOrcid(): void
@@ -144,7 +150,11 @@ class OrcidQuestionnaireTest extends DatabaseTestCase
         $otherId = DB::table('authors')->insertGetId([
             'email' => 'other@example.org', 'publication_id' => $publicationId,
         ]);
-        Repo::author()->edit(Repo::author()->get($otherId), ['deiaToken' => 'correct-token']);
+        Repo::author()->edit(Repo::author()->get($otherId), [
+            'deiaToken' => hash('sha256', $this->token),
+            'deiaTokenExpiresAt' => now()->addDay()->timestamp,
+            'deiaTokenEmail' => 'other@example.org',
+        ]);
         $this->input['authorId'] = $otherId;
         $this->assertCallbackDoesNotContactOrcid();
         self::assertNull(Repo::author()->get($otherId)->getData('deiaOrcid'));
@@ -155,18 +165,23 @@ class OrcidQuestionnaireTest extends DatabaseTestCase
         $this->startOAuth();
         $client = new OrcidClient(new DeiaSurveyPlugin(), $this->createTestContext());
         self::assertFalse($client->consumeOAuthState($this->input['state'], $this->authorId, 'another-token'));
-        self::assertFalse($client->consumeOAuthState($this->input['state'], $this->authorId, 'correct-token'));
+        self::assertFalse($client->consumeOAuthState($this->input['state'], $this->authorId, $this->token));
         $this->startOAuthWithoutRedirect();
         $otherContextClient = new OrcidClient(new DeiaSurveyPlugin(), $this->createTestContext() + 100000);
         self::assertFalse($otherContextClient->consumeOAuthState(
             $this->input['state'],
             $this->authorId,
-            'correct-token'
+            $this->token
         ));
     }
 
     public function testValidCallbackLinksOrcidOnceAndUsesTheSameRedirectUri(): void
     {
+        DB::table('deia_responses')->insert([
+            'deia_question_id' => $this->createDeiaQuestion(),
+            'external_id' => 'https://sandbox.orcid.org/0000-0002-1825-0097',
+            'external_type' => 'orcid',
+        ]);
         $url = $this->startOAuth();
         parse_str(parse_url($url, PHP_URL_QUERY), $query);
         $client = $this->createMock(Client::class);
@@ -204,6 +219,96 @@ class OrcidQuestionnaireTest extends DatabaseTestCase
         self::assertArrayHasKey('deiaOrcid', $errors);
     }
 
+    public function testTokenRotationDuringOAuthCannotRestoreTheRevokedToken(): void
+    {
+        $this->startOAuth();
+        $newToken = '';
+        $client = $this->createMock(Client::class);
+        $client->expects(self::once())->method('request')->willReturnCallback(function () use (&$newToken) {
+            $newToken = (new QuestionnaireTokenService())->create(Repo::author()->get($this->authorId));
+            return new Response(200, [], json_encode(['orcid' => '0000-0002-1825-0097']));
+        });
+        Registry::set(self::MOCKED_GUZZLE_CLIENT_NAME, $client);
+        $this->request->expects(self::never())->method('redirect');
+
+        (new QuestionnaireHandler())->orcidVerify([], $this->request);
+
+        $author = Repo::author()->get($this->authorId);
+        self::assertSame(hash('sha256', $newToken), $author->getData('deiaToken'));
+        self::assertFalse((new QuestionnaireTokenService())->isValid($author, $this->token));
+        self::assertNull($author->getData('deiaOrcid'));
+    }
+
+    public function testEmailDeliversMatchingTokensAndStartsOAuthInTheContributorSession(): void
+    {
+        $mailer = Mail::getFacadeRoot();
+        Mail::fake();
+        try {
+            $author = Repo::author()->get($this->authorId);
+            Repo::author()->edit($author, ['givenName' => ['en' => 'External'], 'familyName' => ['en' => 'Author']]);
+            $publication = Repo::publication()->get($author->getData('publicationId'));
+            $submissionId = $publication->getData('submissionId');
+            DB::table('submissions')->where('submission_id', $submissionId)
+                ->update(['current_publication_id' => $publication->getId()]);
+            DB::table('email_templates_default_data')->updateOrInsert([
+                'email_key' => RequestCollectionContributorData::getEmailTemplateKey(), 'locale' => 'en',
+            ], ['name' => 'Request DEIA data', 'subject' => 'Request DEIA data',
+                'body' => '{$questionnaireUrl} {$orcidQuestionnaireUrl}']);
+
+            (new DataCollectionEmailSender())->sendRequestDataCollectionEmails($submissionId);
+
+            Mail::assertSent(RequestCollectionContributorData::class, 1);
+            $data = Mail::sent(RequestCollectionContributorData::class)->first()->getData();
+            self::assertStringContainsString('/deiaQuestionnaire/orcidAuthorize', $data['orcidQuestionnaireUrl']);
+            self::assertStringNotContainsString('state=', $data['orcidQuestionnaireUrl']);
+            parse_str(parse_url($data['questionnaireUrl'], PHP_URL_QUERY), $emailParams);
+            parse_str(parse_url($data['orcidQuestionnaireUrl'], PHP_URL_QUERY), $orcidParams);
+            self::assertSame($emailParams, $orcidParams);
+            self::assertTrue((new QuestionnaireTokenService())->isValid(
+                Repo::author()->get($this->authorId),
+                $emailParams['authorToken']
+            ));
+            self::assertFalse($this->session->has('deiaOrcidOAuth'));
+        } finally {
+            Mail::swap($mailer);
+        }
+    }
+
+    public function testInvitationUsesTheCurrentEmailIfAuthorChangesAfterSelection(): void
+    {
+        $mailer = Mail::getFacadeRoot();
+        Mail::fake();
+        $author = Repo::author()->get($this->authorId);
+        $publication = Repo::publication()->get($author->getData('publicationId'));
+        $submissionId = $publication->getData('submissionId');
+        DB::table('submissions')->where('submission_id', $submissionId)
+            ->update(['current_publication_id' => $publication->getId()]);
+        DB::table('email_templates_default_data')->updateOrInsert([
+            'email_key' => RequestCollectionContributorData::getEmailTemplateKey(), 'locale' => 'en',
+        ], ['name' => 'Request DEIA data', 'subject' => 'Request DEIA data', 'body' => '{$questionnaireUrl}']);
+        $connection = DB::connection();
+        $originalDispatcher = $connection->getEventDispatcher();
+        $dispatcher = clone $originalDispatcher;
+        $changed = false;
+        $dispatcher->listen(QueryExecuted::class, function ($query) use (&$changed) {
+            if (!$changed && str_contains($query->sql, 'from `authors`')) {
+                $changed = true;
+                DB::table('authors')->where('author_id', $this->authorId)->update(['email' => 'new-owner@example.org']);
+            }
+        });
+        $connection->setEventDispatcher($dispatcher);
+        try {
+            (new DataCollectionEmailSender())->sendRequestDataCollectionEmails($submissionId);
+            self::assertTrue($changed);
+            Mail::assertSent(RequestCollectionContributorData::class, 1);
+            $mail = Mail::sent(RequestCollectionContributorData::class)->first();
+            self::assertSame('new-owner@example.org', $mail->to[0]['address']);
+        } finally {
+            $connection->setEventDispatcher($originalDispatcher);
+            Mail::swap($mailer);
+        }
+    }
+
     private function assertCallbackDoesNotContactOrcid(): void
     {
         $client = $this->createMock(Client::class);
@@ -228,7 +333,7 @@ class OrcidQuestionnaireTest extends DatabaseTestCase
     private function startOAuthWithoutRedirect(): void
     {
         $url = (new OrcidClient(new DeiaSurveyPlugin(), $this->createTestContext()))->buildOAuthUrl([
-            'authorId' => $this->authorId, 'authorToken' => 'correct-token',
+            'authorId' => $this->authorId, 'authorToken' => $this->token,
         ]);
         parse_str(parse_url($url, PHP_URL_QUERY), $query);
         $this->input['state'] = $query['state'];
