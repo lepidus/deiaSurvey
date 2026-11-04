@@ -75,6 +75,13 @@ class EmailValidationTest extends DatabaseTestCase
         parent::tearDown();
     }
 
+    public function testAssociationLinkEscapesHtmlWithoutChangingItsToken(): void
+    {
+        self::assertTrue((new DataCollectionEmailSender())->sendEmailValidation($this->context, $this->user));
+        $this->getConfirmationLink();
+        self::assertStringContainsString('&amp;token=', Mail::sent(ConfirmDeiaEmail::class)->first()->render());
+    }
+
     public function testUnvalidatedAccountWithoutExternalResponsesDoesNotShowConfirmation(): void
     {
         $form = new QuestionsForm($this->request);
@@ -341,7 +348,7 @@ class EmailValidationTest extends DatabaseTestCase
 
     public function testDefaultEmailUsesPortuguesePluginTranslations(): void
     {
-        Locale::setLocale('pt_BR');
+        $this->installDefaultEmailForLocale('pt_BR');
 
         self::assertTrue((new DataCollectionEmailSender())->sendEmailValidation($this->context, $this->user));
         Mail::sent(ConfirmDeiaEmail::class)->first()->setData('pt_BR');
@@ -357,7 +364,7 @@ class EmailValidationTest extends DatabaseTestCase
 
     public function testDefaultEmailUsesSpanishPluginTranslations(): void
     {
-        Locale::setLocale('es');
+        $this->installDefaultEmailForLocale('es');
 
         self::assertTrue((new DataCollectionEmailSender())->sendEmailValidation($this->context, $this->user));
         Mail::sent(ConfirmDeiaEmail::class)->first()->setData('es');
@@ -589,6 +596,20 @@ class EmailValidationTest extends DatabaseTestCase
     {
         return json_decode(DB::table('user_settings')->where('user_id', $this->user->getId())
             ->where('setting_name', EmailAssociationService::SETTING_NAME)->value('setting_value') ?? '{}', true);
+    }
+
+    private function installDefaultEmailForLocale(string $locale): void
+    {
+        Locale::setLocale($locale);
+        DB::table('journal_settings')->where('journal_id', $this->context->getId())
+            ->where('setting_name', 'supportedLocales')->update(['setting_value' => json_encode(['en', $locale])]);
+        DB::table('email_templates_default_data')->updateOrInsert([
+            'email_key' => ConfirmDeiaEmail::getEmailTemplateKey(), 'locale' => $locale,
+        ], [
+            'name' => __('emails.confirmDeiaEmail.name'),
+            'subject' => __('emails.confirmDeiaEmail.subject'),
+            'body' => __('emails.confirmDeiaEmail.body'),
+        ]);
     }
 
     private function getConfirmationLink(): array
