@@ -5,10 +5,39 @@ namespace APP\plugins\generic\deiaSurvey\classes;
 use APP\core\Application;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use Illuminate\Support\Facades\DB;
+use PKP\context\Context;
 use PKP\facades\Locale;
+use PKP\user\User;
 
 class DeiaDataService
 {
+    private const REGISTRATION_EMAIL_SETTING = 'deiaRegistrationEmail';
+
+    public function emailNeedsAssociationConfirmation($user): bool
+    {
+        return !$user->getDateValidated() || !$this->hasRegistrationEmail($user->getId(), $user->getEmail());
+    }
+
+    public function recordRegistrationEmail($user): void
+    {
+        DB::transaction(function () use ($user) {
+            $account = DB::table('users')->where('user_id', $user->getId())->lockForUpdate()->first();
+            if ($account && !$account->date_validated && $account->email === $user->getEmail()) {
+                DB::table('user_settings')->insertOrIgnore([
+                    'user_id' => $user->getId(), 'locale' => '', 'setting_name' => self::REGISTRATION_EMAIL_SETTING,
+                    'setting_value' => $account->email,
+                ]);
+            }
+        });
+    }
+
+    private function hasRegistrationEmail(int $userId, string $email): bool
+    {
+        return DB::table('user_settings')->where('user_id', $userId)
+            ->where('setting_name', self::REGISTRATION_EMAIL_SETTING)->where('setting_value', $email)->exists();
+    }
+
     public function normalizeResponsesForContext(
         int $contextId,
         array $responses,
@@ -329,6 +358,10 @@ class DeiaDataService
 
     public function migrateResponsesByUserIdentifier($context, $user, $idName)
     {
+        if ($idName === 'email') {
+            return $this->migrateResponsesByEmail($context, $user);
+        }
+
         $contextQuestions = Repo::deiaQuestion()->getCollector()
             ->filterByContextIds([$context->getId()])
             ->getMany()
@@ -361,5 +394,52 @@ class DeiaDataService
             $deiaDataDao = new DeiaDataDAO();
             $deiaDataDao->updateDeiaConsent($context->getId(), $user->getId(), true);
         }
+    }
+
+    /** Call only after EmailAssociationService has verified the email token. */
+    public function migrateResponsesByConfirmedEmail(Context $context, User $user, string $email): bool
+    {
+        return $this->migrateResponsesByEmail($context, $user, $email);
+    }
+
+    private function migrateResponsesByEmail(Context $context, User $user, ?string $confirmedEmail = null): bool
+    {
+        return DB::transaction(function () use ($context, $user, $confirmedEmail): bool {
+            // Re-read the account under the same lock used when saving the profile questionnaire.
+            $account = DB::table('users')->where('user_id', $user->getId())->lockForUpdate()->first();
+            if (!$account || $account->disabled
+                || ($confirmedEmail === null && (!$account->date_validated || !$this->hasRegistrationEmail($user->getId(), $account->email)))
+                || ($confirmedEmail !== null && $confirmedEmail !== $account->email)) {
+                return false;
+            }
+
+            $questionIds = DB::table('deia_questions')->select('deia_question_id')
+                ->where('context_id', $context->getId());
+            $responses = DB::table('deia_responses')->whereIn('deia_question_id', $questionIds);
+            $dataDao = new DeiaDataDAO();
+            if ((clone $responses)->where('user_id', $user->getId())->exists()
+                || $dataDao->getDeiaConsentOption($context->getId(), $user->getId()) !== null) {
+                return false;
+            }
+
+            $responseIds = $responses->whereNull('user_id')
+                ->where('external_id', $account->email)
+                ->where('external_type', 'email')
+                ->lockForUpdate()
+                ->pluck('deia_response_id');
+            if ($responseIds->isEmpty()) {
+                return false;
+            }
+
+            // Preserve the encrypted answers; only their ownership changes.
+            DB::table('deia_responses')->whereIn('deia_response_id', $responseIds)->update([
+                'user_id' => $user->getId(),
+                'external_id' => null,
+                'external_type' => null,
+            ]);
+            $dataDao->updateDeiaConsent($context->getId(), $user->getId(), true);
+
+            return true;
+        });
     }
 }

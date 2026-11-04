@@ -3,15 +3,54 @@
 namespace APP\plugins\generic\deiaSurvey\classes;
 
 use APP\core\Application;
-use Illuminate\Support\Facades\Mail;
-use PKP\plugins\PluginRegistry;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use APP\plugins\generic\deiaSurvey\classes\mail\mailables\ConfirmDeiaEmail;
 use APP\plugins\generic\deiaSurvey\classes\mail\mailables\RequestCollectionContributorData;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use PKP\context\Context;
+use PKP\plugins\PluginRegistry;
+use PKP\user\User;
 
 class DataCollectionEmailSender
 {
+    public function sendEmailValidation(Context $context, User $user): bool
+    {
+        return DB::transaction(function () use ($context, $user): bool {
+            $token = (new EmailAssociationService())->create($context, $user->getId());
+            if ($token === null) {
+                return false;
+            }
+            $user = Repo::user()->get($user->getId(), true);
+
+            $request = Application::get()->getRequest();
+            $email = new ConfirmDeiaEmail($context, [
+                'contextName' => htmlspecialchars($context->getLocalizedName(), ENT_QUOTES, 'UTF-8'),
+                'contextUrl' => $request->getDispatcher()->url($request, Application::ROUTE_PAGE, $context->getPath()),
+                'associationUrl' => htmlspecialchars($request->getDispatcher()->url(
+                    $request,
+                    Application::ROUTE_PAGE,
+                    $context->getPath(),
+                    'deiaAssociation',
+                    'index',
+                    null,
+                    ['userId' => $user->getId(), 'token' => $token]
+                ), ENT_QUOTES, 'UTF-8'),
+            ]);
+
+            $template = Repo::emailTemplate()->getByKey($context->getId(), $email::getEmailTemplateKey());
+            $email->from($context->getData('contactEmail'), $context->getData('contactName'));
+            $email->recipients([$user]);
+            $email->subject($template?->getLocalizedData('subject') ?: __('emails.confirmDeiaEmail.subject'));
+            $email->body($template?->getLocalizedData('body') ?: __('emails.confirmDeiaEmail.body'));
+            Mail::send($email);
+
+            return true;
+        });
+    }
+
     public function sendRequestDataCollectionEmails(int $submissionId)
     {
         $submission = Repo::submission()->get($submissionId);
