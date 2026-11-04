@@ -33,7 +33,9 @@ Para autores que não estiverem registrados no sistema, um e-mail será enviado 
 
 O e-mail enviado oferece duas maneiras de preencher o questionário. A primeira requere que um registro ORCID seja autenticado, de forma que os dados fiquem associados a esse registro. A segunda utiliza o endereço de e-mail do(a) autor(a) e é recomendada apenas para aqueles que não possuem um registro ORCID.
 
-Os usuários podem ver e excluir seus dados a qualquer momento. Para os autores sem cadastro que preencheram o questionário, caso estes criem um usuário no sistema com o mesmo endereço de e-mail ou ORCID utilizado, seus dados serão migrados para este novo usuário.
+A associação automática de respostas externas por email exige uma conta habilitada cujo email tenha sido validado pelo OJS (`dateValidated`). Ao abrir a aba Questionário DEIA do perfil, as respostas do email atual naquele contexto são associadas somente se a conta não tiver respostas nem uma escolha de consentimento registrada ali. Os valores criptografados são preservados. Sem a validação nativa, as respostas permanecem externas. Essas versões do OJS preservam a data de validação anterior quando o email muda. Por isso, a associação automática também exige que o email atual corresponda ao email de cadastro observado pelo plugin. Contas existentes sem esse registro exigem confirmação explícita DEIA.
+
+Usuários sem validação nativa confiável podem solicitar a associação pela notificação na aba Questionário DEIA do perfil. O email de confirmação inclui um link de uso único válido por 24 horas; após entrar na conta solicitante e confirmar nessa página, as respostas são associadas diretamente. Isso não ativa a conta, não altera dateValidated nem consome links nativos de ativação. O reenvio é permitido após um minuto e invalida o link anterior.
 
 ## Gerenciamento de blocos de perguntas
 
@@ -123,3 +125,10 @@ Desenvolvido por Lepidus Tecnologia.
 __Este plugin é licenciado sob a GNU General Public License v3.0__
 
 __Copyright (c) 2024 Lepidus Tecnologia__
+
+
+Execute os testes isolados de associação por email a partir da raiz do OJS:
+
+```sh
+php lib/pkp/lib/vendor/bin/phpunit -c plugins/generic/deiaSurvey/tests/phpunit-email-association.xml --no-coverage
+```

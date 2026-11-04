@@ -1,3 +1,11 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: deiaSurvey\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
 msgid "plugins.generic.deiaSurvey.displayName"
 msgstr "DEIA Survey"
 
@@ -388,3 +396,31 @@ msgstr "The question blocks file could not be uploaded."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.import.description"
 msgstr "Imported question blocks will be created as inactive blocks."
+
+
+msgid "plugins.generic.deiaSurvey.emailValidation.description"
+msgstr "Previous DEIA Survey responses are linked to this email address."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.send"
+msgstr "Request association"
+
+msgid "plugins.generic.deiaSurvey.emailValidation.sent"
+msgstr "We sent a link to your email. Open it and confirm the association of the responses with your account."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.unavailable"
+msgstr "The association request could not be sent. If you have just submitted a request, wait one minute and try again."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.confirm"
+msgstr "Confirm and associate responses"
+
+msgid "plugins.generic.deiaSurvey.emailValidation.confirmDescription"
+msgstr "Confirm the association of previous DEIA Survey responses with your account."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.associated"
+msgstr "Previous DEIA Survey responses have been associated with your account."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.invalid"
+msgstr "The responses could not be associated. The link may have expired, already been used, or there may be no responses available for association. Request a new link from the DEIA Survey tab in your profile."
+
+msgid "plugins.generic.deiaSurvey.emailValidation.urlDescription"
+msgstr "Link to confirm the association of DEIA responses."

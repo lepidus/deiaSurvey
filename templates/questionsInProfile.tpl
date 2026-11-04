@@ -1,10 +1,29 @@
 <script>
 	$(function() {ldelim}
 		$('#deiaSurveyForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
+		{if $canValidateEmail}
+			$('#deiaEmailValidationForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
+		{/if}
 	{rdelim});
 </script>
 <link rel="stylesheet" type="text/css" href="/plugins/generic/deiaSurvey/styles/questionsInProfile.css">
 
+{if $canValidateEmail}
+	<form class="pkp_form pkp_notification" id="deiaEmailValidationForm" method="post" action="{url op="requestEmailValidation"}">
+		{csrf}
+		{capture assign="emailValidationContents"}
+			{translate key="plugins.generic.deiaSurvey.emailValidation.description"}
+			<button type="submit" class="pkp_button_link">{translate key="plugins.generic.deiaSurvey.emailValidation.send"}</button>
+		{/capture}
+		{include
+			file="controllers/notification/inPlaceNotificationContent.tpl"
+			notificationId="deiaEmailValidation"
+			notificationStyleClass="notifyWarning"
+			notificationTitle=""
+			notificationContents=$emailValidationContents
+		}
+	</form>
+{/if}
 <h2 id="deiaSurveyTitle">
 	{translate key="plugins.generic.deiaSurvey.questionnairePage.index.title"}
 </h2>

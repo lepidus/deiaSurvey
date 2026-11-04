@@ -2,14 +2,14 @@
 
 require_once('autoload.php');
 
-use PKP\plugins\GenericPlugin;
-use Illuminate\Database\Migrations\Migration;
 use APP\plugins\generic\deiaSurvey\classes\DataEncryption;
-use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
-use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
 use APP\plugins\generic\deiaSurvey\classes\DefaultQuestionsCreator;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
+use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
+use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
 use APP\plugins\generic\deiaSurvey\report\DeiaSurveyReportPlugin;
+use Illuminate\Database\Migrations\Migration;
+use PKP\plugins\GenericPlugin;
 
 class DeiaSurveyPlugin extends \GenericPlugin
 {
@@ -20,6 +20,7 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
         if ($success && $this->getEnabled() && $encrypter->secretConfigExists()) {
             HookRegistry::register('Request::redirect', [$this, 'redirectUserAfterLogin']);
+            HookRegistry::register('Mail::send', [new DeiaDataService(), 'recordNativeValidationEmail']);
             HookRegistry::register('LoadComponentHandler', [$this, 'setupHandlers']);
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
             HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
@@ -193,15 +194,15 @@ class DeiaSurveyPlugin extends \GenericPlugin
         $page = $params[0];
         $op = $params[1];
 
+        if ($page === 'deiaAssociation') {
+            define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\deia\EmailAssociationHandler');
+            return true;
+        }
         if ($page == 'deiaQuestionnaire') {
             define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler');
             return true;
         }
 
-        if ($page === 'user' && $op === 'register') {
-            define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\user\CustomRegistrationHandler');
-            return true;
-        }
         return false;
     }
 

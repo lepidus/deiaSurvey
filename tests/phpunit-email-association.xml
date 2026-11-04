@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="email-association-bootstrap.php" backupGlobals="false" cacheResult="false">
+    <!-- Real PKP locale/mail implementations; env2 replaces AppLocale with a mock. -->
+    <testsuites>
+        <testsuite name="DEIA email association">
+            <file>NativeEmailResponseAssociationTest.php</file>
+            <file>EmailValidationTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

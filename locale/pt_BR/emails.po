@@ -1,3 +1,11 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: deiaSurvey\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
 msgid "emails.requestCollectionContributorData.subject"
 msgstr "Solicitação para coleta de dados DEIA"
 
@@ -25,3 +33,15 @@ msgstr "Solicitação para coleta de dados DEIA"
 
 msgid "emails.requestCollectionContributorData.description"
 msgstr "Modelo de e-mail para requisição de coleta de dados DEIA dos coautores que não possuem cadastro no sistema"
+
+msgid "emails.confirmDeiaEmail.subject"
+msgstr "Confirme a associação das suas respostas DEIA"
+
+msgid "emails.confirmDeiaEmail.body"
+msgstr "<p>Prezado(a) {$recipientName},</p>\n<p>Recebemos uma solicitação para associar à sua conta em {$contextName} as respostas anteriores do Questionário DEIA vinculadas a este endereço de email.</p>\n<p>Para confirmar a associação, acesse o seguinte link: <a href=\"{$associationUrl}\">Associar respostas DEIA</a>.</p>\n<p>O link é válido por 24 horas. Se você não solicitou esta associação, ignore esta mensagem.</p>\n<p>Atenciosamente,<br>{$contactName}</p>\n<br><br>—<br>Esta é uma mensagem automática de <a href=\"{$contextUrl}\">{$contextName}</a>."
+
+msgid "emails.confirmDeiaEmail.name"
+msgstr "Confirmação de associação de respostas DEIA"
+
+msgid "emails.confirmDeiaEmail.description"
+msgstr "Email para confirmar a associação das respostas anteriores do Questionário DEIA à conta do usuário."

@@ -7,11 +7,58 @@ use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\mail\mailables\RequestCollectionContributorData;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Facades\Mail;
 use PKP\plugins\PluginRegistry;
 
 class DataCollectionEmailSender
 {
+    public function sendEmailValidation(\Context $context, \User $user): bool
+    {
+        return Capsule::connection()->transaction(function () use ($context, $user): bool {
+            $token = (new EmailAssociationService())->create($context, $user->getId());
+            if ($token === null) {
+                return false;
+            }
+            $user = \DAORegistry::getDAO('UserDAO')->getById($user->getId());
+            $request = \Application::get()->getRequest();
+            $locale = \AppLocale::getLocale();
+            foreach (array_unique([MASTER_LOCALE, $locale]) as $emailLocale) {
+                $file = dirname(__DIR__) . '/locale/' . $emailLocale . '/emails.po';
+                if (is_file($file)) {
+                    \AppLocale::registerLocaleFile($emailLocale, $file);
+                }
+            }
+            import('lib.pkp.classes.mail.MailTemplate');
+            $email = new \MailTemplate('CONFIRM_DEIA_EMAIL', $locale, $context, false);
+            $template = \Services::get('emailTemplate')->getByKey($context->getId(), 'CONFIRM_DEIA_EMAIL');
+            $subject = ($template ? $template->getData('subject', $locale) : null) ?: __('emails.confirmDeiaEmail.subject');
+            $email->setSubject('[' . $context->getLocalizedAcronym() . '] ' . $subject);
+            $email->setBody(($template ? $template->getData('body', $locale) : null) ?: __('emails.confirmDeiaEmail.body'));
+            $email->setFrom($context->getData('contactEmail'), $context->getData('contactName'));
+            $email->setRecipients([['email' => $user->getEmail(), 'name' => $user->getFullName()]]);
+            $sent = $email->sendWithParams([
+                'associationUrl' => htmlspecialchars($request->getDispatcher()->url(
+                    $request,
+                    ROUTE_PAGE,
+                    $context->getPath(),
+                    'deiaAssociation',
+                    'index',
+                    null,
+                    ['userId' => $user->getId(), 'token' => $token]
+                ), ENT_QUOTES, 'UTF-8'),
+                'recipientName' => htmlspecialchars($user->getFullName(), ENT_QUOTES, 'UTF-8'),
+                'contactName' => htmlspecialchars($context->getData('contactName'), ENT_QUOTES, 'UTF-8'),
+                'contextName' => htmlspecialchars($context->getLocalizedName(), ENT_QUOTES, 'UTF-8'),
+                'contextUrl' => $request->getDispatcher()->url($request, ROUTE_PAGE, $context->getPath()),
+            ]);
+            if (!$sent) {
+                throw new \RuntimeException('DEIA association confirmation could not be sent.');
+            }
+            return true;
+        });
+    }
+
     public function sendRequestDataCollectionEmails(int $submissionId)
     {
         $submission = \Services::get('submission')->get($submissionId);

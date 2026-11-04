@@ -65,6 +65,15 @@ class QuestionsForm extends \Form
         $this->setData('applicationName', \Application::get()->getName());
 
         $context = $this->request->getContext();
+        $user = $this->request->getUser();
+        $this->setData('canValidateEmail', !$user->getDisabled() && (new DeiaDataService())->emailNeedsAssociationConfirmation($user)
+            && Capsule::table('deia_responses as responses')
+                ->join('deia_questions as questions', 'questions.deia_question_id', '=', 'responses.deia_question_id')
+                ->where('questions.context_id', $context->getId())
+                ->whereNull('responses.user_id')
+                ->where('responses.external_type', 'email')
+                ->where('responses.external_id', $user->getEmail())
+                ->exists());
         $this->initConsentData($context);
 
         $deiaDataService  = new DeiaDataService();
@@ -147,17 +156,17 @@ class QuestionsForm extends \Form
         $deiaDataService  = new DeiaDataService();
         $context = $this->request->getContext();
         $user = $this->request->getUser();
-        $previousConsent = $deiaDataDao->getDeiaConsentOption($context->getId(), $user->getId());
         $newConsent = $this->getData('deiaDataConsent');
 
         Capsule::connection()->transaction(function () use (
             $context,
             $user,
             $newConsent,
-            $previousConsent,
             $deiaDataDao,
             $deiaDataService
         ) {
+            Capsule::table('users')->where('user_id', $user->getId())->lockForUpdate()->first();
+            $previousConsent = $deiaDataDao->getDeiaConsentOption($context->getId(), $user->getId());
             $deiaDataDao->updateDeiaConsent($context->getId(), $user->getId(), $newConsent);
 
             if ($newConsent == '1') {
