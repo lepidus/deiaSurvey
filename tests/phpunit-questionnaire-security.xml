@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="email-association-bootstrap.php" backupGlobals="false" cacheResult="false">
+    <testsuites>
+        <testsuite name="DEIA questionnaire security">
+            <file>OrcidOwnershipTest.php</file>
+            <file>OrcidAssociationTest.php</file>
+            <file>OrcidQuestionnaireTest.php</file>
+            <file>QuestionnaireTokenTest.php</file>
+            <file>QuestionnaireRenewalTest.php</file>
+            <file>NativeEmailResponseAssociationTest.php</file>
+            <file>EmailValidationTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

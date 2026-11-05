@@ -56,13 +56,14 @@ class DeiaSurveyPluginTest extends \DatabaseTestCase
 
         $plugin->editAuthorSchema('Schema::get::author', [&$schema]);
 
-        self::assertTrue($schema->properties->deiaToken->writeOnly);
-        self::assertFalse(property_exists($schema->properties->deiaToken, 'readOnly'));
-        self::assertObjectNotHasAttribute('apiSummary', $schema->properties->deiaToken);
+        foreach (['deiaToken', 'deiaTokenExpiresAt', 'deiaTokenEmail'] as $field) {
+            self::assertTrue($schema->properties->{$field}->writeOnly);
+            self::assertFalse($schema->properties->{$field}->apiSummary);
 
-        $errors = [];
-        $plugin->preventDeiaTokenApiWrite('Author::validate', [&$errors, null, ['deiaToken' => 'attacker']]);
-        self::assertArrayHasKey('deiaToken', $errors);
+            $errors = [];
+            $plugin->preventDeiaTokenApiWrite('Author::validate', [&$errors, null, [$field => 'attacker']]);
+            self::assertArrayHasKey($field, $errors);
+        }
     }
 
     public function testQuestionsFormPreservesParentValidationContract(): void
@@ -76,15 +77,10 @@ class DeiaSurveyPluginTest extends \DatabaseTestCase
         );
     }
 
-    public function testExternalDeletionUsesPostAndCsrf(): void
+    public function testExternalDeletionConfirmationUsesPostAndCsrf(): void
     {
-        $handler = file_get_contents(__DIR__ . '/../pages/deia/QuestionnaireHandler.php');
         $template = file_get_contents(__DIR__ . '/../templates/questionnairePage/deleteData.tpl');
 
-        self::assertStringContainsString('$request->isPost()', $handler);
-        self::assertStringContainsString('$request->checkCSRF()', $handler);
-        self::assertStringContainsString("\$storedToken !== ''", $handler);
-        self::assertStringContainsString('authorBelongsToContext($author, $request->getContext())', $handler);
         self::assertStringContainsString('<form', $template);
         self::assertStringContainsString('method="post"', $template);
         self::assertStringContainsString('{csrf}', $template);

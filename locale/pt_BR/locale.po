@@ -426,3 +426,27 @@ msgstr "Não foi possível associar as respostas. O link pode ter expirado, já 
 
 msgid "plugins.generic.deiaSurvey.emailValidation.urlDescription"
 msgstr "Link para confirmar a associação das respostas DEIA."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.description"
+msgstr "Autentique seu ORCID para associar respostas DEIA anteriores à sua conta."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.request"
+msgstr "Autenticar ORCID e associar respostas"
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.associated"
+msgstr "As respostas anteriores do ORCID foram associadas à sua conta."
+
+msgid "plugins.generic.deiaSurvey.orcidAssociation.unavailable"
+msgstr "Não foi possível associar as respostas. Autentique o ORCID informado no seu perfil e tente novamente."
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.expiredLink"
+msgstr "Este link do questionário expirou. Solicite um novo link para o e-mail cadastrado do autor."
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.requestNewLink"
+msgstr "Solicitar novo link"
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.renewalSent"
+msgstr "Enviamos um novo link do questionário para o e-mail cadastrado do autor. O link é válido por sete dias."
+
+msgid "plugins.generic.deiaSurvey.questionnairePage.renewalUnavailable"
+msgstr "Não foi possível concluir a solicitação. Se você já pediu um novo link, confira seu e-mail. Caso contrário, abra novamente o link vencido e tente outra vez."

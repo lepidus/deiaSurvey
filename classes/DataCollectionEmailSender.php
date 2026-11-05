@@ -2,17 +2,34 @@
 
 namespace APP\plugins\generic\deiaSurvey\classes;
 
-use APP\core\Application;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
-use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
-use APP\plugins\generic\deiaSurvey\classes\mail\mailables\RequestCollectionContributorData;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Support\Facades\Mail;
-use PKP\plugins\PluginRegistry;
+use Illuminate\Database\Capsule\Manager as DB;
+use Context;
 
 class DataCollectionEmailSender
 {
+    public function renewQuestionnaireLink(Context $context, int $authorId, string $expiredToken): bool
+    {
+        return DB::connection()->transaction(function () use ($context, $authorId, $expiredToken): bool {
+            if (!DB::table('authors')->where('author_id', $authorId)->lockForUpdate()->first()) {
+                return false;
+            }
+            $author = \Services::get('author')->get($authorId);
+            if (!(new QuestionnaireTokenService())->canRenew($author, $expiredToken)) {
+                return false;
+            }
+            $publication = \Services::get('publication')->get($author->getData('publicationId'));
+            $submission = $publication ? \Services::get('submission')->get($publication->getData('submissionId')) : null;
+            if (!$submission || (int) $submission->getData('contextId') !== $context->getId()) {
+                return false;
+            }
+            // Sending inside this transaction preserves the expired secret if delivery fails.
+            return $this->sendEmailToAuthor($submission, $author);
+        });
+    }
+
     public function sendEmailValidation(\Context $context, \User $user): bool
     {
         return Capsule::connection()->transaction(function () use ($context, $user): bool {
@@ -92,33 +109,38 @@ class DataCollectionEmailSender
         return $nonRegisteredAuthors;
     }
 
-    private function sendEmailToAuthor($submission, $author)
+    private function sendEmailToAuthor($submission, $author): bool
     {
-        $request = \Application::get()->getRequest();
-        $context = $request->getContext();
-        $publication = \Services::get('publication')->get($author->getData('publicationId'));
-
-        import('lib.pkp.classes.mail.MailTemplate');
-        $emailTemplate = new \MailTemplate('REQUEST_COLLECTION_CONTRIBUTOR_DATA', null, $context, false);
-
-        $authorName = $author->getFullName();
-        $authorEmail = $author->getData('email');
-
-        $emailQuestionnaireUrls = $this->getQuestionnaireUrls($request, $author);
-
-        $emailTemplate->setFrom($context->getData('contactEmail'), $context->getData('contactName'));
-        $emailTemplate->setRecipients([['name' => $authorName, 'email' => $authorEmail]]);
-        $emailTemplate->sendWithParams(array_merge($emailQuestionnaireUrls, [
-            'submissionTitle' => htmlspecialchars($publication->getLocalizedTitle()),
-            'contactName' => $context->getData('contactName')
-        ]));
+        return DB::connection()->transaction(function () use ($submission, $author): bool {
+            if (!DB::table('authors')->where('author_id', $author->getId())->lockForUpdate()->first()) {
+                return false;
+            }
+            $author = \Services::get('author')->get($author->getId());
+            $request = \Application::get()->getRequest();
+            $context = $request->getContext();
+            $publication = \Services::get('publication')->get($author->getData('publicationId'));
+            if (!$context || !$publication || (int) $publication->getData('submissionId') !== (int) $submission->getId()
+                || (int) $submission->getContextId() !== (int) $context->getId()) {
+                return false;
+            }
+            import('lib.pkp.classes.mail.MailTemplate');
+            $email = new \MailTemplate('REQUEST_COLLECTION_CONTRIBUTOR_DATA', null, $context, false);
+            $urls = $this->getQuestionnaireUrls($request, $author);
+            $email->setFrom($context->getData('contactEmail'), $context->getData('contactName'));
+            $email->setRecipients([['name' => $author->getFullName(), 'email' => $author->getEmail()]]);
+            if (!$email->sendWithParams(array_merge($urls, [
+                'submissionTitle' => htmlspecialchars((string) $publication->getLocalizedTitle(), ENT_QUOTES, 'UTF-8'),
+                'contactName' => htmlspecialchars((string) $context->getData('contactName'), ENT_QUOTES, 'UTF-8'),
+            ]))) {
+                throw new \RuntimeException('DEIA questionnaire invitation could not be sent.');
+            }
+            return true;
+        });
     }
 
     private function getQuestionnaireUrls($request, $author): array
     {
-        $authorToken = md5(microtime() . $author->getData('email'));
-
-        $author = \Services::get('author')->edit($author, ['deiaToken' => $authorToken], $request);
+        $authorToken = (new QuestionnaireTokenService())->create($author);
 
         $questionnaireUrl = $request->getDispatcher()->url(
             $request,
@@ -130,14 +152,18 @@ class DataCollectionEmailSender
             ['authorId' => $author->getId(), 'authorToken' => $authorToken]
         );
 
-        $plugin = \PluginRegistry::getPlugin('generic', 'deiasurveyplugin');
         $contextId = $request->getContext()->getId();
-        $orcidClient = new OrcidClient($plugin, $contextId);
-
-        $orcidQuestionnaireUrl = $orcidClient->buildOAuthUrl([
-            'authorId' => $author->getId(),
-            'authorToken' => $authorToken
-        ]);
+        // Start OAuth in the contributor's browser so state belongs to their session.
+        $orcidQuestionnaireUrl = (new OrcidConfiguration())->getOrcidConfiguration($contextId)
+            ? $request->getDispatcher()->url(
+                $request,
+                ROUTE_PAGE,
+                null,
+                'deiaQuestionnaire',
+                'orcidAuthorize',
+                null,
+                ['authorId' => $author->getId(), 'authorToken' => $authorToken]
+            ) : '';
 
         return ['questionnaireUrl' => $questionnaireUrl, 'orcidQuestionnaireUrl' => $orcidQuestionnaireUrl];
     }

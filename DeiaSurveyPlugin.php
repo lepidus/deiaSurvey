@@ -25,11 +25,6 @@ class DeiaSurveyPlugin extends \GenericPlugin
             HookRegistry::register('LoadHandler', [$this, 'addPageHandler']);
             HookRegistry::register('Schema::get::author', [$this, 'editAuthorSchema']);
             HookRegistry::register('Author::validate', [$this, 'preventDeiaTokenApiWrite']);
-            HookRegistry::register('userdetailsform::execute', [$this, 'checkMigrateResponsesOrcid']);
-            HookRegistry::register(
-                'userroleform::execute',
-                [$this, 'checkMigrateResponsesOrcidAfterUserCreation']
-            );
             $this->registerHooksForCustomSchemas();
 
             $context = Application::get()->getRequest()->getContext();
@@ -123,6 +118,7 @@ class DeiaSurveyPlugin extends \GenericPlugin
 
         $schema->properties->{'deiaToken'} = (object) [
             'type' => 'string',
+            'apiSummary' => false,
             'writeOnly' => true,
             'validation' => ['nullable'],
         ];
@@ -131,16 +127,30 @@ class DeiaSurveyPlugin extends \GenericPlugin
             'apiSummary' => true,
             'validation' => ['nullable'],
         ];
+        $schema->properties->{'deiaTokenExpiresAt'} = (object) [
+            'type' => 'integer',
+            'apiSummary' => false,
+            'writeOnly' => true,
+            'validation' => ['nullable'],
+        ];
+        $schema->properties->{'deiaTokenEmail'} = (object) [
+            'type' => 'string',
+            'apiSummary' => false,
+            'writeOnly' => true,
+            'validation' => ['nullable'],
+        ];
 
         return false;
     }
 
-    public function preventDeiaTokenApiWrite($hookName, $params)
+    public function preventDeiaTokenApiWrite(string $hookName, array $params): bool
     {
         $errors = &$params[0];
         $props = $params[2];
-        if (array_key_exists('deiaToken', $props)) {
-            $errors['deiaToken'] = [__('api.403.unauthorized')];
+        foreach (['deiaToken', 'deiaTokenExpiresAt', 'deiaTokenEmail', 'deiaOrcid'] as $name) {
+            if (array_key_exists($name, $props)) {
+                $errors[$name] = [__('api.403.unauthorized')];
+            }
         }
 
         return false;
@@ -194,6 +204,10 @@ class DeiaSurveyPlugin extends \GenericPlugin
         $page = $params[0];
         $op = $params[1];
 
+        if ($page === 'deiaOrcidAssociation') {
+            define('HANDLER_CLASS', 'APP\\plugins\\generic\\deiaSurvey\\pages\\deia\\OrcidAssociationHandler');
+            return true;
+        }
         if ($page === 'deiaAssociation') {
             define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\deia\EmailAssociationHandler');
             return true;
@@ -320,49 +334,4 @@ class DeiaSurveyPlugin extends \GenericPlugin
         return parent::manage($args, $request);
     }
 
-    public function checkMigrateResponsesOrcid(string $hookName, array $params)
-    {
-        $form = $params[0];
-        $user = $form->user;
-
-        if (!$user || !$user->getId()) {
-            return;
-        }
-
-        $this->migrateResponsesOrcid($user);
-    }
-
-    public function checkMigrateResponsesOrcidAfterUserCreation(string $hookName, array $params)
-    {
-        $form = $params[0];
-        $user = $this->getUserById($form->userId);
-
-        if (!$user) {
-            return;
-        }
-
-        $this->migrateResponsesOrcid($user);
-    }
-
-    protected function getUserById($userId)
-    {
-        $userDao = DAORegistry::getDAO('UserDAO');
-        return $userDao->getById($userId);
-    }
-
-    protected function getCurrentContext()
-    {
-        return \Application::get()->getRequest()->getContext();
-    }
-
-    protected function migrateResponsesOrcid($user): void
-    {
-        $userOrcid = $user->getOrcid();
-
-        if ($userOrcid) {
-            $context = $this->getCurrentContext();
-            $deiaDataService = new DeiaDataService();
-            $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
-        }
-    }
 }

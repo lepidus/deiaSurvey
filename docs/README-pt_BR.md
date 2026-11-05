@@ -33,6 +33,8 @@ Para autores que não estiverem registrados no sistema, um e-mail será enviado 
 
 O e-mail enviado oferece duas maneiras de preencher o questionário. A primeira requere que um registro ORCID seja autenticado, de forma que os dados fiquem associados a esse registro. A segunda utiliza o endereço de e-mail do(a) autor(a) e é recomendada apenas para aqueles que não possuem um registro ORCID.
 
+Os links do questionário expiram após sete dias. Na página do link vencido, o colaborador pode solicitar outro para o e-mail cadastrado, mesmo após responder. Novos convites e alterações de e-mail invalidam os links anteriores. Links antigos precisam ser substituídos, e associações ORCID legadas exigem nova autenticação.
+
 A associação automática de respostas externas por email exige uma conta habilitada cujo email tenha sido validado pelo OJS (`dateValidated`). Ao abrir a aba Questionário DEIA do perfil, as respostas do email atual naquele contexto são associadas somente se a conta não tiver respostas nem uma escolha de consentimento registrada ali. Os valores criptografados são preservados. Sem a validação nativa, as respostas permanecem externas. Essas versões do OJS preservam a data de validação anterior quando o email muda. Por isso, a associação automática também exige que o email atual corresponda ao email de cadastro observado pelo plugin. Contas existentes sem esse registro exigem confirmação explícita DEIA.
 
 Usuários sem validação nativa confiável podem solicitar a associação pela notificação na aba Questionário DEIA do perfil. O email de confirmação inclui um link de uso único válido por 24 horas; após entrar na conta solicitante e confirmar nessa página, as respostas são associadas diretamente. Isso não ativa a conta, não altera dateValidated nem consome links nativos de ativação. O reenvio é permitido após um minuto e invalida o link anterior.
@@ -131,4 +133,12 @@ Execute os testes isolados de associação por email a partir da raiz do OJS:
 
 ```sh
 php lib/pkp/lib/vendor/bin/phpunit -c plugins/generic/deiaSurvey/tests/phpunit-email-association.xml --no-coverage
+```
+
+Informe o ORCID no perfil e use `Autenticar ORCID e associar respostas` na aba DEIA. No cliente configurado no ORCID Profile, permita o callback `https://SEU-OJS/index.php/REVISTA/deiaOrcidAssociation/verify`, com a URL real da revista, no sandbox ou em produção conforme o ambiente utilizado.
+
+Na raiz do OJS, execute os testes de segurança e regressão de e-mail:
+
+```sh
+php lib/pkp/lib/vendor/bin/phpunit -c plugins/generic/deiaSurvey/tests/phpunit-questionnaire-security.xml --no-coverage
 ```

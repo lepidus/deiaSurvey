@@ -6,6 +6,7 @@ use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 
 class OrcidClient
 {
+    private const OAUTH_SESSION_KEY = 'deiaOrcidOAuth';
     public const ORCID_URL = 'https://orcid.org/';
     public const ORCID_URL_SANDBOX = 'https://sandbox.orcid.org/';
     public const ORCID_API_URL_PUBLIC = 'https://pub.orcid.org/';
@@ -18,25 +19,27 @@ class OrcidClient
     private $plugin;
     private $contextId;
     private $orcidConfiguration;
+    private $httpClient;
 
-    public function __construct($plugin, $contextId)
+    public function __construct($plugin, $contextId, ?\GuzzleHttp\ClientInterface $httpClient = null)
     {
         $this->plugin = $plugin;
         $this->contextId = $contextId;
+        $this->httpClient = $httpClient;
 
         $orcidConfiguration = new OrcidConfiguration();
         $this->orcidConfiguration = $orcidConfiguration->getOrcidConfiguration($contextId);
     }
 
-    public function requestOrcid(string $code)
+    public function requestOrcid(string $code, array $redirectParams = [], string $page = 'deiaQuestionnaire', string $op = 'orcidVerify')
     {
         if (is_null($this->orcidConfiguration)) {
             return null;
         }
 
-        $httpClient = \Application::get()->getHttpClient();
+        $httpClient = $this->httpClient ?: \Application::get()->getHttpClient();
 
-        $tokenUrl = $this->orcidConfiguration['apiPath'] . 'oauth/token';
+        $tokenUrl = $this->getOauthPath() . 'token';
         $requestHeaders = ['Accept' => 'application/json'];
         $requestData = [
             'client_id' => $this->orcidConfiguration['clientId'],
@@ -44,6 +47,10 @@ class OrcidClient
             'grant_type' => 'authorization_code',
             'code' => $code
         ];
+
+        if ($redirectParams) {
+            $requestData['redirect_uri'] = $this->redirectUrl($redirectParams, $page, $op);
+        }
 
         $response = $httpClient->request(
             'POST',
@@ -55,10 +62,10 @@ class OrcidClient
         );
 
         $responseJson = json_decode($response->getBody(), true);
-        return $responseJson['orcid'];
+        return $responseJson['orcid'] ?? null;
     }
 
-    public function buildOAuthUrl($redirectParams)
+    public function buildOAuthUrl($redirectParams, string $page = 'deiaQuestionnaire', string $op = 'orcidVerify', ?string $state = null)
     {
         if (is_null($this->orcidConfiguration)) {
             return '';
@@ -76,19 +83,48 @@ class OrcidClient
             $request,
             ROUTE_PAGE,
             null,
-            'deiaQuestionnaire',
-            'orcidVerify',
+            $page,
+            $op,
             null,
             $redirectParams
         );
+
+        if ($state === null && $page === 'deiaQuestionnaire') {
+            $state = bin2hex(random_bytes(32));
+            $request->getSession()->setSessionVar(self::OAUTH_SESSION_KEY, [
+                'stateHash' => hash('sha256', $state), 'authorId' => (int) $redirectParams['authorId'],
+                'tokenHash' => hash('sha256', $redirectParams['authorToken']), 'contextId' => $this->contextId,
+                'expiresAt' => \Carbon\Carbon::now()->addMinutes(10)->timestamp,
+            ]);
+        }
 
         return $this->getOauthPath() . 'authorize?' . http_build_query(
             array(
                 'client_id' => $this->orcidConfiguration['clientId'],
                 'response_type' => 'code',
                 'scope' => $scope,
-                'redirect_uri' => $redirectUrl)
+                'redirect_uri' => $redirectUrl,
+                'state' => $state)
         );
+    }
+
+    public function consumeOAuthState($state, int $authorId, string $authorToken): bool
+    {
+        $session = \Application::get()->getRequest()->getSession();
+        $pending = $session->getSessionVar(self::OAUTH_SESSION_KEY);
+        $session->unsetSessionVar(self::OAUTH_SESSION_KEY);
+        return is_string($state) && is_array($pending)
+            && ($pending['authorId'] ?? null) === $authorId
+            && ($pending['contextId'] ?? null) === $this->contextId
+            && ($pending['expiresAt'] ?? 0) > \Carbon\Carbon::now()->timestamp
+            && hash_equals($pending['tokenHash'], hash('sha256', $authorToken))
+            && hash_equals($pending['stateHash'], hash('sha256', $state));
+    }
+
+    private function redirectUrl(array $params, string $page, string $op): string
+    {
+        $request = \Application::get()->getRequest();
+        return $request->getDispatcher()->url($request, ROUTE_PAGE, null, $page, $op, null, $params);
     }
 
     private function isMemberApiEnabled()
