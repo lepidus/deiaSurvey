@@ -5,6 +5,8 @@ switch ($op) {
     case 'saveQuestionnaire':
     case 'deleteData':
     case 'orcidVerify':
-        define('HANDLER_CLASS', 'APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler');
+    case 'orcidAuthorize':
+    case 'requestNewLink':
+        return new \APP\plugins\generic\deiaSurvey\pages\deia\QuestionnaireHandler();
         break;
 }

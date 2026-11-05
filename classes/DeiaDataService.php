@@ -356,10 +356,16 @@ class DeiaDataService
         return ($countAuthorResponses > 0);
     }
 
-    public function migrateResponsesByUserIdentifier($context, $user, $idName)
+    public function migrateResponsesByUserIdentifier($context, $user, $idName, bool $orcidAuthenticated = false)
     {
         if ($idName === 'email') {
             return $this->migrateResponsesByEmail($context, $user);
+        }
+
+        // Only the native ORCID Profile OAuth callback may attest the current identity.
+        if ($idName !== 'orcid' || !$context || !$orcidAuthenticated
+            || !$user->getOrcid() || !$user->getData('orcidAccessToken')) {
+            return false;
         }
 
         $contextQuestions = Repo::deiaQuestion()->getCollector()

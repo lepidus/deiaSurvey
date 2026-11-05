@@ -132,14 +132,25 @@ class DeiaSurveyPlugin extends GenericPlugin
 
         $schema->properties->{'deiaToken'} = (object) [
             'type' => 'string',
-            // Keep the legacy setting available to the internal questionnaire flow only.
-            // writeOnly removes it from summary, full and nested API maps.
+            'apiSummary' => false,
             'writeOnly' => true,
             'validation' => ['nullable'],
         ];
         $schema->properties->{'deiaOrcid'} = (object) [
             'type' => 'string',
             'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+        $schema->properties->{'deiaTokenExpiresAt'} = (object) [
+            'type' => 'integer',
+            'apiSummary' => false,
+            'writeOnly' => true,
+            'validation' => ['nullable'],
+        ];
+        $schema->properties->{'deiaTokenEmail'} = (object) [
+            'type' => 'string',
+            'apiSummary' => false,
+            'writeOnly' => true,
             'validation' => ['nullable'],
         ];
 
@@ -150,8 +161,10 @@ class DeiaSurveyPlugin extends GenericPlugin
     {
         $errors = &$params[0];
         $props = $params[2];
-        if (array_key_exists('deiaToken', $props)) {
-            $errors['deiaToken'] = [__('api.403.unauthorized')];
+        foreach (['deiaToken', 'deiaTokenExpiresAt', 'deiaTokenEmail', 'deiaOrcid'] as $name) {
+            if (array_key_exists($name, $props)) {
+                $errors[$name] = [__('api.403.unauthorized')];
+            }
         }
 
         return false;
@@ -324,10 +337,19 @@ class DeiaSurveyPlugin extends GenericPlugin
         $user = $params[0];
         $userOrcid = $user->getOrcid();
 
-        if ($userOrcid) {
+        $props = $params[2] ?? [];
+        // ORCID Profile supplies this internal field list after exchanging an OAuth code.
+        // A manual PublicProfileForm edit supplies no such attestation, even with an old access token.
+        $nativeOAuth = in_array('orcidAccessToken', $props, true)
+            && in_array('orcidRefreshToken', $props, true)
+            && in_array('orcidAccessExpiresOn', $props, true);
+        if ($userOrcid && $nativeOAuth && $user->getData('orcidAccessToken')) {
             $context = Application::get()->getRequest()->getContext();
+            if (!$context) {
+                return;
+            }
             $deiaDataService = new DeiaDataService();
-            $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
+            $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid', true);
         }
     }
 }

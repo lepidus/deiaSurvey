@@ -201,8 +201,9 @@ describe('DEIA Survey - External contributors data collecting', function() {
         cy.url().then(url => {
             cy.visit(url + 'breakToken');
         });
-        cy.contains('DEIA Survey');
-        cy.contains('Only the author can access this page');
+        cy.location('pathname').should('match', /\/user\/authorizationDenied$/);
+        cy.contains('Access denied.').should('be.visible');
+        cy.get('#deiaSurveyForm').should('not.exist');
 
         // Contributor without registration answers DEIA survey.
         cy.visit(Cypress.env('mailpitUrl') || 'http://localhost:8025');
