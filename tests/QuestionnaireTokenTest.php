@@ -214,4 +214,63 @@ class QuestionnaireTokenTest extends QuestionnaireSecurityTestCase
         (new QuestionnaireHandler())->saveQuestionnaire([], $this->request);
         self::assertSame(0, DB::table('deia_responses')->count());
     }
+
+    /** @dataProvider deletionAccessCases */
+    public function testDeletionRequiresValidAccessPostAndCsrf(
+        bool $post,
+        bool $csrf,
+        string $access,
+        bool $deleted
+    ): void {
+        $this->input['authorToken'] = (new QuestionnaireTokenService())->create(\Services::get('author')->get($this->authorId));
+        $this->input['save'] = true;
+        $this->post = $post;
+        $this->csrf = $csrf;
+        $questionId = $this->createDeiaQuestion();
+        $responseId = DB::table('deia_responses')->insertGetId([
+            'deia_question_id' => $questionId, 'external_id' => 'token-test@example.org', 'external_type' => 'email',
+        ]);
+        $otherResponseId = DB::table('deia_responses')->insertGetId([
+            'deia_question_id' => $questionId, 'external_id' => 'other@example.org', 'external_type' => 'email',
+        ]);
+        foreach ([$responseId, $otherResponseId] as $id) {
+            DB::table('deia_response_settings')->insert([
+                'deia_response_id' => $id, 'setting_name' => 'responseValue', 'setting_value' => $this->ciphertext,
+            ]);
+        }
+        if ($access === 'empty') {
+            $this->input['authorToken'] = '';
+        } elseif ($access === 'wrong') {
+            $this->input['authorToken'] .= 'breakToken';
+        } elseif ($access === 'otherContext') {
+            $otherContextId = DB::table('journals')->insertGetId([
+                'path' => 'deia-other-' . bin2hex(random_bytes(4)), 'primary_locale' => 'en_US',
+            ]);
+            $publication = \Services::get('publication')->get(\Services::get('author')->get($this->authorId)->getData('publicationId'));
+            DB::table('submissions')->where('submission_id', $publication->getData('submissionId'))
+                ->update(['context_id' => $otherContextId]);
+        }
+        $template = $this->getMockBuilder(TemplateManager::class)->disableOriginalConstructor()
+            ->onlyMethods(['assign', 'display', 'addStyleSheet'])->getMock();
+        $template->expects(self::once())->method('display')
+            ->with(self::stringContains($deleted ? 'deleteSuccess.tpl' : 'displayMessage.tpl'));
+        Registry::set('templateManager', $template);
+
+        (new QuestionnaireHandler())->deleteData([], $this->request);
+
+        self::assertSame(!$deleted, DB::table('deia_responses')->where('deia_response_id', $responseId)->exists());
+        self::assertTrue(DB::table('deia_responses')->where('deia_response_id', $otherResponseId)->exists());
+    }
+
+    public static function deletionAccessCases(): array
+    {
+        return [
+            'GET cannot delete' => [false, true, 'valid', false],
+            'POST without CSRF' => [true, false, 'valid', false],
+            'empty token' => [true, true, 'empty', false],
+            'wrong token' => [true, true, 'wrong', false],
+            'different context' => [true, true, 'otherContext', false],
+            'authorized POST' => [true, true, 'valid', true],
+        ];
+    }
 }
