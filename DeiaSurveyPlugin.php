@@ -129,6 +129,18 @@ class DeiaSurveyPlugin extends GenericPlugin
             'apiSummary' => true,
             'validation' => ['nullable'],
         ];
+        $schema->properties->{'deiaTokenExpiresAt'} = (object) [
+            'type' => 'integer',
+            'apiSummary' => false,
+            'writeOnly' => true,
+            'validation' => ['nullable'],
+        ];
+        $schema->properties->{'deiaTokenEmail'} = (object) [
+            'type' => 'string',
+            'apiSummary' => false,
+            'writeOnly' => true,
+            'validation' => ['nullable'],
+        ];
 
         return false;
     }
@@ -137,8 +149,10 @@ class DeiaSurveyPlugin extends GenericPlugin
     {
         $errors = &$params[0];
         $props = $params[2];
-        if (array_key_exists('deiaToken', $props)) {
-            $errors['deiaToken'] = [__('api.403.unauthorized')];
+        foreach (['deiaToken', 'deiaTokenExpiresAt', 'deiaTokenEmail', 'deiaOrcid'] as $name) {
+            if (array_key_exists($name, $props)) {
+                $errors[$name] = [__('api.403.unauthorized')];
+            }
         }
 
         return false;
@@ -308,8 +322,11 @@ class DeiaSurveyPlugin extends GenericPlugin
         $user = $params[0];
         $userOrcid = $user->getOrcid();
 
-        if ($userOrcid) {
+        if ($userOrcid && $user->hasVerifiedOrcid()) {
             $context = Application::get()->getRequest()->getContext();
+            if (!$context) {
+                return;
+            }
             $deiaDataService = new DeiaDataService();
             $deiaDataService->migrateResponsesByUserIdentifier($context, $user, 'orcid');
         }

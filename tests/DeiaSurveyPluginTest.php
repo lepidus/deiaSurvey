@@ -41,6 +41,16 @@ class DeiaSurveyPluginTest extends DatabaseTestCase
         $errors = [];
         $plugin->preventDeiaTokenApiWrite('Author::validate', [&$errors, null, ['deiaToken' => 'attacker']]);
         self::assertArrayHasKey('deiaToken', $errors);
+        self::assertTrue($schema->properties->deiaTokenExpiresAt->writeOnly);
+        self::assertFalse($schema->properties->deiaTokenExpiresAt->apiSummary);
+        $errors = [];
+        $plugin->preventDeiaTokenApiWrite('Author::validate', [&$errors, null, ['deiaTokenExpiresAt' => PHP_INT_MAX]]);
+        self::assertArrayHasKey('deiaTokenExpiresAt', $errors);
+        self::assertTrue($schema->properties->deiaTokenEmail->writeOnly);
+        self::assertFalse($schema->properties->deiaTokenEmail->apiSummary);
+        $errors = [];
+        $plugin->preventDeiaTokenApiWrite('Author::validate', [&$errors, null, ['deiaTokenEmail' => 'attacker@example.org']]);
+        self::assertArrayHasKey('deiaTokenEmail', $errors);
     }
 
     private function createRequestStub(): object

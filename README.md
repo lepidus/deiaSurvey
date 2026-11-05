@@ -31,7 +31,9 @@ For authors who are not registered in the system, an e-mail is sent when the sub
 
 The e-mail sent offers two ways of filling in the questionnaire. The first requires an ORCID record to be authenticated, so that the data is associated with this record. The second uses the author's e-mail address and is recommended only for those who do not have an ORCID record.
 
-Users can view and delete their data at any time. Responses associated with an ORCID can be migrated when that ORCID is linked to the account.
+Questionnaire links expire after seven days. From an expired link, contributors can request a replacement at the author’s registered email, even after answering. New invitations and email changes invalidate previous links. Legacy links must be replaced, and legacy ORCID associations require reauthentication.
+
+Registered users can view and delete their data at any time. Responses associated with an ORCID can be migrated only when that ORCID has been authenticated on the account.
 
 For responses associated with an email address, automatic migration requires an enabled account whose email has been validated by the application (`dateValidated`). After signing in, opening the DEIA Survey tab migrates responses for the account's current email in that journal or preprint server, provided the account has no responses or recorded consent choice there. This also applies to previously validated accounts. Without a validation date, automatic migration does not occur.
 
