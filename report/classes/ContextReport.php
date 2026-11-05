@@ -110,12 +110,12 @@ class ContextReport
             foreach ($printingGuide as $questionId) {
                 $question = $this->questions[$questionId];
                 $response = $responseSet[$questionId] ?? null;
+                $responseValue = '';
 
                 if (is_null($response)) {
+                    $responsesLine[] = $responseValue;
                     continue;
                 }
-
-                $responseValue = '';
 
                 if (in_array($question->getQuestionType(), $textualQuestionTypes)) {
                     $responseValue = $response->getLocalizedData('responseValue');
