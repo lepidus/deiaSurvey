@@ -11,7 +11,6 @@ use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\OrcidConfiguration;
 use APP\plugins\generic\deiaSurvey\classes\OrcidClient;
 use TemplateManager;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Capsule\Manager as DB;
 use APP\plugins\generic\deiaSurvey\classes\DataCollectionEmailSender;
 use APP\plugins\generic\deiaSurvey\classes\QuestionnaireTokenService;
@@ -211,22 +210,13 @@ class QuestionnaireHandler extends \Handler
 
         $deiaDataService  = new DeiaDataService();
         try {
-            Capsule::connection()->transaction(function () use (
-                $deiaDataService,
-                $request,
+            $deiaDataService->replaceExternalAuthorResponses(
+                $request->getContext()->getId(),
                 $responsesExternalId,
                 $responsesExternalType,
                 $responses,
                 $responseOptionsInputs
-            ) {
-                $deiaDataService->registerExternalAuthorResponses(
-                    $request->getContext()->getId(),
-                    $responsesExternalId,
-                    $responsesExternalType,
-                    $responses,
-                    $responseOptionsInputs
-                );
-            });
+            );
         } catch (\InvalidArgumentException $exception) {
             $templateMgr->assign(
                 'messageToDisplay',
