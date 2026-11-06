@@ -3,6 +3,7 @@
 namespace APP\plugins\generic\deiaSurvey\report\classes;
 
 use APP\core\Application;
+use APP\plugins\generic\deiaSurvey\classes\CsvRowWriter;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use PKP\context\Context;
 
@@ -66,9 +67,9 @@ class SiteStatisticsReport
         fprintf($csvFile, $this->UTF8_BOM);
 
         $reportHeader = $this->getReportHeader();
-        fputcsv($csvFile, $reportHeader[0]);
-        fputcsv($csvFile, $reportHeader[1]);
-        fputcsv($csvFile, $reportHeader[2]);
+        CsvRowWriter::write($csvFile, $reportHeader[0]);
+        CsvRowWriter::write($csvFile, $reportHeader[1]);
+        CsvRowWriter::write($csvFile, $reportHeader[2]);
         $reportColumns = $this->getReportColumns();
 
         foreach ($this->contextsStatistics as $contextData) {
@@ -80,7 +81,7 @@ class SiteStatisticsReport
                 $row,
                 $contextStats->printStatistics($this->getContextReportColumns($reportColumns, $contextData['printingGuide']))
             );
-            fputcsv($csvFile, $row);
+            CsvRowWriter::write($csvFile, $row);
         }
 
         fclose($csvFile);
