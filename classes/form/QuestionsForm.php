@@ -65,7 +65,7 @@ class QuestionsForm extends Form
 
         $context = $this->request->getContext();
         $user = $this->request->getUser();
-        $this->setData('canValidateEmail', !$user->getDisabled() && !$user->getDateValidated()
+        $this->setData('canValidateEmail', !$user->getDisabled() && (new DeiaDataService())->emailNeedsAssociationConfirmation($user)
             && DB::table('deia_responses as responses')
                 ->join('deia_questions as questions', 'questions.deia_question_id', '=', 'responses.deia_question_id')
                 ->where('questions.context_id', $context->getId())

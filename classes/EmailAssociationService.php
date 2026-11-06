@@ -15,7 +15,11 @@ class EmailAssociationService
     {
         return DB::transaction(function () use ($context, $userId): ?string {
             $account = DB::table('users')->where('user_id', $userId)->lockForUpdate()->first();
-            if (!$account || $account->disabled || $account->date_validated) {
+            if (!$account || $account->disabled) {
+                return null;
+            }
+            $user = Repo::user()->get($userId, true);
+            if (!(new DeiaDataService())->emailNeedsAssociationConfirmation($user)) {
                 return null;
             }
             $previous = json_decode($this->settings($userId)->value('setting_value') ?? '{}', true);

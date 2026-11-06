@@ -12,6 +12,32 @@ use PKP\user\User;
 
 class DeiaDataService
 {
+    private const REGISTRATION_EMAIL_SETTING = 'deiaRegistrationEmail';
+
+    public function emailNeedsAssociationConfirmation($user): bool
+    {
+        return !$user->getDateValidated() || !$this->hasRegistrationEmail($user->getId(), $user->getEmail());
+    }
+
+    public function recordRegistrationEmail($user): void
+    {
+        DB::transaction(function () use ($user) {
+            $account = DB::table('users')->where('user_id', $user->getId())->lockForUpdate()->first();
+            if ($account && !$account->date_validated && $account->email === $user->getEmail()) {
+                DB::table('user_settings')->insertOrIgnore([
+                    'user_id' => $user->getId(), 'locale' => '', 'setting_name' => self::REGISTRATION_EMAIL_SETTING,
+                    'setting_value' => $account->email,
+                ]);
+            }
+        });
+    }
+
+    private function hasRegistrationEmail(int $userId, string $email): bool
+    {
+        return DB::table('user_settings')->where('user_id', $userId)
+            ->where('setting_name', self::REGISTRATION_EMAIL_SETTING)->where('setting_value', $email)->exists();
+    }
+
     public function validateResponsesForContext(
         int $contextId,
         array $responses,
@@ -391,7 +417,7 @@ class DeiaDataService
             // Re-read the account under the same lock used when saving the profile questionnaire.
             $account = DB::table('users')->where('user_id', $user->getId())->lockForUpdate()->first();
             if (!$account || $account->disabled
-                || ($confirmedEmail === null && !$account->date_validated)
+                || ($confirmedEmail === null && (!$account->date_validated || !$this->hasRegistrationEmail($user->getId(), $account->email)))
                 || ($confirmedEmail !== null && $confirmedEmail !== $account->email)) {
                 return false;
             }
