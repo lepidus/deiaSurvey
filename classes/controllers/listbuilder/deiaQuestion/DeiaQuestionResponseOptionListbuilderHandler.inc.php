@@ -55,7 +55,13 @@ class DeiaQuestionResponseOptionListbuilderHandler extends \SetupListbuilderHand
     {
         $formattedResponses = [];
 
-        if (!$this->_deiaQuestionId) {
+        $context = $request->getContext();
+        if (!$this->_deiaQuestionId || !$context) {
+            return $formattedResponses;
+        }
+
+        // Only list options of a question that belongs to the current context.
+        if (!Repo::deiaQuestion()->get($this->_deiaQuestionId, $context->getId())) {
             return $formattedResponses;
         }
 
