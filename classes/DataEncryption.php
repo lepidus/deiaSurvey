@@ -37,7 +37,7 @@ class DataEncryption
 
     public function textIsEncrypted(string $text): bool
     {
-        if (!str_starts_with($text, self::BASE64_PREFIX)) {
+        if (strncmp($text, self::BASE64_PREFIX, strlen(self::BASE64_PREFIX)) !== 0) {
             return false;
         }
 
