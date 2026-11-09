@@ -376,22 +376,43 @@ class QuestionnaireHandler extends Handler
         }
 
         // OAuth proves ownership even when this ORCID already has external responses.
-        $linked = DB::transaction(function () use ($author, $authorToken, $authorOrcidUri, $contextId): bool {
+        $refusalMessage = DB::transaction(function () use ($author, $authorToken, $authorOrcidUri, $contextId): ?string {
             DB::table('authors')->where('author_id', $author->getId())->lockForUpdate()->first();
             $currentAuthor = Repo::author()->get($author->getId());
             if (!$this->authorTokenIsValid($currentAuthor, $authorToken)
                 || !$this->authorBelongsToContext($currentAuthor, $contextId)) {
-                return false;
+                return 'plugins.generic.deiaSurvey.questionnairePage.accessDenied';
+            }
+            if ($this->answeredUnderAnotherIdentifier($currentAuthor, $authorOrcidUri, $contextId)) {
+                return 'plugins.generic.deiaSurvey.questionnairePage.orcidNotLinkedAfterAnswering';
             }
             Repo::author()->edit($currentAuthor, ['deiaOrcid' => $authorOrcidUri]);
-            return true;
+            return null;
         });
-        if (!$linked) {
-            $templateMgr->assign('messageToDisplay', __('plugins.generic.deiaSurvey.questionnairePage.accessDenied'));
+        if ($refusalMessage !== null) {
+            $templateMgr->assign('messageToDisplay', __($refusalMessage));
             return $templateMgr->display($plugin->getTemplateResource('questionnairePage/displayMessage.tpl'));
         }
 
         $request->redirect(null, null, 'index', null, ['authorId' => $author->getId(), 'authorToken' => $request->getUserVar('authorToken')]);
+    }
+
+    /**
+     * Changing the identifier after answering would keep the answers given under the previous
+     * identifier and let the author answer again under the new one, counting the author twice.
+     */
+    private function answeredUnderAnotherIdentifier($author, string $orcidUri, int $contextId): bool
+    {
+        $currentOrcid = $author->getData('deiaOrcid');
+        if ($currentOrcid === $orcidUri) {
+            return false;
+        }
+
+        return Repo::deiaResponse()->getCollector()
+            ->filterByContextIds([$contextId])
+            ->filterByExternalIds([is_null($currentOrcid) ? $author->getData('email') : $currentOrcid])
+            ->filterByExternalTypes([is_null($currentOrcid) ? 'email' : 'orcid'])
+            ->getCount() > 0;
     }
 
     private function addQuestionnairePageStyleSheet($plugin, $request, $templateMgr)
