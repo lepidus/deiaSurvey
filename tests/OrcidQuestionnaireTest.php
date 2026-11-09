@@ -193,6 +193,36 @@ class OrcidQuestionnaireTest extends QuestionnaireSecurityTestCase
         );
     }
 
+    public function testCallbackDoesNotLinkOrcidAfterTheAuthorAnsweredByEmail(): void
+    {
+        DB::table('deia_responses')->insert([
+            'deia_question_id' => $this->createDeiaQuestion(),
+            'external_id' => 'external@example.org',
+            'external_type' => 'email',
+        ]);
+        $this->request->expects(self::never())->method('redirect');
+
+        $this->verifyOrcidReturnedByOAuth('0000-0002-1825-0097');
+
+        self::assertNull(Repo::author()->get($this->authorId)->getData('deiaOrcid'));
+    }
+
+    public function testCallbackDoesNotReplaceTheLinkedOrcidAfterTheAuthorAnswered(): void
+    {
+        $linkedOrcid = 'https://sandbox.orcid.org/0000-0002-1825-0097';
+        Repo::author()->edit(Repo::author()->get($this->authorId), ['deiaOrcid' => $linkedOrcid]);
+        DB::table('deia_responses')->insert([
+            'deia_question_id' => $this->createDeiaQuestion(),
+            'external_id' => $linkedOrcid,
+            'external_type' => 'orcid',
+        ]);
+        $this->request->expects(self::never())->method('redirect');
+
+        $this->verifyOrcidReturnedByOAuth('0000-0001-5109-3700');
+
+        self::assertSame($linkedOrcid, Repo::author()->get($this->authorId)->getData('deiaOrcid'));
+    }
+
     public function testApiValidationRejectsWritingDeiaOrcidWithoutOAuth(): void
     {
         $plugin = new DeiaSurveyPlugin();
@@ -313,6 +343,17 @@ class OrcidQuestionnaireTest extends QuestionnaireSecurityTestCase
             $connection->setEventDispatcher($originalDispatcher);
             Mail::swap($mailer);
         }
+    }
+
+    private function verifyOrcidReturnedByOAuth(string $orcid): void
+    {
+        $this->startOAuth();
+        $client = $this->createMock(Client::class);
+        $client->expects(self::once())->method('request')
+            ->willReturn(new Response(200, [], json_encode(['orcid' => $orcid])));
+        Registry::set(self::MOCKED_GUZZLE_CLIENT_NAME, $client);
+
+        (new QuestionnaireHandler())->orcidVerify([], $this->request);
     }
 
     private function assertCallbackDoesNotContactOrcid(): void
