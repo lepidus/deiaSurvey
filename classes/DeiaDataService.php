@@ -361,6 +361,35 @@ class DeiaDataService
         return null;
     }
 
+    /**
+     * Replace the external author's responses in the context in a single transaction,
+     * so resubmitting the questionnaire never accumulates duplicate answers.
+     */
+    public function replaceExternalAuthorResponses(
+        int $contextId,
+        string $externalId,
+        string $externalType,
+        array $responses,
+        array $responseOptionsInputs
+    ) {
+        DB::connection()->transaction(function () use (
+            $contextId,
+            $externalId,
+            $externalType,
+            $responses,
+            $responseOptionsInputs
+        ) {
+            $this->deleteAuthorResponses($contextId, $externalId, $externalType);
+            $this->registerExternalAuthorResponses(
+                $contextId,
+                $externalId,
+                $externalType,
+                $responses,
+                $responseOptionsInputs
+            );
+        });
+    }
+
     public function registerExternalAuthorResponses(
         int $contextId,
         string $externalId,

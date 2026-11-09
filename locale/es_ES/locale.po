@@ -70,6 +70,9 @@ msgstr "Se ha producido un error al solicitar su ORCID. El mensaje devuelto fue:
 msgid "plugins.generic.deiaSurvey.questionnairePage.userWithOrcidExists"
 msgstr "Hay un usuario registrado con este ORCID en nuestro sistema. Por favor, rellene el Cuestionario DEIA utilizando este usuario."
 
+msgid "plugins.generic.deiaSurvey.questionnairePage.orcidNotLinkedAfterAnswering"
+msgstr "El ORCID no fue vinculado porque usted ya respondió el Cuestionario DEIA. Para responder con este ORCID, elimine primero sus respuestas."
+
 msgid "plugins.generic.deiaSurvey.questionnairePage.privacyStatement"
 msgstr ""
 "Los datos se recogen de acuerdo con la "
