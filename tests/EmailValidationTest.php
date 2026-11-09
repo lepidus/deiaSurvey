@@ -53,6 +53,8 @@ class EmailValidationTest extends DatabaseTestCase
         $router = Application::get()->getRequest()->getRouter();
         $this->context = Application::getContextDAO()->getById($this->createTestContext());
         $this->user = Repo::user()->get($this->createTestUser(), true);
+        // Mirror native registration, observed before the account email is validated.
+        (new DeiaDataService())->recordRegistrationEmail($this->user);
         $this->request = $this->getMockBuilder(Request::class)
             ->onlyMethods(['getContext', 'getUser', 'isPost', 'checkCSRF'])->getMock();
         $this->request->method('getContext')->willReturn($this->context);
@@ -290,6 +292,25 @@ class EmailValidationTest extends DatabaseTestCase
 
         self::assertFalse((new DataCollectionEmailSender())->sendEmailValidation($this->context, $this->user));
         Mail::assertNothingSent();
+    }
+
+    public function testValidatedAccountWithChangedEmailMustConfirmAssociation(): void
+    {
+        $changedEmail = 'changed-' . $this->user->getId() . '@example.org';
+        $validatedAt = date('Y-m-d H:i:s');
+        DB::table('users')->where('user_id', $this->user->getId())->update([
+            'email' => $changedEmail,
+            'date_validated' => $validatedAt,
+        ]);
+        $this->user->setEmail($changedEmail);
+        $this->user->setDateValidated($validatedAt);
+        $this->createExternalResponse();
+        $form = new QuestionsForm($this->request);
+        $form->initData();
+
+        self::assertTrue($form->getData('canValidateEmail'));
+        self::assertTrue((new DataCollectionEmailSender())->sendEmailValidation($this->context, $this->user));
+        Mail::assertSent(ConfirmDeiaEmail::class, fn ($mail) => $mail->hasTo($changedEmail));
     }
 
     public function testDisabledAccountDoesNotReceiveConfirmation(): void

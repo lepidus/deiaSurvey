@@ -9,6 +9,7 @@ use APP\journal\Journal;
 use APP\plugins\generic\deiaSurvey\classes\controllers\TabHandler;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
+use APP\plugins\generic\deiaSurvey\classes\observers\listeners\RecordRegistrationEmail;
 use APP\plugins\generic\deiaSurvey\DeiaSurveyPlugin;
 use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
@@ -56,6 +57,8 @@ class NativeEmailResponseAssociationTest extends DatabaseTestCase
             'disabled' => 0,
         ]);
         $this->user = Repo::user()->get($userId, true);
+        // Mirror native registration, observed before the account email is validated.
+        (new DeiaDataService())->recordRegistrationEmail($this->user);
         $questionId = $this->createDeiaQuestion();
         $this->responseId = DB::table('deia_responses')->insertGetId([
             'deia_question_id' => $questionId,
@@ -247,6 +250,53 @@ class NativeEmailResponseAssociationTest extends DatabaseTestCase
         Mail::assertSent(\PKP\mail\mailables\ValidateEmailContext::class);
         (new RegistrationAccessInvite($invitation))->finalize();
         self::assertTrue((new DeiaDataService())->migrateResponsesByUserIdentifier($this->context, $this->user, 'email'));
+    }
+
+    public function testEmailChangedAfterValidationDoesNotTransfer(): void
+    {
+        $this->invite->finalize();
+        // UserDetailsForm lets a manager change the email without resetting date_validated.
+        DB::table('users')->where('user_id', $this->user->getId())->update(['email' => 'victim@example.org']);
+        DB::table('deia_responses')->where('deia_response_id', $this->responseId)
+            ->update(['external_id' => 'victim@example.org']);
+
+        self::assertNotNull(DB::table('users')->where('user_id', $this->user->getId())->value('date_validated'));
+        self::assertFalse((new DeiaDataService())->migrateResponsesByUserIdentifier($this->context, $this->user, 'email'));
+        self::assertNull(DB::table('deia_responses')->where('deia_response_id', $this->responseId)->value('user_id'));
+    }
+
+    public function testValidatedAccountWithoutObservedRegistrationEmailDoesNotTransfer(): void
+    {
+        $this->invite->finalize();
+        DB::table('user_settings')->where('user_id', $this->user->getId())
+            ->where('setting_name', 'deiaRegistrationEmail')->delete();
+
+        self::assertFalse((new DeiaDataService())->migrateResponsesByUserIdentifier($this->context, $this->user, 'email'));
+        $this->assertResponseRemainsExternal();
+    }
+
+    public function testNativeRegistrationRecordsTheEmailWithoutAssociatingResponses(): void
+    {
+        DB::table('user_settings')->where('user_id', $this->user->getId())
+            ->where('setting_name', 'deiaRegistrationEmail')->delete();
+        $events = new Dispatcher(app());
+        (new RecordRegistrationEmail())->subscribe($events);
+        $events->dispatch(new UserRegisteredContext($this->user, $this->context));
+
+        self::assertSame($this->user->getEmail(), DB::table('user_settings')->where('user_id', $this->user->getId())
+            ->where('setting_name', 'deiaRegistrationEmail')->value('setting_value'));
+        $this->assertResponseRemainsExternal();
+    }
+
+    public function testLaterObservationCannotOverwriteTheOriginalRegistrationEmail(): void
+    {
+        $originalEmail = $this->user->getEmail();
+        DB::table('users')->where('user_id', $this->user->getId())->update(['email' => 'replacement@example.org']);
+        $this->user->setEmail('replacement@example.org');
+        (new DeiaDataService())->recordRegistrationEmail($this->user);
+
+        self::assertSame($originalEmail, DB::table('user_settings')->where('user_id', $this->user->getId())
+            ->where('setting_name', 'deiaRegistrationEmail')->value('setting_value'));
     }
 
     public function testOpeningAuthenticatedDeiaTabTriggersAssociation(): void
