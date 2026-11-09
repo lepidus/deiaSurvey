@@ -135,6 +135,38 @@ class SiteStatisticsReportTest extends \PKPTestCase
         $this->assertEquals($expectedHeader, $this->siteReport->getReportHeader());
     }
 
+    public function testPreservesCellBoundariesInHeadersAndContextName()
+    {
+        $value = 'a\\",=1+1,';
+        $encodedCell = "\"a\\\"\",=1+1,\"";
+        $this->context->setData('name', $value, $this->locale);
+        $printingGuide = $this->createTestPrintingGuide();
+        $question = $printingGuide[0];
+        $question['blockTitle'] = $question['questionText'] = $value;
+        $question['responseOptions'] = [['id' => 1, 'text' => $value]];
+        $this->siteReport->addContextStatistics($this->context, $this->contextStats, [$question]);
+
+        $csvFilePath = tempnam(sys_get_temp_dir(), 'deia-csv-');
+        try {
+            $this->siteReport->writeReport($csvFilePath);
+            $expectedRows = [
+                '"' . __('plugins.generic.deiaSurvey.report.contextName.ojs2', [], $this->locale)
+                    . '",' . $encodedCell
+                    . ',"' . __('plugins.generic.deiaSurvey.report.usersWhoConsented', [], $this->locale)
+                    . '","' . __('plugins.generic.deiaSurvey.report.usersWhoDidNotConsent', [], $this->locale) . '"',
+                '"",' . $encodedCell . ',"",""',
+                '"",' . $encodedCell . ',"",""',
+                $encodedCell . ',"1","5","3"',
+            ];
+            $this->assertSame(
+                "\xEF\xBB\xBF" . implode("\n", $expectedRows) . "\n",
+                file_get_contents($csvFilePath)
+            );
+        } finally {
+            unlink($csvFilePath);
+        }
+    }
+
     public function testWritesReport()
     {
         $printingGuide = $this->createTestPrintingGuide();
