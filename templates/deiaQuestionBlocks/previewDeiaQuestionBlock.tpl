@@ -8,3 +8,4 @@
 		{include file="../../../plugins/generic/deiaSurvey/templates/question.tpl" question=$question}
 	{/foreach}
 </form>
+{include file="../../../plugins/generic/deiaSurvey/templates/questionnaireConditions.tpl" conditionFormId="deiaQuestionBlockPreview"}

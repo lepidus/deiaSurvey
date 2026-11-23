@@ -3,3 +3,4 @@
 <form class="pkp_form deiaQuestionnaire" id="deiaQuestionnairePreview" method="post" action="#">
 	{include file="../../../plugins/generic/deiaSurvey/templates/questionBlocks.tpl"}
 </form>
+{include file="../../../plugins/generic/deiaSurvey/templates/questionnaireConditions.tpl" conditionFormId="deiaQuestionnairePreview"}

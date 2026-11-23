@@ -20,7 +20,7 @@ class QuestionnaireEscapingTest extends TestCase
             self::assertStringContainsString($escapedSink, $question);
         }
 
-        self::assertStringContainsString("{\$responses[\$question['questionId']]|escape}", $responses);
+        self::assertStringContainsString("{\$responses[\$question['questionId']]|default:\"\"|escape}", $responses);
         self::assertStringNotContainsString('|escape|escape', $question . $responses);
     }
 }
