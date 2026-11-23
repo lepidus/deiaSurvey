@@ -16,6 +16,11 @@ class DeiaQuestion extends \PKP\core\DataObject
     public const TYPE_RADIO_BUTTONS = 5;
     public const TYPE_DROP_DOWN_BOX = 6;
 
+    public static function isSingleSelection(int $type): bool
+    {
+        return in_array($type, [self::TYPE_RADIO_BUTTONS, self::TYPE_DROP_DOWN_BOX], true);
+    }
+
     public static function getQuestionTypeConstants(): array
     {
         return [
