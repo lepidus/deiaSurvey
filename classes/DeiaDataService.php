@@ -41,10 +41,11 @@ class DeiaDataService
     public function normalizeResponsesForContext(
         int $contextId,
         array $responses,
-        array $responseOptionsInputs
+        array $responseOptionsInputs,
+        ?string $textLocale = null
     ): array {
         $questions = $this->retrieveAllQuestions($contextId);
-        return (new QuestionnaireResponseValidator())->normalize($questions, $responses, $responseOptionsInputs);
+        return (new QuestionnaireResponseValidator())->normalize($questions, $responses, $responseOptionsInputs, $textLocale);
     }
 
     public function hasActiveQuestionBlocks(int $contextId): bool
@@ -108,11 +109,17 @@ class DeiaDataService
             ->filterByQuestionBlockIds([$deiaQuestionBlock->getId()])
             ->getMany();
 
+        $conditionSources = [];
         foreach ($deiaQuestions as $deiaQuestion) {
+            $condition = $deiaQuestion->getData('showWhen') ?? [];
+            if ($condition) {
+                $conditionSources[$condition[0]] = true;
+            }
             $questionData = [
                 'questionId' => $deiaQuestion->getId(),
                 'type' => $deiaQuestion->getQuestionType(),
                 'inputType' => $deiaQuestion->getQuestionInputType(),
+                'showWhen' => $condition,
                 'title' => $deiaQuestion->getLocalizedQuestionText(),
                 'description' => $this->getCleanText($deiaQuestion->getLocalizedQuestionDescription()),
                 'responseOptions' => $deiaQuestion->getResponseOptions()
@@ -133,6 +140,11 @@ class DeiaDataService
 
             $questionBlockData['questions'][] = $questionData;
         }
+
+        foreach ($questionBlockData['questions'] as &$questionData) {
+            $questionData['isConditionSource'] = isset($conditionSources[$questionData['questionId']]);
+        }
+        unset($questionData);
 
         return $questionBlockData;
     }
@@ -309,11 +321,16 @@ class DeiaDataService
         return '';
     }
 
-    public function deleteUserResponses(int $userId, int $contextId)
+    public function deleteUserResponses(int $userId, int $contextId, ?array $questionIds = null)
     {
+        if ($questionIds === []) {
+            return;
+        }
+
         $userResponses = Repo::deiaResponse()->getCollector()
             ->filterByContextIds([$contextId])
             ->filterByUserIds([$userId])
+            ->filterByQuestionIds($questionIds)
             ->getMany();
 
         foreach ($userResponses as $response) {

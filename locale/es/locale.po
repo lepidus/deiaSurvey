@@ -442,3 +442,6 @@ msgstr "Enviamos un nuevo enlace del cuestionario al correo electrónico registr
 
 msgid "plugins.generic.deiaSurvey.questionnairePage.renewalUnavailable"
 msgstr "No se pudo completar la solicitud. Si ya solicitó un nuevo enlace, revise su correo electrónico. De lo contrario, abra de nuevo el enlace caducado e inténtelo otra vez."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"
+msgstr "Seleccione una respuesta"

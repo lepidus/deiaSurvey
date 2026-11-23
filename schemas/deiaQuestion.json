@@ -31,6 +31,12 @@
         "isDefaultQuestion": {
             "type": "boolean"
         },
+        "showWhen": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            }
+        },
         "questionText": {
             "type": "string"
         }, 
