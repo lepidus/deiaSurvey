@@ -7,6 +7,7 @@ require_once(__DIR__ . '/helpers/TestHelperTrait.php');
 require_once(__DIR__ . '/../classes/DeiaDataService.php');
 
 use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
+use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 use Illuminate\Database\Capsule\Manager as DB;
 
@@ -99,6 +100,47 @@ class DeiaDataServiceTest extends \DatabaseTestCase
         } catch (\InvalidArgumentException $exception) {
             self::assertSame(1, $this->countExternalResponses('author@example.org'));
         }
+    }
+
+    public function testDiscardsAnswersToHiddenQuestions(): void
+    {
+        $service = $this->conditionalQuestionnaire(DeiaQuestion::TYPE_RADIO_BUTTONS, 'radio');
+        [$responses, $optionInputs, $hidden] = $service->normalizeResponses(
+            1,
+            ['question-2-text' => 'Old response', 'question-1-radio' => ['12']],
+            [],
+            false
+        );
+
+        self::assertSame(['question-1-radio' => [12]], $responses);
+        self::assertSame([], $optionInputs);
+        self::assertSame([2], $hidden);
+    }
+
+    public function testRequiresVisibleTextInTheProfileLocale(): void
+    {
+        $service = $this->conditionalQuestionnaire(DeiaQuestion::TYPE_DROP_DOWN_BOX, 'select');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required conditional response.');
+
+        $service->normalizeResponses(
+            1,
+            ['question-1-select' => '11', 'question-2-text' => ['en_US' => '  ', 'pt_BR' => 'Resposta']],
+            [],
+            true,
+            'en_US'
+        );
+    }
+
+    private function conditionalQuestionnaire(int $sourceType, string $inputType): DeiaDataService
+    {
+        $service = $this->getMockBuilder(DeiaDataService::class)->onlyMethods(['retrieveAllQuestions'])->getMock();
+        $service->method('retrieveAllQuestions')->with(1)->willReturn([
+            ['id' => 1, 'type' => $sourceType, 'inputType' => $inputType, 'responseOptions' => [11 => 'Yes', 12 => 'No']],
+            ['id' => 2, 'type' => DeiaQuestion::TYPE_TEXT_FIELD, 'inputType' => 'text', 'showWhen' => [1, 11],
+                'responseOptions' => []],
+        ]);
+        return $service;
     }
 
     private function countExternalResponses(string $externalId): int

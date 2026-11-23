@@ -38,6 +38,7 @@
             </button>
         </div>
     </form>
+{include file="../../../plugins/generic/deiaSurvey/templates/questionnaireConditions.tpl" conditionFormId="deiaSurveyForm"}
 </div>
 
 {include file="frontend/components/footer.tpl"}

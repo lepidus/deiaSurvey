@@ -3,6 +3,7 @@
     {assign var="isListSection" value=true}
 {/if}
 
+<div data-deia-question="{$question['id']|escape}"{if $question['showWhen']|default:[]} data-show-when-question="{$question['showWhen'][0]|escape}" data-show-when-option="{$question['showWhen'][1]|escape}" hidden{/if}>
 {fbvFormSection class="deiaQuestion" title=$question['title'] required=true translate=false}
     {fbvFormSection for=$questionId description=$question['description'] translate=false list=$isListSection}
         {if $question['type'] == $questionTypeConsts['TYPE_SMALL_TEXT_FIELD']}
@@ -63,7 +64,14 @@
                 </div>
             {/foreach}
         {elseif $question['type'] == $questionTypeConsts['TYPE_DROP_DOWN_BOX']}
-            {fbvElement type="select" name=$questionId id="deiaResponses" from=$question['responseOptions'] selected=$question['response']['value'] translate=false required=true size=$fbvStyles.size.LARGE}
+            {assign var="selectPlaceholder" value=""}
+            {assign var="selectDefaultValue" value=null}
+            {if $question['isConditionSource']|default:false}
+                {assign var="selectDefaultValue" value=""}
+                {capture assign="selectPlaceholder"}{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"}{/capture}
+            {/if}
+            {fbvElement defaultLabel=$selectPlaceholder defaultValue=$selectDefaultValue type="select" name=$questionId id="deiaResponses" from=$question['responseOptions'] selected=$question['response']['value'] translate=false required=true size=$fbvStyles.size.LARGE}
         {/if}
     {/fbvFormSection}
 {/fbvFormSection}
+</div>

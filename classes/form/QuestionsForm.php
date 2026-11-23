@@ -129,7 +129,8 @@ class QuestionsForm extends \Form
                     $context->getId(),
                     $this->getData('responses') ?? [],
                     $this->getData('responseOptionsInputs') ?? [],
-                    true
+                    true,
+                    $this->defaultLocale
                 );
                 $this->setData('responses', $responses);
                 $this->setData('responseOptionsInputs', $responseOptionsInputs);
@@ -175,7 +176,8 @@ class QuestionsForm extends \Form
                     $context->getId(),
                     $user->getId(),
                     $this->getData('responses'),
-                    $this->getData('responseOptionsInputs')
+                    $this->getData('responseOptionsInputs'),
+                    $this->defaultLocale
                 );
             } elseif ($newConsent == '0' && $previousConsent) {
                 $deiaDataService->deleteUserResponses($user->getId(), $context->getId());

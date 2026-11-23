@@ -453,3 +453,6 @@ msgstr "Enviamos um novo link do questionário para o e-mail cadastrado do autor
 
 msgid "plugins.generic.deiaSurvey.questionnairePage.renewalUnavailable"
 msgstr "Não foi possível concluir a solicitação. Se você já pediu um novo link, confira seu e-mail. Caso contrário, abra novamente o link vencido e tente outra vez."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"
+msgstr "Selecione uma resposta"

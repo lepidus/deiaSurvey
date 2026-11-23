@@ -9,7 +9,8 @@ use APP\plugins\generic\deiaSurvey\classes\DeiaDataService;
 use APP\plugins\generic\deiaSurvey\classes\migrations\SchemaMigration;
 use APP\plugins\generic\deiaSurvey\report\DeiaSurveyReportPlugin;
 use Illuminate\Database\Migrations\Migration;
-use PKP\plugins\GenericPlugin;
+
+import('lib.pkp.classes.plugins.GenericPlugin');
 
 class DeiaSurveyPlugin extends \GenericPlugin
 {

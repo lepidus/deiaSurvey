@@ -451,3 +451,6 @@ msgstr "We sent a new questionnaire link to the author’s registered email addr
 
 msgid "plugins.generic.deiaSurvey.questionnairePage.renewalUnavailable"
 msgstr "The request could not be completed. If you already requested a new link, check your email. Otherwise, reopen the expired link and try again."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"
+msgstr "Select an answer"
