@@ -1,3 +1,13 @@
+{literal}
+<style>
+	#deiaConditionFields:not([hidden]) {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+		gap: 0.75rem;
+		margin: 0.75rem 0 0;
+	}
+</style>
+{/literal}
 <script>
 	function toggleResponseOptions(newValue, responseOptionQuestionTypesString, showWarning) {ldelim}
 		var form = document.getElementById('deiaQuestionForm'),
@@ -23,7 +33,30 @@
 	{rdelim}
 
 	$(function() {ldelim}
-		$('#deiaQuestionForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
+		const form = document.getElementById('deiaQuestionForm');
+		$(form).pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
+		const conditional = document.getElementById('deiaConditionEnabled');
+		const fields = document.getElementById('deiaConditionFields');
+		const source = document.getElementById('showWhenQuestion');
+		const option = document.getElementById('showWhenOption');
+
+		function updateCondition() {ldelim}
+			fields.hidden = !conditional.checked;
+			fields.disabled = !conditional.checked;
+			option.disabled = source.value === '';
+
+			for (const item of option.options) {ldelim}
+				const unavailable = item.value !== '' && item.dataset.question !== source.value;
+				item.hidden = unavailable;
+				item.disabled = unavailable;
+			{rdelim}
+			if (option.selectedOptions[0]?.disabled) {ldelim}
+				option.value = '';
+			{rdelim}
+		{rdelim}
+		form.querySelectorAll('[name="questionVisibility"]').forEach((radio) => radio.addEventListener('change', updateCondition));
+		source.addEventListener('change', updateCondition);
+		updateCondition();
 		toggleResponseOptions(
 			$('#questionType').val(),
 			'{$responseOptionQuestionTypesString|escape:"javascript"}',
@@ -53,17 +86,17 @@
 
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="deiaQuestionsNotification"}
 
-	{fbvFormArea id="deiaQuestionForm"}
+	{fbvFormArea id="deiaQuestionFields"}
 		{fbvFormSection title="plugins.generic.deiaSurvey.questionBlocks.questions.text" required=true for="questionText"}
 			{fbvElement type="text" id="questionText" value=$questionText multilingual=true required=true}
 		{/fbvFormSection}
 		{fbvFormSection title="plugins.generic.deiaSurvey.questionBlocks.description" for="questionDescription"}
 			{fbvElement type="textarea" id="questionDescription" value=$questionDescription multilingual=true rich=false}
 		{/fbvFormSection}
-		{fbvFormSection title="common.type" required=true for="questionType" list=true}
+
+		{fbvFormSection title="plugins.generic.deiaSurvey.questionBlocks.questions.responseType" required=true for="questionType"}
 			{fbvElement
 				type="select"
-				label="common.type"
 				id="questionType"
 				from=$questionTypeOptions
 				selected=$questionType
@@ -75,12 +108,52 @@
 			}
 		{/fbvFormSection}
 
-		<div id="responseOptions" class="full left"{if !$questionTypeAllowsResponseOptions} style="display: none;"{/if}>
+		<div id="responseOptions" class="section"{if !$questionTypeAllowsResponseOptions} style="display: none;"{/if}>
 			<div id="responseOptionsContainer" class="full left">
 				{capture assign=responseOptionsUrl}{url router=$smarty.const.ROUTE_COMPONENT component="plugins.generic.deiaSurvey.classes.controllers.listbuilder.deiaQuestion.DeiaQuestionResponseOptionListbuilderHandler" op="fetch" deiaQuestionBlockId=$deiaQuestionBlockId deiaQuestionId=$deiaQuestionId escape=false}{/capture}
 				{load_url_in_div id="responseOptionsListbuilderContainer" url=$responseOptionsUrl}
 			</div>
 		</div>
+
+		{assign var=selectedConditionQuestion value=$showWhenQuestion|default:null}
+		{assign var=selectedConditionOption value=$showWhenOption|default:null}
+		{fbvFormArea id="deiaQuestionVisibility" title="plugins.generic.deiaSurvey.questionBlocks.questions.visibility"}
+			<ul class="checkbox_and_radiobutton">
+				<li><label>
+					<input type="radio" name="questionVisibility" value="always"{if !$selectedConditionQuestion} checked{/if}>
+					{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.noCondition"}
+				</label></li>
+				<li><label>
+					<input type="radio" id="deiaConditionEnabled" name="questionVisibility" value="conditional"{if $selectedConditionQuestion} checked{elseif !$conditionSources} disabled aria-describedby="deiaConditionUnavailable"{/if}>
+					{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.conditional"}
+				</label></li>
+			</ul>
+			{if !$conditionSources && !$selectedConditionQuestion}
+				<p id="deiaConditionUnavailable" class="description">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.conditionUnavailable"}</p>
+			{/if}
+			<fieldset id="deiaConditionFields"{if !$selectedConditionQuestion} hidden disabled{/if}>
+				<div>
+					<label for="showWhenQuestion">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.conditionQuestion"}</label>
+					<select name="showWhenQuestion" id="showWhenQuestion" required>
+						<option value="">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.chooseConditionQuestion"}</option>
+						{foreach $conditionSources as $sourceId => $source}
+							<option value="{$sourceId|escape}"{if $sourceId == $selectedConditionQuestion} selected{/if}>{$source.text|escape}</option>
+						{/foreach}
+					</select>
+				</div>
+				<div>
+					<label for="showWhenOption">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.conditionOption"}</label>
+					<select name="showWhenOption" id="showWhenOption" required{if !$selectedConditionQuestion} disabled{/if}>
+						<option value="">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"}</option>
+						{foreach $conditionSources as $sourceId => $source}
+							{foreach $source.options as $optionId => $optionText}
+								<option data-question="{$sourceId|escape}" value="{$optionId|escape}"{if $optionId == $selectedConditionOption} selected{/if}>{$optionText|escape}</option>
+							{/foreach}
+						{/foreach}
+					</select>
+				</div>
+			</fieldset>
+		{/fbvFormArea}
 
 		<p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 		{fbvFormButtons id="deiaQuestionFormSubmit" submitText="common.save"}

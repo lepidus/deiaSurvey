@@ -53,6 +53,9 @@ class DeiaQuestionForm extends Form
             'questionDescription',
             'questionType',
             'responseOptions',
+            'questionVisibility',
+            'showWhenQuestion',
+            'showWhenOption',
         ]);
     }
 
@@ -66,6 +69,9 @@ class DeiaQuestionForm extends Form
         $request = Application::get()->getRequest();
         $deiaQuestion = Repo::deiaQuestion()->get($this->deiaQuestionId, $request->getContext()->getId());
 
+        [$sourceQuestion, $sourceOption] = $deiaQuestion->getData('showWhen') ?: [null, null];
+        $this->setData('showWhenQuestion', $sourceQuestion);
+        $this->setData('showWhenOption', $sourceOption);
         $this->setData('questionText', $deiaQuestion->getData('questionText'));
         $this->setData('questionDescription', $deiaQuestion->getData('questionDescription'));
         $this->setData('questionType', $deiaQuestion->getQuestionType());
@@ -80,6 +86,7 @@ class DeiaQuestionForm extends Form
         $templateMgr->assign([
             'deiaQuestionBlockId' => $this->deiaQuestionBlockId,
             'deiaQuestionId' => $this->deiaQuestionId,
+            'conditionSources' => $this->getConditionSources($request->getContext()->getId()),
             'questionTypeOptions' => [
                 DeiaQuestion::TYPE_SMALL_TEXT_FIELD
                     => 'plugins.generic.deiaSurvey.questionBlocks.questions.type.smallText',
@@ -99,6 +106,97 @@ class DeiaQuestionForm extends Form
         ]);
 
         return parent::fetch($request, $template, $display);
+    }
+
+    public function validate($callHooks = true)
+    {
+        if (!parent::validate($callHooks)) {
+            return false;
+        }
+
+        $request = Application::get()->getRequest();
+        $contextId = $request->getContext()->getId();
+        $visibility = $this->getData('questionVisibility');
+        $sourceQuestion = $this->getData('showWhenQuestion');
+        $sourceOption = $this->getData('showWhenOption');
+        $showWhen = [];
+        if (
+            $visibility !== 'always' && (
+                $visibility === 'conditional'
+                || ($sourceQuestion !== null && $sourceQuestion !== '')
+                || ($sourceOption !== null && $sourceOption !== '')
+            )
+        ) {
+            $sources = $this->getConditionSources($contextId);
+            if (
+                !is_scalar($sourceQuestion) || !is_scalar($sourceOption)
+                || !isset($sources[(string) $sourceQuestion]['options'][(string) $sourceOption])
+            ) {
+                $this->addError('showWhenOption', __('plugins.generic.deiaSurvey.questionBlocks.questions.invalidCondition'));
+                return false;
+            }
+            $showWhen = [(int) $sourceQuestion, (int) $sourceOption];
+        }
+        $this->setData('showWhen', $showWhen);
+
+        $questionType = (int) $this->getData('questionType');
+        $this->setData('responseOptionsProcessed', []);
+        if (in_array($questionType, $this->getResponseOptionQuestionTypes(), true)) {
+            $this->setData('responseOptionsProcessed', $this->getResponseOptionsForListbuilder());
+            if (!ListbuilderHandler::unpack(
+                $request,
+                $this->getData('responseOptions') ?? '',
+                [$this, 'deleteEntry'],
+                [$this, 'insertEntry'],
+                [$this, 'updateEntry']
+            )) {
+                return false;
+            }
+        }
+
+        if ($this->deiaQuestionId) {
+            $keptOptions = [];
+            foreach ($this->getData('responseOptionsProcessed') as $option) {
+                if (isset($option['id']) && array_filter((array) $option['optionText'])) {
+                    $keptOptions[$option['id']] = true;
+                }
+            }
+            foreach (Repo::deiaQuestion()->getBlockQuestions($contextId, $this->deiaQuestionBlockId) as $question) {
+                $condition = $question->getData('showWhen');
+                if (
+                    $condition && $condition[0] === $this->deiaQuestionId
+                    && (!DeiaQuestion::isSingleSelection($questionType) || !isset($keptOptions[$condition[1]]))
+                ) {
+                    $this->addError('responseOptions', __('plugins.generic.deiaSurvey.questionBlocks.questions.conditionInUse'));
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private function getConditionSources(int $contextId): array
+    {
+        $sources = [];
+        foreach (Repo::deiaQuestion()->getBlockQuestions($contextId, $this->deiaQuestionBlockId) as $question) {
+            if ($question->getId() === $this->deiaQuestionId) {
+                break;
+            }
+            if (!DeiaQuestion::isSingleSelection($question->getQuestionType())) {
+                continue;
+            }
+
+            $options = [];
+            foreach ($question->getResponseOptions() as $option) {
+                $options[$option->getId()] = $option->getLocalizedOptionText();
+            }
+            if ($options) {
+                $sources[$question->getId()] = ['text' => $question->getLocalizedQuestionText(), 'options' => $options];
+            }
+        }
+
+        return $sources;
     }
 
     public function execute(...$functionArgs)
@@ -123,6 +221,7 @@ class DeiaQuestionForm extends Form
             'questionDescription' => $this->getData('questionDescription'),
             'isTranslated' => true,
             'isDefaultQuestion' => false,
+            'showWhen' => $this->getData('showWhen') ?? [],
         ];
 
         if ($this->deiaQuestionId) {
@@ -133,19 +232,7 @@ class DeiaQuestionForm extends Form
             Repo::deiaQuestion()->dao->resequence($this->deiaQuestionBlockId);
         }
 
-        if (in_array((int) $questionParams['questionType'], $this->getResponseOptionQuestionTypes())) {
-            $this->setData('responseOptionsProcessed', $this->getResponseOptionsForListbuilder());
-            ListbuilderHandler::unpack(
-                $request,
-                $this->getData('responseOptions'),
-                [$this, 'deleteEntry'],
-                [$this, 'insertEntry'],
-                [$this, 'updateEntry']
-            );
-            $this->replaceResponseOptions($this->getData('responseOptionsProcessed'));
-        } else {
-            $this->replaceResponseOptions([]);
-        }
+        $this->replaceResponseOptions($this->getData('responseOptionsProcessed') ?? []);
 
         parent::execute(...$functionArgs);
 
@@ -155,8 +242,8 @@ class DeiaQuestionForm extends Form
     public function insertEntry($request, $newRowId): bool
     {
         $responseOptionsProcessed = (array) $this->getData('responseOptionsProcessed');
-        $responseOptionsProcessed[] = [
-            'optionText' => $newRowId['responseOption'],
+        $responseOptionsProcessed['new-' . count($responseOptionsProcessed)] = [
+            'optionText' => $newRowId['responseOption'] ?? [],
             'hasInputField' => !empty($newRowId['hasInputField']),
         ];
         $this->setData('responseOptionsProcessed', $responseOptionsProcessed);
@@ -166,7 +253,10 @@ class DeiaQuestionForm extends Form
     public function deleteEntry($request, $rowId): bool
     {
         $responseOptionsProcessed = (array) $this->getData('responseOptionsProcessed');
-        unset($responseOptionsProcessed[$rowId - 1]);
+        if (!isset($responseOptionsProcessed[$rowId])) {
+            return false;
+        }
+        unset($responseOptionsProcessed[$rowId]);
         $this->setData('responseOptionsProcessed', $responseOptionsProcessed);
         return true;
     }
@@ -174,8 +264,12 @@ class DeiaQuestionForm extends Form
     public function updateEntry($request, $rowId, $newRowId): bool
     {
         $responseOptionsProcessed = (array) $this->getData('responseOptionsProcessed');
-        $responseOptionsProcessed[$rowId - 1] = [
-            'optionText' => $newRowId['responseOption'],
+        if ((!is_string($rowId) && !is_int($rowId)) || !isset($responseOptionsProcessed[$rowId]['id'])) {
+            return false;
+        }
+        $responseOptionsProcessed[$rowId] = [
+            'id' => $responseOptionsProcessed[$rowId]['id'],
+            'optionText' => $newRowId['responseOption'] ?? [],
             'hasInputField' => !empty($newRowId['hasInputField']),
         ];
         $this->setData('responseOptionsProcessed', $responseOptionsProcessed);
@@ -197,24 +291,31 @@ class DeiaQuestionForm extends Form
             return;
         }
 
-        foreach ($this->getExistingResponseOptions() as $existingOption) {
-            Repo::deiaResponseOption()->delete($existingOption);
-        }
-
+        $existingOptions = $this->getExistingResponseOptions()->toArray();
         $sequence = 0;
         foreach ($responseOptions as $responseOptionData) {
             if (empty(array_filter((array) $responseOptionData['optionText']))) {
                 continue;
             }
 
-            $responseOption = Repo::deiaResponseOption()->newDataObject([
+            $params = [
                 'deiaQuestionId' => $this->deiaQuestionId,
                 'sequence' => ++$sequence,
                 'optionText' => $responseOptionData['optionText'],
                 'isTranslated' => true,
                 'hasInputField' => !empty($responseOptionData['hasInputField']),
-            ]);
-            Repo::deiaResponseOption()->add($responseOption);
+            ];
+            $optionId = $responseOptionData['id'] ?? null;
+            if ($optionId !== null) {
+                Repo::deiaResponseOption()->edit($existingOptions[$optionId], $params);
+                unset($existingOptions[$optionId]);
+            } else {
+                Repo::deiaResponseOption()->add(Repo::deiaResponseOption()->newDataObject($params));
+            }
+        }
+
+        foreach ($existingOptions as $existingOption) {
+            Repo::deiaResponseOption()->delete($existingOption);
         }
     }
 
@@ -238,7 +339,8 @@ class DeiaQuestionForm extends Form
 
         foreach ($this->getExistingResponseOptions() as $responseOption) {
             $optionText = $responseOption->getData('optionText');
-            $responseOptions[] = [
+            $responseOptions[$responseOption->getId()] = [
+                'id' => $responseOption->getId(),
                 'optionText' => is_array($optionText)
                     ? $optionText
                     : [$locale => $responseOption->getLocalizedOptionText()],
