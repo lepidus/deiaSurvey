@@ -484,3 +484,6 @@ msgstr "Select an answer from an earlier single-choice question in this block."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionInUse"
 msgstr "This question or answer option is used by a display condition. Update that condition first."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.invalidConditionOrder"
+msgstr "A conditional question must follow the question it depends on."

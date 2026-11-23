@@ -158,6 +158,50 @@ class DeiaQuestionGridHandler extends \GridHandler
         Repo::deiaQuestion()->edit($gridDataElement, ['sequence' => $newSequence]);
     }
 
+    public function saveSequence($args, $request)
+    {
+        if (!$request->checkCSRF()) {
+            return new JSONMessage(false);
+        }
+
+        return $this->modifyInactiveBlock($request, function () use ($args, $request) {
+            $questions = Repo::deiaQuestion()->getBlockQuestions(
+                $request->getContext()->getId(),
+                $this->deiaQuestionBlockId
+            );
+            $order = json_decode($request->getUserVar('data') ?? '');
+            if (!is_array($order) || count($order) !== count($questions)) {
+                return new JSONMessage(false);
+            }
+
+            $positions = [];
+            foreach ($order as $position => $questionId) {
+                if ((!is_int($questionId) && !is_string($questionId))
+                    || !isset($questions[$questionId]) || isset($positions[$questionId])
+                ) {
+                    return new JSONMessage(false);
+                }
+                $positions[$questionId] = $position;
+            }
+            foreach ($questions as $question) {
+                $condition = $question->getData('showWhen');
+                if ($condition && ($positions[$condition[0]] ?? PHP_INT_MAX) >= $positions[$question->getId()]) {
+                    (new NotificationManager())->createTrivialNotification(
+                        $request->getUser()->getId(),
+                        NOTIFICATION_TYPE_ERROR,
+                        ['contents' => __('plugins.generic.deiaSurvey.questionBlocks.questions.invalidConditionOrder')]
+                    );
+
+                    $response = DAO::getDataChangedEvent();
+                    $response->setEvent('notifyUser');
+                    return $response;
+                }
+            }
+
+            return parent::saveSequence($args, $request);
+        });
+    }
+
     public function createDeiaQuestion($args, $request)
     {
         if (!$this->canModifyQuestionBlock()) {
