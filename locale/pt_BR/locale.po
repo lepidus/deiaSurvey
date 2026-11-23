@@ -454,5 +454,35 @@ msgstr "Enviamos um novo link do questionário para o e-mail cadastrado do autor
 msgid "plugins.generic.deiaSurvey.questionnairePage.renewalUnavailable"
 msgstr "Não foi possível concluir a solicitação. Se você já pediu um novo link, confira seu e-mail. Caso contrário, abra novamente o link vencido e tente outra vez."
 
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionQuestion"
+msgstr "Pergunta anterior"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionOption"
+msgstr "Resposta esperada"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.responseType"
+msgstr "Tipo de resposta"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.visibility"
+msgstr "Quando exibir esta pergunta?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditional"
+msgstr "Quando houver uma resposta específica"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseConditionQuestion"
+msgstr "Selecione uma pergunta"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionUnavailable"
+msgstr "Adicione uma pergunta anterior de escolha única com opções para habilitar a exibição condicional."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.noCondition"
+msgstr "Sempre"
+
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"
 msgstr "Selecione uma resposta"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.invalidCondition"
+msgstr "Selecione uma resposta de uma pergunta anterior de escolha única neste bloco."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionInUse"
+msgstr "Uma condição de exibição usa esta pergunta ou opção de resposta. Atualize a condição primeiro."

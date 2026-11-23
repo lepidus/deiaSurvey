@@ -452,5 +452,35 @@ msgstr "We sent a new questionnaire link to the author’s registered email addr
 msgid "plugins.generic.deiaSurvey.questionnairePage.renewalUnavailable"
 msgstr "The request could not be completed. If you already requested a new link, check your email. Otherwise, reopen the expired link and try again."
 
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionQuestion"
+msgstr "Previous question"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionOption"
+msgstr "Expected answer"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.responseType"
+msgstr "Response type"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.visibility"
+msgstr "When should this question appear?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditional"
+msgstr "When a specific answer is given"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseConditionQuestion"
+msgstr "Select a question"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionUnavailable"
+msgstr "Add an earlier single-choice question with answer options to enable conditional display."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.noCondition"
+msgstr "Always"
+
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"
 msgstr "Select an answer"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.invalidCondition"
+msgstr "Select an answer from an earlier single-choice question in this block."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionInUse"
+msgstr "This question or answer option is used by a display condition. Update that condition first."
