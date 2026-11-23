@@ -4,6 +4,7 @@ namespace APP\plugins\generic\deiaSurvey\classes\importExport;
 
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use Illuminate\Database\Capsule\Manager as DB;
 use InvalidArgumentException;
 
 class DeiaQuestionBlockJsonImporter
@@ -18,14 +19,16 @@ class DeiaQuestionBlockJsonImporter
 
         $this->validatePayload($data);
 
-        $importedBlockIds = [];
-        foreach ($data['blocks'] as $blockData) {
-            $importedBlockIds[] = $this->importBlock($blockData, $contextId);
-        }
+        return DB::connection()->transaction(function () use ($data, $contextId) {
+            $importedBlockIds = [];
+            foreach ($data['blocks'] as $blockData) {
+                $importedBlockIds[] = $this->importBlock($blockData, $contextId);
+            }
 
-        Repo::deiaQuestionBlock()->dao->resequence($contextId);
+            Repo::deiaQuestionBlock()->dao->resequence($contextId);
 
-        return $importedBlockIds;
+            return $importedBlockIds;
+        });
     }
 
     private function validatePayload(array $data): void
@@ -47,8 +50,12 @@ class DeiaQuestionBlockJsonImporter
                 throw new InvalidArgumentException('Missing block title.');
             }
 
-            foreach ((array) ($blockData['questions'] ?? []) as $questionData) {
+            $questions = array_values((array) ($blockData['questions'] ?? []));
+            foreach ($questions as $position => $questionData) {
                 $this->validateQuestion($questionData);
+                if (array_key_exists('showWhen', $questionData)) {
+                    $this->validateCondition($questionData['showWhen'], $questions, $position);
+                }
             }
         }
     }
@@ -59,8 +66,31 @@ class DeiaQuestionBlockJsonImporter
             throw new InvalidArgumentException('Unknown question type.');
         }
 
-        if (empty($questionData['questionText']) || !is_array($questionData['questionText'])) {
+        if (!$this->hasTextualData($questionData['questionText'] ?? null)) {
             throw new InvalidArgumentException('Missing question text.');
+        }
+    }
+
+    private function validateCondition($condition, array $questions, int $position): void
+    {
+        if (!is_array($condition) || array_keys($condition) !== [0, 1]) {
+            throw new InvalidArgumentException('Invalid question display condition.');
+        }
+
+        [$sourcePosition, $optionPosition] = $condition;
+        if (!is_int($sourcePosition) || $sourcePosition < 0 || $sourcePosition >= $position
+            || !is_int($optionPosition) || $optionPosition < 0
+        ) {
+            throw new InvalidArgumentException('Invalid question display condition.');
+        }
+
+        $source = $questions[$sourcePosition];
+        $type = $this->normalizeQuestionType($source['questionType']);
+        $options = array_values((array) ($source['responseOptions'] ?? []));
+        if (!DeiaQuestion::isSingleSelection($type)
+            || !$this->hasTextualData($options[$optionPosition]['optionText'] ?? null)
+        ) {
+            throw new InvalidArgumentException('Invalid question display condition.');
         }
     }
 
@@ -76,46 +106,63 @@ class DeiaQuestionBlockJsonImporter
 
         $blockId = Repo::deiaQuestionBlock()->add($block);
 
-        foreach ((array) ($blockData['questions'] ?? []) as $questionData) {
-            $this->importQuestion($questionData, $contextId, $blockId);
+        $importedQuestions = [];
+        foreach (array_values((array) ($blockData['questions'] ?? [])) as $position => $questionData) {
+            $showWhen = [];
+            if (isset($questionData['showWhen'])) {
+                [$sourcePosition, $optionPosition] = $questionData['showWhen'];
+                $source = $importedQuestions[$sourcePosition];
+                $showWhen = [$source['id'], $source['options'][$optionPosition]];
+            }
+            $importedQuestions[] = $this->importQuestion($questionData, $contextId, $blockId, $position + 1, $showWhen);
         }
 
         return $blockId;
     }
 
-    private function importQuestion(array $questionData, int $contextId, int $blockId): void
-    {
+    private function importQuestion(
+        array $questionData,
+        int $contextId,
+        int $blockId,
+        int $sequence,
+        array $showWhen
+    ): array {
+        $questionText = $this->normalizeTextualData($questionData['questionText']);
+        $questionDescription = $this->normalizeTextualData($questionData['questionDescription'] ?? []);
+
         $question = Repo::deiaQuestion()->newDataObject([
             'contextId' => $contextId,
             'questionBlockId' => $blockId,
             'questionType' => $this->normalizeQuestionType($questionData['questionType']),
-            'questionText' => $questionData['questionText'],
-            'questionDescription' => $questionData['questionDescription'] ?? [],
-            'sequence' => REALLY_BIG_NUMBER,
+            'questionText' => $questionText,
+            'questionDescription' => $questionDescription,
+            'sequence' => $sequence,
+            'showWhen' => $showWhen,
             'isTranslated' => true,
             'isDefaultQuestion' => false,
         ]);
 
         $questionId = Repo::deiaQuestion()->add($question);
 
-        foreach (array_values((array) ($questionData['responseOptions'] ?? [])) as $sequence => $optionData) {
-            $this->importResponseOption($optionData, $questionId, $sequence + 1);
+        $optionIds = [];
+        foreach (array_values((array) ($questionData['responseOptions'] ?? [])) as $position => $optionData) {
+            $optionIds[] = $this->importResponseOption($optionData, $questionId, $position + 1);
         }
 
-        Repo::deiaQuestion()->dao->resequence($blockId);
+        return ['id' => $questionId, 'options' => $optionIds];
     }
 
-    private function importResponseOption(array $optionData, int $questionId, int $sequence): void
+    private function importResponseOption(array $optionData, int $questionId, int $sequence): int
     {
         $responseOption = Repo::deiaResponseOption()->newDataObject([
             'deiaQuestionId' => $questionId,
-            'optionText' => $optionData['optionText'] ?? [],
+            'optionText' => $this->normalizeTextualData($optionData['optionText'] ?? []),
             'hasInputField' => !empty($optionData['hasInputField']),
             'sequence' => $sequence,
             'isTranslated' => true,
         ]);
 
-        Repo::deiaResponseOption()->add($responseOption);
+        return Repo::deiaResponseOption()->add($responseOption);
     }
 
     private function normalizeQuestionType($questionType): ?int
@@ -127,5 +174,30 @@ class DeiaQuestionBlockJsonImporter
         }
 
         return null;
+    }
+
+    private function hasTextualData($value): bool
+    {
+        if (!is_array($value)) {
+            return is_string($value) && !empty($value) && trim($value) !== '';
+        }
+
+        $hasText = false;
+        foreach ($value as $text) {
+            if (!is_string($text)) {
+                return false;
+            }
+            $hasText = $hasText || (!empty($text) && trim($text) !== '');
+        }
+        return $hasText;
+    }
+
+    private function normalizeTextualData($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        return [\AppLocale::getLocale() => (string) $value];
     }
 }

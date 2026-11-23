@@ -8,6 +8,7 @@ require_once(dirname(__DIR__) . '/helpers/TestHelperTrait.php');
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use APP\plugins\generic\deiaSurvey\classes\importExport\DeiaQuestionBlockJsonImporter;
+use APP\plugins\generic\deiaSurvey\classes\importExport\DeiaQuestionBlockJsonSerializer;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 use InvalidArgumentException;
 
@@ -164,6 +165,118 @@ class DeiaQuestionBlockJsonImporterTest extends \DatabaseTestCase
         self::assertFalse($options[0]->hasInputField());
         self::assertSame(['en' => 'Other'], $options[1]->getData('optionText'));
         self::assertTrue($options[1]->hasInputField());
+    }
+
+    public function testImportsQuestionTextAsString(): void
+    {
+        $importedIds = (new DeiaQuestionBlockJsonImporter())->import(
+            json_encode([
+                'plugin' => 'deiaSurvey',
+                'blocks' => [
+                    [
+                        'title' => ['en_US' => 'Funding DEIA questions'],
+                        'questions' => [
+                            [
+                                'questionType' => 'TYPE_TEXT_FIELD',
+                                'questionText' => 'plugins.generic.deiaSurvey.defaultQuestion',
+                                'questionDescription' => '',
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+            $this->contextId
+        );
+
+        $questions = Repo::deiaQuestion()->getCollector()
+            ->filterByContextIds([$this->contextId])
+            ->filterByQuestionBlockIds([$importedIds[0]])
+            ->getMany()
+            ->toArray();
+        $question = array_shift($questions);
+
+        self::assertSame(
+            [\AppLocale::getLocale() => 'plugins.generic.deiaSurvey.defaultQuestion'],
+            $question->getData('questionText')
+        );
+        self::assertTrue($question->isTranslated());
+    }
+
+    public function testRemapsConditionalQuestionsWhenRoundTrippingBlocks(): void
+    {
+        $payload = [
+            'plugin' => 'deiaSurvey',
+            'blocks' => [[
+                'title' => ['en_US' => 'Residence'],
+                'questions' => [
+                    [
+                        'questionType' => 'TYPE_RADIO_BUTTONS',
+                        'questionText' => ['en_US' => 'Do you live in Brazil?'],
+                        'responseOptions' => [
+                            ['optionText' => ['en_US' => 'No']],
+                            ['optionText' => 'Yes'],
+                        ],
+                    ],
+                    [
+                        'questionType' => 'TYPE_TEXT_FIELD',
+                        'questionText' => ['en_US' => 'Which state?'],
+                        'showWhen' => [0, 1],
+                    ],
+                ],
+            ]],
+        ];
+        $importer = new DeiaQuestionBlockJsonImporter();
+        [$blockId] = $importer->import(json_encode($payload), $this->contextId);
+        $block = Repo::deiaQuestionBlock()->get($blockId, $this->contextId);
+        $questions = Repo::deiaQuestion()->getBlockQuestions($this->contextId, $blockId);
+        $block->setData('questions', $questions);
+        [$source] = array_values($questions);
+        $source->setData('responseOptions', $source->getResponseOptions());
+
+        $exported = (new DeiaQuestionBlockJsonSerializer())->serializeBlocks([$block]);
+        self::assertSame([0, 1], $exported['blocks'][0]['questions'][1]['showWhen']);
+        self::assertSame(
+            [\AppLocale::getLocale() => 'Yes'],
+            $exported['blocks'][0]['questions'][0]['responseOptions'][1]['optionText']
+        );
+
+        [$newBlockId] = $importer->import(json_encode($exported), $this->contextId);
+        [$newSource, $newDependent] = array_values(
+            Repo::deiaQuestion()->getBlockQuestions($this->contextId, $newBlockId)
+        );
+        [, $newOption] = array_values($newSource->getResponseOptions());
+
+        self::assertNotSame($source->getId(), $newSource->getId());
+        self::assertSame([$newSource->getId(), $newOption->getId()], $newDependent->getData('showWhen'));
+    }
+
+    public function testRejectsConditionThatPointsToLaterQuestion(): void
+    {
+        $blockCount = Repo::deiaQuestionBlock()->getCollector()->filterByContextIds([$this->contextId])->getCount();
+        try {
+            (new DeiaQuestionBlockJsonImporter())->import(json_encode([
+                'plugin' => 'deiaSurvey',
+                'blocks' => [[
+                    'title' => ['en_US' => 'Residence'],
+                    'questions' => [[
+                        'questionType' => 'TYPE_TEXT_FIELD',
+                        'questionText' => ['en_US' => 'Which state?'],
+                        'showWhen' => [1, 0],
+                    ], [
+                        'questionType' => 'TYPE_RADIO_BUTTONS',
+                        'questionText' => ['en_US' => 'Do you live in Brazil?'],
+                        'responseOptions' => [['optionText' => ['en_US' => 'Yes']]],
+                    ]],
+                ]],
+            ]), $this->contextId);
+            self::fail('A later question cannot be a condition source.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('Invalid question display condition.', $exception->getMessage());
+        }
+        self::assertSame(
+            $blockCount,
+            Repo::deiaQuestionBlock()->getCollector()->filterByContextIds([$this->contextId])->getCount()
+        );
     }
 
     public function testRejectsUnknownQuestionType(): void

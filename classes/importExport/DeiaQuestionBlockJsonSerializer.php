@@ -16,10 +16,27 @@ class DeiaQuestionBlockJsonSerializer
 
     private function serializeBlock($block): array
     {
+        $serializedQuestions = [];
+        $questionPositions = [];
+        $optionPositions = [];
+        foreach ((array) $block->getData('questions') as $question) {
+            $serialized = $this->serializeQuestion($question);
+            $condition = $question->getData('showWhen');
+            if ($condition) {
+                [$sourceId, $optionId] = $condition;
+                $serialized['showWhen'] = [$questionPositions[$sourceId], $optionPositions[$optionId]];
+            }
+            $questionPositions[$question->getId()] = count($serializedQuestions);
+            foreach (array_values((array) $question->getData('responseOptions')) as $position => $option) {
+                $optionPositions[$option->getId()] = $position;
+            }
+            $serializedQuestions[] = $serialized;
+        }
+
         return [
             'title' => $block->getData('title'),
             'description' => $block->getData('description'),
-            'questions' => array_map([$this, 'serializeQuestion'], array_values((array) $block->getData('questions'))),
+            'questions' => $serializedQuestions,
         ];
     }
 
