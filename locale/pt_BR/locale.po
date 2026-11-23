@@ -475,3 +475,6 @@ msgstr "Selecione uma resposta de uma pergunta anterior de escolha única neste 
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionInUse"
 msgstr "Uma condição de exibição usa esta pergunta ou opção de resposta. Atualize a condição primeiro."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.invalidConditionOrder"
+msgstr "A pergunta condicional deve vir depois da pergunta da qual depende."
