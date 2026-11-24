@@ -422,7 +422,7 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseConditionQuesti
 msgstr "Select a question"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionUnavailable"
-msgstr "Add an earlier single-choice question with answer options to enable conditional display."
+msgstr "Add an earlier question with answer options to enable conditional display."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.noCondition"
 msgstr "Always"
@@ -431,7 +431,7 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"
 msgstr "Select an answer"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.invalidCondition"
-msgstr "Select an answer from an earlier single-choice question in this block."
+msgstr "Select an answer from an earlier question in this block."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionInUse"
 msgstr "This question or answer option is used by a display condition. Update that condition first."

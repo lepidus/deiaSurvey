@@ -422,7 +422,7 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseConditionQuesti
 msgstr "Seleccione una pregunta"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionUnavailable"
-msgstr "Añada una pregunta anterior de opción única con opciones de respuesta para habilitar la visualización condicional."
+msgstr "Añada una pregunta anterior con opciones de respuesta para habilitar la visualización condicional."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.noCondition"
 msgstr "Siempre"
@@ -431,7 +431,7 @@ msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"
 msgstr "Seleccione una respuesta"
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.invalidCondition"
-msgstr "Seleccione una respuesta de una pregunta anterior de opción única de este bloque."
+msgstr "Seleccione una respuesta de una pregunta anterior de este bloque."
 
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionInUse"
 msgstr "Una condición de visualización utiliza esta pregunta u opción de respuesta. Actualice primero la condición."

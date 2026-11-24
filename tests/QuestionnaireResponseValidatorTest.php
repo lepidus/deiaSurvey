@@ -4,6 +4,7 @@ namespace APP\plugins\generic\deiaSurvey\tests;
 
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\QuestionnaireResponseValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class QuestionnaireResponseValidatorTest extends TestCase
@@ -119,10 +120,48 @@ class QuestionnaireResponseValidatorTest extends TestCase
         self::assertSame([], $hiddenQuestions);
     }
 
+    #[DataProvider('checkboxSelections')]
+    public function testShowsConditionalQuestionWhenItsCheckboxIsSelected(
+        array $selectedOptions,
+        array $expectedOptions,
+        bool $visible
+    ): void {
+        $questions = array_reverse($this->questions());
+        $questions[0]['type'] = DeiaQuestion::TYPE_CHECKBOXES;
+        $questions[0]['inputType'] = 'checkbox';
+        $questions[0]['responseOptions'] = [20 => 'Other', 21 => 'North', 22 => 'South'];
+        $questions[1]['showWhen'] = [2, 20];
+
+        [$responses, , $hiddenQuestions] = (new QuestionnaireResponseValidator())->validate(
+            $questions,
+            ['question-2-checkbox' => $selectedOptions, 'question-1-text' => 'Amazonas'],
+            [],
+            false
+        );
+
+        $expected = ['question-2-checkbox' => $expectedOptions];
+        if ($visible) {
+            $expected['question-1-text'] = 'Amazonas';
+        }
+        self::assertSame($expected, $responses);
+        self::assertSame($visible ? [] : [1], $hiddenQuestions);
+    }
+
+    public static function checkboxSelections(): array
+    {
+        return [
+            'trigger selected alone' => [['20'], [20], true],
+            'trigger selected alongside another option' => [['21', '20'], [21, 20], true],
+            'other options selected without the trigger' => [['21', '22'], [21, 22], false],
+        ];
+    }
+
     public function testHiddenQuestionCannotActivateAnotherCondition(): void
     {
         $questions = $this->questions();
         $questions[1]['showWhen'] = [3, 30];
+        $questions[1]['type'] = DeiaQuestion::TYPE_CHECKBOXES;
+        $questions[1]['inputType'] = 'checkbox';
         array_unshift($questions, [
             'questionId' => 3,
             'type' => DeiaQuestion::TYPE_DROP_DOWN_BOX,
@@ -139,7 +178,7 @@ class QuestionnaireResponseValidatorTest extends TestCase
 
         [$responses, $inputs, $hiddenQuestions] = (new QuestionnaireResponseValidator())->validate(
             $questions,
-            ['question-3-select' => '31', 'question-1-text' => 'answer', 'question-2-radio' => ['20']],
+            ['question-3-select' => '31', 'question-1-text' => 'answer', 'question-2-checkbox' => ['20']],
             ['responseOptionInput-20' => 'discard this'],
             false
         );

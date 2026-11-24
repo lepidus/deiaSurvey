@@ -9,6 +9,7 @@ use APP\plugins\generic\deiaSurvey\classes\importExport\DeiaQuestionBlockJsonSer
 use APP\plugins\generic\deiaSurvey\tests\helpers\DatabaseTestCase;
 use APP\plugins\generic\deiaSurvey\tests\helpers\TestHelperTrait;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PKP\facades\Locale;
 
 class DeiaQuestionBlockJsonImporterTest extends DatabaseTestCase
@@ -177,7 +178,8 @@ class DeiaQuestionBlockJsonImporterTest extends DatabaseTestCase
         self::assertTrue($question->isTranslated());
     }
 
-    public function testRemapsConditionalQuestionsWhenRoundTrippingBlocks(): void
+    #[DataProvider('conditionSourceTypes')]
+    public function testRemapsConditionalQuestionsWhenRoundTrippingBlocks(string $sourceType): void
     {
         $payload = [
             'plugin' => 'deiaSurvey',
@@ -185,7 +187,7 @@ class DeiaQuestionBlockJsonImporterTest extends DatabaseTestCase
                 'title' => ['en' => 'Residence'],
                 'questions' => [
                     [
-                        'questionType' => 'TYPE_RADIO_BUTTONS',
+                        'questionType' => $sourceType,
                         'questionText' => ['en' => 'Do you live in Brazil?'],
                         'responseOptions' => [
                             ['optionText' => ['en' => 'No']],
@@ -219,6 +221,14 @@ class DeiaQuestionBlockJsonImporterTest extends DatabaseTestCase
 
         self::assertNotSame($source->getId(), $newSource->getId());
         self::assertSame([$newSource->getId(), $newOption->getId()], $newDependent->getData('showWhen'));
+    }
+
+    public static function conditionSourceTypes(): array
+    {
+        return [
+            'radio buttons' => ['TYPE_RADIO_BUTTONS'],
+            'checkboxes' => ['TYPE_CHECKBOXES'],
+        ];
     }
 
     public function testRejectsConditionThatPointsToLaterQuestion(): void
