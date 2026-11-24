@@ -315,11 +315,15 @@ describe('DEIA Survey - Conditional questions', function () {
 
 		cy.window().then((win) => cy.stub(win, 'alert').as('orderingAlert'));
 		cy.route('POST', '**/save-sequence*').as('saveOrder');
+		cy.route('GET', '**/deia-question-grid/fetch-grid?*').as('reloadQuestions');
 		cy.get(questionsGrid).find('.order_finish_controls .saveButton').click();
 		cy.wait('@saveOrder');
+		cy.wait('@reloadQuestions').its('status').should('equal', 200);
 		cy.contains('.pkpNotification', invalidOrderMessage).should('exist');
 		cy.get('@orderingAlert').should('not.have.been.called');
-		cy.get(questionsGrid).find('tr.gridRow').first().should('contain.text', checkboxSource);
+		cy.get(`${questionsGrid} tr.gridRow`).should(($rows) => {
+			expect($rows.first()).to.contain.text(checkboxSource);
+		});
 	});
 
 	it('removes a saved profile answer when its checkbox is deselected', function () {
