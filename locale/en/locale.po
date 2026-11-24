@@ -460,9 +460,6 @@ msgstr "When a specific answer is given"
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseConditionQuestion"
 msgstr "Select a question"
 
-msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionUnavailable"
-msgstr "Add an earlier question with answer options to enable conditional display."
-
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.noCondition"
 msgstr "Always"
 
