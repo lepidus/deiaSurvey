@@ -471,9 +471,6 @@ msgstr "Cuando se dé una respuesta específica"
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseConditionQuestion"
 msgstr "Seleccione una pregunta"
 
-msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionUnavailable"
-msgstr "Añada una pregunta anterior con opciones de respuesta para habilitar la visualización condicional."
-
 msgid "plugins.generic.deiaSurvey.questionBlocks.questions.noCondition"
 msgstr "Siempre"
 
