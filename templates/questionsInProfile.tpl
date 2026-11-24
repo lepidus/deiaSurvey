@@ -40,7 +40,8 @@
 		}
 	</div>
 {/if}
-<form class="pkp_form deiaQuestionnaire" id="deiaSurveyForm" method="post" action="{url op="saveDeiaData"}" enctype="multipart/form-data">
+{assign var="deiaConsentLocked" value=is_null($deiaDataConsent)&&!is_null($userConsentSetting)}
+<form class="pkp_form deiaQuestionnaire" id="deiaSurveyForm" method="post" action="{url op="saveDeiaData"}" enctype="multipart/form-data"{if $deiaConsentLocked} data-deia-locked{/if}>
 	{csrf}
 
 	{fbvFormSection id="deiaConsentSection" list="false" label='plugins.generic.deiaSurvey.consent' description='plugins.generic.deiaSurvey.consent.description' required=true}
@@ -51,8 +52,8 @@
 			{assign var=checkedConsentYes value=$deiaDataConsent}
 			{assign var=checkedConsentNo value=!$deiaDataConsent}
 		{/if}
-		{fbvElement type="radio" id="deiaDataConsentYes" name="deiaDataConsent" value=1 checked=$checkedConsentYes required=true label="plugins.generic.deiaSurvey.consent.yes"}
-		{fbvElement type="radio" id="deiaDataConsentNo" name="deiaDataConsent" value=0 checked=$checkedConsentNo required=true label="plugins.generic.deiaSurvey.consent.no"}
+		{fbvElement type="radio" id="deiaDataConsentYes" name="deiaDataConsent" disabled=$deiaConsentLocked value=1 checked=$checkedConsentYes required=true label="plugins.generic.deiaSurvey.consent.yes"}
+		{fbvElement type="radio" id="deiaDataConsentNo" name="deiaDataConsent" disabled=$deiaConsentLocked value=0 checked=$checkedConsentNo required=true label="plugins.generic.deiaSurvey.consent.no"}
 	{/fbvFormSection}
 
 	{include file="../../../plugins/generic/deiaSurvey/templates/questionBlocks.tpl"}
@@ -61,58 +62,7 @@
 
 	{fbvFormButtons hideCancel=true submitText="common.save"}
 </form>
-
-<script>
-	function setRequirementOnQuestions(required){ldelim}
-		let questions = document.querySelectorAll('[id^="deiaResponses"]');
-		let reqSymbols = document.querySelectorAll('span.req');
-		let reqErrorMessages = document.querySelectorAll('label.error');
-
-		for (let question of questions) {ldelim}
-			question.required = required;
-			question.disabled = !required;
-		{rdelim}
-
-		for (let reqSymbol of reqSymbols) {ldelim}
-			let reqSymbolParent = reqSymbol.parentNode;
-
-			if (!reqSymbolParent.textContent.includes('{translate key="plugins.generic.deiaSurvey.consent"}')) {ldelim}
-				reqSymbol.style.display = (required ? 'inline' : 'none');
-			{rdelim}
-		{rdelim}
-
-		for (let reqErrorMessage of reqErrorMessages) {ldelim}
-			reqErrorMessage.style.display = 'none';
-		{rdelim}
-	{rdelim}
-	
-	$(document).ready(function () {ldelim}
-		let deiaDataConsentYes = document.getElementById('deiaDataConsentYes');
-		let deiaDataConsentNo = document.getElementById('deiaDataConsentNo');
-
-		{if !is_null($deiaDataConsent) || is_null($userConsentSetting)}
-			deiaDataConsentYes.addEventListener('change', (event) => {ldelim}
-				if (event.currentTarget.checked) {ldelim}
-					setRequirementOnQuestions(true);
-				{rdelim}
-			{rdelim});
-
-			deiaDataConsentNo.addEventListener('change', (event) => {ldelim}
-				if (event.currentTarget.checked) {ldelim}
-					setRequirementOnQuestions(false);
-				{rdelim}
-			{rdelim});
-
-			if (deiaDataConsentNo.checked) {ldelim}
-				setRequirementOnQuestions(false);
-			{rdelim}
-		{else}
-			setRequirementOnQuestions(false);
-			deiaDataConsentYes.disabled = true;
-			deiaDataConsentNo.disabled = true;
-		{/if}
-	{rdelim});
-</script>
+{include file="../../../plugins/generic/deiaSurvey/templates/questionnaireConditions.tpl" conditionFormId="deiaSurveyForm"}
 
 {if $canAssociateOrcid}
     <form method="post" action="{url router=ROUTE_PAGE page="deiaOrcidAssociation" op="index"}">

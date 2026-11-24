@@ -70,14 +70,13 @@ class DeiaQuestionResponseOptionListbuilderHandler extends \SetupListbuilderHand
             ->filterByQuestionIds([$this->_deiaQuestionId])
             ->getMany();
 
-        $rowId = 1;
         foreach ($responseOptions as $responseOption) {
+            $rowId = $responseOption->getId();
             $optionText = $responseOption->getData('optionText');
             $formattedResponses[$rowId][0]['content'] = is_array($optionText)
                 ? $optionText
                 : [$locale => $responseOption->getLocalizedOptionText()];
             $formattedResponses[$rowId][1]['hasInputField'] = $responseOption->hasInputField();
-            $rowId++;
         }
 
         return $formattedResponses;

@@ -7,7 +7,6 @@ use APP\plugins\generic\deiaSurvey\classes\DeiaDataDAO;
 use APP\plugins\generic\deiaSurvey\classes\deiaQuestion\DeiaQuestion;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
 use Illuminate\Database\Capsule\Manager as DB;
-use PKP\facades\Locale;
 
 class DeiaDataService
 {
@@ -56,21 +55,15 @@ class DeiaDataService
         int $contextId,
         array $responses,
         array $responseOptionsInputs,
-        bool $localizedText
+        bool $localizedText,
+        ?string $textLocale = null
     ): array {
         $allowedQuestions = [];
         foreach ($this->retrieveAllQuestions($contextId) as $question) {
             $allowedQuestions[(int) $question['id']] = $question;
         }
 
-        if (count($responses) !== count($allowedQuestions)) {
-            throw new \InvalidArgumentException('Every active question must have exactly one response.');
-        }
-
-        $normalizedResponses = [];
-        $selectedOptionIds = [];
-        $optionsAllowingInput = [];
-        foreach ($responses as $fieldName => $responseInput) {
+        foreach (array_keys($responses) as $fieldName) {
             if (!is_string($fieldName)
                 || !preg_match('/^question-([1-9][0-9]*)-(text|textarea|checkbox|radio|select)$/D', $fieldName, $matches)
             ) {
@@ -83,9 +76,33 @@ class DeiaDataService
             }
 
             $question = $allowedQuestions[$questionId];
-            if ($matches[2] !== $question['inputType'] || isset($normalizedResponses[$questionId])) {
+            if ($matches[2] !== $question['inputType']) {
                 throw new \InvalidArgumentException('Question type or identifier is invalid.');
             }
+        }
+
+        $normalizedResponses = [];
+        $selectedOptionIds = [];
+        $optionsAllowingInput = [];
+        $hiddenQuestions = [];
+        $hiddenOptionInputs = [];
+        $selectionsByQuestion = [];
+        foreach ($allowedQuestions as $questionId => $question) {
+            $condition = $question['showWhen'] ?? [];
+            if ($condition && !in_array($condition[1], $selectionsByQuestion[$condition[0]] ?? [], true)) {
+                $hiddenQuestions[] = $questionId;
+                foreach ($question['responseOptions'] as $option) {
+                    if (is_object($option) && $option->hasInputField()) {
+                        $hiddenOptionInputs[(int) $option->getId()] = true;
+                    }
+                }
+                continue;
+            }
+            $fieldName = "question-{$questionId}-{$question['inputType']}";
+            if (!array_key_exists($fieldName, $responses)) {
+                throw new \InvalidArgumentException('Every visible question requires a response.');
+            }
+            $responseInput = $responses[$fieldName];
 
             if (in_array($question['type'], [
                 DeiaQuestion::TYPE_SMALL_TEXT_FIELD,
@@ -103,6 +120,12 @@ class DeiaDataService
                     }
                 } elseif (!is_scalar($responseInput)) {
                     throw new \InvalidArgumentException('Text response is malformed.');
+                }
+                if ($condition) {
+                    $text = $localizedText ? ($responseInput[$textLocale ?? \AppLocale::getLocale()] ?? '') : $responseInput;
+                    if (trim((string) $text) === '') {
+                        throw new \InvalidArgumentException('Missing required conditional response.');
+                    }
                 }
             } else {
                 $allowedOptions = [];
@@ -136,12 +159,13 @@ class DeiaDataService
                     $normalizedOptions[$optionId] = $optionId;
                     $selectedOptionIds[$optionId] = true;
                 }
+                $selectionsByQuestion[$questionId] = array_values($normalizedOptions);
                 $responseInput = $question['type'] === DeiaQuestion::TYPE_DROP_DOWN_BOX
                     ? reset($normalizedOptions)
                     : array_values($normalizedOptions);
             }
 
-            $normalizedResponses[$questionId] = $responseInput;
+            $normalizedResponses[$fieldName] = $responseInput;
         }
 
         $normalizedOptionInputs = [];
@@ -153,6 +177,9 @@ class DeiaDataService
                 throw new \InvalidArgumentException('Response option input is malformed.');
             }
             $optionId = (int) $matches[1];
+            if (isset($hiddenOptionInputs[$optionId])) {
+                continue;
+            }
             if (!isset($optionsAllowingInput[$optionId])) {
                 throw new \InvalidArgumentException('Response option input is not allowed.');
             }
@@ -165,13 +192,7 @@ class DeiaDataService
             $normalizedOptionInputs[$fieldName] = (string) $value;
         }
 
-        $canonicalResponses = [];
-        foreach ($allowedQuestions as $questionId => $question) {
-            $canonicalResponses['question-' . $questionId . '-' . $question['inputType']] =
-                $normalizedResponses[$questionId];
-        }
-
-        return [$canonicalResponses, $normalizedOptionInputs];
+        return [$normalizedResponses, $normalizedOptionInputs, $hiddenQuestions];
     }
 
     public function hasActiveQuestionBlocks(int $contextId): bool
@@ -235,11 +256,17 @@ class DeiaDataService
             ->filterByQuestionBlockIds([$deiaQuestionBlock->getId()])
             ->getMany();
 
+        $conditionSources = [];
         foreach ($deiaQuestions as $deiaQuestion) {
+            $condition = $deiaQuestion->getData('showWhen') ?? [];
+            if ($condition) {
+                $conditionSources[$condition[0]] = true;
+            }
             $questionData = [
                 'id' => $deiaQuestion->getId(),
                 'type' => $deiaQuestion->getQuestionType(),
                 'inputType' => $deiaQuestion->getQuestionInputType(),
+                'showWhen' => $condition,
                 'title' => $deiaQuestion->getLocalizedQuestionText(),
                 'description' => $this->getCleanText($deiaQuestion->getLocalizedQuestionDescription()),
                 'responseOptions' => $deiaQuestion->getResponseOptions()
@@ -260,6 +287,11 @@ class DeiaDataService
 
             $questionBlockData['questions'][] = $questionData;
         }
+
+        foreach ($questionBlockData['questions'] as &$questionData) {
+            $questionData['isConditionSource'] = isset($conditionSources[$questionData['id']]);
+        }
+        unset($questionData);
 
         return $questionBlockData;
     }
@@ -303,14 +335,17 @@ class DeiaDataService
         int $contextId,
         int $userId,
         array $responses,
-        array $responseOptionsInputs
+        array $responseOptionsInputs,
+        ?string $textLocale = null
     ) {
-        [$responses, $responseOptionsInputs] = $this->normalizeResponses(
+        [$responses, $responseOptionsInputs, $hiddenQuestions] = $this->normalizeResponses(
             $contextId,
             $responses,
             $responseOptionsInputs,
-            true
+            true,
+            $textLocale
         );
+        $this->deleteUserResponses($userId, $contextId, $hiddenQuestions);
 
         foreach ($responses as $question => $responseInput) {
             $questionId = explode("-", $question)[1];
@@ -487,11 +522,16 @@ class DeiaDataService
         return '';
     }
 
-    public function deleteUserResponses(int $userId, int $contextId)
+    public function deleteUserResponses(int $userId, int $contextId, ?array $questionIds = null)
     {
+        if ($questionIds === []) {
+            return;
+        }
+
         $userResponses = Repo::deiaResponse()->getCollector()
             ->filterByContextIds([$contextId])
             ->filterByUserIds([$userId])
+            ->filterByQuestionIds($questionIds)
             ->getMany();
 
         foreach ($userResponses as $response) {

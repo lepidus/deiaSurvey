@@ -96,7 +96,9 @@ class DeiaSurveyPluginTest extends \DatabaseTestCase
         self::assertStringContainsString("{\$question['title']|escape}", $question);
         self::assertStringContainsString("{\$question['description']|escape}", $question);
         self::assertStringContainsString('{$responseOption->getLocalizedOptionText()|escape}', $question);
-        self::assertStringContainsString("{\$responses[\$question['id']]|escape}", $responses);
+        self::assertStringContainsString('{$optionInputName|escape}', $question);
+        self::assertStringContainsString("{\$responses[\$question['id']]|default:\"\"|escape}", $responses);
+        self::assertStringNotContainsString('|escape|escape', $question . $responses);
         self::assertStringContainsString("{\$questionBlock['description']|escape}", $index);
     }
 
