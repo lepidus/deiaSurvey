@@ -198,7 +198,7 @@ describe('DEIA Survey - Conditional questions', function () {
 			saveProfile();
 		}
 		cy.logout();
-		cy.login('dbarnes', null, context);
+		prepareManager();
 		openQuestionBlocks();
 		this.blocksToRemove.forEach((title) => {
 			cy.get(blocksGrid).then(($grid) => {
@@ -320,19 +320,10 @@ describe('DEIA Survey - Conditional questions', function () {
 		]));
 		setBlockActive(this.title, true);
 		cy.logout();
-		const username = `deia${Date.now()}`;
-		cy.register({
-			username,
-			email: `${username}@example.test`,
-			givenName: 'DEIA',
-			familyName: 'Conditional',
-			affiliation: 'Test institution',
-			country: 'Brazil',
-		});
+		cy.login('jnovak', null, context);
 
 		openProfile();
-		cy.then(() => { this.withdrawRespondentConsent = true; });
-		cy.get(`${survey} input[name="deiaDataConsent"][value="1"]`).check();
+		cy.get(`${survey} input[name="deiaDataConsent"][value="1"]`).should('not.be.checked').check();
 		dependentField(survey).should('not.be.visible');
 		completeOtherBlocks(this.title);
 		choice(survey, checkboxSource, 'North').check();
@@ -341,6 +332,7 @@ describe('DEIA Survey - Conditional questions', function () {
 		dependentField(survey).should('be.visible').and('have.prop', 'required', true);
 		dependentField(survey).type('Central West');
 		saveProfile();
+		cy.then(() => { this.withdrawRespondentConsent = true; });
 		openProfile();
 		choice(survey, checkboxSource, 'Other').should('be.checked');
 		dependentField(survey).should('have.value', 'Central West');
