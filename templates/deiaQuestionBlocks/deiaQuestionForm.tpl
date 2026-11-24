@@ -54,9 +54,11 @@
 				option.value = '';
 			{rdelim}
 		{rdelim}
-		form.querySelectorAll('[name="questionVisibility"]').forEach((radio) => radio.addEventListener('change', updateCondition));
-		source.addEventListener('change', updateCondition);
-		updateCondition();
+		if (conditional) {ldelim}
+			form.querySelectorAll('[name="questionVisibility"]').forEach((radio) => radio.addEventListener('change', updateCondition));
+			source.addEventListener('change', updateCondition);
+			updateCondition();
+		{rdelim}
 		toggleResponseOptions(
 			$('#questionType').val(),
 			'{$responseOptionQuestionTypesString|escape:"javascript"}',
@@ -94,6 +96,45 @@
 			{fbvElement type="textarea" id="questionDescription" value=$questionDescription multilingual=true rich=false}
 		{/fbvFormSection}
 
+		{if $conditionSources}
+			{assign var=selectedConditionQuestion value=$showWhenQuestion|default:null}
+			{assign var=selectedConditionOption value=$showWhenOption|default:null}
+			{fbvFormArea id="deiaQuestionVisibility" title="plugins.generic.deiaSurvey.questionBlocks.questions.visibility"}
+				<ul class="checkbox_and_radiobutton">
+					<li><label>
+						<input type="radio" name="questionVisibility" value="always"{if !$selectedConditionQuestion} checked{/if}>
+						{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.noCondition"}
+					</label></li>
+					<li><label>
+						<input type="radio" id="deiaConditionEnabled" name="questionVisibility" value="conditional"{if $selectedConditionQuestion} checked{/if}>
+						{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.conditional"}
+					</label></li>
+				</ul>
+				<fieldset id="deiaConditionFields"{if !$selectedConditionQuestion} hidden disabled{/if}>
+					<div>
+						<label for="showWhenQuestion">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.conditionQuestion"}</label>
+						<select name="showWhenQuestion" id="showWhenQuestion" required>
+							<option value="">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.chooseConditionQuestion"}</option>
+							{foreach $conditionSources as $sourceId => $source}
+								<option value="{$sourceId|escape}"{if $sourceId == $selectedConditionQuestion} selected{/if}>{$source.text|escape}</option>
+							{/foreach}
+						</select>
+					</div>
+					<div>
+						<label for="showWhenOption">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.conditionOption"}</label>
+						<select name="showWhenOption" id="showWhenOption" required{if !$selectedConditionQuestion} disabled{/if}>
+							<option value="">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"}</option>
+							{foreach $conditionSources as $sourceId => $source}
+								{foreach $source.options as $optionId => $optionText}
+									<option data-question="{$sourceId|escape}" value="{$optionId|escape}"{if $optionId == $selectedConditionOption} selected{/if}>{$optionText|escape}</option>
+								{/foreach}
+							{/foreach}
+						</select>
+					</div>
+				</fieldset>
+			{/fbvFormArea}
+		{/if}
+
 		{fbvFormSection title="plugins.generic.deiaSurvey.questionBlocks.questions.responseType" required=true for="questionType"}
 			{fbvElement
 				type="select"
@@ -114,46 +155,6 @@
 				{load_url_in_div id="responseOptionsListbuilderContainer" url=$responseOptionsUrl}
 			</div>
 		</div>
-
-		{assign var=selectedConditionQuestion value=$showWhenQuestion|default:null}
-		{assign var=selectedConditionOption value=$showWhenOption|default:null}
-		{fbvFormArea id="deiaQuestionVisibility" title="plugins.generic.deiaSurvey.questionBlocks.questions.visibility"}
-			<ul class="checkbox_and_radiobutton">
-				<li><label>
-					<input type="radio" name="questionVisibility" value="always"{if !$selectedConditionQuestion} checked{/if}>
-					{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.noCondition"}
-				</label></li>
-				<li><label>
-					<input type="radio" id="deiaConditionEnabled" name="questionVisibility" value="conditional"{if $selectedConditionQuestion} checked{elseif !$conditionSources} disabled aria-describedby="deiaConditionUnavailable"{/if}>
-					{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.conditional"}
-				</label></li>
-			</ul>
-			{if !$conditionSources && !$selectedConditionQuestion}
-				<p id="deiaConditionUnavailable" class="description">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.conditionUnavailable"}</p>
-			{/if}
-			<fieldset id="deiaConditionFields"{if !$selectedConditionQuestion} hidden disabled{/if}>
-				<div>
-					<label for="showWhenQuestion">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.conditionQuestion"}</label>
-					<select name="showWhenQuestion" id="showWhenQuestion" required>
-						<option value="">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.chooseConditionQuestion"}</option>
-						{foreach $conditionSources as $sourceId => $source}
-							<option value="{$sourceId|escape}"{if $sourceId == $selectedConditionQuestion} selected{/if}>{$source.text|escape}</option>
-						{/foreach}
-					</select>
-				</div>
-				<div>
-					<label for="showWhenOption">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.conditionOption"}</label>
-					<select name="showWhenOption" id="showWhenOption" required{if !$selectedConditionQuestion} disabled{/if}>
-						<option value="">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"}</option>
-						{foreach $conditionSources as $sourceId => $source}
-							{foreach $source.options as $optionId => $optionText}
-								<option data-question="{$sourceId|escape}" value="{$optionId|escape}"{if $optionId == $selectedConditionOption} selected{/if}>{$optionText|escape}</option>
-							{/foreach}
-						{/foreach}
-					</select>
-				</div>
-			</fieldset>
-		{/fbvFormArea}
 
 		<p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 		{fbvFormButtons id="deiaQuestionFormSubmit" submitText="common.save"}
