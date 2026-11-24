@@ -86,10 +86,10 @@ class DeiaDataService
         $optionsAllowingInput = [];
         $hiddenQuestions = [];
         $hiddenOptionInputs = [];
-        $singleSelections = [];
+        $selectionsByQuestion = [];
         foreach ($allowedQuestions as $questionId => $question) {
             $condition = $question['showWhen'] ?? [];
-            if ($condition && ($singleSelections[$condition[0]] ?? null) !== $condition[1]) {
+            if ($condition && !in_array($condition[1], $selectionsByQuestion[$condition[0]] ?? [], true)) {
                 $hiddenQuestions[] = $questionId;
                 foreach ($question['responseOptions'] as $option) {
                     if (is_object($option) && $option->hasInputField()) {
@@ -159,9 +159,7 @@ class DeiaDataService
                     $normalizedOptions[$optionId] = $optionId;
                     $selectedOptionIds[$optionId] = true;
                 }
-                if ($question['type'] !== DeiaQuestion::TYPE_CHECKBOXES) {
-                    $singleSelections[$questionId] = reset($normalizedOptions);
-                }
+                $selectionsByQuestion[$questionId] = array_values($normalizedOptions);
                 $responseInput = $question['type'] === DeiaQuestion::TYPE_DROP_DOWN_BOX
                     ? reset($normalizedOptions)
                     : array_values($normalizedOptions);

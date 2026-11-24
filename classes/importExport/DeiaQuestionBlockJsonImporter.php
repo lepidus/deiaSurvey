@@ -87,7 +87,7 @@ class DeiaQuestionBlockJsonImporter
         $source = $questions[$sourcePosition];
         $type = $this->normalizeQuestionType($source['questionType']);
         $options = array_values((array) ($source['responseOptions'] ?? []));
-        if (!DeiaQuestion::isSingleSelection($type)
+        if (!in_array($type, DeiaQuestion::TYPES_WITH_RESPONSE_OPTIONS, true)
             || !$this->hasTextualData($options[$optionPosition]['optionText'] ?? null)
         ) {
             throw new InvalidArgumentException('Invalid question display condition.');

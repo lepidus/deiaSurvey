@@ -132,6 +132,34 @@ class DeiaDataServiceTest extends \DatabaseTestCase
         );
     }
 
+    /** @dataProvider checkboxSelections */
+    public function testEvaluatesTheConditionAgainstAllSelectedCheckboxes(array $options, bool $visible): void
+    {
+        $service = $this->conditionalQuestionnaire(DeiaQuestion::TYPE_CHECKBOXES, 'checkbox');
+        [$responses, , $hidden] = $service->normalizeResponses(
+            1,
+            ['question-1-checkbox' => $options, 'question-2-text' => 'Region'],
+            [],
+            false
+        );
+
+        $expected = ['question-1-checkbox' => array_map('intval', $options)];
+        if ($visible) {
+            $expected['question-2-text'] = 'Region';
+        }
+        self::assertSame($expected, $responses);
+        self::assertSame($visible ? [] : [2], $hidden);
+    }
+
+    public static function checkboxSelections(): array
+    {
+        return [
+            'trigger alone' => [['11'], true],
+            'trigger alongside another option' => [['12', '11'], true],
+            'another option without the trigger' => [['12'], false],
+        ];
+    }
+
     private function conditionalQuestionnaire(int $sourceType, string $inputType): DeiaDataService
     {
         $service = $this->getMockBuilder(DeiaDataService::class)->onlyMethods(['retrieveAllQuestions'])->getMock();

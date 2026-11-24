@@ -77,7 +77,7 @@ class DeiaQuestionForm extends \Form
     public function fetch($request, $template = null, $display = false)
     {
         $templateMgr = \TemplateManager::getManager($request);
-        $responseOptionQuestionTypes = $this->getResponseOptionQuestionTypes();
+        $responseOptionQuestionTypes = DeiaQuestion::TYPES_WITH_RESPONSE_OPTIONS;
         $questionType = (int) $this->getData('questionType');
         $templateMgr->assign([
             'deiaQuestionBlockId' => $this->deiaQuestionBlockId,
@@ -132,7 +132,7 @@ class DeiaQuestionForm extends \Form
 
         $questionType = (int) $this->getData('questionType');
         $this->setData('responseOptionsProcessed', []);
-        if (in_array($questionType, $this->getResponseOptionQuestionTypes(), true)) {
+        if (in_array($questionType, DeiaQuestion::TYPES_WITH_RESPONSE_OPTIONS, true)) {
             $this->setData('responseOptionsProcessed', $this->getResponseOptionsForListbuilder());
             if (!\ListbuilderHandler::unpack(
                 $request,
@@ -156,7 +156,7 @@ class DeiaQuestionForm extends \Form
                 $condition = $question->getData('showWhen');
                 if (
                     $condition && $condition[0] === $this->deiaQuestionId
-                    && (!DeiaQuestion::isSingleSelection($questionType) || !isset($keptOptions[$condition[1]]))
+                    && !isset($keptOptions[$condition[1]])
                 ) {
                     $this->addError('responseOptions', __('plugins.generic.deiaSurvey.questionBlocks.questions.conditionInUse'));
                     return false;
@@ -174,7 +174,7 @@ class DeiaQuestionForm extends \Form
             if ($question->getId() === $this->deiaQuestionId) {
                 break;
             }
-            if (!DeiaQuestion::isSingleSelection($question->getQuestionType())) {
+            if (!in_array((int) $question->getQuestionType(), DeiaQuestion::TYPES_WITH_RESPONSE_OPTIONS, true)) {
                 continue;
             }
 
@@ -311,15 +311,6 @@ class DeiaQuestionForm extends \Form
     public function getLocaleFieldNames()
     {
         return ['questionText', 'questionDescription'];
-    }
-
-    private function getResponseOptionQuestionTypes(): array
-    {
-        return [
-            DeiaQuestion::TYPE_CHECKBOXES,
-            DeiaQuestion::TYPE_RADIO_BUTTONS,
-            DeiaQuestion::TYPE_DROP_DOWN_BOX,
-        ];
     }
 
     private function getResponseOptionsForListbuilder(): array
