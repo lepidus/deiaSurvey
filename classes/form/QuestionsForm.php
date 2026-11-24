@@ -126,10 +126,12 @@ class QuestionsForm extends Form
                 $normalized = (new DeiaDataService())->normalizeResponsesForContext(
                     $context->getId(),
                     $this->getData('responses') ?? [],
-                    $this->getData('responseOptionsInputs') ?? []
+                    $this->getData('responseOptionsInputs') ?? [],
+                    $this->defaultLocale
                 );
                 $this->setData('responses', $normalized['responses']);
                 $this->setData('responseOptionsInputs', $normalized['responseOptionsInputs']);
+                $this->setData('hiddenQuestions', $normalized['hiddenQuestions']);
             } catch (\DomainException $exception) {
                 return false;
             }
@@ -162,6 +164,11 @@ class QuestionsForm extends Form
             $deiaDataDao->updateDeiaConsent($context->getId(), $user->getId(), $newConsent);
 
             if ($newConsent == '1') {
+                $deiaDataService->deleteUserResponses(
+                    $user->getId(),
+                    $context->getId(),
+                    $this->getData('hiddenQuestions') ?? []
+                );
                 $deiaDataService->registerUserResponses(
                     $user->getId(),
                     $this->getData('responses'),

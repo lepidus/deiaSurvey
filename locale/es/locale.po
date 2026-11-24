@@ -442,3 +442,36 @@ msgstr "Enviamos un nuevo enlace del cuestionario al correo electrónico registr
 
 msgid "plugins.generic.deiaSurvey.questionnairePage.renewalUnavailable"
 msgstr "No se pudo completar la solicitud. Si ya solicitó un nuevo enlace, revise su correo electrónico. De lo contrario, abra de nuevo el enlace caducado e inténtelo otra vez."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionQuestion"
+msgstr "Pregunta anterior"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionOption"
+msgstr "Respuesta esperada"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.responseType"
+msgstr "Tipo de respuesta"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.visibility"
+msgstr "¿Cuándo se muestra esta pregunta?"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditional"
+msgstr "Cuando se dé una respuesta específica"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseConditionQuestion"
+msgstr "Seleccione una pregunta"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.noCondition"
+msgstr "Siempre"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"
+msgstr "Seleccione una respuesta"
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.invalidCondition"
+msgstr "Seleccione una respuesta de una pregunta anterior de este bloque."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.conditionInUse"
+msgstr "Una condición de visualización utiliza esta pregunta u opción de respuesta. Actualice primero la condición."
+
+msgid "plugins.generic.deiaSurvey.questionBlocks.questions.invalidConditionOrder"
+msgstr "La pregunta condicional debe aparecer después de la pregunta de la que depende."

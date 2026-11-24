@@ -5,6 +5,7 @@ namespace APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestion;
 use APP\notification\NotificationManager;
 use APP\plugins\generic\deiaSurvey\classes\controllers\grid\deiaQuestionBlock\form\DeiaQuestionForm;
 use APP\plugins\generic\deiaSurvey\classes\facades\Repo;
+use Illuminate\Support\Facades\DB;
 use PKP\controllers\grid\feature\OrderGridItemsFeature;
 use PKP\controllers\grid\GridColumn;
 use PKP\controllers\grid\GridHandler;
@@ -12,6 +13,7 @@ use PKP\core\JSONMessage;
 use PKP\db\DAO;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
+use PKP\notification\PKPNotification;
 use PKP\plugins\PluginRegistry;
 use PKP\security\authorization\PolicySet;
 use PKP\security\authorization\RoleBasedHandlerOperationPolicy;
@@ -153,6 +155,50 @@ class DeiaQuestionGridHandler extends GridHandler
         }
     }
 
+    public function saveSequence($args, $request)
+    {
+        if (!$request->checkCSRF()) {
+            return new JSONMessage(false);
+        }
+
+        return $this->modifyInactiveBlock($request, function () use ($args, $request) {
+            $questions = Repo::deiaQuestion()->getBlockQuestions(
+                $request->getContext()->getId(),
+                $this->deiaQuestionBlockId
+            );
+            $order = json_decode($request->getUserVar('data') ?? '');
+            if (!is_array($order) || count($order) !== count($questions)) {
+                return new JSONMessage(false);
+            }
+
+            $positions = [];
+            foreach ($order as $position => $questionId) {
+                if ((!is_int($questionId) && !is_string($questionId))
+                    || !isset($questions[$questionId]) || isset($positions[$questionId])
+                ) {
+                    return new JSONMessage(false);
+                }
+                $positions[$questionId] = $position;
+            }
+            foreach ($questions as $question) {
+                $condition = $question->getData('showWhen');
+                if ($condition && ($positions[$condition[0]] ?? PHP_INT_MAX) >= $positions[$question->getId()]) {
+                    (new NotificationManager())->createTrivialNotification(
+                        $request->getUser()->getId(),
+                        PKPNotification::NOTIFICATION_TYPE_ERROR,
+                        ['contents' => __('plugins.generic.deiaSurvey.questionBlocks.questions.invalidConditionOrder')]
+                    );
+
+                    $response = DAO::getDataChangedEvent();
+                    $response->setEvent('notifyUser');
+                    return $response;
+                }
+            }
+
+            return parent::saveSequence($args, $request);
+        });
+    }
+
     public function createDeiaQuestion($args, $request)
     {
         if (!$this->canModifyQuestionBlock()) {
@@ -181,50 +227,77 @@ class DeiaQuestionGridHandler extends GridHandler
 
     public function updateDeiaQuestion($args, $request)
     {
-        $deiaQuestionId = $request->getUserVar('deiaQuestionId')
-            ? (int) $request->getUserVar('deiaQuestionId')
-            : null;
+        return $this->modifyInactiveBlock($request, function () use ($request) {
+            $deiaQuestionId = $request->getUserVar('deiaQuestionId')
+                ? (int) $request->getUserVar('deiaQuestionId')
+                : null;
 
-        if ($deiaQuestionId) {
-            $deiaQuestion = $this->getRequestQuestion($request, $deiaQuestionId);
-
-            if (!$this->canModifyQuestion($deiaQuestion)) {
+            if ($deiaQuestionId && !$this->canModifyQuestion($this->getRequestQuestion($request, $deiaQuestionId))) {
                 return new JSONMessage(false);
             }
-        } elseif (!$this->canModifyQuestionBlock()) {
-            return new JSONMessage(false);
-        }
 
-        $form = new DeiaQuestionForm($this->plugin, $this->deiaQuestionBlockId, $deiaQuestionId);
-        $form->readInputData();
+            $form = new DeiaQuestionForm($this->plugin, $this->deiaQuestionBlockId, $deiaQuestionId);
+            $form->readInputData();
 
-        if ($form->validate()) {
+            if (!$form->validate()) {
+                return new JSONMessage(false, implode(' ', $form->getErrorsArray()));
+            }
+
             $deiaQuestionId = $form->execute();
-
             $notificationMgr = new NotificationManager();
             $notificationMgr->createTrivialNotification($request->getUser()->getId());
 
             return DAO::getDataChangedEvent($deiaQuestionId);
-        }
-
-        return new JSONMessage(false);
+        });
     }
 
     public function deleteDeiaQuestion($args, $request)
     {
-        $deiaQuestionId = (int) $request->getUserVar('rowId');
-        $deiaQuestion = $this->getRequestQuestion($request, $deiaQuestionId);
-
-        if (!$request->checkCSRF() || !$this->canModifyQuestion($deiaQuestion)) {
+        if (!$request->checkCSRF()) {
             return new JSONMessage(false);
         }
 
-        foreach ($deiaQuestion->getResponseOptions() as $responseOption) {
-            Repo::deiaResponseOption()->delete($responseOption);
-        }
-        Repo::deiaQuestion()->delete($deiaQuestion);
+        return $this->modifyInactiveBlock($request, function () use ($request) {
+            $deiaQuestionId = (int) $request->getUserVar('rowId');
+            $deiaQuestion = $this->getRequestQuestion($request, $deiaQuestionId);
+            if (!$this->canModifyQuestion($deiaQuestion)) {
+                return new JSONMessage(false);
+            }
 
-        return DAO::getDataChangedEvent($deiaQuestionId);
+            $questions = Repo::deiaQuestion()->getBlockQuestions(
+                $request->getContext()->getId(),
+                $this->deiaQuestionBlockId
+            );
+            foreach ($questions as $question) {
+                if (($question->getData('showWhen')[0] ?? null) === $deiaQuestionId) {
+                    return new JSONMessage(
+                        false,
+                        __('plugins.generic.deiaSurvey.questionBlocks.questions.conditionInUse')
+                    );
+                }
+            }
+
+            foreach ($deiaQuestion->getResponseOptions() as $responseOption) {
+                Repo::deiaResponseOption()->delete($responseOption);
+            }
+            Repo::deiaQuestion()->delete($deiaQuestion);
+
+            return DAO::getDataChangedEvent($deiaQuestionId);
+        });
+    }
+
+    private function modifyInactiveBlock($request, callable $modify): JSONMessage
+    {
+        return DB::transaction(function () use ($request, $modify) {
+            $contextId = $request->getContext()->getId();
+            $block = DB::table('deia_question_blocks')
+                ->where('context_id', $contextId)
+                ->where('deia_question_block_id', $this->deiaQuestionBlockId)
+                ->lockForUpdate()
+                ->first();
+
+            return $block && !$block->is_active ? $modify() : new JSONMessage(false);
+        });
     }
 
     private function getRequestQuestion($request, int $deiaQuestionId)

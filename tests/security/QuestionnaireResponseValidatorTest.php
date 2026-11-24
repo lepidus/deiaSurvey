@@ -59,6 +59,7 @@ class QuestionnaireResponseValidatorTest extends TestCase
                 'question-20-checkbox' => [202],
             ],
             'responseOptionsInputs' => ['responseOptionInput-202' => 'detail'],
+            'hiddenQuestions' => [],
         ], $normalized);
     }
 
@@ -74,6 +75,140 @@ class QuestionnaireResponseValidatorTest extends TestCase
         );
 
         self::assertSame([], $normalized['responseOptionsInputs']);
+    }
+
+    public function testDiscardsAnswersIfTheConditionIsFalse(): void
+    {
+        $normalized = (new QuestionnaireResponseValidator())->normalize(
+            $this->conditionalQuestions(),
+            ['question-10-text' => 'Old answer', 'question-20-radio' => ['201']],
+            []
+        );
+
+        self::assertSame(['question-20-radio' => [201]], $normalized['responses']);
+        self::assertSame([10], $normalized['hiddenQuestions']);
+    }
+
+    public function testRequiresTheConditionalResponseIfTheConditionIsTrue(): void
+    {
+        $this->expectException(DomainException::class);
+
+        (new QuestionnaireResponseValidator())->normalize(
+            $this->conditionalQuestions(),
+            ['question-20-radio' => ['202']],
+            []
+        );
+    }
+
+    /** @dataProvider invalidConditionalText */
+    public function testRejectsInvalidConditionalText($answer, ?string $locale): void
+    {
+        $this->expectException(DomainException::class);
+
+        (new QuestionnaireResponseValidator())->normalize(
+            $this->conditionalQuestions(),
+            ['question-20-radio' => ['202'], 'question-10-text' => $answer],
+            [],
+            $locale
+        );
+    }
+
+    public static function invalidConditionalText(): array
+    {
+        return [
+            'blank invitation text' => ['  ', null],
+            'localized map in an invitation' => [['en' => 'Amazonas'], null],
+            'profile text blank in its locale' => [['en' => '  ', 'pt_BR' => 'Amazonas'], 'en'],
+        ];
+    }
+
+    public function testAcceptsConditionalTextInTheProfileLocale(): void
+    {
+        $normalized = (new QuestionnaireResponseValidator())->normalize(
+            $this->conditionalQuestions(),
+            ['question-20-radio' => ['202'], 'question-10-text' => ['en' => 'Amazonas']],
+            [],
+            'en'
+        );
+
+        self::assertSame(['en' => 'Amazonas'], $normalized['responses']['question-10-text']);
+    }
+
+    public function testAcceptsConditionalResponseWhenDropdownMatches(): void
+    {
+        $questions = $this->conditionalQuestions();
+        $questions[0]['type'] = 6;
+        $questions[0]['inputType'] = 'select';
+        $questions[0]['responseOptions'] = [201 => 'No', 202 => 'Yes'];
+
+        $normalized = (new QuestionnaireResponseValidator())->normalize(
+            $questions,
+            ['question-10-text' => 'Amazonas', 'question-20-select' => '202'],
+            []
+        );
+
+        self::assertSame(['question-20-select' => 202, 'question-10-text' => 'Amazonas'], $normalized['responses']);
+        self::assertSame([], $normalized['hiddenQuestions']);
+    }
+
+    /** @dataProvider checkboxSelections */
+    public function testShowsConditionalQuestionWhenItsCheckboxIsSelected(array $options, bool $visible): void
+    {
+        $questions = array_reverse($this->questions());
+        $questions[1]['showWhen'] = [20, 202];
+        $normalized = (new QuestionnaireResponseValidator())->normalize(
+            $questions,
+            ['question-20-checkbox' => $options, 'question-10-text' => 'Amazonas'],
+            []
+        );
+
+        $expected = ['question-20-checkbox' => array_map('intval', $options)];
+        if ($visible) {
+            $expected['question-10-text'] = 'Amazonas';
+        }
+        self::assertSame($expected, $normalized['responses']);
+        self::assertSame($visible ? [] : [10], $normalized['hiddenQuestions']);
+    }
+
+    public static function checkboxSelections(): array
+    {
+        return [
+            'trigger selected alone' => [['202'], true],
+            'trigger selected alongside another option' => [['201', '202'], true],
+            'other option selected without the trigger' => [['201'], false],
+        ];
+    }
+
+    public function testHiddenCheckboxCannotActivateAnotherCondition(): void
+    {
+        $questions = array_reverse($this->questions());
+        $questions[0]['showWhen'] = [30, 301];
+        $questions[1]['showWhen'] = [20, 202];
+        array_unshift($questions, [
+            'questionId' => 30,
+            'type' => 6,
+            'inputType' => 'select',
+            'responseOptions' => [301 => 'Yes', 302 => 'No'],
+        ]);
+
+        $normalized = (new QuestionnaireResponseValidator())->normalize(
+            $questions,
+            ['question-30-select' => '302', 'question-20-checkbox' => ['202'], 'question-10-text' => 'Old answer'],
+            ['responseOptionInput-202' => 'Old detail']
+        );
+
+        self::assertSame(['question-30-select' => 302], $normalized['responses']);
+        self::assertSame([], $normalized['responseOptionsInputs']);
+        self::assertSame([20, 10], $normalized['hiddenQuestions']);
+    }
+
+    private function conditionalQuestions(): array
+    {
+        $questions = array_reverse($this->questions());
+        $questions[0]['type'] = 5;
+        $questions[0]['inputType'] = 'radio';
+        $questions[1]['showWhen'] = [20, 202];
+        return $questions;
     }
 
     private function questions(): array

@@ -13,10 +13,12 @@
 
     <fieldset class="fields">
         {foreach $questions as $question}
-            <div class="authorResponse">
-                <span class="questionTitle">{$question['title']|escape}</span>
-                <span class="responseValue">{$responses[$question['questionId']]|escape}</span>
-            </div>
+            {if !$question['showWhen']|default:[] || isset($responses[$question['questionId']])}
+                <div class="authorResponse">
+                    <span class="questionTitle">{$question['title']|escape}</span>
+                    <span class="responseValue">{$responses[$question['questionId']]|default:""|escape}</span>
+                </div>
+            {/if}
         {/foreach}
     </fieldset>
 

@@ -7,25 +7,18 @@ use DomainException;
 
 class QuestionnaireResponseValidator
 {
-    public function normalize(array $questions, array $responses, array $responseOptionsInputs): array
-    {
+    public function normalize(
+        array $questions,
+        array $responses,
+        array $responseOptionsInputs,
+        ?string $textLocale = null
+    ): array {
         $allowedQuestions = [];
         foreach ($questions as $question) {
             $allowedQuestions[(int) $question['questionId']] = $question;
         }
 
-        $definedOptionInputs = [];
-        foreach ($allowedQuestions as $question) {
-            foreach ($this->getAllowedOptions($question['responseOptions']) as $optionId => $option) {
-                if ($option['hasInput']) {
-                    $definedOptionInputs[$optionId] = true;
-                }
-            }
-        }
-
-        $normalizedResponses = [];
-        $selectedOptions = [];
-        foreach ($responses as $fieldName => $value) {
+        foreach (array_keys($responses) as $fieldName) {
             if (!is_string($fieldName)
                 || !preg_match('/^question-([1-9][0-9]*)-([a-z]+)$/D', $fieldName, $matches)
             ) {
@@ -38,18 +31,51 @@ class QuestionnaireResponseValidator
             }
 
             $question = $allowedQuestions[$questionId];
-            $canonicalFieldName = "question-{$questionId}-{$question['inputType']}";
-            if ($fieldName !== $canonicalFieldName || array_key_exists($canonicalFieldName, $normalizedResponses)) {
+            if ($fieldName !== "question-{$questionId}-{$question['inputType']}") {
                 throw new DomainException('Question type or identifier is invalid.');
             }
-
-            [$normalizedValue, $selected] = $this->normalizeValue($question, $value);
-            $normalizedResponses[$canonicalFieldName] = $normalizedValue;
-            $selectedOptions += $selected;
         }
 
-        if (count($normalizedResponses) !== count($allowedQuestions)) {
-            throw new DomainException('Responses must match all active questions.');
+        $normalizedResponses = [];
+        $selectedOptions = [];
+        $definedOptionInputs = [];
+        $hiddenOptionInputs = [];
+        $hiddenQuestions = [];
+        $selectionsByQuestion = [];
+
+        foreach ($allowedQuestions as $questionId => $question) {
+            $optionInputs = [];
+            foreach ($this->getAllowedOptions($question['responseOptions']) as $optionId => $option) {
+                if ($option['hasInput']) {
+                    $optionInputs[$optionId] = true;
+                }
+            }
+
+            $condition = $question['showWhen'] ?? [];
+            if ($condition && !in_array($condition[1], $selectionsByQuestion[$condition[0]] ?? [], true)) {
+                $hiddenQuestions[] = $questionId;
+                $hiddenOptionInputs += $optionInputs;
+                continue;
+            }
+
+            $fieldName = "question-{$questionId}-{$question['inputType']}";
+            if (!array_key_exists($fieldName, $responses)) {
+                throw new DomainException('Responses must match all applicable questions.');
+            }
+
+            [$normalizedValue, $selected] = $this->normalizeValue($question, $responses[$fieldName]);
+            if ($condition && !$selected) {
+                $text = $textLocale === null ? $normalizedValue : ($normalizedValue[$textLocale] ?? null);
+                if (!is_string($text) || trim($text) === '') {
+                    throw new DomainException('Missing required conditional response.');
+                }
+            }
+
+            $normalizedResponses[$fieldName] = $normalizedValue;
+            $selectedOptions += $selected;
+            $definedOptionInputs += $optionInputs;
+
+            $selectionsByQuestion[$questionId] = array_keys($selected);
         }
 
         $normalizedInputs = [];
@@ -63,6 +89,9 @@ class QuestionnaireResponseValidator
             }
 
             $optionId = (int) $matches[1];
+            if (isset($hiddenOptionInputs[$optionId])) {
+                continue;
+            }
             if (!isset($definedOptionInputs[$optionId])) {
                 throw new DomainException('Response option input is not defined.');
             }
@@ -78,6 +107,7 @@ class QuestionnaireResponseValidator
         return [
             'responses' => $normalizedResponses,
             'responseOptionsInputs' => $normalizedInputs,
+            'hiddenQuestions' => $hiddenQuestions,
         ];
     }
 

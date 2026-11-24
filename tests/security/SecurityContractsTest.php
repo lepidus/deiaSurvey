@@ -45,6 +45,6 @@ class SecurityContractsTest extends TestCase
         self::assertStringContainsString('{$question[\'title\']|escape}', $question);
         self::assertStringContainsString('{$question[\'description\']|escape}', $question);
         self::assertStringContainsString('getLocalizedOptionText()|escape', $question);
-        self::assertStringContainsString('{$responses[$question[\'questionId\']]|escape}', $responses);
+        self::assertStringContainsString('{$responses[$question[\'questionId\']]|default:""|escape}', $responses);
     }
 }
