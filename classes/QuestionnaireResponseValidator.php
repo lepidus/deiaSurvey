@@ -41,7 +41,7 @@ class QuestionnaireResponseValidator
         $definedOptionInputs = [];
         $hiddenOptionInputs = [];
         $hiddenQuestions = [];
-        $singleSelections = [];
+        $selectionsByQuestion = [];
 
         foreach ($allowedQuestions as $questionId => $question) {
             $optionInputs = [];
@@ -52,7 +52,7 @@ class QuestionnaireResponseValidator
             }
 
             $condition = $question['showWhen'] ?? [];
-            if ($condition && ($singleSelections[$condition[0]] ?? null) !== $condition[1]) {
+            if ($condition && !in_array($condition[1], $selectionsByQuestion[$condition[0]] ?? [], true)) {
                 $hiddenQuestions[] = $questionId;
                 $hiddenOptionInputs += $optionInputs;
                 continue;
@@ -75,9 +75,7 @@ class QuestionnaireResponseValidator
             $selectedOptions += $selected;
             $definedOptionInputs += $optionInputs;
 
-            if ($selected && (int) $question['type'] !== DeiaQuestion::TYPE_CHECKBOXES) {
-                $singleSelections[$questionId] = array_key_first($selected);
-            }
+            $selectionsByQuestion[$questionId] = array_keys($selected);
         }
 
         $normalizedInputs = [];

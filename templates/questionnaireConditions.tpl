@@ -18,23 +18,25 @@
 
 		function updateQuestions() {
 			const responsesEnabled = !form.hasAttribute('data-deia-locked') && !consentNo?.checked;
-			const selectedOptions = new Map();
+			const selectionsByQuestion = new Map();
 			for (const {section, controls, checkboxes} of questions) {
 				const {deiaQuestion, showWhenQuestion, showWhenOption} = section.dataset;
-				const visible = !showWhenQuestion || selectedOptions.get(showWhenQuestion) === showWhenOption;
+				const visible = !showWhenQuestion || selectionsByQuestion.get(showWhenQuestion)?.includes(showWhenOption);
 				section.hidden = !visible;
 
 				const enabled = responsesEnabled && visible;
+				const selectedOptions = [];
 				for (const {control, required} of controls) {
 					control.disabled = !enabled;
 					control.required = enabled && required;
 					if (required) {
 						control.setAttribute('aria-required', String(enabled));
 					}
-					if (enabled && (control.tagName === 'SELECT' || (control.type === 'radio' && control.checked))) {
-						selectedOptions.set(deiaQuestion, control.value);
+					if (enabled && control.matches('select, input:checked')) {
+						selectedOptions.push(control.value);
 					}
 				}
+				selectionsByQuestion.set(deiaQuestion, selectedOptions);
 				if (checkboxes.length) {
 					const missing = enabled && !checkboxes.some((control) => control.checked);
 					checkboxes[0].setCustomValidity(missing ? checkboxRequired : '');
