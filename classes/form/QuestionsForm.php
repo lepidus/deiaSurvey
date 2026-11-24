@@ -125,7 +125,7 @@ class QuestionsForm extends Form
             $locale = $this->defaultLocale;
 
             try {
-                [$responses, $responseOptionsInputs] = (new DeiaDataService())->validateResponsesForContext(
+                [$responses, $responseOptionsInputs, $hiddenQuestions] = (new DeiaDataService())->validateResponsesForContext(
                     $context->getId(),
                     $this->getData('responses'),
                     $this->getData('responseOptionsInputs'),
@@ -133,6 +133,7 @@ class QuestionsForm extends Form
                 );
                 $this->setData('responses', $responses);
                 $this->setData('responseOptionsInputs', $responseOptionsInputs);
+                $this->setData('hiddenQuestions', $hiddenQuestions);
             } catch (\InvalidArgumentException $exception) {
                 return false;
             }
@@ -170,6 +171,11 @@ class QuestionsForm extends Form
             $deiaDataDao->updateDeiaConsent($context->getId(), $user->getId(), $newConsent);
 
             if ($newConsent == '1') {
+                $deiaDataService->deleteUserResponses(
+                    $user->getId(),
+                    $context->getId(),
+                    $this->getData('hiddenQuestions') ?? []
+                );
                 $deiaDataService->registerUserResponses(
                     $user->getId(),
                     $this->getData('responses'),

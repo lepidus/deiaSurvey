@@ -14,6 +14,7 @@ class DeiaQuestionResponseOptionListbuilderHandlerTest extends DatabaseTestCase
     use TestHelperTrait;
 
     private $deiaQuestionId;
+    private int $responseOptionId;
 
     protected function setUp(): void
     {
@@ -23,7 +24,7 @@ class DeiaQuestionResponseOptionListbuilderHandlerTest extends DatabaseTestCase
         $this->deiaQuestionId = $this->createDeiaQuestion();
 
         $repository = app(DeiaResponseOptionRepository::class);
-        $repository->add($repository->newDataObject([
+        $this->responseOptionId = $repository->add($repository->newDataObject([
             'deiaQuestionId' => $this->deiaQuestionId,
             'optionText' => self::TEST_OPTION_TEXT,
             'isTranslated' => false,
@@ -37,7 +38,8 @@ class DeiaQuestionResponseOptionListbuilderHandlerTest extends DatabaseTestCase
         $rows = $this->loadOptionsAs($this->createTestContext());
 
         self::assertCount(1, $rows);
-        self::assertTrue($rows[1][1]['hasInputField']);
+        self::assertSame([$this->responseOptionId], array_keys($rows));
+        self::assertTrue($rows[$this->responseOptionId][1]['hasInputField']);
     }
 
     public function testDoesNotListOptionsOfQuestionFromAnotherContext(): void

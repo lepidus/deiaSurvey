@@ -1,4 +1,4 @@
-<div class="question">
+<div class="question" data-deia-question="{$question['questionId']|escape}"{if $question['showWhen']|default:[]} data-show-when-question="{$question['showWhen'][0]|escape}" data-show-when-option="{$question['showWhen'][1]|escape}" hidden{/if}>
     {assign var="questionId" value="question-{$question['questionId']}-{$question['inputType']}"}
     <span class="questionTitle">{$question['title']|escape}</span>
     <span class="questionDescription">{$question['description']|escape}</span>
@@ -27,7 +27,7 @@
         {foreach from=$question['responseOptions'] item="responseOption"}
             <div id="responseOption-{$responseOption->getId()|escape}">
                 <label class="questionRadio">
-                    <input type="radio" id="deiaResponses" name="{$questionId|escape}[]" value="{$responseOption->getId()|escape}">
+                    <input type="radio" required id="deiaResponses" name="{$questionId|escape}[]" value="{$responseOption->getId()|escape}">
                     {$responseOption->getLocalizedOptionText()|escape}
                 </label>
                 {if $responseOption->hasInputField()}
@@ -38,7 +38,10 @@
             </div>
         {/foreach}
     {elseif $question['type'] == $questionTypeConsts['TYPE_DROP_DOWN_BOX']}
-        <select id="deiaResponses" class="questionSelect" name="{$questionId|escape}">
+        <select id="deiaResponses" class="questionSelect" name="{$questionId|escape}" required>
+            {if $question['isConditionSource']|default:false}
+                <option value="">{translate key="plugins.generic.deiaSurvey.questionBlocks.questions.chooseOption"}</option>
+            {/if}
             {foreach from=$question['responseOptions'] key="responseOptionValue" item="responseOptionLabel"}
                 <option value="{$responseOptionValue|escape}">{$responseOptionLabel|escape}</option>
             {/foreach}

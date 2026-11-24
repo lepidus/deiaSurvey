@@ -49,6 +49,15 @@ class Repository
         return $this->dao->exists($id, $contextId);
     }
 
+    public function getBlockQuestions(int $contextId, int $blockId): array
+    {
+        return $this->getCollector()
+            ->filterByContextIds([$contextId])
+            ->filterByQuestionBlockIds([$blockId])
+            ->getMany()
+            ->toArray();
+    }
+
     public function getCollector(): Collector
     {
         return app(Collector::class);

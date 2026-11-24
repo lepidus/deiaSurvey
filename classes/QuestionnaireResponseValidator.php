@@ -17,15 +17,7 @@ class QuestionnaireResponseValidator
             $allowedQuestions[(int) $question['questionId']] = $question;
         }
 
-        if (count($responses) !== count($allowedQuestions)) {
-            throw new \InvalidArgumentException('Responses must match the active questionnaire');
-        }
-
-        $normalizedResponses = [];
-        $selectedOptions = [];
-        $allowedOptionInputs = [];
-        $definedOptionInputs = [];
-        $seenQuestionIds = [];
+        $submittedFields = [];
 
         foreach ($responses as $fieldName => $value) {
             if (!is_string($fieldName)
@@ -35,16 +27,40 @@ class QuestionnaireResponseValidator
             }
 
             $questionId = (int) $matches[1];
-            if (isset($seenQuestionIds[$questionId]) || !isset($allowedQuestions[$questionId])) {
+            if (isset($submittedFields[$questionId]) || !isset($allowedQuestions[$questionId])) {
                 throw new \InvalidArgumentException('Question is duplicated or outside the active context');
             }
-            $seenQuestionIds[$questionId] = true;
 
             $question = $allowedQuestions[$questionId];
             if ($matches[2] !== $question['inputType']) {
                 throw new \InvalidArgumentException('Question type does not match the server definition');
             }
 
+            $submittedFields[$questionId] = $fieldName;
+        }
+
+        $normalizedResponses = [];
+        $selectedOptions = [];
+        $allowedOptionInputs = [];
+        $definedOptionInputs = [];
+        $hiddenQuestions = [];
+        $hiddenOptionInputs = [];
+        $selectionsByQuestion = [];
+
+        foreach ($allowedQuestions as $questionId => $question) {
+            $options = $this->getOptions($question['responseOptions']);
+            $condition = $question['showWhen'] ?? [];
+            if ($condition && !in_array($condition[1], $selectionsByQuestion[$condition[0]] ?? [], true)) {
+                $hiddenQuestions[] = $questionId;
+                $hiddenOptionInputs += array_filter($options);
+                continue;
+            }
+
+            $fieldName = $submittedFields[$questionId] ?? null;
+            if ($fieldName === null) {
+                throw new \InvalidArgumentException('Responses must match the active questionnaire');
+            }
+            $value = $responses[$fieldName];
             $questionType = (int) $question['type'];
             if (in_array($questionType, [
                 DeiaQuestion::TYPE_SMALL_TEXT_FIELD,
@@ -52,10 +68,12 @@ class QuestionnaireResponseValidator
                 DeiaQuestion::TYPE_TEXTAREA,
             ], true)) {
                 $normalizedResponses[$fieldName] = $this->validateText($value, $multilingualText);
+                if ($condition && !$multilingualText && trim($normalizedResponses[$fieldName]) === '') {
+                    throw new \InvalidArgumentException('Missing required conditional response');
+                }
                 continue;
             }
 
-            $options = $this->getOptions($question['responseOptions']);
             foreach ($options as $optionId => $hasInputField) {
                 if ($hasInputField) {
                     $definedOptionInputs[$optionId] = true;
@@ -88,6 +106,8 @@ class QuestionnaireResponseValidator
             $normalizedResponses[$fieldName] = $questionType === DeiaQuestion::TYPE_DROP_DOWN_BOX
                 ? $normalizedValues[0]
                 : $normalizedValues;
+
+            $selectionsByQuestion[$questionId] = $normalizedValues;
         }
 
         $normalizedInputs = [];
@@ -99,6 +119,9 @@ class QuestionnaireResponseValidator
                 throw new \InvalidArgumentException('Malformed response option input');
             }
             $optionId = (int) $matches[1];
+            if (isset($hiddenOptionInputs[$optionId])) {
+                continue;
+            }
             if (!isset($definedOptionInputs[$optionId])) {
                 throw new \InvalidArgumentException('Response option input is not defined');
             }
@@ -111,7 +134,7 @@ class QuestionnaireResponseValidator
             $normalizedInputs[$fieldName] = $value;
         }
 
-        return [$normalizedResponses, $normalizedInputs];
+        return [$normalizedResponses, $normalizedInputs, $hiddenQuestions];
     }
 
     private function validateText($value, bool $multilingualText)
